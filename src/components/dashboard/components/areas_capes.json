@@ -1,0 +1,113 @@
+[
+    {
+        "name": "Ciências Exatas e da Terra",
+        "value": "ciencias_exatas_e_da_terra",
+        "subareas": [
+            {"name": "Matemática/Probabilidade e Estatística", "value": "matematica_probabilidade_estatistica"},
+            {"name": "Astronomia", "value": "astronomia"},
+            {"name": "Física", "value": "fisica"},
+            {"name": "Química", "value": "quimica"},
+            {"name": "Geociências", "value": "geociencias"},
+            {"name": "Ciência da Computação", "value": "ciencia_da_computacao"}
+        ]
+    },
+    {
+        "name": "Ciências Biológicas",
+        "value": "ciencias_biologicas",
+        "subareas": [
+            {"name": "Biologia Geral", "value": "biologia_geral"},
+            {"name": "Genética", "value": "genetica"},
+            {"name": "Botânica", "value": "botanica"},
+            {"name": "Zoologia", "value": "zoologia"},
+            {"name": "Ecologia", "value": "ecologia"},
+            {"name": "Morfologia", "value": "morfologia"},
+            {"name": "Fisiologia", "value": "fisiologia"},
+            {"name": "Bioquímica", "value": "bioquimica"},
+            {"name": "Farmacologia", "value": "farmacologia"},
+            {"name": "Imunologia", "value": "imunologia"},
+            {"name": "Microbiologia", "value": "microbiologia"},
+            {"name": "Parasitologia", "value": "parasitologia"}
+        ]
+    },
+    {
+        "name": "Engenharias",
+        "value": "engenharias",
+        "subareas": [
+            {"name": "Engenharias I", "value": "engenharias_i"},
+            {"name": "Engenharias II", "value": "engenharias_ii"},
+            {"name": "Engenharias III", "value": "engenharias_iii"},
+            {"name": "Engenharias IV", "value": "engenharias_iv"},
+            {"name": "Engenharias V", "value": "engenharias_v"}
+        ]
+    },
+    {
+        "name": "Ciências da Saúde",
+        "value": "ciencias_da_saude",
+        "subareas": [
+            {"name": "Medicina I", "value": "medicina_i"},
+            {"name": "Medicina II", "value": "medicina_ii"},
+            {"name": "Medicina III", "value": "medicina_iii"},
+            {"name": "Odontologia", "value": "odontologia"},
+            {"name": "Enfermagem", "value": "enfermagem"},
+            {"name": "Farmácia", "value": "farmacia"},
+            {"name": "Saúde Coletiva", "value": "saude_coletiva"}
+        ]
+    },
+    {
+        "name": "Ciências Agrárias",
+        "value": "ciencias_agrarias",
+        "subareas": [
+            {"name": "Agronomia", "value": "agronomia"},
+            {"name": "Recursos Florestais e Engenharia Florestal", "value": "recursos_florestais_engenharia_florestal"},
+            {"name": "Engenharia Agrícola", "value": "engenharia_agricola"},
+            {"name": "Zootecnia/Recursos Pesqueiros", "value": "zootecnia_recursos_pesqueiros"},
+            {"name": "Medicina Veterinária", "value": "medicina_veterinaria"},
+            {"name": "Ciência e Tecnologia de Alimentos", "value": "ciencia_tecnologia_alimentos"}
+        ]
+    },
+    {
+        "name": "Ciências Sociais Aplicadas",
+        "value": "ciencias_sociais_aplicadas",
+        "subareas": [
+            {"name": "Direito", "value": "direito"},
+            {"name": "Administração", "value": "administracao"},
+            {"name": "Ciências Contábeis e Turismo", "value": "ciencias_contabeis_turismo"},
+            {"name": "Comunicação", "value": "comunicacao"},
+            {"name": "Ciência da Informação", "value": "ciencia_da_informacao"},
+            {"name": "Economia", "value": "economia"},
+            {"name": "Planejamento Urbano e Regional/Demografia", "value": "planejamento_urbano_regional_demografia"},
+            {"name": "Serviço Social", "value": "servico_social"}
+        ]
+    },
+    {
+        "name": "Ciências Humanas",
+        "value": "ciencias_humanas",
+        "subareas": [
+            {"name": "Filosofia", "value": "filosofia"},
+            {"name": "Teologia", "value": "teologia"},
+            {"name": "Sociologia", "value": "sociologia"},
+            {"name": "Antropologia/Arqueologia", "value": "antropologia_arqueologia"},
+            {"name": "Ciência Política e Relações Internacionais", "value": "ciencia_politica_relacoes_internacionais"},
+            {"name": "História", "value": "historia"},
+            {"name": "Educação", "value": "educacao"},
+            {"name": "Psicologia", "value": "psicologia"},
+            {"name": "Geografia", "value": "geografia"}
+        ]
+    },
+    {
+        "name": "Linguística, Letras e Artes",
+        "value": "linguistica_letras_artes",
+        "subareas": [
+            {"name": "Linguística e Literatura", "value": "linguistica_literatura"},
+            {"name": "Letras", "value": "letras"},
+            {"name": "Artes", "value": "artes"}
+        ]
+    },
+    {
+        "name": "Interdisciplinar",
+        "value": "interdisciplinar",
+        "subareas": [
+            {"name": "Programas Interdisciplinares", "value": "programas_interdisciplinares"}
+        ]
+    }
+]

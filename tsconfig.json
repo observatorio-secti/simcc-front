@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "types": [
+      "node",
+      "vite/client"
+    ],
+    "useDefineForClassFields": true,
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable",
+      "esnext"
+    ],
+    "module": "ESNext",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "noImplicitAny": false,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": false, // Desativa o aviso para variáveis locais não usadas
+    "noUnusedParameters": false, // Desativa o aviso para parâmetros não usados
+    "noFallthroughCasesInSwitch": false,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "target": "esnext",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "src",
+    "@/lib"
+  ]
+}
