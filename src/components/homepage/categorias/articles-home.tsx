@@ -129,7 +129,7 @@ function ArticlesChartsAccordion({ loading, publicacoes }: { loading: boolean, p
                         </div>
                     ) : (
                         <div className="grid gap-8">
-                            <GraficoArticleHome articles={publicacoes} />
+                            <GraficoArticleHome />
                             <GraficoCitationsArticleHome articles={publicacoes} />
                         </div>
                     )}

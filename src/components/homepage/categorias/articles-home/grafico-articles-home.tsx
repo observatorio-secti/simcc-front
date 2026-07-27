@@ -87,7 +87,7 @@ export function GraficoArticleHome() {
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
             {Object.keys(chartConfig).map((key, index) => {
               if (key !== "views") {
-                const configKey = key as keyof typeof chartConfig;
+                const configKey = key as Exclude<keyof typeof chartConfig, "views">;
                 return (
                   <Bar
                     key={configKey}

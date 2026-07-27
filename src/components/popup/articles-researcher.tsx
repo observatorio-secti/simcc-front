@@ -170,15 +170,15 @@ export function ArticlesResearcherPopUp(props: Props) {
     const total = publicacoes.length;
     const validDoiCount = publicacoes.filter(pub => pub.doi && pub.doi.trim() !== "").length;
     const percentage = total > 0 ? (validDoiCount / total) * 100 : 0;
-    
+
 
     return (
         <>
             <div className="">
-              <div className="mb-6">
-              <FilterArticlePopUp
-                    onFilterUpdate={handleResearcherUpdate} />
-              </div>
+                <div className="mb-6">
+                    <FilterArticlePopUp
+                        onFilterUpdate={handleResearcherUpdate} />
+                </div>
 
                 <Accordion type="single" collapsible defaultValue="item-1">
                     <AccordionItem value="item-1" >
@@ -195,7 +195,6 @@ export function ArticlesResearcherPopUp(props: Props) {
                             ) : (
 
                                 <GraficoArticleHome
-                                    articles={publicacoes}
                                 />
                             )}
                         </AccordionContent>

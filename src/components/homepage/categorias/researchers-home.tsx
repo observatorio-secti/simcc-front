@@ -1176,8 +1176,8 @@ export function ResearchersHome() {
                                     ) : (
                                         <div>
                                             <div className="grid gap-8 xl:grid-cols-2">
-                                                <GraficoTitulacao researchers={researcher} />
-                                                <GraficoAreaPesquisares researchers={researcher} />
+                                                <GraficoTitulacao />
+                                                <GraficoAreaPesquisares />
                                             </div>
                                         </div>
                                     )}
