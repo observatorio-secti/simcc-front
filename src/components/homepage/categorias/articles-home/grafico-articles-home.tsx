@@ -1,11 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { UserContext } from "../../../../context/context";
 import { Alert } from "../../../ui/alert";
-import { BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, LabelList, CartesianGrid, ResponsiveContainer } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../../components/ui/chart";
-
-type Articles = {
-  articles: any[];
-};
 
 const chartConfig = {
   views: {
@@ -53,72 +50,49 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function GraficoArticleHome(props: Articles) {
-  type Qualis = "A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "SQ" | "NP";
-
+export function GraficoArticleHome() {
+  const { urlGeral } = useContext(UserContext);
   const [chartData, setChartData] = useState<{ year: number;[qualis: string]: number }[]>([]);
 
   useEffect(() => {
-    if (props.articles) {
-      const counts: { [year: number]: { [qualis: string]: number } } = {};
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${urlGeral}metrics/article/chart`);
+        const data = await response.json();
 
-      props.articles.forEach((publicacao) => {
-        const year = Number(publicacao.year);
-        const qualis = publicacao.qualis;
+        const formattedData = data.map((item: any) => ({
+          year: item.year,
+          ...item.qualis,
+        }));
 
-        if (!counts[year]) {
-          counts[year] = {};
-        }
-
-        counts[year][qualis] = (counts[year][qualis] || 0) + 1;
-      });
-
-      const data = Object.entries(counts).map(([year, qualisCounts]) => ({
-        year: Number(year),
-        ...qualisCounts,
-      }));
-
-      setChartData(data);
-    }
-  }, [props.articles]);
-
-  function getColorForInstitution(qualis: Qualis) {
-    const colors = {
-      A1: '#006837',
-      A2: '#8FC53E',
-      A3: '#ACC483',
-      A4: '#BDC4B1',
-      B1: '#F15A24',
-      B2: '#F5831F',
-      B3: '#F4AD78',
-      B4: '#F4A992',
-      B5: '#F2D3BB',
-      C: '#EC1C22',
-      SQ: '#560B11',
-      NP: '#560B11',
+        setChartData(formattedData);
+      } catch (error) {
+        console.error(error);
+      }
     };
-    return colors[qualis] || '#000000';
-  }
+
+    if (urlGeral) {
+      fetchData();
+    }
+  }, [urlGeral]);
 
   return (
     <Alert className="pt-12">
-
-
       <ChartContainer config={chartConfig} className="h-[250px] w-full">
         <ResponsiveContainer>
           <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
             <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
-
             <CartesianGrid vertical={false} horizontal={false} />
             <ChartLegend className="flex flex-wrap text-[0.6rem] md:text-[0.8rem]" content={<ChartLegendContent />} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
             {Object.keys(chartConfig).map((key, index) => {
               if (key !== "views") {
+                const configKey = key as keyof typeof chartConfig;
                 return (
                   <Bar
-                    key={key}
-                    dataKey={key}
-                    fill={chartConfig[key].color}
+                    key={configKey}
+                    dataKey={configKey}
+                    fill={chartConfig[configKey].color}
                     stackId="a"
                     radius={4}
                   >
@@ -130,12 +104,9 @@ export function GraficoArticleHome(props: Articles) {
               }
               return null;
             })}
-
           </BarChart>
         </ResponsiveContainer>
       </ChartContainer>
-
-
     </Alert>
   );
 }

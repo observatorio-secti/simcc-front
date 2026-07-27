@@ -1,17 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { UserContext } from "../../../context/context";
 import { Alert } from "../../ui/alert";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../components/ui/chart";
-import { Research } from "../researchers-home";
+import { BarChart, Bar, XAxis, ResponsiveContainer, LabelList, Cell } from "recharts";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../../../components/ui/chart";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "../../ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../ui/tooltip";
 import { Info } from "lucide-react";
 
-type ResearchData = {
-  researchers: Research[];
-};
-
-const areaColors = {
+const areaColors: Record<string, string> = {
   "CIENCIAS AGRARIAS": "#EF4444",
   "CIENCIAS EXATAS E DA TERRA": "#34D399",
   "CIENCIAS DA SAUDE": "#20BDBE",
@@ -30,52 +26,34 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function GraficoAreaPesquisares(props: ResearchData) {
+export function GraficoAreaPesquisares() {
+  const { urlGeral } = useContext(UserContext);
   const [chartData, setChartData] = useState<{ area: string; count: number }[]>([]);
 
   useEffect(() => {
-    if (props.researchers && Array.isArray(props.researchers)) {
-      const counts: { [area: string]: number } = {};
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${urlGeral}metrics/great-area/chart`);
+        const data = await response.json();
 
-      props.researchers.forEach((researcher) => {
-        if (!researcher || !researcher.area) return;
+        const formattedData = data.map((item: { great_area: string; count: number }) => ({
+          area: item.great_area,
+          count: item.count,
+        }));
 
-        const areas = researcher.area
-          .split(";")
-          .map((area) => area.trim().toUpperCase())
-          .filter((area) => area !== "");
+        setChartData(formattedData);
+      } catch (error) {
+        console.error("Erro na busca dos dados do gráfico:", error);
+      }
+    };
 
-        areas.forEach((area) => {
-          if (!counts[area]) {
-            counts[area] = 0;
-          }
-          counts[area] += 1;
-        });
-      });
-
-      const data = Object.entries(counts).map(([area, count]) => ({
-        area,
-        count,
-      }));
-
-      setChartData(data);
-    } else {
-      setChartData([]);
+    if (urlGeral) {
+      fetchData();
     }
-  }, [props.researchers]);
+  }, [urlGeral]);
 
   const getAreaColor = (area: string) => {
-    if (!area) return areaColors["DEFAULT"];
-    if (area.includes("CIENCIAS AGRARIAS")) return areaColors["CIENCIAS AGRARIAS"];
-    if (area.includes("CIENCIAS EXATAS E DA TERRA")) return areaColors["CIENCIAS EXATAS E DA TERRA"];
-    if (area.includes("CIENCIAS DA SAUDE")) return areaColors["CIENCIAS DA SAUDE"];
-    if (area.includes("CIENCIAS HUMANAS")) return areaColors["CIENCIAS HUMANAS"];
-    if (area.includes("CIENCIAS BIOLOGICAS")) return areaColors["CIENCIAS BIOLOGICAS"];
-    if (area.includes("ENGENHARIAS")) return areaColors["ENGENHARIAS"];
-    if (area.includes("CIENCIAS SOCIAIS APLICADAS")) return areaColors["CIENCIAS SOCIAIS APLICADAS"];
-    if (area.includes("LINGUISTICA LETRAS E ARTES")) return areaColors["LINGUISTICA LETRAS E ARTES"];
-    if (area.includes("OUTROS")) return areaColors["OUTROS"];
-    return areaColors["DEFAULT"];
+    return areaColors[area] || areaColors["DEFAULT"];
   };
 
   return (

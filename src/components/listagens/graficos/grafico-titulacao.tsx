@@ -1,17 +1,11 @@
-import { useEffect, useState } from "react";
-
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid,  ResponsiveContainer, LabelList, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../components/ui/chart";
+import { useEffect, useState, useContext } from "react";
+import { UserContext } from "../../../context/context";
+import { BarChart, Bar, XAxis, CartesianGrid, ResponsiveContainer, LabelList } from "recharts";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../../../components/ui/chart";
 import { Alert } from "../../ui/alert";
-import { Research } from "../researchers-home";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "../../ui/card";
-import { Tooltip ,TooltipContent, TooltipProvider, TooltipTrigger } from "../../ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../ui/tooltip";
 import { Info } from "lucide-react";
-
-
-type ResearchData = {
-  researchers: Research[];
-};
 
 const chartConfig = {
   graduation: {
@@ -20,78 +14,75 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function GraficoTitulacao(props: ResearchData) {
+export function GraficoTitulacao() {
+  const { urlGeral } = useContext(UserContext);
   const [chartData, setChartData] = useState<{ graduation: string; count: number }[]>([]);
 
   useEffect(() => {
-    if (props.researchers) {
-      const counts: { [graduation: string]: number } = {};
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${urlGeral}metrics/academic-degree/chart`);
+        const data = await response.json();
 
-      // Conta a quantidade de pesquisadores por nível de graduação
-      props.researchers.forEach((researcher) => {
-        const graduation = researcher.graduation;
+        const formattedData = data.map((item: { graduation: string; among: number }) => ({
+          graduation: item.graduation,
+          count: item.among,
+        }));
 
-        if (!counts[graduation]) {
-          counts[graduation] = 0;
-        }
+        setChartData(formattedData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-        counts[graduation] += 1;
-      });
-
-      // Transforma o objeto em um array para o gráfico
-      const data = Object.entries(counts).map(([graduation, count]) => ({
-        graduation,
-        count,
-      }));
-
-      setChartData(data);
+    if (urlGeral) {
+      fetchData();
     }
-  }, [props.researchers]);
+  }, [urlGeral]);
 
   return (
     <Alert className="pt-">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div>
+          <CardTitle className="text-sm font-medium">
+            Quantidade total por titulação
+          </CardTitle>
+          <CardDescription>Soma de titulação dos pesquisadores</CardDescription>
+        </div>
 
-<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                          <div>
-                                            <CardTitle className="text-sm font-medium">
-                                              Quantidade total por titulação
-                                            </CardTitle>
-                                            <CardDescription>Soma de titulação dos pesquisadores</CardDescription>
-                                          </div>
-                      
-                                          <TooltipProvider>
-                                            <Tooltip>
-                                              <TooltipTrigger> <Info className="h-4 w-4 text-muted-foreground" /></TooltipTrigger>
-                                              <TooltipContent>
-                                                <p>Fonte: Currículo Lattes</p>
-                                              </TooltipContent>
-                                            </Tooltip>
-                                          </TooltipProvider>
-                      
-                                        </CardHeader>
-    <CardContent>
-    <ChartContainer config={chartConfig} className="h-[300px] w-full">
-        <ResponsiveContainer>
-          <BarChart
-            data={chartData}
-            margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
-          >
-            <XAxis dataKey="graduation" tickLine={false} tickMargin={10} axisLine={false} />
-           
-            <CartesianGrid vertical={false} horizontal={false} />
-          
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-            <Bar
-              dataKey="count"
-              fill={chartConfig.graduation.color}
-              radius={4}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger> <Info className="h-4 w-4 text-muted-foreground" /></TooltipTrigger>
+            <TooltipContent>
+              <p>Fonte: Currículo Lattes</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <ResponsiveContainer>
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
             >
-              <LabelList dataKey="count" position="top" offset={12} className="fill-foreground" fontSize={12} />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartContainer>
-    </CardContent>
+              <XAxis dataKey="graduation" tickLine={false} tickMargin={10} axisLine={false} />
+
+              <CartesianGrid vertical={false} horizontal={false} />
+
+              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+              <Bar
+                dataKey="count"
+                fill={chartConfig.graduation.color}
+                radius={4}
+              >
+                <LabelList dataKey="count" position="top" offset={12} className="fill-foreground" fontSize={12} />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </CardContent>
     </Alert>
   );
 }
