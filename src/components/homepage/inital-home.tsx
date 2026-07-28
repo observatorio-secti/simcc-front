@@ -205,40 +205,11 @@ export function InitialHome() {
         years.push(i);
     }
 
-    const [grupos, setGrupos] = useState<GrupoPesquisa[]>([]);
-
-
-    const urlMetrics = urlGeral + `metrics/researcher/scholarship`;
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(urlMetrics, {
-                    mode: "cors",
-                    headers: {
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "GET",
-                        "Access-Control-Allow-Headers": "Content-Type",
-                        "Access-Control-Max-Age": "3600",
-                    },
-                });
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    setMetrics(data);
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        };
-        fetchData();
-    }, [urlMetrics]);
 
     const urlRt = `${urlGeral}departament/rt`
     const [rt, setRt] = useState<Rt | null>(null);
     useEffect(() => {
-
         const fetchData = async () => {
-
             try {
 
                 const response = await fetch(urlRt, {
@@ -279,15 +250,6 @@ export function InitialHome() {
     }, [rt]);
 
     const { theme } = useTheme()
-    const areaTotais = grupos.reduce((acc, grupo) => {
-        const area = grupo.area;
-        if (!acc[area]) {
-            acc[area] = 1;
-        } else {
-            acc[area]++;
-        }
-        return acc;
-    }, {});
 
     const urlVisaoPrograma = `${urlGeral}graduate_program_production?graduate_program_id=0&year=1900`;
 
@@ -315,45 +277,28 @@ export function InitialHome() {
         fetchData();
     }, [urlVisaoPrograma]);
 
-    const [loading, isLoading] = useState(false)
-
     const [dados, setDados] = useState<Count[]>([]);
 
     let urlDados = `${urlGeral}ResearcherData/DadosGerais?year=${year}`
 
     useEffect(() => {
+        const fetchMetrics = async () => {
+            const response = await fetch(`${urlGeral}metrics/researcher/scholarship`);
+            const data = await response.json();
+            setMetrics(data);
+        };
+        fetchMetrics();
+
         const fetchData = async () => {
-            try {
-                isLoading(true)
-                const response = await fetch(urlDados, {
-                    mode: "cors",
-                    headers: {
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "GET",
-                        "Access-Control-Allow-Headers": "Content-Type",
-                        "Access-Control-Max-Age": "3600",
-                        "Content-Type": "text/plain",
-                    },
-                });
-                const data = await response.json();
-                if (data) {
-                    setDados(data);
-                    isLoading(false)
-                }
-            } catch (err) {
-                console.log(err);
-            }
+            const response = await fetch(urlDados);
+            const data = await response.json();
+            setDados(data);
         };
         fetchData();
+
     }, [urlDados]);
 
     const { isOpen, type } = useModalHomepage();
-
-
-    const isModalOpen = isOpen && type === "initial-home";
-
-
-    console.log(urlDados)
 
     const [words, setWords] = useState<PalavrasChaves[]>([]);
     let urlPalavrasChaves = `${urlGeral}lists_word_researcher?graduate_program_id=&researcher_id=`
@@ -490,6 +435,8 @@ export function InitialHome() {
     }, [urlBolsistas]);
 
     const totalCountR = Number(VisaoPrograma[0]?.researcher || 0);
+
+
     const pqCount = metrics
         .filter(item => item.modality_code === 'PQ')
         .reduce((acc, curr) => acc + curr.count, 0);
@@ -497,6 +444,7 @@ export function InitialHome() {
     const dtCount = metrics
         .filter(item => item.modality_code === 'DT')
         .reduce((acc, curr) => acc + curr.count, 0);
+
     const totalBolsistas = metrics.reduce((acc, curr) => acc + curr.count, 0);
 
     const chartData = [

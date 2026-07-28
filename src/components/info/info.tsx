@@ -338,7 +338,6 @@ export function Info() {
                         <TableBody>
                             {log.map((log, index) => (
                                 <TableRow key={index}>
-
                                     <TableCell>{log.routine_type}</TableCell>
                                     <TableCell>{format(new Date(log.created_at), "dd/MM/yyyy HH:mm:ss")}</TableCell>
                                     <TableCell>{log.error ? "Sim" : "Não"}</TableCell>
