@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { useModal } from "./use-modal-store";
 import { Keepo } from "../dashboard/builder-page/builder-page";
 
-export type ModalType = 'articles-modal' | 'cookies' | 'edit-article' | 'image-article' | 'project-modal' | 'coautores' | 'editor-page'
+export type ModalType = 'articles-modal' | 'cookies' | 'edit-article' | 'image-article' | 'project-modal' | 'coautores' | 'editor-page' | 'share-article'
 
 interface ModalData {
     id?: string,
