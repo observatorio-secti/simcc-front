@@ -1139,33 +1139,6 @@ export function ResearchersHome() {
                         </Accordion>
                     )}
 
-                    {(searchType != 'name' && simcc) && (
-                        <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
-                            <AccordionItem value="item-1" className="w-full ">
-                                <div className="flex mb-2">
-                                    <HeaderResultTypeHome title="Pesquisadores no mapa" icon={<MapIcon size={24} className="text-gray-400" />}>
-                                    </HeaderResultTypeHome>
-
-                                    <AccordionTrigger>
-
-                                    </AccordionTrigger>
-                                </div>
-                                <AccordionContent className="p-0">
-                                    {loading ? (
-                                        <Skeleton className="rounded-md w-full h-[300px] " />
-                                    ) : (
-                                        <div>
-                                            <Alert className="p-0">
-                                                <MapaResearcher
-                                                    cityData={cityData}
-                                                />
-                                            </Alert>
-                                        </div>
-                                    )}
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    )}
                     {(!isOpenAlex && FinalOpenAlex != 'true') && (
                         <div>
                             <Accordion defaultValue="item-1" type="single" collapsible>
@@ -1224,6 +1197,34 @@ export function ResearchersHome() {
                         </div>
                     )}
 
+                                        {(searchType != 'name' && simcc) && (
+                        <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
+                            <AccordionItem value="item-1" className="w-full ">
+                                <div className="flex mb-2">
+                                    <HeaderResultTypeHome title="Pesquisadores no mapa" icon={<MapIcon size={24} className="text-gray-400" />}>
+                                    </HeaderResultTypeHome>
+
+                                    <AccordionTrigger>
+
+                                    </AccordionTrigger>
+                                </div>
+                                <AccordionContent className="p-0">
+                                    {loading ? (
+                                        <Skeleton className="rounded-md w-full h-[300px] " />
+                                    ) : (
+                                        <div>
+                                            <Alert className="p-0">
+                                                <MapaResearcher
+                                                    cityData={cityData}
+                                                />
+                                            </Alert>
+                                        </div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    )}
+                    
                     {searchType !== 'name' && searchType !== 'area' && (
                         <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
                             <AccordionItem value="item-1" className="w-full ">
