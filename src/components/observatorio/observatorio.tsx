@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Info, Building2, Network } from "lucide-react";
-import { CarrosselInstitution } from "../../components/homepage/components/carrossel-institution";
+import { CarrosselInstitution, TotalInstitutions } from "../../components/homepage/components/carrossel-institution";
 import { Helmet } from "react-helmet";
 import bg_popup from "../../assets/bg_graduate.png";
 import { Alert } from "../ui/alert";
@@ -204,7 +204,7 @@ export const Observatorio = () => {
                         </CardHeader>
                         <CardContent>
                             <span className="font-bold leading-none text-3xl">
-                                10
+                                {TotalInstitutions}
                             </span>
                         </CardContent>
                     </div>

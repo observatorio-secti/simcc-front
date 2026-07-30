@@ -47,7 +47,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, PieChart, Pie, LabelList, Cell, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
 import { Label as LabelChart } from 'recharts';
 
-import { CarrosselInstitution } from "./components/carrossel-institution";
+import { CarrosselInstitution, TotalInstitutions } from "./components/carrossel-institution";
 
 type Count = {
     count_article: number
@@ -662,7 +662,7 @@ export function InitialHome() {
                                 </CardHeader>
                                 <CardContent>
                                     <span className="font-bold leading-none text-3xl">
-                                        10
+                                        {TotalInstitutions}
                                     </span>
                                 </CardContent>
                             </div>

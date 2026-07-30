@@ -66,7 +66,7 @@ export function Institution() {
     let programSelecionado = type_search || ''
 
     const [search, setSearch] = useState('')
-    const urlGraduateProgram = `${urlGeral}institution/`;
+    const urlGraduateProgram = `${urlGeral}institution`;
 
     console.log(urlGraduateProgram)
     const [loading, setLoading] = useState(true);

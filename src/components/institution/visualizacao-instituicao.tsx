@@ -110,7 +110,7 @@ export function VisualizacaoInstituicao() {
         }
     };
     const [graduatePrograms, setGraduatePrograms] = useState<GraduateProgram>();
-    const urlGraduateProgram = `https://simcc.uesc.br/v3/api/institution/${type_search}/`;
+    const urlGraduateProgram = `${urlGeral}institution/${type_search}`;
     const [loading, setLoading] = useState(true);
     console.log(urlGraduateProgram);
     useEffect(() => {

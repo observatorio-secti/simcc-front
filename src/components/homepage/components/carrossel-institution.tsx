@@ -1,4 +1,5 @@
 import logo_ufba from '../../../assets/logo_ufba.png';
+import logo_ufba_dark from '../../../assets/logo_ufba_dark.png';
 import logo_ebmsp from '../../../assets/logo_ebmsp.png';
 import logo_ebmsp_dark from '../../../assets/logo_ebmsp_dark.png';
 import logo_uesb from '../../../assets/logo_uesb.png';
@@ -13,8 +14,10 @@ import logo_uesc from '../../../assets/logo_uesc.png';
 import logo_ufrb20 from '../../../assets/logo_ufrb-20.png';
 import logo_ufrb20_dark from '../../../assets/logo_ufrb-20_dark.png';
 import logo_uneb from '../../../assets/logo_uneb.png';
-import logo_ifba from '../../../assets/logo_ifba.png';
 import logo_uneb_dark from '../../../assets/logo_uneb_dark.png';
+import logo_ifba from '../../../assets/logo_ifba.png';
+import logo_fiocruz from '../../../assets/logo_fiocruz.png';
+import logo_fiocruz_dark from '../../../assets/logo_fiocruz_dark.png';
 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../../ui/carousel';
 import { useRef, useState, useEffect, useContext } from 'react';
@@ -23,16 +26,6 @@ import { useTheme } from 'next-themes';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../../../context/context';
 
-const logoMap = {
-    "EBMSP": { light: logo_ebmsp, dark: logo_ebmsp_dark },
-    "UESB": { light: logo_uesb, dark: logo_uesb_dark },
-    "UFOB": { light: logo_ufob, dark: logo_ufob_dark },
-    "UFSB": { light: logo_ufsb, dark: logo_ufsb_dark },
-    "UEFS": { light: logo_uefs, dark: logo_uefs_dark },
-    "UESC": { light: logo_uesc, dark: logo_uesc },
-    "UFRB": { light: logo_ufrb20, dark: logo_ufrb20_dark },
-    "UNEB": { light: logo_uneb, dark: logo_uneb_dark },
-};
 
 const extractInstitutionAcronym = (institutionName: string): string => {
     const match = institutionName.match(/^([A-Z]{2,6})\s*[-–]\s*/);
@@ -49,74 +42,83 @@ const instituicoesFallback = [
     {
         name: "UFBA",
         institution: "UFBA - Universidade Federal da Bahia",
-        id: "153f05ef-01a1-4198-9f1b-88d3e9442386",
+        id: "f1ac00a8-15d9-4306-a893-c611636601d6",
         img: logo_ufba,
-        imgDark: logo_ufba,
+        imgDark: logo_ufba_dark,
     },
     {
         name: "EBMSP",
         institution: "EBMSP - Escola Bahiana de Medicina e Saúde Pública",
-        id: "4163cc61-19ca-40fa-9378-4c09571a7d97",
+        id: "dc6b3b63-2ada-49cb-bbca-f888ff31d56b",
         img: logo_ebmsp,
         imgDark: logo_ebmsp_dark,
     },
     {
         name: "UESB",
         institution: "UESB - Universidade Estadual do Sudoeste da Bahia",
-        id: "78faa085-6c1a-41ec-9bc1-403604db9378",
+        id: "36422e54-342b-4a4d-9879-edac6235343d",
         img: logo_uesb,
         imgDark: logo_uesb_dark,
     },
     {
         name: "UFOB",
         institution: "UFOB - Universidade Federal do Oeste da Bahia",
-        id: "4f124839-5c11-4dcc-95db-65763202da82",
+        id: "ecafd569-d31f-429b-ba33-26780f46b990",
         img: logo_ufob,
         imgDark: logo_ufob_dark,
     },
     {
         name: "UFSB",
         institution: "UFSB - Universidade Federal do Sul da Bahia",
-        id: "962f06a8-8fe9-4d10-a83a-a0368edd49fa",
+        id: "3c0594c8-ffbe-43e2-901a-b109e2e99985",
         img: logo_ufsb,
         imgDark: logo_ufsb_dark,
     },
     {
         name: "UEFS",
         institution: "UEFS - Universidade Estadual de Feira de Santana",
-        id: "b38787cc-01de-4b18-986a-f6973d4780e3",
+        id: "d752090d-8ecf-458f-a9fb-3e7b3659a9f0",
         img: logo_uefs,
         imgDark: logo_uefs_dark,
     },
     {
         name: "UESC",
         institution: "UESC - Universidade Estadual de Santa Cruz",
-        id: "4a94e51e-49f9-42a8-a5d0-9d2c2e26b250",
+        id: "f670bac4-e1ab-452c-af25-300e994759c3",
         img: logo_uesc,
         imgDark: logo_uesc,
     },
     {
         name: "UFRB",
         institution: "UFRB - Universidade Federal do Recôncavo da Bahia",
-        id: "44a649ac-c91c-47a8-bc75-0464d9fd9021",
+        id: "73cdfd5f-e313-42c9-a90d-38ed38260d48",
         img: logo_ufrb20,
         imgDark: logo_ufrb20_dark,
     },
     {
         name: "UNEB",
         institution: "UNEB - Universidade do Estado da Bahia",
-        id: "df0e65ee-ea58-48cb-b8c0-1ddb51af3576",
+        id: "815f5ab1-3340-45b0-97d1-c16f93909caa",
         img: logo_uneb,
         imgDark: logo_uneb_dark,
     },
     {
         name: "IFBA",
         institution: "IFBA - Instituto Federal da Bahia",
-        id: "003f6522-93fe-495c-a681-4768435d9e88",
+        id: "f1e4790b-5053-4aa2-89f4-37c2978d4086",
         img: logo_ifba,
         imgDark: logo_ifba,
     },
+    { 
+        name: "Fundação Oswaldo Cruz",
+        institution: "FIOCRUZ - Fundação Oswaldo Cruz",
+        id: "d18e767a-72d4-43a9-beef-8999feb57266",
+        img: logo_fiocruz,
+        imgDark: logo_fiocruz_dark,
+    }
 ];
+
+export const TotalInstitutions = instituicoesFallback.length;
 
 export function CarrosselInstitution() {
     const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));

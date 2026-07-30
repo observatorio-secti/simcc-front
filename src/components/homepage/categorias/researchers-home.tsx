@@ -1197,7 +1197,7 @@ export function ResearchersHome() {
                         </div>
                     )}
 
-                                        {(searchType != 'name' && simcc) && (
+                    {(searchType != 'name' && simcc) && (
                         <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
                             <AccordionItem value="item-1" className="w-full ">
                                 <div className="flex mb-2">
