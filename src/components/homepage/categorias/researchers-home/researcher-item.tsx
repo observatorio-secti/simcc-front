@@ -2,7 +2,7 @@ import { useContext } from "react"
 import { Alert } from "../../../ui/alert"
 import { UserContext } from "../../../../context/context"
 import { MapPin, Plus, PuzzlePiece, X } from "phosphor-react"
-import { GraduationCap } from "lucide-react"
+import { Building2, GraduationCap } from "lucide-react"
 import { useModal } from "../../../hooks/use-modal-store"
 import { Button } from "../../../ui/button"
 
@@ -57,6 +57,54 @@ interface GraduatePrograms {
   name: string
 }
 
+const siglasConhecidas: Record<string, string> = {
+  "Universidade Federal Da Bahia": "UFBA",
+  "Escola Bahiana de Medicina e Saúde Pública": "EBMSP",
+  "Universidade Estadual do Sudoeste da Bahia": "UESB",
+  "Universidade Federal do Oeste da Bahia": "UFOB",
+  "Universidade Federal do Sul da Bahia": "UFSB",
+  "Universidade Estadual de Feira de Santana": "UEFS",
+  "Universidade Estadual de Santa Cruz": "UESC",
+  "Universidade Federal do Recôncavo da Bahia": "UFRB",
+  "Universidade do Estado da Bahia": "UNEB",
+  "Instituto Federal da Bahia": "IFBA",
+  "Instituto Federal de Educação, Ciência e Tecnologia da Bahia": "IFBA",
+  "Universidade Externa a Plataforma": "Externa",
+  "Universidade Federal do Norte do Tocantins": "UFNT",
+  "Centro Universitário Senai Cimatec": "CIMATEC",
+  "Universidade Estadual Da Paraiba": "UEPB",
+  "FIOCRUZ": "FIOCRUZ",
+};
+
+// mapa auxiliar: chave em lowercase -> sigla
+const siglasConhecidasLower: Record<string, string> = Object.fromEntries(
+  Object.entries(siglasConhecidas).map(([nome, sigla]) => [nome.toLowerCase(), sigla])
+);
+
+function getUniversitySigla(university: string) {
+  if (!university) return "";
+
+  const universitiesArray = university.split(/;/);
+
+  const siglas = universitiesArray.map((uni) => {
+    const nomeLimpo = uni.trim();
+    if (!nomeLimpo) return "";
+
+    const siglaConhecida = siglasConhecidasLower[nomeLimpo.toLowerCase()];
+    if (siglaConhecida) {
+      return siglaConhecida;
+    }
+
+    return nomeLimpo
+      .split(/\s+/)
+      .map((word) => word.trim())
+      .filter((word) => word && !["de", "da", "do", "das", "dos", "e", "a", "à", "na", "no"].includes(word.toLowerCase()))
+      .map((word) => word[0]?.toUpperCase())
+      .join("");
+  });
+
+  return siglas.filter(Boolean).join(" / ");
+}
 
 export function ResearchItem(props: Research) {
   const { onOpen } = useModal();
@@ -142,13 +190,19 @@ export function ResearchItem(props: Research) {
 
                 <CardTitle className="text-lg font-medium">{props.name}</CardTitle>
 
+                {getUniversitySigla(props.university) && (
+                  <div className="flex gap-1 text-sm items-center mt-1 text-gray-200">
+                    <Building2 size={14} className="min-w-[14px]" />
+                    <span>{getUniversitySigla(props.university)}</span>
+                  </div>
+                )}
+
                 <div className="group-hover:flex hidden items-center flex-wrap gap-1  mb-2">
                   <div className="flex gap-1 text-sm  items-center "><GraduationCap size={12} />{props.graduation}</div>
 
                   {(props.city != "" && props.city != "None") && (
                     <div className="flex gap-1 text-sm  items-center"><MapPin size={12} />{props.city}</div>
                   )}
-
 
                 </div>
               </div>

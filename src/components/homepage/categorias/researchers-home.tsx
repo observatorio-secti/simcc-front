@@ -761,12 +761,17 @@ export function ResearchersHome() {
     const [originalResearcher, setOriginalResearcher] = useState<Research[]>([]);
     const [cityData, setCityData] = useState<CityData[]>([]);
     const [typeVisu, setTypeVisu] = useState('block');
+    const [visibleResearchersCount, setVisibleResearchersCount] = useState(12);
     const { itemsSelecionados, urlGeral, searchType, simcc } = useContext(UserContext);
     const { version, pesquisadoresSelecionados, idGraduateProgram } = useContext(UserContext);
 
     useEffect(() => {
         localStorage.setItem('pesquisadoresSelecionados', JSON.stringify(pesquisadoresSelecionados));
     }, [pesquisadoresSelecionados]);
+
+    useEffect(() => {
+        setVisibleResearchersCount(12);
+    }, [researcher]);
 
     const queryUrl = useQuery();
 
@@ -897,6 +902,8 @@ export function ResearchersHome() {
         <Skeleton key={index} className="w-full rounded-md h-[300px]" />
     ));
     const totalAmong = researcher.reduce((sum, researcher) => sum + researcher.among, 0);
+    const visibleResearchers = researcher.slice(0, visibleResearchersCount);
+    const hasMoreResearchers = visibleResearchersCount < researcher.length;
 
     const { theme } = useTheme()
 
@@ -1132,59 +1139,6 @@ export function ResearchersHome() {
                         </Accordion>
                     )}
 
-                    {(searchType != 'name' && simcc) && (
-                        <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
-                            <AccordionItem value="item-1" className="w-full ">
-                                <div className="flex mb-2">
-                                    <HeaderResultTypeHome title="Pesquisadores no mapa" icon={<MapIcon size={24} className="text-gray-400" />}>
-                                    </HeaderResultTypeHome>
-
-                                    <AccordionTrigger>
-
-                                    </AccordionTrigger>
-                                </div>
-                                <AccordionContent className="p-0">
-                                    {loading ? (
-                                        <Skeleton className="rounded-md w-full h-[300px] " />
-                                    ) : (
-                                        <div>
-                                            <Alert className="p-0">
-                                                <MapaResearcher
-                                                    cityData={cityData}
-                                                />
-                                            </Alert>
-                                        </div>
-                                    )}
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    )}
-                    {searchType !== 'name' && searchType !== 'area' && (
-                        <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
-                            <AccordionItem value="item-1" className="w-full ">
-                                <div className="flex mb-2">
-                                    <HeaderResultTypeHome title="Gráficos dos pesquisadores" icon={<ChartBar size={24} className="text-gray-400" />}>
-                                    </HeaderResultTypeHome>
-
-                                    <AccordionTrigger>
-
-                                    </AccordionTrigger>
-                                </div>
-                                <AccordionContent className="p-0">
-                                    {loading ? (
-                                        <Skeleton className="rounded-md w-full h-[300px] " />
-                                    ) : (
-                                        <div>
-                                            <div className="grid gap-8 xl:grid-cols-2">
-                                                <GraficoTitulacao />
-                                                <GraficoAreaPesquisares />
-                                            </div>
-                                        </div>
-                                    )}
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    )}
                     {(!isOpenAlex && FinalOpenAlex != 'true') && (
                         <div>
                             <Accordion defaultValue="item-1" type="single" collapsible>
@@ -1224,7 +1178,11 @@ export function ResearchersHome() {
                                                     </Masonry>
                                                 </ResponsiveMasonry>
                                             ) : (
-                                                <ResearchersBloco researcher={researcher} />
+                                                <ResearchersBloco
+                                                    researcher={visibleResearchers}
+                                                    onLoadMore={() => setVisibleResearchersCount((count) => count + 12)}
+                                                    hasMore={hasMoreResearchers}
+                                                />
                                             )
                                         ) : (
                                             loading ? (
@@ -1237,6 +1195,61 @@ export function ResearchersHome() {
                                 </AccordionItem>
                             </Accordion>
                         </div>
+                    )}
+
+                                        {(searchType != 'name' && simcc) && (
+                        <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
+                            <AccordionItem value="item-1" className="w-full ">
+                                <div className="flex mb-2">
+                                    <HeaderResultTypeHome title="Pesquisadores no mapa" icon={<MapIcon size={24} className="text-gray-400" />}>
+                                    </HeaderResultTypeHome>
+
+                                    <AccordionTrigger>
+
+                                    </AccordionTrigger>
+                                </div>
+                                <AccordionContent className="p-0">
+                                    {loading ? (
+                                        <Skeleton className="rounded-md w-full h-[300px] " />
+                                    ) : (
+                                        <div>
+                                            <Alert className="p-0">
+                                                <MapaResearcher
+                                                    cityData={cityData}
+                                                />
+                                            </Alert>
+                                        </div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    )}
+                    
+                    {searchType !== 'name' && searchType !== 'area' && (
+                        <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
+                            <AccordionItem value="item-1" className="w-full ">
+                                <div className="flex mb-2">
+                                    <HeaderResultTypeHome title="Gráficos dos pesquisadores" icon={<ChartBar size={24} className="text-gray-400" />}>
+                                    </HeaderResultTypeHome>
+
+                                    <AccordionTrigger>
+
+                                    </AccordionTrigger>
+                                </div>
+                                <AccordionContent className="p-0">
+                                    {loading ? (
+                                        <Skeleton className="rounded-md w-full h-[300px] " />
+                                    ) : (
+                                        <div>
+                                            <div className="grid gap-8 xl:grid-cols-2">
+                                                <GraficoTitulacao />
+                                                <GraficoAreaPesquisares />
+                                            </div>
+                                        </div>
+                                    )}
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     )}
 
                     {(isOpenAlex && FinalOpenAlex === 'true') && (
@@ -1296,4 +1309,4 @@ export function ResearchersHome() {
             </div>
         </div>
     );
-} 
+}

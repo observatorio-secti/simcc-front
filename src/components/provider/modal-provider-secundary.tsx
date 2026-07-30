@@ -11,6 +11,7 @@ import { EditArticle } from "../modals/edit-article";
 import { ProjectModal } from "../modals/project-modal";
 import { CoautoresModal } from "../modals/coautores-modal";
 import { EditorpageModal } from "../modals/editor-page";
+import { ShareArticleModal } from "../modals/share-article-modal";
 
 
 const ModalContentSecundary = () => {
@@ -27,6 +28,8 @@ const ModalContentSecundary = () => {
       return <CoautoresModal />
     case 'editor-page':
       return <EditorpageModal />
+    case 'share-article':
+      return <ShareArticleModal />
     default:
       return null;
   }

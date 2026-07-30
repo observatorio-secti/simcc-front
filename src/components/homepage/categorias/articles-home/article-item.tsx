@@ -1,4 +1,4 @@
-import { CalendarBlank, LinkBreak, Quotes } from "phosphor-react";
+import { CalendarBlank, LinkBreak, Quotes, ShareNetwork} from "phosphor-react";
 import { Alert } from "../../../ui/alert";
 import { useContext } from "react";
 import { UserContext } from "../../../../context/context";
@@ -224,6 +224,27 @@ export function ArticleItem(props: Articles) {
               </div>
 
               <div className="flex items-start justify-end min-w-20   gap-3">
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpen('share-article', {
+                      title: props.title,
+                      doi: props.doi,
+                      landing_page_url: props.landing_page_url,
+                      qualis: props.qualis,
+                      researcher: props.researcher,
+                      abstract: props.abstract,
+                      magazine: props.name_periodical || props.magazine,
+                      year: props.year,
+                    });
+                  }}
+                  variant={'outline'}
+                  className="h-8 w-8 text-gray-500 dark:text-white hidden group-hover:flex"
+                  size={'icon'}
+                >
+                  <ShareNetwork size={16} />
+                </Button>
+
                 {(user?.lattes_id == props.lattes_id || has_editar_producao) && (
                   <Button
                     onClick={() =>
