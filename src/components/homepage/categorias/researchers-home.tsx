@@ -761,7 +761,7 @@ export function ResearchersHome() {
     const [originalResearcher, setOriginalResearcher] = useState<Research[]>([]);
     const [cityData, setCityData] = useState<CityData[]>([]);
     const [typeVisu, setTypeVisu] = useState('block');
-    const [visibleResearchersCount, setVisibleResearchersCount] = useState(12);
+    const [visibleResearchersCount, setVisibleResearchersCount] = useState(36);
     const { itemsSelecionados, urlGeral, searchType, simcc } = useContext(UserContext);
     const { version, pesquisadoresSelecionados, idGraduateProgram } = useContext(UserContext);
 
@@ -770,7 +770,7 @@ export function ResearchersHome() {
     }, [pesquisadoresSelecionados]);
 
     useEffect(() => {
-        setVisibleResearchersCount(12);
+        setVisibleResearchersCount(36);
     }, [researcher]);
 
     const queryUrl = useQuery();
@@ -1180,7 +1180,7 @@ export function ResearchersHome() {
                                             ) : (
                                                 <ResearchersBloco
                                                     researcher={visibleResearchers}
-                                                    onLoadMore={() => setVisibleResearchersCount((count) => count + 12)}
+                                                    onLoadMore={() => setVisibleResearchersCount((count) => count + 36)}
                                                     hasMore={hasMoreResearchers}
                                                 />
                                             )
