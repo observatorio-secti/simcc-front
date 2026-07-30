@@ -223,11 +223,11 @@ export function BooksResearcherPopUp(props: Props) {
     <>
 
       <div className="mb-[150px]">
-<div className="mb-6">
-  
-<FilterYearPopUp
-          onFilterUpdate={handleResearcherUpdate} />
-</div>
+        <div className="mb-6">
+
+          <FilterYearPopUp
+            onFilterUpdate={handleResearcherUpdate} />
+        </div>
 
         <Accordion type="single" collapsible defaultValue="item-1">
           <AccordionItem value="item-1" className="text-left" >
@@ -235,7 +235,6 @@ export function BooksResearcherPopUp(props: Props) {
               <HeaderResultTypeHome title="Gráfico de quantidade total de livros e capítulos" icon={<ChartBar size={24} className="text-gray-400" />}>
               </HeaderResultTypeHome>
               <AccordionTrigger>
-
               </AccordionTrigger>
             </div>
 

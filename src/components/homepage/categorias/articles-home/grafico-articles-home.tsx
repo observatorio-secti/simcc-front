@@ -50,14 +50,19 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function GraficoArticleHome() {
+export function GraficoArticleHome({ researcher_id }) {
+  console.log('ID TA AQUI', researcher_id)
   const { urlGeral } = useContext(UserContext);
   const [chartData, setChartData] = useState<{ year: number;[qualis: string]: number }[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${urlGeral}metrics/article/chart`);
+        const url = new URL(`${urlGeral}metrics/article/chart`);
+        if (researcher_id != null && researcher_id !== '') {
+          url.searchParams.append('researcher_id', researcher_id);
+        }
+        const response = await fetch(url.toString());
         const data = await response.json();
 
         const formattedData = data.map((item: any) => ({
