@@ -193,8 +193,7 @@ export function ArticlesResearcherPopUp(props: Props) {
                             {loading ? (
                                 <Skeleton className="w-full rounded-md h-[300px]" />
                             ) : (
-
-                                <GraficoArticleHome
+                                <GraficoArticleHome researcher_id={props.name}
                                 />
                             )}
                         </AccordionContent>
