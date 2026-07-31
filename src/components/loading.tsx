@@ -2,18 +2,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { LogoConectee } from './svg/LogoConectee';
 import { UserContext } from '../context/context';
-import { useTheme } from 'next-themes';
-import { LogoConecteeWhite } from './svg/LogoConecteeWhite';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import { LogoIapos } from './svg/LogoIapos';
-import { LogoIaposWhite } from './svg/LogoIaposWhite';
 
 interface LoadingWrapperProps {
     children: React.ReactNode;
 }
-
 
 interface Uid {
     uid: string
@@ -21,7 +17,6 @@ interface Uid {
     displayName: string
     email: string
 }
-
 
 const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
     const [loading, setLoading] = useState(true);
@@ -56,7 +51,7 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
                         const data = await response.json();
 
                         if (data && Array.isArray(data) && data.length > 0) {
-                            setUid(data[0].uid); // setUid agora usa o valor da uid
+                            setUid(data[0].uid);
                             fetchDataLogin();
                         } else {
 
@@ -108,7 +103,6 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
         handleLoginMinhaUfmg();
     }, [uid]);
 
-
     /// LOGIN FIRE
     useEffect(() => {
         setLoading(true);
@@ -118,15 +112,10 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
             setPermission(JSON.parse(storedPermission));
         }
 
-
-
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-
             if (firebaseUser) {
                 if (firebaseUser.uid !== '') {
 
-
-                    // Recupera as informações adicionais do seu banco de dados aqui
                     const urlUser = `${urlGeralAdm}s/user?uid=${firebaseUser.uid}`;
 
                     const fetchData = async () => {
@@ -147,32 +136,26 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
                                 data[0].roles = data[0].roles || [];
                                 setUser(data[0]);
 
-
-
                                 const storedUser = localStorage.getItem('permission');
                                 const storedRole = localStorage.getItem('role');
 
                                 if (storedUser) {
-                                    // Se as informações do usuário forem encontradas no armazenamento local, defina o usuário e marque como autenticado
                                     setPermission(JSON.parse(storedUser));
-
                                 }
 
                                 if (storedRole) {
-                                    // Se as informações do usuário forem encontradas no armazenamento local, defina o usuário e marque como autenticado
                                     setRole(JSON.parse(storedRole));
-
                                 }
 
                                 setTimeout(() => {
                                     setLoading(false);
-                                }, 2000); // 2000 ms = 2 segundos
+                                }, 2000);
                             }
                         } catch (err) {
                         } finally {
                             setTimeout(() => {
                                 setLoading(false);
-                            }, 2000); // 2000 ms = 2 segundos
+                            }, 2000);
                         }
                     };
 
@@ -181,40 +164,32 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
                     setLoggedIn(false);
                     setTimeout(() => {
                         setLoading(false);
-                    }, 2000); // 2000 ms = 2 segundos
+                    }, 2000); 
                 }
             } else {
                 setLoggedIn(false);
                 setTimeout(() => {
                     setLoading(false);
-                }, 2000); // 2000 ms = 2 segundos
+                }, 2000); 
             }
 
             setTimeout(() => {
                 setLoading(false);
-            }, 2000); // 2000 ms = 2 segundos
+            }, 2000); 
         });
 
         return () => {
             unsubscribe();
-
         };
-
 
     }, []);
 
-
-
-
-
-    const { theme } = useTheme()
-
-    return <>{loading ? <main className='h-screen w-full flex items-center justify-center'>
+    return <>{loading ? <main className='h-screen w-full flex items-center justify-center bg-neutral-50'>
         <div className='h-16 animate-pulse'>
             {version ? (
-                <div className="h-16  "  >{(theme == 'dark') ? (<LogoConecteeWhite />) : (<LogoConectee />)}</div>
+                <div className="h-16"><LogoConectee /></div>
             ) : (
-                <div className="h-16  " >{(theme == 'dark') ? (<LogoIaposWhite />) : (<LogoIapos />)}</div>
+                <div className="h-16"><LogoIapos /></div>
             )}
         </div>
     </main> : children}</>;

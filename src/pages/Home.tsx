@@ -1,12 +1,8 @@
-
 import { useContext, useEffect } from "react";
-import SearchLayout from "../layout/search-layout";
 import { UserContext } from "../context/context";
 import { GeralProvider } from "../components/provider/geral-provider";
 import { useModalHomepage } from "../components/hooks/use-modal-homepage";
 import { useLocation, useParams } from "react-router-dom";
-
-
 
 export function Home() {
     const { onOpen } = useModalHomepage();
@@ -53,7 +49,9 @@ export function Home() {
             onOpen('instituicoes')
         }
     }, [location]);
-    return <SearchLayout defaultLayout={defaultLayout} defaultCollapsed={isCollapsed} navCollapsedSize={navCollapsedSize} >
+    
+    // O MinimalLayout foi removido daqui!
+    return (
         <GeralProvider />
-    </SearchLayout>
+    )
 }

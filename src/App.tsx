@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Home } from './pages/Home'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { UserContext } from '../src/context/context'
-
+import MinimalLayout from './layout/minimal-layout';
 
 import { Dashboard } from './pages/Dashboard';
 import DefaultLayout from './layout/default-layout';
@@ -84,11 +84,9 @@ interface HistoricoItem {
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
     const [navbar, setNavbar] = useState(false);
-    const [user, setUser] = useState<User | null>(null);;
-
+    const [user, setUser] = useState<User | null>(null);
 
     const [urlGeral, setUrlGeral] = useState(import.meta.env.VITE_URL_GERAL || '');
-
     const [urlGeralAdm, setUrlGeralAdm] = useState(import.meta.env.VITE_URL_GERAL_ADM || '');
 
     const [mapModal, setMapModal] = useState(false)
@@ -207,8 +205,6 @@ function App() {
     }, [user, loggedIn])
 
 
-
-
     const storedIsCollapsed = localStorage.getItem("isCollapsed");
     const [isCollapsed, setIsCollapsed] = useState(
         storedIsCollapsed ? JSON.parse(storedIsCollapsed) : true
@@ -248,9 +244,9 @@ function App() {
 
         if (storedUser) {
             setPermission(JSON.parse(storedUser));
-
         }
     }, []);
+    
     useWindowResize(() => { });
 
     const hasBaremaAvaliacao = permission.some(
@@ -308,21 +304,21 @@ function App() {
         localStorage.setItem("pesquisadoresSelecionados", JSON.stringify(pesquisadoresSelecionados));
     }, [pesquisadoresSelecionados]);
 
-    const logPageAccess = (url) => {
+    const logPageAccess = (url: string) => {
         logEvent(analytics, 'page_view', {
-            page_url: url, // Aqui você pode passar a URL ou outros parâmetros que você queira
-            page_title: document.title, // Também pode passar o título da página
+            page_url: url,
+            page_title: document.title,
         });
     };
 
     useEffect(() => {
-        const currentURL = window.location.hostname; // Obtém o domínio da página
-        if (currentURL === "conectee.eng.ufmg.br" || currentURL === "iapos.cimatec.com.br" || currentURL === "simcc.uesc.b") {
-            logPageAccess(currentURL); // Registra o evento de acesso
+        const currentURL = window.location.hostname;
+        if (currentURL === "conectee.eng.ufmg.br" || currentURL === "iapos.cimatec.com.br" || currentURL === "simcc.uesc.br") {
+            logPageAccess(currentURL);
         }
     }, []);
 
-    return (<>
+    return (
         <Router>
             <CookiesProvider>
                 <UserContext.Provider
@@ -359,312 +355,103 @@ function App() {
                         keepoData, setKeepoData,
                         historico, setHistorico
                     }}>
-                    <DefaultLayout>
-                        <LoadingWrapper>
-                            <Routes>
-                                <Route path='/' element={<Home />} />
-                                <Route path='/resultados' element={<Home />} />
-                                <Route path='/dicionario' element={<Home />} />
-                                <Route path='/pos-graduacao' element={<Home />} />
-                                <Route path='/grupos-pesquisa' element={<Home />} />
-                                <Route path='/instituicao/:institution_id?' element={<Home />} />
-                                <Route path='/indicadores' element={<Home />} />
-                                <Route path='/incites' element={<Home />} />
-                                <Route path='/observatorio' element={<Observatorio />} />
-                                <Route path='/producoes-recentes' element={<Home />} />
-                                <Route path='/departamentos' element={<Home />} />
-                                <Route path='/researcher' element={<Home />} />
-                                <Route path='/resultados-ia' element={<Home />} />
-                                <Route path='/paines-dados-externos' element={<Home />} />
-                                <Route path='/indice-pesquisador' element={<Home />} />
-                                <Route path='/provimento-cargo' element={<Home />} />
-                                <Route path='/listagens' element={<Home />} />
-                                <Route path='/tv' element={<Tv />} />
-                                <Route path='/termos-uso' element={<TermosUso />} />
-                                <Route path='/politica-privacidade' element={<TermosUso />} />
-                                <Route path='/api-docs' element={<TermosUso />} />
-                                <Route path='/informacoes' element={<TermosUso />} />
-                                <Route path='/dicionario-cores' element={<TermosUso />} />
-                                <Route path='/videos' element={<TermosUso />} />
-                                <Route path='/sobre' element={<AboutPage />} />
-                                <Route path='/ufmg/' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
-                                <Route path='/signIn' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
-                                <Route path='/signUp' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
-                                <Route path='/recoverPassword' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
-                                <Route path='/updatePassword' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
-                                <Route path='/dashboard/administrativo' element={<ProtectedRoute
-                                    element={<Dashboard />}
-                                    hasPermission={has_visualizar_gerencia_modulo_administrativo}
-                                />
-                                }
-                                />
+                    
+                    <Routes>
+                        {/* ========================================== */}
+                        {/* ROTAS PÚBLICAS (Envelopadas pelo MinimalLayout) */}
+                        {/* ========================================== */}
+                        <Route element={
+                            <MinimalLayout>
+                                <LoadingWrapper>
+                                    <Outlet />
+                                </LoadingWrapper>
+                            </MinimalLayout>
+                        }>
+                            <Route path='/' element={<Home />} />
+                            <Route path='/resultados' element={<Home />} />
+                            <Route path='/dicionario' element={<Home />} />
+                            <Route path='/pos-graduacao' element={<Home />} />
+                            <Route path='/grupos-pesquisa' element={<Home />} />
+                            <Route path='/instituicao/:institution_id?' element={<Home />} />
+                            <Route path='/indicadores' element={<Home />} />
+                            <Route path='/incites' element={<Home />} />
+                            <Route path='/observatorio' element={<Observatorio />} />
+                            <Route path='/producoes-recentes' element={<Home />} />
+                            <Route path='/departamentos' element={<Home />} />
+                            <Route path='/researcher' element={<Home />} />
+                            <Route path='/resultados-ia' element={<Home />} />
+                            <Route path='/paines-dados-externos' element={<Home />} />
+                            <Route path='/indice-pesquisador' element={<Home />} />
+                            <Route path='/provimento-cargo' element={<Home />} />
+                            <Route path='/listagens' element={<Home />} />
+                            <Route path='/tv' element={<Tv />} />
+                            <Route path='/termos-uso' element={<TermosUso />} />
+                            <Route path='/politica-privacidade' element={<TermosUso />} />
+                            <Route path='/api-docs' element={<TermosUso />} />
+                            <Route path='/informacoes' element={<TermosUso />} />
+                            <Route path='/dicionario-cores' element={<TermosUso />} />
+                            <Route path='/videos' element={<TermosUso />} />
+                            <Route path='/sobre' element={<AboutPage />} />
+                            
+                            {/* Rota 404 centralizada aqui! */}
+                            <Route path='*' element={<Error404 />} />
+                        </Route>
 
-
-                                <Route
-                                    path='/dashboard'
-                                    element={<Dashboard />}
-                                />
-
-                                <Route
-                                    path='/dashboard/parametros-pesquisa'
-                                    element={<Dashboard />}
-                                />
-
-                                <Route
-                                    path='/dashboard/secao-pessoal'
-                                    element={<Dashboard />}
-                                />
-
-                                <Route
-                                    path='/dashboard/construtor-pagina'
-                                    element={<Dashboard />}
-                                />
-
-                                <Route path='/dashboard/relatar-problema' element={<Dashboard />} />
-                                <Route path='/dashboard/pesquisadores-selecionados' element={<Dashboard />} />
-
-
-                                <Route
-                                    path='/dashboard/programas'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_todos_programas}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/dashboard/departamentos'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_todos_departamentos}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/dashboard/pesquisadores'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_pesquisadores}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/dashboard/inct'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_inct}
-                                        />
-                                    }
-                                />
-
-
-                                <Route
-                                    path='/dashboard/pesos-avaliacao'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_editar_pesos_avaliacao}
-                                        />
-                                    }
-                                />
-
-
-                                <Route
-                                    path='/dashboard/minhas-producoes'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_minhas_producoes}
-                                        />
-                                    }
-                                />
-
-
-                                <Route
-                                    path='/dashboard/grupos-pesquisa'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_grupos_pesquisa}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/dashboard/indicadores'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_indicadores_instituicao}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/dashboard/baremas'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={hasBaremaAvaliacao}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/dashboard/enviar-notificacoes'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={hasNotificacoes}
-                                        />
-                                    }
-                                />
-
-
-                                {/*
-        Este é um comentário de múltiplas linhas dentro do JSX.
-        Pode ser usado para descrições mais longas.
-      */}
-                                <Route
-                                    path='/minhaufmg/dashboard/administrativo'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_gerencia_modulo_administrativo}
-                                        />
-                                    }
-                                />
-
-
-                                <Route
-                                    path='/minhaufmg/dashboard'
-                                    element={<Dashboard />}
-                                />
-
-
-                                <Route
-                                    path='/minhaufmg/dashboard/programas'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_todos_programas}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/minhaufmg/dashboard/departamentos'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_todos_departamentos}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/minhaufmg/dashboard/pesquisadores'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_pesquisadores}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/minhaufmg/dashboard/inct'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_inct}
-                                        />
-                                    }
-                                />
-
-
-                                <Route
-                                    path='/minhaufmg/dashboard/pesos-avaliacao'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_editar_pesos_avaliacao}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/minhaufmg/dashboard/grupos-pesquisa'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_grupos_pesquisa}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/minhaufmg/dashboard/indicadores'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={has_visualizar_indicadores_instituicao}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/minhaufmg/dashboard/baremas'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={hasBaremaAvaliacao}
-                                        />
-                                    }
-                                />
-
-                                <Route
-                                    path='/minhaufmg/dashboard/enviar-notificacoes'
-                                    element={
-                                        <ProtectedRoute
-                                            element={<Dashboard />}
-                                            hasPermission={hasNotificacoes}
-                                        />
-                                    }
-                                />
-
-                                <Route path='/minhaufmg/dashboard/informacoes' element={<Dashboard />} />
-
-
-                                {/*
-        Este é um comentário de múltiplas linhas dentro do JSX.
-        Pode ser usado para descrições mais longas.
-      */}
-
-
-                                <Route path='/dashboard/informacoes' element={<Dashboard />} />
-
-                                <Route path='/unauthorized' element={<Unauthorized />} />
-
-                                <Route path='*' element={<Error404 />} />
-
-                            </Routes>
-                        </LoadingWrapper>
-                    </DefaultLayout>
-
+                        {/* ========================================== */}
+                        {/* ROTAS PRIVADAS (Envelopadas pelo DefaultLayout) */}
+                        {/* ========================================== */}
+                        <Route element={
+                            <DefaultLayout>
+                                <LoadingWrapper>
+                                    <Outlet />
+                                </LoadingWrapper>
+                            </DefaultLayout>
+                        }>
+                            <Route path='/ufmg/' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
+                            <Route path='/signIn' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
+                            <Route path='/signUp' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
+                            <Route path='/recoverPassword' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
+                            <Route path='/updatePassword' element={loggedIn == false ? <Authentication /> : <Navigate to='/' />} />
+                            
+                            <Route path='/dashboard/administrativo' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_gerencia_modulo_administrativo} />} />
+                            <Route path='/dashboard' element={<Dashboard />} />
+                            <Route path='/dashboard/parametros-pesquisa' element={<Dashboard />} />
+                            <Route path='/dashboard/secao-pessoal' element={<Dashboard />} />
+                            <Route path='/dashboard/construtor-pagina' element={<Dashboard />} />
+                            <Route path='/dashboard/relatar-problema' element={<Dashboard />} />
+                            <Route path='/dashboard/pesquisadores-selecionados' element={<Dashboard />} />
+                            
+                            <Route path='/dashboard/programas' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_todos_programas} />} />
+                            <Route path='/dashboard/departamentos' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_todos_departamentos} />} />
+                            <Route path='/dashboard/pesquisadores' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_pesquisadores} />} />
+                            <Route path='/dashboard/inct' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_inct} />} />
+                            <Route path='/dashboard/pesos-avaliacao' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_editar_pesos_avaliacao} />} />
+                            <Route path='/dashboard/minhas-producoes' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_minhas_producoes} />} />
+                            <Route path='/dashboard/grupos-pesquisa' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_grupos_pesquisa} />} />
+                            <Route path='/dashboard/indicadores' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_indicadores_instituicao} />} />
+                            <Route path='/dashboard/baremas' element={<ProtectedRoute element={<Dashboard />} hasPermission={hasBaremaAvaliacao} />} />
+                            <Route path='/dashboard/enviar-notificacoes' element={<ProtectedRoute element={<Dashboard />} hasPermission={hasNotificacoes} />} />
+                            <Route path='/dashboard/informacoes' element={<Dashboard />} />
+                            
+                            <Route path='/minhaufmg/dashboard/administrativo' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_gerencia_modulo_administrativo} />} />
+                            <Route path='/minhaufmg/dashboard' element={<Dashboard />} />
+                            <Route path='/minhaufmg/dashboard/programas' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_todos_programas} />} />
+                            <Route path='/minhaufmg/dashboard/departamentos' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_todos_departamentos} />} />
+                            <Route path='/minhaufmg/dashboard/pesquisadores' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_pesquisadores} />} />
+                            <Route path='/minhaufmg/dashboard/inct' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_inct} />} />
+                            <Route path='/minhaufmg/dashboard/pesos-avaliacao' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_editar_pesos_avaliacao} />} />
+                            <Route path='/minhaufmg/dashboard/grupos-pesquisa' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_grupos_pesquisa} />} />
+                            <Route path='/minhaufmg/dashboard/indicadores' element={<ProtectedRoute element={<Dashboard />} hasPermission={has_visualizar_indicadores_instituicao} />} />
+                            <Route path='/minhaufmg/dashboard/baremas' element={<ProtectedRoute element={<Dashboard />} hasPermission={hasBaremaAvaliacao} />} />
+                            <Route path='/minhaufmg/dashboard/enviar-notificacoes' element={<ProtectedRoute element={<Dashboard />} hasPermission={hasNotificacoes} />} />
+                            <Route path='/minhaufmg/dashboard/informacoes' element={<Dashboard />} />
+                            
+                            <Route path='/unauthorized' element={<Unauthorized />} />
+                        </Route>
+                    </Routes>
                 </UserContext.Provider>
-
             </CookiesProvider>
         </Router>
-
-    </>
     )
 }
 

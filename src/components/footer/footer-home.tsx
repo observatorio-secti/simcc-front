@@ -1,73 +1,49 @@
-
-import img_2 from '../../assets/logo_email_2.png';
-import img_1 from '../../assets/logo_email_4.png';
-import img_5 from '../../assets/logo_email_5.png';
-import { LogoIaposWhite } from '../svg/LogoIaposWhite';
-import { LogoConecteeWhite } from '../svg/LogoConecteeWhite';
-import { useContext } from 'react';
-import { UserContext } from '../../context/context';
-import { Button } from '../ui/button';
 import { Link } from 'react-router-dom';
-import { Copy, Copyright, File, Info } from 'lucide-react';
-import { Badge } from '../ui/badge';
-
+import { File, Info } from 'lucide-react';
 
 export function FooterHome() {
-
-    const { version } = useContext(UserContext)
     return (
-        <div className='w-full'>
-            <div
-                className='
-                    flex flex-col w-full gap-8 mb-8
+        <div className="w-full mb-8">
+            <div className="w-full bg-blue-900 rounded-xl overflow-hidden shadow-lg border-t-4 border-red-600 flex flex-col md:flex-row">
+                
+                {/* Lado Esquerdo - "Logo" em formato de texto */}
+                <div className="md:w-1/3 bg-blue-800 p-8 flex items-center justify-center min-h-[250px]">
+                    <div className="flex justify-center hover:scale-105 transition-transform duration-300">
+                        <h2 className="text-3xl md:text-4xl font-black text-white uppercase tracking-widest drop-shadow-md text-center">
+                            Observatório
+                        </h2>
+                    </div>
+                </div>
 
-                    sm:grid
+                {/* Lado Direito - Sobre o Observatório e Links */}
+                <div className="md:w-2/3 p-8 flex flex-col justify-center">
+                    <h3 className="text-2xl font-bold text-white mb-4">
+                        Sobre o Observatório
+                    </h3>
                     
-                    lg:grid-cols-3
-                '
-            >
-                <div className='flex items-center justify-center bg-eng-blue min-h-[50vh] rounded-lg'>
-                    <div className="w-full max-w-[200px]"  >{(version) ? (<LogoConecteeWhite />) : (<LogoIaposWhite />)}</div>
-                </div>
+                    <p className="text-blue-50 text-sm leading-relaxed text-justify mb-8 opacity-90">
+                        O Observatório da Ciência da Bahia integra sistemas e painéis temáticos 
+                        que apresentam informações sobre produção científica, laboratórios e 
+                        equipamentos, pós-graduação, grupos de pesquisa, INCITEs, inovação 
+                        tecnológica, clubes de ciência e iniciativas de popularização científica.
+                    </p>
 
-                <div className='rounded-lg bg-neutral-200 flex flex-col justify-between min-h-[50vh] gap-8 p-4 md:p-8 dark:bg-neutral-800 lg:col-span-2'>
-                    <div><Badge className='flex items-center gap-2 w-fit border-neutral-300' variant={'outline'}><Copyright size={12} /> Todos os direitos reservados</Badge></div>
-
-                    {version ? (
-                        <div className='w-full relative flex justify-between'>
-                            <div
-                                className='
-                                    flex absolute bottom-14 left-4 gap-6
-
-                                    sm:absolute sm:bottom-0 sm:right-2 sm:left-auto
-                                '
-                            >
-                                <img src={img_2} className="h-8" alt="Logo" />
-                                <img src={img_1} className="h-8" alt="Logo" />
-                            </div>
-
-                            <div className='flex gap-3'>
-                                <Link to={'/informacoes'}> <Button variant={'link'}><Info size={16} />Informações</Button></Link>
-                                <Link to={'/termos-uso'}> <Button variant={'link'}><File size={16} />Termos de Uso</Button></Link>
-                            </div>
+                    {/* Rodapé Interno com Links Úteis */}
+                    <div className="flex flex-col sm:flex-row items-center justify-end gap-6 mt-auto pt-6 border-t border-blue-700">
+                        
+                        {/* Links de Informações e Termos */}
+                        <div className="flex items-center gap-6 text-sm font-medium">
+                            <Link to={'/informacoes'} className="text-blue-100 hover:text-white flex items-center gap-2 transition-colors">
+                                <Info size={16} className="text-red-400" /> Informações
+                            </Link>
+                            <Link to={'/termos-uso'} className="text-blue-100 hover:text-white flex items-center gap-2 transition-colors">
+                                <File size={16} className="text-red-400" /> Termos de Uso
+                            </Link>
                         </div>
-                    ) : (
-                        <div className='flex justify-between'>
-                            <div className='flex gap-6'>
-                            </div>
-
-                            <div className='flex gap-3'>
-                                <Link to={'/informacoes'}> <Button variant={'link'}><Info size={16} />Informações</Button></Link>
-                                <Link to={'/termos-uso'}> <Button variant={'link'}><File size={16} />Termos de Uso</Button></Link>
-                            </div>
-                        </div>
-                    )}
+                        
+                    </div>
                 </div>
-            </div>
-
-            <div className='rounded-lg bg-neutral-200 flex flex-col justify-between mb-8 gap-8 p-4 md:p-8 dark:bg-neutral-800 lg:col-span-2'>
-
             </div>
         </div>
-    )
+    );
 }
