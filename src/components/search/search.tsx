@@ -370,15 +370,17 @@ export function Search() {
                     <div className="flex gap-4 w-full">
                         <Alert className="h-14 p-2 flex items-center justify-between">
                             <div className="flex items-center gap-2 w-full flex-1">
-                                <Play size={16} className="hidden md:flex md:whitespace-nowrap md:w-10" />
+                                {/* <Play size={16} className="hidden md:flex md:whitespace-nowrap md:w-10" /> */}
 
                                 <div className="hidden md:flex gap-2 w-fit  items-center">
                                     <div className="flex items-center gap-2">
+                                        {/*
                                         <Switch
                                             checked={maria}
                                             onCheckedChange={(value) => setMaria(value)}
                                         />
                                         <Label className="flex gap-2 items-center">{version ? ('GaIA') : ('MarIA')}<Chats size={16} className="" /></Label>
+                                        */}
                                     </div>
 
                                     {!maria && (

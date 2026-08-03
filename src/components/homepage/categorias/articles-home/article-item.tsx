@@ -37,6 +37,7 @@ type Articles = {
   pdf: string
   has_image: boolean
   relevance: boolean
+  quadrennial?: string
 }
 
 interface ItemsSelecionados {
@@ -232,6 +233,7 @@ export function ArticleItem(props: Articles) {
                       doi: props.doi,
                       landing_page_url: props.landing_page_url,
                       qualis: props.qualis,
+                      quadrennial: props.quadrennial,
                       researcher: props.researcher,
                       abstract: props.abstract,
                       magazine: props.name_periodical || props.magazine,
@@ -326,6 +328,7 @@ export function ArticleItem(props: Articles) {
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center">
               <div className={`w-4 h-4 rounded-md ${qualisColor[props.qualis as keyof typeof qualisColor]}`}></div>Qualis {props.qualis}
+                {props.quadrennial && ` (${props.quadrennial})`}
             </div>
             {(props.jif != "None" && props.jif != "") && (
               <Link to={props.jcr_link} target="_blank" className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center">

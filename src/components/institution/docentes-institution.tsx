@@ -154,9 +154,13 @@ export function DocentesInstitution() {
         return `${urlGeral}researcher_metrics?type=&term=&area=&graduate_program=&city=&institution=&modality=&graduation=&departament=&year=1900&institution_id=${institutionId}`;
     }, [urlGeral, institutionId]);
 
-    // MODIFICADO: URL da lista de pesquisadores não inclui mais 'length' e 'page'
     const urlGraduateProgram = useMemo(() => {
         return `${urlGeral}researcherName?name=&institution_id=${institutionId}`;
+    }, [urlGeral, institutionId]);
+
+    // Fallback: endpoint paginado que funciona mesmo quando researcherName falha (ex.: 500 no backend)
+    const urlResearchersPaginated = useMemo(() => {
+        return `${urlGeral}researcher?terms=&university=&institution_id=${institutionId}`;
     }, [urlGeral, institutionId]);
 
     // Efeito para buscar os totais (sem alterações)
@@ -176,25 +180,45 @@ export function DocentesInstitution() {
         fetchTotals();
     }, [urlTotais, institutionId]);
 
-    // Efeito para buscar a lista de pesquisadores (sem alterações na lógica interna)
+    // Efeito para buscar a lista de pesquisadores, com fallback paginado
     useEffect(() => {
         const fetchResearchers = async () => {
             if (!institutionId) return;
             setLoading(true);
             try {
                 const response = await fetch(urlGraduateProgram, { mode: "cors" });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
-                if (data) {
+                // researcherName tem limite fixo de 100 no backend; se vier exatamente 100, assume truncamento
+                if (data && data.length < 100) {
                     setGraduatePrograms(data);
+                } else {
+                    throw new Error("Lista truncada (limite de 100), buscando paginado");
                 }
             } catch (err) {
-                console.log("Erro ao buscar pesquisadores:", err);
+                console.log("researcherName falhou ou truncou, tentando fallback paginado:", err);
+                try {
+                    const allResearchers: Pesquisador[] = [];
+                    let page = 1;
+                    let batch: Pesquisador[] = [];
+                    do {
+                        const response = await fetch(`${urlResearchersPaginated}&page=${page}`, { mode: "cors" });
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        batch = await response.json();
+                        allResearchers.push(...batch);
+                        page++;
+                        if (page > 100) break;
+                    } while (batch.length > 0);
+                    setGraduatePrograms(allResearchers);
+                } catch (fallbackErr) {
+                    console.log("Erro ao buscar pesquisadores:", fallbackErr);
+                }
             } finally {
                 setLoading(false);
             }
         };
         fetchResearchers();
-    }, [urlGraduateProgram, institutionId]);
+    }, [urlGraduateProgram, urlResearchersPaginated, institutionId]);
 
     const items = Array.from({ length: 12 }, (_, index) => (
         <Skeleton key={index} className="w-full rounded-md h-[300px]" />

@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext, useState, useEffect } from "react"
 import { Alert } from "../../../ui/alert"
 import { UserContext } from "../../../../context/context"
 import { MapPin, Plus, PuzzlePiece, X } from "phosphor-react"
@@ -57,58 +57,95 @@ interface GraduatePrograms {
   name: string
 }
 
-const siglasConhecidas: Record<string, string> = {
-  "Universidade Federal Da Bahia": "UFBA",
-  "Escola Bahiana de Medicina e Saúde Pública": "EBMSP",
-  "Universidade Estadual do Sudoeste da Bahia": "UESB",
-  "Universidade Federal do Oeste da Bahia": "UFOB",
-  "Universidade Federal do Sul da Bahia": "UFSB",
-  "Universidade Estadual de Feira de Santana": "UEFS",
-  "Universidade Estadual de Santa Cruz": "UESC",
-  "Universidade Federal do Recôncavo da Bahia": "UFRB",
-  "Universidade do Estado da Bahia": "UNEB",
-  "Instituto Federal da Bahia": "IFBA",
-  "Instituto Federal de Educação, Ciência e Tecnologia da Bahia": "IFBA",
+const fallbackSiglas: Record<string, string> = {
   "Universidade Externa a Plataforma": "Externa",
-  "Universidade Federal do Norte do Tocantins": "UFNT",
   "Centro Universitário Senai Cimatec": "CIMATEC",
-  "Universidade Estadual Da Paraiba": "UEPB",
-  "FIOCRUZ": "FIOCRUZ",
 };
 
-// mapa auxiliar: chave em lowercase -> sigla
-const siglasConhecidasLower: Record<string, string> = Object.fromEntries(
-  Object.entries(siglasConhecidas).map(([nome, sigla]) => [nome.toLowerCase(), sigla])
+const fallbackSiglasLower: Record<string, string> = Object.fromEntries(
+  Object.entries(fallbackSiglas).map(([nome, sigla]) => [nome.toLowerCase(), sigla])
 );
 
-function getUniversitySigla(university: string) {
-  if (!university) return "";
+// Cache global: garante que o fetch seja feito apenas UMA vez por sessão
+let institutionPromise: Promise<Record<string, string>> | null = null;
 
-  const universitiesArray = university.split(/;/);
+function getInstitutionMap(urlGeral: string): Promise<Record<string, string>> {
+  if (!institutionPromise) {
+    institutionPromise = fetch(`${urlGeral}institution`, {
+      mode: "cors",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Max-Age": "3600",
+        "Content-Type": "text/plain",
+      },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Falha na resposta do servidor");
+        return res.json();
+      })
+      .then(data => {
+        const map: Record<string, string> = {};
+        data.forEach((inst: any) => {
+          if (inst.name && inst.acronym) {
+            map[inst.name.toLowerCase().trim()] = inst.acronym;
+          }
+        });
+        return map;
+      })
+      .catch(err => {
+        institutionPromise = null;
+        return {}; 
+      });
+  }
+  return institutionPromise;
+}
 
-  const siglas = universitiesArray.map((uni) => {
-    const nomeLimpo = uni.trim();
-    if (!nomeLimpo) return "";
+function useUniversitySigla(urlGeral: string, university: string) {
+  const [sigla, setSigla] = useState<string>("");
 
-    const siglaConhecida = siglasConhecidasLower[nomeLimpo.toLowerCase()];
-    if (siglaConhecida) {
-      return siglaConhecida;
+  useEffect(() => {
+    if (!university) {
+      setSigla("");
+      return;
     }
 
-    return nomeLimpo
-      .split(/\s+/)
-      .map((word) => word.trim())
-      .filter((word) => word && !["de", "da", "do", "das", "dos", "e", "a", "à", "na", "no"].includes(word.toLowerCase()))
-      .map((word) => word[0]?.toUpperCase())
-      .join("");
-  });
+    getInstitutionMap(urlGeral).then((apiMap) => {
+      const universitiesArray = university.split(/;/);
 
-  return siglas.filter(Boolean).join(" / ");
+      const siglas = universitiesArray.map((uni) => {
+        const nomeLimpo = uni.trim();
+        const nomeLower = nomeLimpo.toLowerCase();
+        if (!nomeLimpo) return "";
+
+        if (apiMap[nomeLower]) {
+          return apiMap[nomeLower];
+        }
+
+        if (fallbackSiglasLower[nomeLower]) {
+          return fallbackSiglasLower[nomeLower];
+        }
+
+        return nomeLimpo
+          .split(/\s+/)
+          .filter((word) => word && !["de", "da", "do", "das", "dos", "e", "a", "à", "na", "no"].includes(word.toLowerCase()))
+          .map((word) => word[0]?.toUpperCase())
+          .join("");
+      });
+
+      setSigla(siglas.filter(Boolean).join(" / "));
+    });
+  }, [urlGeral, university]);
+
+  return sigla;
 }
 
 export function ResearchItem(props: Research) {
   const { onOpen } = useModal();
   const { urlGeral, setPesquisadoresSelecionados, permission, pesquisadoresSelecionados } = useContext(UserContext)
+
+  const universitySigla = useUniversitySigla(urlGeral, props.university);
 
   const hasBaremaAvaliacao = permission.some(
     (perm) => perm.permission === 'criar_barema_avaliacao'
@@ -168,10 +205,6 @@ export function ResearchItem(props: Research) {
                   </Tooltip>
                 </TooltipProvider>
 
-
-
-
-
                 <div className="flex group-hover:hidden">
                   <div className="flex text-white gap-2 items-center" >
                     <div className={` rounded-md h-4 w-4 ${props.status ? ('bg-green-500') : ('bg-red-500')}`}></div>
@@ -190,13 +223,12 @@ export function ResearchItem(props: Research) {
 
                 <CardTitle className="text-lg font-medium">{props.name}</CardTitle>
 
-                {getUniversitySigla(props.university) && (
+                {universitySigla && (
                   <div className="flex gap-1 text-sm items-center mt-1 text-gray-200">
                     <Building2 size={14} className="min-w-[14px]" />
-                    <span>{getUniversitySigla(props.university)}</span>
+                    <span>{universitySigla}</span>
                   </div>
                 )}
-
                 <div className="group-hover:flex hidden items-center flex-wrap gap-1  mb-2">
                   <div className="flex gap-1 text-sm  items-center "><GraduationCap size={12} />{props.graduation}</div>
 

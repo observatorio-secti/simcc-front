@@ -59,6 +59,7 @@ export function ArticleBlock(props: Articles) {
                             pdf={item.pdf}
                             has_image={item.has_image}
                             relevance={item.relevance}
+                            quadrennial={item.quadrennial}
                         />
                     ))}
                 </Masonry>

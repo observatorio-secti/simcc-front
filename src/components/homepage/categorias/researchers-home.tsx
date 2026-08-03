@@ -22,7 +22,6 @@ import { useModal } from "../../hooks/use-modal-store";
 import { ToggleGroup, ToggleGroupItem } from "../../ui/toggle-group"
 
 import { Label } from "../../ui/label";
-import { HeaderResult } from "../header-results";
 import { SymbolEEWhite } from "../../svg/SymbolEEWhite";
 import { SymbolEE } from "../../svg/SymbolEE";
 import { useTheme } from "next-themes";
@@ -932,9 +931,6 @@ export function ResearchersHome() {
             <div className="w-full flex gap-4 justify-center">
                 <div className="flex-1 gap-4 flex flex-col">
 
-                    <div className="w-full">
-                        <HeaderResult />
-                    </div>
                     <div className={`flex flex-col gap-4 w-full ${selectedAreas.length > 0 || selectedCities.length > 0 || selectedDepartaments.length > 0 || selectedGraduatePrograms.length > 0 || selectedGraduations.length > 0 || selectedSubsidies.length > 0 || selectedUniversities.length > 0 ? ('flex') : ('hidden')}`}>
                         <Separator />
                         <div className="flex flex-wrap gap-3 items-center">

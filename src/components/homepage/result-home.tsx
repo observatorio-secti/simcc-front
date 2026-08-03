@@ -11,6 +11,7 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useModal } from "../hooks/use-modal-store";
 import { DotsThreeOutline, DotsThreeVertical, File, Plus, Quotes } from "phosphor-react";
 import { Search } from "../search/search";
+import { HeaderResult } from "./header-results";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
@@ -228,6 +229,7 @@ export function ResultHome() {
                                 <Search />
                             </div>
                         )}
+                        {itemsSelecionados.length > 0 && <HeaderResult />}
                         <div className={`flex w-full flex-wrap gap-4 pt-2 justify-between ${isOn ? '' : ''} `}>
                             <div className="flex flex-1 w-full">
                                 <ScrollArea>

@@ -91,6 +91,7 @@ export function ArticleBlockPopUp(props: Articles) {
                 pdf={props.pdf}
                 has_image={props.has_image}
                 relevance={props.relevance}
+                quadrennial={props.quadrennial}
               />
             );
           })}

@@ -62,6 +62,8 @@ interface ModalData {
     relevance?: boolean
     has_image?: boolean
 
+    quadrennial?: string
+
     type_reset?: string
 
     agency_code?: string

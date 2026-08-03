@@ -58,24 +58,25 @@ export function ShareArticleModal() {
     const revista = normalizeText(data.magazine) || "Revista não informada";
     const year = data.year || "";
     const qualis = data.qualis && data.qualis !== "None" ? data.qualis : "";
+    const quadrennial = data.quadrennial || "";
     const researcher = normalizeText(data.researcher) || "";
 
-    const lines = [`${revista}`, `${title}`];
+    const lines = [`Título: ${title}`, `Revista: ${revista}`];
 
     if (year) {
-      lines.push(`${year}`);
+      lines.push(`Ano: ${year}`);
     }
 
     if (qualis) {
-      lines.push(`Qualis ${qualis}`);
+      lines.push(`Qualis: ${qualis}${quadrennial ? ` (${quadrennial})` : ""}`);
     }
 
     if (researcher) {
-      lines.push(`${researcher}`);
+      lines.push(`Pesquisador: ${researcher}`);
     }
 
     return lines.join("\n");
-  }, [data.magazine, data.qualis, data.researcher, data.title, data.year, shareTarget]);
+  }, [data.magazine, data.qualis, data.quadrennial, data.researcher, data.title, data.year, shareTarget]);
 
   const shareLinks = useMemo(() => {
     const encodedUrl = encodeURIComponent(shareTarget);
