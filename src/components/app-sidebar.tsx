@@ -3,7 +3,7 @@ import {
     AArrowUp,
     AudioWaveform,
     BarChartBig,
-    Beaker, // 1. Ícone adicionado aqui
+    Beaker,
     Blocks,
     BookOpen,
     Bot,
@@ -45,9 +45,10 @@ import {
 } from "./ui/sidebar"
 import { UserContext } from "../context/context"
 import { useContext } from "react"
-import { AccountSwitcher } from "./navigation/user-list"
 import { DotsThree } from "phosphor-react"
 import { useModal } from "./hooks/use-modal-store"
+
+import logo_observatorio from "../assets/logo_observatorio.png";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { urlGeral, user, version, loggedIn } = useContext(UserContext)
@@ -141,15 +142,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
 
     return (
-        <Sidebar collapsible='icon' className="border-0" {...props}>
+        // Aplicando o fundo branco, borda leve e texto base azul escuro no container principal
+        <Sidebar collapsible='icon' className="border-r border-gray-200 bg-white text-blue-900" {...props}>
             <SidebarHeader>
-                <AccountSwitcher />
+                <div className="flex items-center justify-center py-6 w-full">
+                    <img 
+                        src={logo_observatorio} 
+                        alt="Logo Observatório" 
+                        className="h-48 w-auto object-contain drop-shadow-sm" 
+                    />
+                </div>
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className="bg-white">
                 <NavProjects projects={data.projects} />
                 <NavMain items={data.navMain} />
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="bg-white border-t border-gray-100">
                 {loggedIn && <NavUser user={data.user} />}
             </SidebarFooter>
             <SidebarRail />

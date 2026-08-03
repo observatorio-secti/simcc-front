@@ -141,9 +141,9 @@ function App() {
     const normalizarTermo = (termo: string): string => {
         return termo
             .toLowerCase()
-            .normalize('NFD')                  // separa acentos
+            .normalize('NFD')                   // separa acentos
             .replace(/[\u0300-\u036f]/g, '')   // remove acentos
-            .replace(/[^\w\s]/gi, '')          // remove caracteres especiais
+            .replace(/[^\w\s]/gi, '')           // remove caracteres especiais
             .trim()
     }
 
@@ -220,12 +220,10 @@ function App() {
     const [mode, setMode] = useState('')
 
     useEffect(() => {
-        // Salva o estado de isCollapsed no localStorage sempre que ele mudar
         localStorage.setItem("isCollapsed", JSON.stringify(isCollapsed));
     }, [isCollapsed]);
 
     useEffect(() => {
-        // Salva o estado de isCollapsed no localStorage sempre que ele mudar
         localStorage.setItem("isCollapsedRight", JSON.stringify(isCollapsedRight));
     }, [isCollapsedRight]);
 
@@ -393,7 +391,6 @@ function App() {
                             <Route path='/videos' element={<TermosUso />} />
                             <Route path='/sobre' element={<AboutPage />} />
                             
-                            {/* Rota 404 centralizada aqui! */}
                             <Route path='*' element={<Error404 />} />
                         </Route>
 
