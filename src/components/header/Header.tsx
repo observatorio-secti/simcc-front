@@ -82,14 +82,14 @@ export function Header() {
 
                         <Separator orientation="vertical" className="mx-2 md:mx-0 h-6 bg-slate-300" />
 
-                        <div className="min-w-max">
-
-                            <Link to={"/observatorio"} className="whitespace-nowrap text-sm font-medium hover:underline">
-                                <Button variant='outline' size="sm" className="h-8 px-2" >
-                                    Observatório
-                                </Button>
-                            </Link>
-                        </div>
+<div className="min-w-max">
+    <Link to={"https://observatoriocti.secti.ba.gov.br/"} target="_blank" className="whitespace-nowrap text-sm font-medium hover:underline">
+        <Button variant='outline' size="sm" className="h-8 px-2 gap-2">
+            <img src="/LOGO-OBS.png" alt="Logo Observatório" className="h-4 w-4 object-contain" />
+            Observatório
+        </Button>
+    </Link>
+</div>
 
                         <span className="absolute right-2 md:relative md:ml-3 md:mb-[1px]">
                             {(role != '' && role != 'Visitante') && (
