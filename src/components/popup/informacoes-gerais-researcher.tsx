@@ -246,6 +246,22 @@ export function InformacoesGeraisResearcher(props: Research) {
                     </TooltipProvider>
                 )}
 
+                {props.subsidy && props.subsidy.length != 0 && props.subsidy.slice(0, 1).map((item) => (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger className="outline-none">
+                                <div className="py-2 px-4 border border-neutral-200 bg-white dark:bg-black dark:border-neutral-800 rounded-md text-xs flex gap-2 items-center">
+                                    <img src={item.modality_code == 'DT' ? (dt) : (pq)} className="w-4 h-4" alt="" />
+                                    {item.modality_name}
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Bolsista CNPq</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                ))}
+
                 {!version && (
                     <TooltipProvider>
                         <Tooltip>

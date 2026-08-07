@@ -206,6 +206,7 @@ export function ProjetoPesquisaHome() {
     const queryUrl = useQuery();
     const institutionId = queryUrl.get('institution_id');
     const institutionParam = institutionId ? `&institution_id=${institutionId}` : '';
+    const selectedTerms = institutionId ? '' : valoresSelecionadosExport;
 
     const [publicacoes, setPublicacoes] = useState<Projeto[]>([]);
     const [chartData, setChartData] = useState<ChartMetricProject[]>([]);
@@ -241,12 +242,12 @@ export function ProjetoPesquisaHome() {
 
     const urlTermPublicacoes = useMemo(() => {
         const paginationParams = `&page=${page}&lenght=${limit}&sort_by=year&sort_order=desc`;
-        return `${urlGeral}researcher_research_project?researcher_id=&term=${valoresSelecionadosExport}&year=${yearString}&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
-    }, [urlGeral, yearString, valoresSelecionadosExport, distinct, institutionParam, page]);
+        return `${urlGeral}researcher_research_project?researcher_id=&term=${selectedTerms}&year=${yearString}&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
+    }, [urlGeral, yearString, selectedTerms, distinct, institutionParam, page]);
 
     const urlChartProject = useMemo(() => {
-        return `${urlGeral}metrics/research-project/chart?researcher_id=&term=${valoresSelecionadosExport}&year=${yearString}&distinct=${distinct ? '1' : '0'}${institutionParam}`;
-    }, [urlGeral, yearString, valoresSelecionadosExport, distinct, institutionParam]);
+        return `${urlGeral}metrics/research-project/chart?researcher_id=&term=${selectedTerms}&year=${yearString}&distinct=${distinct ? '1' : '0'}${institutionParam}`;
+    }, [urlGeral, yearString, selectedTerms, distinct, institutionParam]);
 
     const fetchOptions = {
         mode: "cors",

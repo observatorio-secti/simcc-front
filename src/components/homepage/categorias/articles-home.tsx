@@ -14,7 +14,6 @@ import { Button } from "../../ui/button";
 import { TableReseracherArticleshome } from "./articles-home/table-articles";
 import { Alert } from "../../ui/alert";
 import { CardContent, CardHeader, CardTitle } from "../../ui/card";
-import { HeaderResult } from "../header-results";
 import { FilterArticle } from "./articles-home/filters-articles";
 import { GraficoCitationsArticleHome } from "./articles-home/grafico-citacoes";
 import { File } from "lucide-react";
@@ -215,6 +214,7 @@ export function ArticlesHome() {
     const limit = 12;
     const idGraduateProgram = '';
     const institutionParam = institutionId ? `&institution_id=${institutionId}` : '';
+    const selectedTerms = institutionId ? '' : valoresSelecionadosExport;
 
     const publicacoesLength = useMemo(() => {
         return chartData.reduce((acc, item) => acc + item.among, 0);
@@ -237,38 +237,38 @@ export function ArticlesHome() {
 
         let url = `${urlGeral}bibliographic_production_article?terms=&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}${paginationParams}`;
 
-        if (valoresSelecionadosExport !== '') {
+        if (selectedTerms !== '') {
             if (searchType === 'name') {
-                url = `${urlGeral}bibliographic_production_researcher?terms=${valoresSelecionadosExport}&researcher_id=&type=ARTICLE&qualis=${qualisString}&year=${yearString}${institutionParam}${paginationParams}`;
+                url = `${urlGeral}bibliographic_production_researcher?terms=${selectedTerms}&researcher_id=&type=ARTICLE&qualis=${qualisString}&year=${yearString}${institutionParam}${paginationParams}`;
             } else if (searchType === 'article') {
-                url = `${urlGeral}bibliographic_production_article?terms=${valoresSelecionadosExport}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}${paginationParams}`;
+                url = `${urlGeral}bibliographic_production_article?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}${paginationParams}`;
             } else if (searchType === 'area') {
-                url = `${urlGeral}bibliographic_production_article_area?area_specialty=${valoresSelecionadosExport.replace(/;/g, ' ')}&great_area=&year=${yearString}&qualis=${qualisString}${institutionParam}${paginationParams}`;
+                url = `${urlGeral}bibliographic_production_article_area?area_specialty=${selectedTerms.replace(/;/g, ' ')}&great_area=&year=${yearString}&qualis=${qualisString}${institutionParam}${paginationParams}`;
             } else if (searchType === 'abstract') {
-                url = `${urlGeral}bibliographic_production_article?terms=${valoresSelecionadosExport}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
+                url = `${urlGeral}bibliographic_production_article?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
             }
         }
         return url;
-    }, [filters, searchType, valoresSelecionadosExport, distinct, idGraduateProgram, institutionParam, urlGeral, page]);
+    }, [filters, searchType, selectedTerms, distinct, idGraduateProgram, institutionParam, urlGeral, page]);
     const urlTermCharts = useMemo(() => {
         const yearString = filters.length > 0 ? filters[0].year.join(';') : [2020];
         const qualisString = filters.length > 0 ? filters[0].qualis.join(';') : '';
 
         let url = `${urlGeral}metrics/article/chart?terms=&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}`;
 
-        if (valoresSelecionadosExport !== '') {
+        if (selectedTerms !== '') {
             if (searchType === 'name') {
-                url = `${urlGeral}metrics/article/chart?terms=${valoresSelecionadosExport}&researcher_id=&type=ARTICLE&qualis=${qualisString}&year=${yearString}${institutionParam}`;
+                url = `${urlGeral}metrics/article/chart?terms=${selectedTerms}&researcher_id=&type=ARTICLE&qualis=${qualisString}&year=${yearString}${institutionParam}`;
             } else if (searchType === 'article') {
-                url = `${urlGeral}metrics/article/chart?terms=${valoresSelecionadosExport}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}`;
+                url = `${urlGeral}metrics/article/chart?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}`;
             } else if (searchType === 'area') {
-                url = `${urlGeral}metrics/article/chart?area_specialty=${valoresSelecionadosExport.replace(/;/g, ' ')}&great_area=&year=${yearString}&qualis=${qualisString}${institutionParam}`;
+                url = `${urlGeral}metrics/article/chart?area_specialty=${selectedTerms.replace(/;/g, ' ')}&great_area=&year=${yearString}&qualis=${qualisString}${institutionParam}`;
             } else if (searchType === 'abstract') {
-                url = `${urlGeral}metrics/article/chart?terms=${valoresSelecionadosExport}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}${institutionParam}`;
+                url = `${urlGeral}metrics/article/chart?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}${institutionParam}`;
             }
         }
         return url;
-    }, [filters, searchType, valoresSelecionadosExport, distinct, idGraduateProgram, institutionParam, urlGeral]);
+    }, [filters, searchType, selectedTerms, distinct, idGraduateProgram, institutionParam, urlGeral]);
     useEffect(() => {
         const fetchData = async () => {
             if (page === 1) isLoading(true);
@@ -328,8 +328,6 @@ export function ArticlesHome() {
 
     return (
         <div className="grid grid-cols-1 gap-4 pb-16">
-            <HeaderResult />
-
             <div className="mt-6">
                 <FilterArticle onFilterUpdate={handleResearcherUpdate} />
             </div>

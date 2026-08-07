@@ -371,8 +371,8 @@ export function SearchModal() {
                     });
                     const data = await response.json();
                     if (data.results && data.results.length > 0) {
-                        const firstFiveResults = data.results.slice(0, 5);
-                        const extractedData = firstFiveResults.map(result => ({
+                        const firstResults = data.results.slice(0, 15);
+                        const extractedData = firstResults.map(result => ({
                             term: result.display_name,
                             type: 'name-openalex'
                         }));
@@ -665,7 +665,7 @@ export function SearchModal() {
                                         <div>
                                             <p className="uppercase font-medium text-xs mb-3">Artigos</p>
                                             <div className="flex flex-wrap gap-3">
-                                                {filteredItems.filter(item => item.type_ === 'ARTICLE').slice(0, 5).map((props, index) => (
+                                                {filteredItems.filter(item => item.type_ === 'ARTICLE').slice(0, 15).map((props, index) => (
                                                     <div key={index} onClick={() => handlePesquisa(props.term_normalize, props.type_)} className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`} >
                                                         {props.term}
                                                     </div>
@@ -678,7 +678,7 @@ export function SearchModal() {
                                         <div>
                                             <p className="uppercase font-medium text-xs mb-3">Resumo</p>
                                             <div className="flex flex-wrap gap-3">
-                                                {filteredItems.filter(item => item.type_ === 'ABSTRACT').slice(0, 5).map((props, index) => (
+                                                {filteredItems.filter(item => item.type_ === 'ABSTRACT').slice(0, 15).map((props, index) => (
                                                     <div key={index} onClick={() => handlePesquisa(props.term_normalize, props.type_)} className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`} >
                                                         {props.term}
                                                     </div>
@@ -691,7 +691,7 @@ export function SearchModal() {
                                         <div>
                                             <p className="uppercase font-medium text-xs mb-3">Patente</p>
                                             <div className="flex flex-wrap gap-3">
-                                                {filteredItems.filter(item => item.type_ === 'PATENT').slice(0, 5).map((props, index) => (
+                                                {filteredItems.filter(item => item.type_ === 'PATENT').slice(0, 15).map((props, index) => (
                                                     <div key={index} onClick={() => handlePesquisa(props.term_normalize, props.type_)} className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`} >
                                                         {props.term}
                                                     </div>
@@ -704,7 +704,7 @@ export function SearchModal() {
                                         <div>
                                             <p className="uppercase font-medium text-xs mb-3">Livros e capítulos</p>
                                             <div className="flex flex-wrap gap-3">
-                                                {filteredItems.filter(item => item.type_ === 'BOOK' || item.type_ === 'BOOK_CHAPTER').slice(0, 5).map((props, index) => (
+                                                {filteredItems.filter(item => item.type_ === 'BOOK' || item.type_ === 'BOOK_CHAPTER').slice(0, 15).map((props, index) => (
                                                     <div key={index} onClick={() => handlePesquisa(props.term_normalize, props.type_)} className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`} >
                                                         {props.term}
                                                     </div>
@@ -717,7 +717,7 @@ export function SearchModal() {
                                         <div>
                                             <p className="uppercase font-medium text-xs mb-3">Participação em eventos</p>
                                             <div className="flex flex-wrap gap-3">
-                                                {filteredItems.filter(item => item.type_ === 'SPEAKER').slice(0, 5).map((props, index) => (
+                                                {filteredItems.filter(item => item.type_ === 'SPEAKER').slice(0, 15).map((props, index) => (
                                                     <div key={index} onClick={() => handlePesquisa(props.term_normalize, props.type_)} className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`} >
                                                         {props.term}
                                                     </div>
@@ -730,7 +730,7 @@ export function SearchModal() {
                                         <div>
                                             <p className="uppercase font-medium text-xs mb-3">Área de especialidade</p>
                                             <div className="flex flex-wrap gap-3">
-                                                {filteredItems.filter(item => item.type_ === 'AREA').slice(0, 5).map((props, index) => (
+                                                {filteredItems.filter(item => item.type_ === 'AREA').slice(0, 15).map((props, index) => (
                                                     <div key={index} onClick={() => handlePesquisa(props.term, props.type_)} className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`} >
                                                         {props.term} | {props.great_area}
                                                     </div>
@@ -751,7 +751,7 @@ export function SearchModal() {
                                                             normalizeTerm(t.term) === normalizeTerm(value.term)
                                                         ))
                                                     )
-                                                    .slice(0, 5)
+                                                    .slice(0, 15)
                                                     .map((props, index) => (
                                                         <div
                                                             key={index}

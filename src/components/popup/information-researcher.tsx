@@ -1,7 +1,6 @@
 import { useContext, useState } from "react"
 import { UserContext } from "../../context/context"
 import { BracketsCurly, CaretDown, Copy, GraduationCap, IdentificationBadge, LinkSimple, LinkedinLogo, MapPin, PuzzlePiece, StripeLogo } from "phosphor-react"
-
 import { Button } from "../ui/button"
 
 import { Link } from "react-router-dom"
@@ -43,7 +42,6 @@ interface Props {
   scopus: string,
   openalex: string,
   openAPI: boolean
-
 }
 type Research = {
   h_index: number;

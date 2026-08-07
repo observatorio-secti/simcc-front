@@ -586,7 +586,7 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
 
                                     <AccordionItem value="item-4">
                                         <div className="flex items-center justify-between">
-                                            <Label>Universidade</Label>
+                                            <Label>Instituições</Label>
                                             <div className="flex gap-2 items-center">
 
                                                 {selectedUniversities.length > 0 && (
@@ -809,27 +809,63 @@ export function ResearchersHome() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(urlTermPesquisadores, {
-                    mode: "cors",
-                    headers: {
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "GET",
-                        "Access-Control-Allow-Headers": "Content-Type",
-                        "Access-Control-Max-Age": "3600",
-                        "Content-Type": "text/plain",
-                    },
-                });
-                const data = await response.json();
-                if (data) {
-                    setResearcher(data);
-                    setOriginalResearcher(data);
-                    setLoading(false);
 
+                // Os endpoints do backend tem limite fixo de 100 itens por consulta.
+                // Busca paginada: acumula todas as páginas até não retornar mais resultados.
+                const allResearchers: Research[] = [];
+                let page = 1;
+                let batch: Research[] = [];
+                const sep = urlTermPesquisadores.includes('?') ? '&' : '?';
 
+                try {
+                    do {
+                        const response = await fetch(`${urlTermPesquisadores}${sep}page=${page}`, {
+                            mode: "cors",
+                            headers: {
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "GET",
+                                "Access-Control-Allow-Headers": "Content-Type",
+                                "Access-Control-Max-Age": "3600",
+                                "Content-Type": "text/plain",
+                            },
+                        });
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        batch = await response.json();
+                        allResearchers.push(...batch);
+                        page++;
+                        // Para quando a página não vier completa (menos de 100 = fim da lista)
+                        if (batch.length < 100) break;
+                        if (page > 100) break;
+                    } while (batch.length > 0);
+                } catch (err) {
+                    // Se a primeira busca paginada falhar sem trazer nada, tenta a URL original
+                    if (allResearchers.length === 0) {
+                        try {
+                            const response = await fetch(urlTermPesquisadores, {
+                                mode: "cors",
+                                headers: {
+                                    "Access-Control-Allow-Origin": "*",
+                                    "Access-Control-Allow-Methods": "GET",
+                                    "Access-Control-Allow-Headers": "Content-Type",
+                                    "Access-Control-Max-Age": "3600",
+                                    "Content-Type": "text/plain",
+                                },
+                            });
+                            const single = await response.json();
+                            allResearchers.push(...single);
+                        } catch (singleErr) {
+                            console.error("Fallback fetch error:", singleErr);
+                        }
+                    }
+                }
+
+                if (allResearchers.length > 0) {
+                    setResearcher(allResearchers);
+                    setOriginalResearcher(allResearchers);
                 }
 
                 // Check OpenAlex data only if no researchers found and OpenAlex is enabled
-                if (data.length === 0 && FinalOpenAlex === 'true') {
+                if (allResearchers.length === 0 && FinalOpenAlex === 'true') {
                     try {
                         const openAlexResponse = await fetch(urlOpenAlex, {
                             mode: "cors"
@@ -846,6 +882,7 @@ export function ResearchersHome() {
                 }
             } catch (err) {
                 console.error("Main data fetch error:", err);
+            } finally {
                 setLoading(false);
             }
         };

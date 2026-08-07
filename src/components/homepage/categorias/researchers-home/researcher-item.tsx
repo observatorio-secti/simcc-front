@@ -58,7 +58,18 @@ interface GraduatePrograms {
 }
 
 const fallbackSiglas: Record<string, string> = {
-  "Universidade Externa a Plataforma": "Externa",
+  "Universidade Estadual Do Sudoeste Da Bahia": "UESB",
+  "Universidade Federal Do Sul Da Bahia": "UFSB",
+  "Universidade Federal Do Recôncavo Da Bahia": "UFRB",
+  "Universidade Do Estado Da Bahia": "UNEB",
+  "Fundação Oswaldo Cruz": "FIOCRUZ",
+  "Universidade Estadual De Feira De Santana": "UEFS",
+  "Escola Bahiana De Medicina E Saúde Pública": "EBMSP",
+  "Universidade Federal Do Oeste Da Bahia": "UFOB",
+  "Universidade Federal da Bahia": "UFBA",
+  "Instituto Federal De Educação, Ciência E Tecnologia Da Bahia": "IFBA",
+  "Universidade Estadual De Santa Cruz": "UESC",
+  "Universidade Externa a Plataforma": "---",
   "Centro Universitário Senai Cimatec": "CIMATEC",
 };
 
@@ -127,11 +138,7 @@ function useUniversitySigla(urlGeral: string, university: string) {
           return fallbackSiglasLower[nomeLower];
         }
 
-        return nomeLimpo
-          .split(/\s+/)
-          .filter((word) => word && !["de", "da", "do", "das", "dos", "e", "a", "à", "na", "no"].includes(word.toLowerCase()))
-          .map((word) => word[0]?.toUpperCase())
-          .join("");
+        return "";
       });
 
       setSigla(siglas.filter(Boolean).join(" / "));

@@ -154,11 +154,8 @@ export function DocentesInstitution() {
         return `${urlGeral}researcher_metrics?type=&term=&area=&graduate_program=&city=&institution=&modality=&graduation=&departament=&year=1900&institution_id=${institutionId}`;
     }, [urlGeral, institutionId]);
 
-    const urlGraduateProgram = useMemo(() => {
-        return `${urlGeral}researcherName?name=&institution_id=${institutionId}`;
-    }, [urlGeral, institutionId]);
-
-    // Fallback: endpoint paginado que funciona mesmo quando researcherName falha (ex.: 500 no backend)
+    // Endpoint paginado: busca todos os pesquisadores da instituição,
+    // contornando o limite fixo de 100 itens do researcherName no backend.
     const urlResearchersPaginated = useMemo(() => {
         return `${urlGeral}researcher?terms=&university=&institution_id=${institutionId}`;
     }, [urlGeral, institutionId]);
@@ -180,45 +177,32 @@ export function DocentesInstitution() {
         fetchTotals();
     }, [urlTotais, institutionId]);
 
-    // Efeito para buscar a lista de pesquisadores, com fallback paginado
+    // Efeito para buscar a lista de pesquisadores com paginação
     useEffect(() => {
         const fetchResearchers = async () => {
             if (!institutionId) return;
             setLoading(true);
             try {
-                const response = await fetch(urlGraduateProgram, { mode: "cors" });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                // researcherName tem limite fixo de 100 no backend; se vier exatamente 100, assume truncamento
-                if (data && data.length < 100) {
-                    setGraduatePrograms(data);
-                } else {
-                    throw new Error("Lista truncada (limite de 100), buscando paginado");
-                }
+                const allResearchers: Pesquisador[] = [];
+                let page = 1;
+                let batch: Pesquisador[] = [];
+                do {
+                    const response = await fetch(`${urlResearchersPaginated}&page=${page}`, { mode: "cors" });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    batch = await response.json();
+                    allResearchers.push(...batch);
+                    page++;
+                    if (page > 100) break;
+                } while (batch.length > 0);
+                setGraduatePrograms(allResearchers);
             } catch (err) {
-                console.log("researcherName falhou ou truncou, tentando fallback paginado:", err);
-                try {
-                    const allResearchers: Pesquisador[] = [];
-                    let page = 1;
-                    let batch: Pesquisador[] = [];
-                    do {
-                        const response = await fetch(`${urlResearchersPaginated}&page=${page}`, { mode: "cors" });
-                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                        batch = await response.json();
-                        allResearchers.push(...batch);
-                        page++;
-                        if (page > 100) break;
-                    } while (batch.length > 0);
-                    setGraduatePrograms(allResearchers);
-                } catch (fallbackErr) {
-                    console.log("Erro ao buscar pesquisadores:", fallbackErr);
-                }
+                console.log("Erro ao buscar pesquisadores:", err);
             } finally {
                 setLoading(false);
             }
         };
         fetchResearchers();
-    }, [urlGraduateProgram, urlResearchersPaginated, institutionId]);
+    }, [urlResearchersPaginated, institutionId]);
 
     const items = Array.from({ length: 12 }, (_, index) => (
         <Skeleton key={index} className="w-full rounded-md h-[300px]" />

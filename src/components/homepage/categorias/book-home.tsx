@@ -12,7 +12,6 @@ import { CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { GraficoLivros } from "../../popup/graficos/grafico-livros";
 import { TableReseracherBookPopup } from "../../popup/columns/table-books-popup";
 import { BlockItemGeral } from "./book-home/block-item-geral";
-import { HeaderResult } from "../header-results";
 import { Switch } from "../../ui/switch";
 import { useQuery } from "../../dashboard/builder-page/tabelas/tabela-artigos";
 
@@ -261,6 +260,7 @@ export function BookHome() {
     const queryUrl = useQuery();
     const institutionId = queryUrl.get('institution_id');
     const institutionParam = institutionId ? `&institution_id=${institutionId}` : '';
+    const selectedTerms = institutionId ? '' : valoresSelecionadosExport;
 
     const [publicacoes, setPublicacoes] = useState<Patente[]>([]);
     const [capLivros, setCapLivros] = useState<Patente[]>([]);
@@ -310,21 +310,21 @@ export function BookHome() {
 
     const urlTermPublicacoes = useMemo(() => {
         const paginationParams = `&page=${pageBook}&lenght=${limit}&sort_by=year&sort_order=desc`;
-        return `${urlGeral}book_production_researcher?researcher_id=&year=${yearString}&term=${valoresSelecionadosExport}&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
-    }, [urlGeral, yearString, valoresSelecionadosExport, distinct, institutionParam, pageBook]);
+        return `${urlGeral}book_production_researcher?researcher_id=&year=${yearString}&term=${selectedTerms}&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
+    }, [urlGeral, yearString, selectedTerms, distinct, institutionParam, pageBook]);
 
     const urlTermCap = useMemo(() => {
         const paginationParams = `&page=${pageChapter}&lenght=${limit}&sort_by=year&sort_order=desc`;
-        return `${urlGeral}book_chapter_production_researcher?researcher_id=&year=${yearString}&term=${valoresSelecionadosExport}&distinct=${distinct2 ? '1' : '0'}${institutionParam}${paginationParams}`;
-    }, [urlGeral, yearString, valoresSelecionadosExport, distinct2, institutionParam, pageChapter]);
+        return `${urlGeral}book_chapter_production_researcher?researcher_id=&year=${yearString}&term=${selectedTerms}&distinct=${distinct2 ? '1' : '0'}${institutionParam}${paginationParams}`;
+    }, [urlGeral, yearString, selectedTerms, distinct2, institutionParam, pageChapter]);
 
     const urlChartBooks = useMemo(() => {
-        return `${urlGeral}metrics/book/chart?researcher_id=&year=${yearString}&term=${valoresSelecionadosExport}&distinct=${distinct ? '1' : '0'}${institutionParam}`;
-    }, [urlGeral, yearString, valoresSelecionadosExport, distinct, institutionParam]);
+        return `${urlGeral}metrics/book/chart?researcher_id=&year=${yearString}&term=${selectedTerms}&distinct=${distinct ? '1' : '0'}${institutionParam}`;
+    }, [urlGeral, yearString, selectedTerms, distinct, institutionParam]);
 
     const urlChartChapters = useMemo(() => {
-        return `${urlGeral}metrics/book-chapter/chart?researcher_id=&year=${yearString}&term=${valoresSelecionadosExport}&distinct=${distinct2 ? '1' : '0'}${institutionParam}`;
-    }, [urlGeral, yearString, valoresSelecionadosExport, distinct2, institutionParam]);
+        return `${urlGeral}metrics/book-chapter/chart?researcher_id=&year=${yearString}&term=${selectedTerms}&distinct=${distinct2 ? '1' : '0'}${institutionParam}`;
+    }, [urlGeral, yearString, selectedTerms, distinct2, institutionParam]);
 
     const fetchOptions = {
         mode: "cors",
@@ -417,8 +417,6 @@ export function BookHome() {
 
     return (
         <div className="grid grid-cols-1 gap-4 pb-16">
-            <HeaderResult />
-
             <div className="mt-6">
                 <FilterYearPopUp onFilterUpdate={handleResearcherUpdate} />
             </div>

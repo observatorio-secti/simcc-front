@@ -12,7 +12,6 @@ import { TableReseracherPatentesPopup } from "../../popup/columns/producoes-tecn
 import { Alert } from "../../ui/alert";
 import { CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { BlockItemGeral } from "./book-home/block-item-geral";
-import { HeaderResult } from "../header-results";
 import { GraficoPatente } from "./patent-home/grafico-patent";
 import { Switch } from "../../ui/switch";
 import { useQuery } from "../../dashboard/builder-page/tabelas/tabela-artigos";
@@ -163,6 +162,7 @@ export function PatentHome() {
     const queryUrl = useQuery();
     const institutionId = queryUrl.get('institution_id');
     const institutionParam = institutionId ? `&institution_id=${institutionId}` : '';
+    const selectedTerms = institutionId ? '' : valoresSelecionadosExport;
 
     const [publicacoes, setPublicacoes] = useState<Patente[]>([]);
     const [chartData, setChartData] = useState<ChartMetricPatent[]>([]);
@@ -198,12 +198,12 @@ export function PatentHome() {
 
     const urlTermPublicacoes = useMemo(() => {
         const paginationParams = `&page=${page}&lenght=${limit}&sort_by=year&sort_order=desc`;
-        return `${urlGeral}patent_production_researcher?researcher_id=&year=${yearString}&term=${valoresSelecionadosExport}&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
-    }, [urlGeral, yearString, valoresSelecionadosExport, distinct, institutionParam, page]);
+        return `${urlGeral}patent_production_researcher?researcher_id=&year=${yearString}&term=${selectedTerms}&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
+    }, [urlGeral, yearString, selectedTerms, distinct, institutionParam, page]);
 
     const urlChartPatents = useMemo(() => {
-        return `${urlGeral}metrics/patent/chart?researcher_id=&year=${yearString}&term=${valoresSelecionadosExport}&distinct=${distinct ? '1' : '0'}${institutionParam}`;
-    }, [urlGeral, yearString, valoresSelecionadosExport, distinct, institutionParam]);
+        return `${urlGeral}metrics/patent/chart?researcher_id=&year=${yearString}&term=${selectedTerms}&distinct=${distinct ? '1' : '0'}${institutionParam}`;
+    }, [urlGeral, yearString, selectedTerms, distinct, institutionParam]);
 
     const fetchOptions = {
         mode: "cors",
@@ -265,8 +265,6 @@ export function PatentHome() {
 
     return (
         <div className="grid grid-cols-1 gap-4 pb-16">
-            <HeaderResult />
-
             <div className="mt-6">
                 <FilterYearPopUp onFilterUpdate={handleResearcherUpdate} />
             </div>

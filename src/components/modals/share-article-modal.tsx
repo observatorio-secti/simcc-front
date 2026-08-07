@@ -78,19 +78,48 @@ export function ShareArticleModal() {
     return lines.join("\n");
   }, [data.magazine, data.qualis, data.quadrennial, data.researcher, data.title, data.year, shareTarget]);
 
+  const twitterMessage = useMemo(() => {
+    const totalLimit = 280;
+    const urlLength = 24;
+    const separator = "\n\n";
+    const sharedUrl = shareTarget;
+
+    const full = `${shareMessage}${separator}${sharedUrl}`;
+    if (full.length <= totalLimit) return full;
+
+    const textBudget = totalLimit - urlLength - separator.length;
+
+    const lines = shareMessage.split("\n");
+    const restLines = lines.slice(1);
+    const restText = restLines.join("\n");
+
+    const maxTitleLength = Math.max(
+      0,
+      textBudget - (restLines.length > 0 ? restText.length + 1 : 0)
+    );
+
+    const titleLine = truncateWithEllipsis(lines[0] || "Título", maxTitleLength);
+    const truncatedText = restLines.length > 0
+      ? `${titleLine}\n${restText}`
+      : titleLine;
+
+    return `${truncatedText}${separator}${sharedUrl}`;
+  }, [shareMessage, shareTarget]);
+
   const shareLinks = useMemo(() => {
     const encodedUrl = encodeURIComponent(shareTarget);
     const encodedMessage = encodeURIComponent(shareMessage);
     const encodedTitle = encodeURIComponent(normalizeText(data.title) || "Artigo");
+    const encodedTwitterMessage = encodeURIComponent(twitterMessage);
 
     return {
       whatsapp: `https://wa.me/?text=${encodeURIComponent(`${shareMessage}\n\n${shareTarget}`)}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}&title=${encodedTitle}&summary=${encodedMessage}`,
-      twitter: `https://twitter.com/intent/tweet?text=${encodedMessage}&url=${encodedUrl}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodedTwitterMessage}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedMessage}`,
       email: `mailto:?subject=${encodeURIComponent(`Artigo: ${data.title || "Compartilhamento"}`)}&body=${encodeURIComponent(`${shareMessage}\n\n${shareTarget}`)}`,
     };
-  }, [data.title, shareMessage, shareTarget]);
+  }, [data.title, shareMessage, shareTarget, twitterMessage]);
 
   useEffect(() => {
     const checkOverflow = () => {

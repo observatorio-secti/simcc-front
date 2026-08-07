@@ -16,7 +16,6 @@ import { InstitutionsBlock } from "./institutions-home/institutions-block";
 import { Button } from "../../ui/button";
 import { useModalSidebar } from "../../hooks/use-modal-sidebar";
 import { TableReseracherInstitutionshome } from "./institutions-home/table-institutions-home";
-import { HeaderResult } from "../header-results";
 import { Alert } from "../../ui/alert";
 import { CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { Building2 } from "lucide-react";
@@ -90,8 +89,6 @@ export function InstitutionsHome() {
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      <HeaderResult />
-
       <div className="mt-4 ">
         <Alert className={`p-0 bg-cover bg-no-repeat bg-center `}  >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
