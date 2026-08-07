@@ -12,7 +12,7 @@ type ResearchData = {
 };
 
 const normalizeArea = (area: string): string => {
-  return area.toUpperCase(); // Converte para maiúsculas
+  return (area || '').toUpperCase(); // Converte para maiúsculas
 };
 
 
@@ -118,7 +118,7 @@ export function GraficoAreaGrupos(props: ResearchData) {
   const [chartData, setChartData] = useState<{ area: string; count: number }[]>([]);
 
   const normalizeArea = (area: string): string => {
-    return area
+    return (area || '')
 
       .toUpperCase(); // Converte para maiúsculas
   };
@@ -129,7 +129,7 @@ export function GraficoAreaGrupos(props: ResearchData) {
 
       // Conta a quantidade de grupos por área
       props.group.forEach((group) => {
-        const area = normalizeArea(group.area);
+        const area = normalizeArea(group.area) || 'SEM ÁREA DEFINIDA';
 
         if (!counts[area]) {
           counts[area] = 0;
@@ -181,7 +181,7 @@ export function GraficoAreaGrupos(props: ResearchData) {
               <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
               <Bar dataKey="count" radius={4}>
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={qualisColor[normalizeArea(entry.area)] } />
+                  <Cell key={`cell-${index}`} fill={qualisColor[normalizeArea(entry.area)] || "#004A75"} />
                 ))}
                 <LabelList dataKey="count" position="top" offset={12} fill="#8C8C8C" className="fill-foreground" fontSize={12} />
               </Bar>

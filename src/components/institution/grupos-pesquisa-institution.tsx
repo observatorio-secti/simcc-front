@@ -177,7 +177,7 @@ export function GruposPesquisaInstitution({ institutionId, institutionName }: Gr
   // Filtrar grupos por instituição
   const filteredByInstitution = Array.isArray(total) ? total.filter(item => {
     // Normalizar strings para comparação
-    const normalizeString = (str: string) => str
+    const normalizeString = (str: string) => (str || '')
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
@@ -193,10 +193,10 @@ export function GruposPesquisaInstitution({ institutionId, institutionName }: Gr
            targetInstitution.includes(itemInstitution);
   }) : [];
 
-  const areas = Array.isArray(filteredByInstitution) ? [...new Set(filteredByInstitution.map(item => item.area))] : [];
+  const areas = Array.isArray(filteredByInstitution) ? [...new Set(filteredByInstitution.map(item => item.area).filter((area): area is string => !!area))] : [];
 
   const filteredTotal = filteredByInstitution.filter(item => {
-    const normalizeString = (str: string) => str
+    const normalizeString = (str: string) => (str || '')
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
@@ -223,6 +223,7 @@ export function GruposPesquisaInstitution({ institutionId, institutionName }: Gr
 
   const convertJsonToCsv = (json: any[]): string => {
     const items = json;
+    if (items.length === 0) return '';
     const replacer = (_: string, value: any) => (value === null ? '' : value);
     const header = Object.keys(items[0]);
     const csv = [
@@ -250,7 +251,7 @@ export function GruposPesquisaInstitution({ institutionId, institutionName }: Gr
   };
 
   const filteredTotal2 = Array.isArray(areas) ? areas.filter(item => {
-    const normalizeString = (str: any) => str
+    const normalizeString = (str: any) => (str || '')
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();

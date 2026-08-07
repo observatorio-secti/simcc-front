@@ -26,7 +26,7 @@ export function GraficoInstituicaoGrupos(props: ResearchData) {
       const counts: { [institution: string]: number } = {};
 
       props.group.forEach((group) => {
-        const institution = group.institution.toUpperCase();
+        const institution = (group.institution || 'SEM INSTITUIÇÃO').toUpperCase();
 
         if (!counts[institution]) {
           counts[institution] = 0;

@@ -202,8 +202,8 @@ export function GruposPesquisaPage() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const institutions = Array.isArray(total) ? [...new Set(total.map(item => item.institution))] : [];
-    const areas = Array.isArray(total) ? [...new Set(total.map(item => item.area))] : [];
+    const institutions = Array.isArray(total) ? [...new Set(total.map(item => item.institution).filter((i): i is string => !!i))] : [];
+    const areas = Array.isArray(total) ? [...new Set(total.map(item => item.area).filter((a): a is string => !!a))] : [];
 
     const updateFilters = (category: string, values: string[]) => {
         const query = new URLSearchParams(location.search);
@@ -243,7 +243,7 @@ export function GruposPesquisaPage() {
     }, []);
 
     const filteredTotal = Array.isArray(total) ? total.filter(item => {
-        const normalizeString = (str) => str
+        const normalizeString = (str) => (str || '')
             .normalize("NFD")
             .replace(/[̀-ͯ]/g, "")
             .toLowerCase();
@@ -319,7 +319,7 @@ export function GruposPesquisaPage() {
 
     const filteredTotal2 = Array.isArray(areas) ? areas.filter(item => {
         // Normaliza a string do item e da busca para comparação
-        const normalizeString = (str: any) => str
+        const normalizeString = (str: any) => (str || '')
             .normalize("NFD") // Decompõe os caracteres acentuados
             .replace(/[\u0300-\u036f]/g, "") // Remove os diacríticos
             .toLowerCase(); // Converte para minúsculas
@@ -334,7 +334,7 @@ export function GruposPesquisaPage() {
 
     const filteredTotal3 = Array.isArray(institutions) ? institutions.filter(item => {
         // Normaliza a string do item e da busca para comparação
-        const normalizeString = (str: any) => str
+        const normalizeString = (str: any) => (str || '')
             .normalize("NFD") // Decompõe os caracteres acentuados
             .replace(/[\u0300-\u036f]/g, "") // Remove os diacríticos
             .toLowerCase(); // Converte para minúsculas
