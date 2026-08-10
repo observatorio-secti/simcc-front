@@ -59,7 +59,7 @@ const initiativesList: Initiatives[] = [
         id: "simcc",
         title: "SIMCC - Mapeamento de Competências",
         description: "Navegue pelo Sistema de Mapeamento de Competências Científicas para encontrar pesquisadores e especialidades em todo o estado.",
-        link: "/",
+        link: "http://simcc.uesc.br/",
         icon: Map,
         status: 'active',
         imageUrl: SIMCC
