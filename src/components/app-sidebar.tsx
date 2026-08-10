@@ -91,6 +91,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 isActive: true,
                 items: [
                     {
+                        title: "Instituições",
+                        url: "/instituicao",
+                        icon: Building2,
+                    },
+                    {
                         title: "Vídeos",
                         url: "/videos",
                         icon: SquarePlay,

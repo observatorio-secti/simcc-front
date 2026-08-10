@@ -632,7 +632,7 @@ export function InitialHome() {
 
             <div className=" w-full md:px-8 gap-8 flex flex-col px-4">
 
-                <Alert className="grid lg:grid-cols-4 gap-4">
+                {/* <Alert className="grid lg:grid-cols-4 gap-4">
                     {version ? (
                         <div>
                             <CardHeader className="flex flex-row items-center pb-2 justify-between space-y-0">
@@ -675,9 +675,9 @@ export function InitialHome() {
                             <CarrosselInstitution />
                         )}
                     </div>
-                </Alert>
+                </Alert> */}
 
-                <Alert className="flex flex-col md:grid gap-3 lg:grid-cols-4 grid-cols-2">
+                {/* <Alert className="flex flex-col md:grid gap-3 lg:grid-cols-4 grid-cols-2">
                     <Link onClick={() => onOpenResult('articles-home')} to={'/resultados?type_search=article&terms=&researcher=false'}>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <div>
@@ -754,7 +754,7 @@ export function InitialHome() {
 
                     </Link>
 
-                </Alert>
+                </Alert> */}
 
                 <div
                     className="

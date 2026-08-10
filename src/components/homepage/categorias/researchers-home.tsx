@@ -1,4 +1,5 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { cn } from "../../../lib/utils";
 import { useModalResult } from "../../hooks/use-modal-result";
 import { UserContext } from "../../../context/context";
 import { CloudWordResearcherHome } from "./researchers-home/clould-word-researcher-home";
@@ -14,7 +15,7 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Alert } from "../../ui/alert";
 import { CardContent, CardHeader, CardTitle } from "../../ui/card";
-import { Hash, MapIcon, Sparkles, Trash, User, X } from "lucide-react";
+import { Hash, MapIcon, SlidersHorizontal, Sparkles, Trash, User, X } from "lucide-react";
 import bg_popup from '../../../assets/bg_popup.png';
 import bg_user from '../../../assets/user.png';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../../ui/dialog";
@@ -32,7 +33,6 @@ import MapaResearcher from "./researchers-home/mapa-researcher";
 import municipios from './researchers-home/municipios.json';
 import { Sheet, SheetContent } from "../../ui/sheet";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../ui/tooltip";
-import { ScrollArea } from "../../ui/scroll-area";
 import { Input } from "../../ui/input";
 import { Separator } from "../../ui/separator";
 import { Badge } from "../../ui/badge";
@@ -144,14 +144,11 @@ type FiltersModalProps = {
     setResearcher: React.Dispatch<React.SetStateAction<Research[]>>;
 };
 
-export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
-    const isFirstRender = useRef(true);
+function useResearcherFilters({ researcher, setResearcher }: FiltersModalProps) {
     const queryUrl = useQuery();
     const getArrayFromUrl = (key: string) => queryUrl.get(key)?.split(";") || [];
 
 
-    const { onClose, isOpen, type: typeModal } = useModal();
-    const isModalOpen = isOpen && typeModal === "filters";
     const [selectedAreas, setSelectedAreas] = useState<string[]>(getArrayFromUrl("areas"));
     const [selectedGraduations, setSelectedGraduations] = useState<string[]>(getArrayFromUrl("graduations"));
     const [selectedCities, setSelectedCities] = useState<string[]>(getArrayFromUrl("cities"));
@@ -163,7 +160,6 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
     const [filteredCount, setFilteredCount] = useState<number>(0);
     const navigate = useNavigate();
 
-    const { simcc } = useContext(UserContext)
     useEffect(() => {
         // Calculate filtered results count
         let filtered = [...researcher];
@@ -271,7 +267,6 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
 
     const applyFilters = () => {
         setResearcher(filteredResearchers);
-        onClose();
     };
 
     const clearFilters = () => {
@@ -283,7 +278,6 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
         setSelectedDepartaments([]);
         setSelectedGraduatePrograms([])
         setResearcher(researcher);
-        onClose();
     };
 
     // Ensure unique values
@@ -337,8 +331,6 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
 
 
 
-    const { version } = useContext(UserContext)
-
     const updateFilters = (category: string, values: string[]) => {
         if (values.length > 0) {
             queryUrl.set(category, values.join(";"));
@@ -387,6 +379,46 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
         return searchString.includes(normalizedSearch);
     }) : [];
 
+    const filters = {
+        selectedAreas,
+        selectedGraduations,
+        selectedCities,
+        selectedDepartaments,
+        selectedGraduatePrograms,
+        selectedSubsidies,
+        selectedUniversities,
+        setSelectedAreas,
+        setSelectedGraduations,
+        setSelectedCities,
+        setSelectedDepartaments,
+        setSelectedGraduatePrograms,
+        setSelectedSubsidies,
+        setSelectedUniversities,
+        handleAreaToggle,
+        handleGraduationToggle,
+        handleDepartamentToggle,
+        handleCityToggle,
+        handleUniversityToggle,
+        handleSubsidyToggle,
+        handleGraduateProgramToggle,
+        uniqueAreas,
+        uniqueGraduations,
+        uniqueCities,
+        uniqueUniversities,
+        uniqueSubsidies,
+        uniqueGraduatePrograms,
+        uniqueDepartaments,
+        search,
+        setSearch,
+        search2,
+        setSearch2,
+        filteredTotal,
+        filteredTotal2,
+        clearFilters,
+        applyFilters,
+        filteredCount,
+    };
+
     return {
         selectedAreas,
         selectedGraduations,
@@ -403,353 +435,465 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
         setSelectedSubsidies,
         setSelectedUniversities,
         clearFilters,
-        component: (
-            <Sheet open={isModalOpen} onOpenChange={onClose}>
-                <SheetContent className={`p-0 dark:bg-neutral-900 dark:border-gray-600 min-w-[60vw]`}>
-                    <DialogHeader className="h-[50px] px-4 justify-center border-b dark:border-gray-600">
-
-                        <div className="flex items-center gap-3">
-
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button className="h-8 w-8" variant={'outline'} onClick={() => {
-                                            onClose()
-                                        }} size={'icon'}><X size={16} /></Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent> Fechar</TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </div>
-
-                    </DialogHeader>
-
-                    <div className="relative flex">
-
-                        <div>
-                            <div className="hidden lg:block p-8 pr-0 h-full">
-                                <div style={{ backgroundImage: `url(${bg_user})` }} className=" h-full w-[270px]  bg-cover bg-no-repeat bg-left rounded-md bg-eng-blue p-8"></div>
-
-                            </div>
-
-                        </div>
-                        <ScrollArea className="relative whitespace-nowrap h-[calc(100vh-50px)] p-8 w-full ">
-                            <div>
-                                <p className="max-w-[750px] mb-2 text-lg font-light text-foreground">
-                                    Pesquisadores
-                                </p>
-
-                                <h1 className="max-w-[500px] text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] mb-8 md:block">
-                                    Filtros de pesquisa
-                                </h1>
-                            </div>
-
-                            <div className="w-full">
-                                {/* Área de especialidade */}
-
-
-                                <Accordion defaultValue="item-1" type="single" collapsible className="w-full">
-                                    <AccordionItem value="item-1" className="w-full">
-                                        <div className="flex items-center justify-between">
-                                            <Label>Área de especialidade</Label>
-                                            <div className="flex gap-2 items-center">
-                                                {selectedAreas.length > 0 && (
-                                                    <Button
-                                                        onClick={() => {
-                                                            setSelectedAreas([])
-                                                            applyFilters()
-                                                        }}
-                                                        className="" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
-                                                )}
-                                                <AccordionTrigger>
-
-                                                </AccordionTrigger>
-                                            </div>
-
-                                        </div>
-                                        <AccordionContent>
-                                            <ToggleGroup
-                                                type="multiple"
-                                                variant={'outline'}
-                                                value={selectedAreas}
-                                                onValueChange={handleAreaToggle}
-                                                className="aspect-auto flex flex-wrap items-start justify-start gap-2"
-                                            >
-                                                {uniqueAreas
-                                                    .filter((area) => area.trim() !== "")
-                                                    .map((area) => (
-                                                        <ToggleGroupItem key={area} value={area} className="px-3 py-2 gap-2 flex">
-                                                            <Alert className={` w-4 rounded-md border-0 h-4 p-0 ${area.includes("CIENCIAS AGRARIAS")
-                                                                ? "bg-red-400"
-                                                                : area.includes("CIENCIAS EXATAS E DA TERRA")
-                                                                    ? "bg-green-400"
-                                                                    : area.includes("CIENCIAS DA SAUDE")
-                                                                        ? "bg-[#20BDBE]"
-                                                                        : area.includes("CIENCIAS HUMANAS")
-                                                                            ? "bg-[#F5831F]"
-                                                                            : area.includes("CIENCIAS BIOLOGICAS")
-                                                                                ? "bg-[#EB008B]"
-                                                                                : area.includes("ENGENHARIAS")
-                                                                                    ? "bg-[#FCB712]"
-                                                                                    : area.includes("CIENCIAS SOCIAIS APLICADAS")
-                                                                                        ? "bg-[#009245]"
-                                                                                        : area.includes("LINGUISTICA LETRAS E ARTES")
-                                                                                            ? "bg-[#A67C52]"
-                                                                                            : area.includes("OUTROS")
-                                                                                                ? "bg-[#1B1464]"
-                                                                                                : "bg-[#000]"
-                                                                }`} />   {area}
-                                                        </ToggleGroupItem>
-                                                    ))}
-                                            </ToggleGroup>
-                                        </AccordionContent>
-                                    </AccordionItem>
-
-                                    <AccordionItem value="item-2">
-                                        <div className="flex items-center justify-between">
-                                            <Label>Titulação</Label>
-
-                                            <div className="flex gap-2 items-center">
-
-                                                {selectedGraduations.length > 0 && (
-                                                    <Button
-                                                        onClick={() => setSelectedGraduations([])}
-                                                        className="" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
-                                                )}
-                                                <AccordionTrigger>
-
-                                                </AccordionTrigger>
-                                            </div>
-                                        </div>
-                                        <AccordionContent>
-                                            <ToggleGroup
-                                                type="multiple"
-                                                variant={'outline'}
-                                                value={selectedGraduations}
-                                                onValueChange={handleGraduationToggle}
-                                                className="aspect-auto flex flex-wrap items-start justify-start gap-2"
-                                            >
-                                                {uniqueGraduations.map((graduation) => (
-                                                    <ToggleGroupItem key={graduation} value={graduation} className="px-3 py-2">
-                                                        {graduation}
-                                                    </ToggleGroupItem>
-                                                ))}
-                                            </ToggleGroup>
-                                        </AccordionContent>
-                                    </AccordionItem>
-
-                                    <AccordionItem value="item-3">
-                                        <div className="flex items-center justify-between">
-                                            <Label>Cidade</Label>
-
-
-                                            <div className="flex gap-2 items-center">
-
-                                                {selectedCities.length > 0 && (
-                                                    <Button
-                                                        onClick={() => setSelectedCities([])}
-                                                        className="" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
-                                                )}
-                                                <AccordionTrigger>
-
-                                                </AccordionTrigger>
-                                            </div>
-                                        </div>
-                                        <AccordionContent>
-                                            <Alert className="h-12 p-2 mb-4 flex items-center justify-between  w-full ">
-                                                <div className="flex items-center gap-2 w-full flex-1">
-                                                    <MagnifyingGlass size={16} className=" whitespace-nowrap w-10" />
-                                                    <Input onChange={(e) => setSearch2(e.target.value)} value={search2} type="text" className="border-0 w-full " />
-                                                </div>
-
-                                                <div className="w-fit">
-
-
-                                                </div>
-                                            </Alert>
-
-                                            <ToggleGroup
-                                                type="multiple"
-                                                variant={'outline'}
-                                                value={selectedCities}
-                                                onValueChange={handleCityToggle}
-                                                className="aspect-auto flex flex-wrap items-start justify-start gap-2"
-                                            >
-                                                {filteredTotal2.map((city) => (
-                                                    <ToggleGroupItem key={city} value={city} className="px-3 py-2">
-                                                        {city}
-                                                    </ToggleGroupItem>
-                                                ))}
-                                            </ToggleGroup>
-                                        </AccordionContent>
-                                    </AccordionItem>
-
-                                    <AccordionItem value="item-4">
-                                        <div className="flex items-center justify-between">
-                                            <Label>Instituições</Label>
-                                            <div className="flex gap-2 items-center">
-
-                                                {selectedUniversities.length > 0 && (
-                                                    <Button
-                                                        onClick={() => setSelectedUniversities([])}
-                                                        className="" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
-                                                )}
-                                                <AccordionTrigger>
-
-                                                </AccordionTrigger>
-                                            </div>
-
-                                        </div>
-                                        <AccordionContent>
-                                            <ToggleGroup
-                                                type="multiple"
-                                                variant={'outline'}
-                                                value={selectedUniversities}
-                                                onValueChange={handleUniversityToggle}
-                                                className="aspect-auto flex flex-wrap items-start justify-start gap-2"
-                                            >
-                                                {uniqueUniversities.map((university) => (
-                                                    <ToggleGroupItem key={university} value={university} className="px-3 py-2">
-                                                        {university}
-                                                    </ToggleGroupItem>
-                                                ))}
-                                            </ToggleGroup>
-                                        </AccordionContent>
-                                    </AccordionItem>
-
-
-                                    <AccordionItem value="item-5">
-                                        <div className="flex items-center justify-between">
-                                            <Label>Bolsa CNPq</Label>
-
-
-                                            <div className="flex gap-2 items-center">
-
-                                                {selectedSubsidies.length > 0 && (
-                                                    <Button
-                                                        onClick={() => setSelectedSubsidies([])}
-                                                        className="" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
-                                                )}
-                                                <AccordionTrigger>
-
-                                                </AccordionTrigger>
-                                            </div>
-                                        </div>
-                                        <AccordionContent>
-                                            <ToggleGroup
-                                                type="multiple"
-                                                variant={'outline'}
-                                                value={selectedSubsidies}
-                                                onValueChange={handleSubsidyToggle}
-                                                className="aspect-auto flex flex-wrap items-start justify-start gap-2"
-                                            >
-                                                {uniqueSubsidies.map((subsidy) => (
-                                                    <ToggleGroupItem key={subsidy} value={subsidy} className="px-3 py-2">
-                                                        {subsidy === 'pq' ? 'Produtividade em Pesquisa' : subsidy === 'dt' ? 'Desenvolvimento Tecnológico' : subsidy}
-                                                    </ToggleGroupItem>
-                                                ))}
-                                            </ToggleGroup>
-                                        </AccordionContent>
-                                    </AccordionItem>
-
-                                    {version && (
-                                        <AccordionItem value="item-6">
-                                            <div className="flex items-center justify-between">
-                                                <Label>Departamentos</Label>
-                                                <div className="flex gap-2 items-center">
-
-                                                    {selectedDepartaments.length > 0 && (
-                                                        <Button
-                                                            onClick={() => setSelectedDepartaments([])}
-                                                            className="" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
-                                                    )}
-                                                    <AccordionTrigger>
-
-                                                    </AccordionTrigger>
-                                                </div>
-                                            </div>
-                                            <AccordionContent>
-                                                <ToggleGroup
-                                                    type="multiple"
-                                                    variant={'outline'}
-                                                    value={selectedDepartaments}
-                                                    onValueChange={handleDepartamentToggle}
-                                                    className="aspect-auto flex flex-wrap items-start justify-start gap-2"
-                                                >
-                                                    {uniqueDepartaments.map((program) => (
-                                                        <ToggleGroupItem key={program} value={program} className="px-3 py-2 whitespace-normal">
-                                                            {program}
-                                                        </ToggleGroupItem>
-                                                    ))}
-                                                </ToggleGroup>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    )}
-
-                                    <AccordionItem value="item-7">
-                                        <div className="flex items-center justify-between">
-                                            <Label>Programas de Pós-graduação</Label>
-                                            <div className="flex gap-2 items-center">
-
-                                                {selectedGraduatePrograms.length > 0 && (
-                                                    <Button
-                                                        onClick={() => setSelectedGraduatePrograms([])}
-                                                        className="" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
-                                                )}
-                                                <AccordionTrigger>
-
-                                                </AccordionTrigger>
-                                            </div>
-                                        </div>
-                                        <AccordionContent>
-                                            <Alert className="h-12 p-2 mb-4 flex items-center justify-between  w-full ">
-                                                <div className="flex items-center gap-2 w-full flex-1">
-                                                    <MagnifyingGlass size={16} className=" whitespace-nowrap w-10" />
-                                                    <Input onChange={(e) => setSearch(e.target.value)} value={search} type="text" className="border-0 w-full " />
-                                                </div>
-
-                                                <div className="w-fit">
-
-
-                                                </div>
-                                            </Alert>
-
-                                            <ToggleGroup
-                                                type="multiple"
-                                                variant={'outline'}
-                                                value={selectedGraduatePrograms}
-                                                onValueChange={handleGraduateProgramToggle}
-                                                className="aspect-auto flex flex-wrap items-start justify-start gap-2"
-                                            >
-                                                {filteredTotal.map((program) => (
-                                                    <ToggleGroupItem key={program} value={program} className="px-3 py-2 whitespace-normal">
-                                                        {program}
-                                                    </ToggleGroupItem>
-                                                ))}
-                                            </ToggleGroup>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </Accordion>
-
-                            </div>
-
-                            <DialogFooter className="py-4">
-                                <Button variant="ghost" onClick={clearFilters} className="gap-2">
-                                    <Trash size={16} />
-                                    Limpar Filtros
-                                </Button>
-
-                                <Button onClick={applyFilters} className="gap-2">
-                                    <FadersHorizontal size={16} />
-                                    Mostrar {filteredCount} resultados
-                                </Button>
-                            </DialogFooter>
-                        </ScrollArea>
-                    </div>
-                </SheetContent>
-            </Sheet>
-        )
+        sidebar: <FiltersSidebar filters={filters} />,
+        component: <FiltersSheet filters={filters} />,
     }
+}
+
+type FiltersData = {
+    selectedAreas: string[];
+    selectedGraduations: string[];
+    selectedCities: string[];
+    selectedDepartaments: string[];
+    selectedGraduatePrograms: string[];
+    selectedSubsidies: string[];
+    selectedUniversities: string[];
+    setSelectedAreas: React.Dispatch<React.SetStateAction<string[]>>;
+    setSelectedGraduations: React.Dispatch<React.SetStateAction<string[]>>;
+    setSelectedCities: React.Dispatch<React.SetStateAction<string[]>>;
+    setSelectedDepartaments: React.Dispatch<React.SetStateAction<string[]>>;
+    setSelectedGraduatePrograms: React.Dispatch<React.SetStateAction<string[]>>;
+    setSelectedSubsidies: React.Dispatch<React.SetStateAction<string[]>>;
+    setSelectedUniversities: React.Dispatch<React.SetStateAction<string[]>>;
+    handleAreaToggle: (value: any) => void;
+    handleGraduationToggle: (value: any) => void;
+    handleDepartamentToggle: (value: any) => void;
+    handleCityToggle: (value: any) => void;
+    handleUniversityToggle: (value: any) => void;
+    handleSubsidyToggle: (value: any) => void;
+    handleGraduateProgramToggle: (value: any) => void;
+    uniqueAreas: string[];
+    uniqueGraduations: string[];
+    uniqueCities: string[];
+    uniqueUniversities: string[];
+    uniqueSubsidies: string[];
+    uniqueGraduatePrograms: string[];
+    uniqueDepartaments: string[];
+    search: string;
+    setSearch: React.Dispatch<React.SetStateAction<string>>;
+    search2: string;
+    setSearch2: React.Dispatch<React.SetStateAction<string>>;
+    filteredTotal: string[];
+    filteredTotal2: string[];
+    clearFilters: () => void;
+    applyFilters: () => void;
+    filteredCount: number;
+};
+
+function useMediaQueryLg() {
+    const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : false);
+
+    useEffect(() => {
+        const mql = window.matchMedia('(min-width: 1024px)');
+        const onChange = () => setIsDesktop(mql.matches);
+        mql.addEventListener('change', onChange);
+        setIsDesktop(mql.matches);
+        return () => mql.removeEventListener('change', onChange);
+    }, []);
+
+    return isDesktop;
+}
+
+function FilterSections({ filters }: { filters: FiltersData }) {
+    const { version } = useContext(UserContext);
+
+    return (
+        <Accordion defaultValue="item-1" type="single" collapsible className="w-full">
+            <AccordionItem value="item-1" className="w-full">
+                <div className="flex items-center justify-between">
+                    <Label>Área de especialidade</Label>
+                    <div className="flex gap-2 items-center">
+                        {filters.selectedAreas.length > 0 && (
+                            <Button
+                                onClick={() => {
+                                    filters.setSelectedAreas([])
+                                    filters.applyFilters()
+                                }}
+                                className="lg:h-8 lg:w-8" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
+                        )}
+                        <AccordionTrigger>
+
+                        </AccordionTrigger>
+                    </div>
+
+                </div>
+                <AccordionContent>
+                    <ToggleGroup
+                        type="multiple"
+                        variant={'outline'}
+                        value={filters.selectedAreas}
+                        onValueChange={filters.handleAreaToggle}
+                        className="aspect-auto flex flex-wrap items-start justify-start gap-2"
+                    >
+                        {filters.uniqueAreas
+                            .filter((area) => area.trim() !== "")
+                            .map((area) => (
+                                <ToggleGroupItem key={area} value={area} className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left gap-2 flex">
+                                    <Alert className={` w-4 rounded-md border-0 h-4 p-0 ${area.includes("CIENCIAS AGRARIAS")
+                                        ? "bg-red-400"
+                                        : area.includes("CIENCIAS EXATAS E DA TERRA")
+                                            ? "bg-green-400"
+                                            : area.includes("CIENCIAS DA SAUDE")
+                                                ? "bg-[#20BDBE]"
+                                                : area.includes("CIENCIAS HUMANAS")
+                                                    ? "bg-[#F5831F]"
+                                                    : area.includes("CIENCIAS BIOLOGICAS")
+                                                        ? "bg-[#EB008B]"
+                                                        : area.includes("ENGENHARIAS")
+                                                            ? "bg-[#FCB712]"
+                                                            : area.includes("CIENCIAS SOCIAIS APLICADAS")
+                                                                ? "bg-[#009245]"
+                                                                : area.includes("LINGUISTICA LETRAS E ARTES")
+                                                                    ? "bg-[#A67C52]"
+                                                                    : area.includes("OUTROS")
+                                                                        ? "bg-[#1B1464]"
+                                                                        : "bg-[#000]"
+                                        }`} />   {area}
+                                </ToggleGroupItem>
+                            ))}
+                    </ToggleGroup>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2">
+                <div className="flex items-center justify-between">
+                    <Label>Titulação</Label>
+
+                    <div className="flex gap-2 items-center">
+
+                        {filters.selectedGraduations.length > 0 && (
+                            <Button
+                                onClick={() => filters.setSelectedGraduations([])}
+                                className="lg:h-8 lg:w-8" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
+                        )}
+                        <AccordionTrigger>
+
+                        </AccordionTrigger>
+                    </div>
+                </div>
+                <AccordionContent>
+                    <ToggleGroup
+                        type="multiple"
+                        variant={'outline'}
+                        value={filters.selectedGraduations}
+                        onValueChange={filters.handleGraduationToggle}
+                        className="aspect-auto flex flex-wrap items-start justify-start gap-2"
+                    >
+                        {filters.uniqueGraduations.map((graduation) => (
+                            <ToggleGroupItem key={graduation} value={graduation} className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left">
+                                {graduation}
+                            </ToggleGroupItem>
+                        ))}
+                    </ToggleGroup>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3">
+                <div className="flex items-center justify-between">
+                    <Label>Cidade</Label>
+
+
+                    <div className="flex gap-2 items-center">
+
+                        {filters.selectedCities.length > 0 && (
+                            <Button
+                                onClick={() => filters.setSelectedCities([])}
+                                className="lg:h-8 lg:w-8" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
+                        )}
+                        <AccordionTrigger>
+
+                        </AccordionTrigger>
+                    </div>
+                </div>
+                <AccordionContent>
+                    <Alert className="h-12 p-2 mb-4 flex items-center justify-between  w-full ">
+                        <div className="flex items-center gap-2 w-full flex-1">
+                            <MagnifyingGlass size={16} className=" whitespace-nowrap w-10" />
+                            <Input onChange={(e) => filters.setSearch2(e.target.value)} value={filters.search2} type="text" className="border-0 w-full " />
+                        </div>
+
+                        <div className="w-fit">
+
+
+                        </div>
+                    </Alert>
+
+                    <ToggleGroup
+                        type="multiple"
+                        variant={'outline'}
+                        value={filters.selectedCities}
+                        onValueChange={filters.handleCityToggle}
+                        className="aspect-auto flex flex-wrap items-start justify-start gap-2"
+                    >
+                        {filters.filteredTotal2.map((city) => (
+                            <ToggleGroupItem key={city} value={city} className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left">
+                                {city}
+                            </ToggleGroupItem>
+                        ))}
+                    </ToggleGroup>
+                </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4">
+                <div className="flex items-center justify-between">
+                    <Label>Instituições</Label>
+                    <div className="flex gap-2 items-center">
+
+                        {filters.selectedUniversities.length > 0 && (
+                            <Button
+                                onClick={() => filters.setSelectedUniversities([])}
+                                className="lg:h-8 lg:w-8" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
+                        )}
+                        <AccordionTrigger>
+
+                        </AccordionTrigger>
+                    </div>
+
+                </div>
+                <AccordionContent>
+                    <ToggleGroup
+                        type="multiple"
+                        variant={'outline'}
+                        value={filters.selectedUniversities}
+                        onValueChange={filters.handleUniversityToggle}
+                        className="aspect-auto flex flex-wrap items-start justify-start gap-2"
+                    >
+                        {filters.uniqueUniversities.map((university) => (
+                            <ToggleGroupItem key={university} value={university} className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left">
+                                {university}
+                            </ToggleGroupItem>
+                        ))}
+                    </ToggleGroup>
+                </AccordionContent>
+            </AccordionItem>
+
+
+            <AccordionItem value="item-5">
+                <div className="flex items-center justify-between">
+                    <Label>Bolsa CNPq</Label>
+
+
+                    <div className="flex gap-2 items-center">
+
+                        {filters.selectedSubsidies.length > 0 && (
+                            <Button
+                                onClick={() => filters.setSelectedSubsidies([])}
+                                className="lg:h-8 lg:w-8" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
+                        )}
+                        <AccordionTrigger>
+
+                        </AccordionTrigger>
+                    </div>
+                </div>
+                <AccordionContent>
+                    <ToggleGroup
+                        type="multiple"
+                        variant={'outline'}
+                        value={filters.selectedSubsidies}
+                        onValueChange={filters.handleSubsidyToggle}
+                        className="aspect-auto flex flex-wrap items-start justify-start gap-2"
+                    >
+                        {filters.uniqueSubsidies.map((subsidy) => (
+                            <ToggleGroupItem key={subsidy} value={subsidy} className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left">
+                                {subsidy === 'pq' ? 'Produtividade em Pesquisa' : subsidy === 'dt' ? 'Desenvolvimento Tecnológico' : subsidy}
+                            </ToggleGroupItem>
+                        ))}
+                    </ToggleGroup>
+                </AccordionContent>
+            </AccordionItem>
+
+            {version && (
+                <AccordionItem value="item-6">
+                    <div className="flex items-center justify-between">
+                        <Label>Departamentos</Label>
+                        <div className="flex gap-2 items-center">
+
+                            {filters.selectedDepartaments.length > 0 && (
+                                <Button
+                                    onClick={() => filters.setSelectedDepartaments([])}
+                                    className="lg:h-8 lg:w-8" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
+                            )}
+                            <AccordionTrigger>
+
+                            </AccordionTrigger>
+                        </div>
+                    </div>
+                    <AccordionContent>
+                        <ToggleGroup
+                            type="multiple"
+                            variant={'outline'}
+                            value={filters.selectedDepartaments}
+                            onValueChange={filters.handleDepartamentToggle}
+                            className="aspect-auto flex flex-wrap items-start justify-start gap-2"
+                        >
+                            {filters.uniqueDepartaments.map((program) => (
+                                <ToggleGroupItem key={program} value={program} className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left">
+                                    {program}
+                                </ToggleGroupItem>
+                            ))}
+                        </ToggleGroup>
+                    </AccordionContent>
+                </AccordionItem>
+            )}
+
+            <AccordionItem value="item-7">
+                <div className="flex items-center justify-between">
+                    <Label>Programas de Pós-graduação</Label>
+                    <div className="flex gap-2 items-center">
+
+                        {filters.selectedGraduatePrograms.length > 0 && (
+                            <Button
+                                onClick={() => filters.setSelectedGraduatePrograms([])}
+                                className="lg:h-8 lg:w-8" variant={'destructive'} size={'icon'}><Trash size={16} /></Button>
+                        )}
+                        <AccordionTrigger>
+
+                        </AccordionTrigger>
+                    </div>
+                </div>
+                <AccordionContent>
+                    <Alert className="h-12 p-2 mb-4 flex items-center justify-between  w-full ">
+                        <div className="flex items-center gap-2 w-full flex-1">
+                            <MagnifyingGlass size={16} className=" whitespace-nowrap w-10" />
+                            <Input onChange={(e) => filters.setSearch(e.target.value)} value={filters.search} type="text" className="border-0 w-full " />
+                        </div>
+
+                        <div className="w-fit">
+
+
+                        </div>
+                    </Alert>
+
+                    <ToggleGroup
+                        type="multiple"
+                        variant={'outline'}
+                        value={filters.selectedGraduatePrograms}
+                        onValueChange={filters.handleGraduateProgramToggle}
+                        className="aspect-auto flex flex-wrap items-start justify-start gap-2"
+                    >
+                        {filters.filteredTotal.map((program) => (
+                                <ToggleGroupItem key={program} value={program} className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left">
+                                    {program}
+                                </ToggleGroupItem>
+                        ))}
+                    </ToggleGroup>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    );
+}
+
+function FiltersSidebar({ filters }: { filters: FiltersData }) {
+    const [collapsed, setCollapsed] = useState(false);
+
+    return (
+        <div
+            className="group relative hidden lg:block shrink-0 sticky top-[calc(68px+var(--sticky-header-h,0px))] h-[calc(100vh-68px-var(--sticky-header-h,0px))]"
+            data-state={collapsed ? "collapsed" : "expanded"}
+            data-side="left"
+        >
+            <aside className={cn(
+                "h-full overflow-hidden transition-[width] duration-200 ease-linear",
+                collapsed ? "w-0" : "w-72"
+            )}>
+                <div className="h-full w-72 overflow-y-auto border-r border-neutral-200 bg-card p-4 dark:border-neutral-800">
+                    <div className="mb-4">
+                        <h1 className="mb-6 flex items-center gap-2 text-2xl font-bold leading-tight tracking-tighter">
+                            <SlidersHorizontal size={24} />
+                            Filtros
+                        </h1>
+                    </div>
+
+                    <FilterSections filters={filters} />
+
+                    <div className="mt-4 border-t border-neutral-200 pt-4 dark:border-neutral-800">
+                        <Button variant="ghost" onClick={filters.clearFilters} className="gap-2 w-full">
+                            <Trash size={16} />
+                            Limpar Filtros
+                        </Button>
+                    </div>
+                </div>
+            </aside>
+
+            <button
+                onClick={() => setCollapsed((c) => !c)}
+                aria-label="Ocultar ou mostrar filtros"
+                tabIndex={-1}
+                title="Ocultar ou mostrar filtros"
+                className={cn(
+                    "absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border lg:flex -right-4",
+                    collapsed
+                        ? "cursor-e-resize after:bg-sidebar-border"
+                        : "cursor-w-resize"
+                )}
+            />
+        </div>
+    );
+}
+
+function FiltersSheet({ filters }: { filters: FiltersData }) {
+    const { onClose, isOpen, type: typeModal } = useModal();
+    const isModalOpen = isOpen && typeModal === "filters";
+    const isDesktop = useMediaQueryLg();
+
+    return (
+        <Sheet open={isModalOpen && !isDesktop} onOpenChange={onClose}>
+            <SheetContent className={`p-0 dark:bg-neutral-900 dark:border-gray-600 min-w-[60vw]`}>
+                <DialogHeader className="h-[50px] px-4 justify-center border-b dark:border-gray-600">
+
+                    <div className="flex items-center gap-3">
+
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button className="h-8 w-8" variant={'outline'} onClick={() => {
+                                        onClose()
+                                    }} size={'icon'}><X size={16} /></Button>
+                                </TooltipTrigger>
+                                <TooltipContent> Fechar</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+
+                </DialogHeader>
+
+                <div className="relative flex">
+
+                    <div>
+                        <div className="hidden lg:block p-8 pr-0 h-full">
+                            <div style={{ backgroundImage: `url(${bg_user})` }} className=" h-full w-[270px]  bg-cover bg-no-repeat bg-left rounded-md bg-eng-blue p-8"></div>
+
+                        </div>
+
+                    </div>
+                    <div className="relative h-[calc(100vh-50px)] p-8 w-full overflow-y-auto">
+                        <div>
+                            <h1 className="mb-8 flex items-center gap-3 max-w-[500px] text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
+                                <SlidersHorizontal size={32} className="shrink-0" />
+                                Filtros
+                            </h1>
+                        </div>
+
+                        <div className="w-full">
+                            <FilterSections filters={filters} />
+                        </div>
+
+                        <DialogFooter className="py-4">
+                            <Button variant="ghost" onClick={filters.clearFilters} className="gap-2">
+                                <Trash size={16} />
+                                Limpar Filtros
+                            </Button>
+
+                            <Button onClick={() => { filters.applyFilters(); onClose(); }} className="gap-2">
+                                <FadersHorizontal size={16} />
+                                Mostrar {filters.filteredCount} resultados
+                            </Button>
+                        </DialogFooter>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+    );
 }
 
 export function ResearchersHome() {
@@ -958,14 +1102,15 @@ export function ResearchersHome() {
         setSelectedGraduatePrograms,
         setSelectedSubsidies,
         setSelectedUniversities,
-        clearFilters, selectedAreas, selectedGraduations, component, selectedCities, selectedDepartaments, selectedGraduatePrograms, selectedSubsidies, selectedUniversities } = FiltersModal({
+        clearFilters, selectedAreas, selectedGraduations, component, sidebar, selectedCities, selectedDepartaments, selectedGraduatePrograms, selectedSubsidies, selectedUniversities } = useResearcherFilters({
             researcher: originalResearcher,
             setResearcher,
         });
 
     return (
         <div className="w-full h-full">
-            <div className="w-full flex gap-4 justify-center">
+            <div className="w-full flex gap-4 justify-center items-start">
+                {sidebar}
                 <div className="flex-1 gap-4 flex flex-col">
 
                     <div className={`flex flex-col gap-4 w-full ${selectedAreas.length > 0 || selectedCities.length > 0 || selectedDepartaments.length > 0 || selectedGraduatePrograms.length > 0 || selectedGraduations.length > 0 || selectedSubsidies.length > 0 || selectedUniversities.length > 0 ? ('flex') : ('hidden')}`}>

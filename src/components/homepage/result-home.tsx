@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useModalHomepage } from "../hooks/use-modal-homepage";
 import { ModalType, useModalResult } from "../hooks/use-modal-result";
 import { ResultProvider } from "../provider/result-provider";
@@ -201,8 +201,25 @@ export function ResultHome() {
     };
 
     const { version } = useContext(UserContext)
+    const rootRef = useRef<HTMLDivElement>(null);
+    const stickyHeaderRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const header = stickyHeaderRef.current;
+        const root = rootRef.current;
+        if (!header || !root) return;
+
+        const update = () => {
+            root.style.setProperty('--sticky-header-h', `${header.offsetHeight}px`);
+        };
+        update();
+        const observer = new ResizeObserver(update);
+        observer.observe(header);
+        return () => observer.disconnect();
+    }, [itemsSelecionados]);
+
     return (
-        <div className="h-full w-full flex flex-col">
+        <div ref={rootRef} className="min-h-full w-full flex flex-col">
             <Helmet>
                 <title>
                     {itemsSelecionados.length === 0
@@ -222,7 +239,7 @@ export function ResultHome() {
             </Helmet>
 
             {(itemsSelecionados.length > 0 || (researcher == 'false')) && (
-                <div className="top-[68px] h-fit sticky z-[2] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
+                <div ref={stickyHeaderRef} className="top-[68px] h-fit sticky z-[2] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
                     <div className={`w-full px-8 border-b border-b-neutral-200 dark:border-b-neutral-800`}>
                         {isOn && (
                             <div className="w-full pt-4  flex justify-between items-center">
@@ -303,14 +320,6 @@ export function ResultHome() {
                                     </Button>
                                 </div>
 
-                                <div>
-                                    {typeResult == 'researchers-home' && (
-                                        <Button onClick={() => onOpenModal('filters')} variant="ghost" className="">
-                                            <SlidersHorizontal size={16} className="" />
-                                            Filtros
-                                        </Button>
-                                    )}
-                                </div>
                                 <Button variant="ghost" size="icon" onClick={() => setIsOn(!isOn)}>
                                     {isOn ? (
                                         <ChevronUp className="h-4 w-4" />
@@ -345,7 +354,7 @@ export function ResultHome() {
                                         </DropdownMenuItem >
 
                                         {typeResult == 'researchers-home' && (
-                                            <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2">
+                                            <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2 lg:hidden">
 
                                                 <SlidersHorizontal size={16} className="" />
                                                 Filtros
