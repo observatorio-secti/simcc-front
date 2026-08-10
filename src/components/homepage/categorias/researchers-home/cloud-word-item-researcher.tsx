@@ -21,8 +21,6 @@ export function CloudWordItemResearcher(props:Props) {
     return(
         <li key={props.id} className="list-none list-item w-min group" onClick={() => onOpen('researcher-modal', {name:props.name})} >
         <div
-         
-          className="inline-flex whitespace-nowrap cursor-pointer"
         >
           <Alert
            className={`flex gap-2 font-semibold   text-white items-center
