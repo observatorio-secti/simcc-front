@@ -1213,7 +1213,7 @@ export function InitialHome() {
                     </div>
                 </div>
 
-                <h3 className="text-2xl font-medium ">Destaques do mês</h3>
+                {/* <h3 className="text-2xl font-medium ">Destaques do mês</h3>
 
                 <div className="rounded-md w-full bg-eng-blue p-8 gap-8 md:p-16  grid lg:grid-cols-2">
                     <CardContent
@@ -1247,7 +1247,7 @@ export function InitialHome() {
                             />
                         </div>
                     </div>
-                </div>
+                </div> */}
 
                 <Newsletter />
 
