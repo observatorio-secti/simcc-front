@@ -8,7 +8,7 @@ type ResearcherItem = {
 };
 
 type Research = {
-    researcher: ResearcherItem[];
+    researcher: any[];
 }
 
 export function CloudWordResearcherHome(props: Research) {
@@ -27,7 +27,7 @@ export function CloudWordResearcherHome(props: Research) {
                     distinctAmongCount <= 1
                         ? maxFontSize
                         : maxFontSize -
-                          ((maxFontSize - minFontSize) / (distinctAmongCount - 1)) * rankIndex;
+                        ((maxFontSize - minFontSize) / (distinctAmongCount - 1)) * rankIndex;
 
                 return (
                     <CloudWordItemResearcher
