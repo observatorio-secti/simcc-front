@@ -9,8 +9,6 @@ import { UserContext } from "../../context/context";
 
 import { SelectTypeSearch } from "./select-type-search";
 import { Input } from "../ui/input";
-import { Switch } from "../ui/switch";
-import { Label } from "../ui/label";
 interface Message {
     message: any;
     direction: string;
