@@ -50,7 +50,7 @@ const initiativesList: Initiatives[] = [
         id: "indicadores-institucionais",
         title: "Indicadores Institucionais e Pós-graduação",
         description: "Visualize métricas e dados consolidados sobre as instituições de ensino, pesquisa e os programas de pós-graduação da Bahia.",
-        link: "/indicadores",
+        link: "https://simcc.uesc.br/indicadores",
         icon: BarChart,
         status: 'active',
         imageUrl: INDICADORES,
@@ -59,7 +59,7 @@ const initiativesList: Initiatives[] = [
         id: "simcc",
         title: "SIMCC - Mapeamento de Competências",
         description: "Navegue pelo Sistema de Mapeamento de Competências Científicas para encontrar pesquisadores e especialidades em todo o estado.",
-        link: "/",
+        link: "http://simcc.uesc.br/",
         icon: Map,
         status: 'active',
         imageUrl: SIMCC
@@ -77,7 +77,7 @@ const initiativesList: Initiatives[] = [
         id: "pos-graduacao",
         title: "Programas de Pós-Graduação",
         description: "Explore informações detalhadas sobre os programas de mestrado e doutorado oferecidos pelas instituições de ensino superior da Bahia.",
-        link: "/pos-graduacao",
+        link: "https://simcc.uesc.br/pos-graduacao",
         icon: GraduationCap,
         status: 'active',
         imageUrl: PESQUISA
@@ -86,7 +86,7 @@ const initiativesList: Initiatives[] = [
         id: "producao-tecnica",
         title: "Produção Técnica e Inovação",
         description: "Acesse dados sobre patentes, registros de software e marcas que compõem a produção tecnológica e de inovação do estado.",
-        link: "/listagens?tab=patent",
+        link: "https://simcc.uesc.br/listagens?tab=patent",
         icon: Lightbulb,
         status: 'active',
         imageUrl: PATENTE
@@ -95,7 +95,7 @@ const initiativesList: Initiatives[] = [
         id: "grupos-pesquisa",
         title: "Grupos de Pesquisa",
         description: "Encontre e analise os grupos de pesquisa certificados da Bahia, suas linhas de atuação, membros e produção científica.",
-        link: "/grupos-pesquisa",
+        link: "https://simcc.uesc.br/grupos-pesquisa",
         icon: Users,
         status: 'active',
         imageUrl: GRUPOS
@@ -104,7 +104,7 @@ const initiativesList: Initiatives[] = [
         id: "incite",
         title: "INCITE - Institutos de C&T&I",
         description: "Conheça os Institutos de Ciência, Inovação e Tecnologia do Estado, suas áreas de atuação e projetos estratégicos.",
-        link: "/incites",
+        link: "https://simcc.uesc.br/incites",
         icon: Landmark,
         status: 'active',
         imageUrl: INCT
@@ -113,7 +113,7 @@ const initiativesList: Initiatives[] = [
         id: "bolsistas-produtividade",
         title: "Bolsistas de Produtividade",
         description: "Visualize dados sobre os pesquisadores com bolsa de produtividade, destacando a excelência científica na Bahia.",
-        link: "/listagens?tab=bolsistas",
+        link: "https://simcc.uesc.br/listagens?tab=bolsistas",
         icon: Award,
         status: 'active',
         imageUrl: BOLSISTA
@@ -122,7 +122,7 @@ const initiativesList: Initiatives[] = [
         id: "busca-ia",
         title: "Busca por IA",
         description: "Utilize nossa busca inteligente para encontrar informações em toda a plataforma usando linguagem natural.",
-        link: "/resultados-ia",
+        link: "https://simcc.uesc.br/resultados-ia",
         icon: Sparkles,
         status: 'active',
         imageUrl: IA
