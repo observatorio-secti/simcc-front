@@ -34,28 +34,42 @@ import { ProducoesPrograma } from './producoes-programa';
 import { LinhasPesquisaPrograma } from './linhas-pesquisa-programa';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { Keepo } from '../dashboard/builder-page/builder-page';
-interface GraduateProgram {
-  id: string;
-  name: string;
-  count_r: string;
-  count_gp: string;
-  count_gpr: string;
-  count_gps: string;
-  count_d: string;
-  count_t: string;
-  researchers: string[];
-}
+import { useParams } from 'react-router-dom';
+import { useInstitution } from './hooks/use-institution-queries';
+import { Institution as InstitutionType } from '../../services/institution';
+
+export type GraduateProgram = InstitutionType;
 HC_wordcloud(Highcharts);
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
-export function VisualizacaoInstituicao() {
-  const { urlGeral, itemsSelecionados, searchType, permission, urlGeralAdm } =
-    useContext(UserContext);
-  const { onOpen: onOpenModal } = useModal();
+
+interface VisualizacaoInstituicaoProps {
+  identifier?: string;
+}
+
+export function VisualizacaoInstituicao({
+  identifier: propIdentifier,
+}: VisualizacaoInstituicaoProps = {}) {
+  const { urlGeral, urlGeralAdm } = useContext(UserContext);
   const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams<{
+    acronym?: string;
+    institution_id?: string;
+  }>();
   const queryUrl = useQuery();
-  const type_search = queryUrl.get('institution_id');
+
+  const effectiveIdentifier =
+    propIdentifier ||
+    params.acronym ||
+    params.institution_id ||
+    queryUrl.get('acronym') ||
+    queryUrl.get('institution_id') ||
+    '';
+
+  const { data: graduatePrograms, isLoading: loading } =
+    useInstitution(effectiveIdentifier);
 
   // Mapeamento de links das instituições
   const institutionLinks: { [key: string]: string } = {
@@ -78,52 +92,8 @@ export function VisualizacaoInstituicao() {
   };
 
   const handleVoltar = () => {
-    const currentPath = location.pathname;
-    const hasQueryParams = location.search.length > 0;
-    if (hasQueryParams) {
-      navigate(currentPath);
-    } else {
-      const pathSegments = currentPath
-        .split('/')
-        .filter((segment) => segment !== '');
-      if (pathSegments.length > 1) {
-        pathSegments.pop();
-        const previousPath = '/' + pathSegments.join('/');
-        navigate(previousPath);
-      } else {
-        navigate('/');
-      }
-    }
+    navigate('/instituicao');
   };
-  const [graduatePrograms, setGraduatePrograms] = useState<GraduateProgram>();
-  const urlGraduateProgram = `${urlGeral}institution/${type_search}`;
-  const [loading, setLoading] = useState(true);
-  console.log(urlGraduateProgram);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlGraduateProgram, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setGraduatePrograms(data);
-        }
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [urlGraduateProgram]);
 
   const { theme } = useTheme();
   const siteTitle = graduatePrograms?.name
@@ -146,7 +116,6 @@ export function VisualizacaoInstituicao() {
   ];
   const tab = queryUrl.get('pagina');
   const [value, setValue] = useState(tab || tabs[0].id);
-  const navigate = useNavigate();
   const updateFilters = (category: string, values: any) => {
     if (values) {
       queryUrl.set(category, values);
@@ -155,13 +124,19 @@ export function VisualizacaoInstituicao() {
     }
   };
   useEffect(() => {
-    console.log('typeResult mudou para:', value);
-    updateFilters('pagina', value);
-    navigate({
-      pathname: location.pathname,
-      search: queryUrl.toString(),
-    });
-  }, [value]);
+    const currentParams = new URLSearchParams(location.search);
+    currentParams.set('pagina', value);
+    if (graduatePrograms?.id) {
+      currentParams.set('institution_id', graduatePrograms.id);
+    }
+    navigate(
+      {
+        pathname: location.pathname,
+        search: currentParams.toString(),
+      },
+      { replace: true },
+    );
+  }, [value, graduatePrograms?.id]);
   const [loadingMessage, setLoadingMessage] = useState(
     'Estamos procurando todas as informações no nosso banco de dados, aguarde.',
   );
@@ -547,23 +522,23 @@ lg:flex-row
               <LinhasPesquisaPrograma />
             </TabsContent>
             <TabsContent value="docentes" className="m-0">
-              <DocentesInstitution />
+              <DocentesInstitution institutionId={graduatePrograms.id} />
             </TabsContent>
             <TabsContent value="programas_pos" className="m-0">
               <ProgramasPosInstitution
-                institutionId={type_search || ''}
+                institutionId={graduatePrograms.id}
                 institutionName={graduatePrograms.name}
               />
             </TabsContent>
             <TabsContent value="grupos_pesquisa" className="m-0">
               <GruposPesquisaInstitution
-                institutionId={type_search || ''}
+                institutionId={graduatePrograms.id}
                 institutionName={graduatePrograms.name}
               />
             </TabsContent>
             <TabsContent value="bolsistas" className="m-0">
               <BolsistasInstitution
-                institutionId={type_search || ''}
+                institutionId={graduatePrograms.id}
                 institutionName={graduatePrograms.name}
               />
             </TabsContent>

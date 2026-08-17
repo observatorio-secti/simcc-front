@@ -5,7 +5,7 @@ import { useModalHomepage } from '../hooks/use-modal-homepage';
 
 import { areasComCores, InstitutionItem } from './institution-item';
 
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 
 import { Alert } from '../ui/alert';
@@ -41,94 +41,52 @@ import { CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Keepo } from '../dashboard/builder-page/builder-page';
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
 import { VisualizacaoInstituicao } from './visualizacao-instituicao';
+import { useInstitutions } from './hooks/use-institution-queries';
+import { Institution as InstitutionType } from '../../services/institution';
 
-export interface Institution {
-  id: string;
-  name: string;
-  count_r: string;
-  count_gp: string;
-  count_gpr: string;
-  count_gps: string;
-  count_d: string;
-  count_t: string;
-  acronym: string;
-  researchers: string[];
-}
+export type Institution = InstitutionType;
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
 export function Institution() {
-  const { urlGeral, urlGeralAdm } = useContext(UserContext);
-  const { isOpen, type } = useModalHomepage();
-  const { onOpen } = useModal();
+  const { urlGeralAdm } = useContext(UserContext);
   const queryUrl = useQuery();
+  const params = useParams<{
+    acronym?: string;
+    institution_id?: string;
+  }>();
 
-  const type_search = queryUrl.get('institution_id');
+  const type_search =
+    params.acronym ||
+    params.institution_id ||
+    queryUrl.get('acronym') ||
+    queryUrl.get('institution_id') ||
+    '';
 
-  const [cidade, setCidade] = useState('');
-  const [graduatePrograms, setGraduatePrograms] = useState<Institution[]>([]);
-  const [originalGraduatePrograms, setOriginalGraduatePrograms] = useState<
-    Institution[]
-  >([]);
-  const programSelecionado = type_search || '';
+  const programSelecionado = type_search;
+
+  const { data: graduatePrograms = [], isLoading: loading } = useInstitutions();
 
   const [search, setSearch] = useState('');
-  const urlGraduateProgram = `${urlGeral}institution`;
-
-  console.log(urlGraduateProgram);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(urlGraduateProgram, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setGraduatePrograms(data);
-          setOriginalGraduatePrograms(data);
-          setJsonData(data);
-          setLoading(false);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [urlGraduateProgram]);
+  const [isOn, setIsOn] = useState(true);
+  const jsonData = graduatePrograms;
 
   const filteredTotal = Array.isArray(graduatePrograms)
     ? graduatePrograms.filter((item) => {
-        // Normaliza a string do item e da busca para comparação
         const normalizeString = (str: any) =>
-          str
-            .normalize('NFD') // Decompõe os caracteres acentuados
-            .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
-            .toLowerCase(); // Converte para minúsculas
+          (str || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
 
-        const searchString = normalizeString(item.name);
+        const searchString = normalizeString(item.name) + ' ' + normalizeString(item.acronym);
         const normalizedSearch = normalizeString(search);
 
         return searchString.includes(normalizedSearch);
       })
     : [];
-
-  const { simcc } = useContext(UserContext);
-
-  const [isOn, setIsOn] = useState(true);
-
-  const [jsonData, setJsonData] = useState<any[]>([]);
 
   const convertJsonToCsv = (json: any[]): string => {
     const items = json;
@@ -488,7 +446,7 @@ export function Institution() {
             </main>
           </div>
         ) : (
-          <VisualizacaoInstituicao />
+          <VisualizacaoInstituicao identifier={programSelecionado} />
         )}
       </>
     </>

@@ -128,11 +128,8 @@ export function InstitutionItem(props: GraduateProgram) {
   // Calcula a diferença em dias entre a data atual e a data do item
 
   const handlePesquisaFinal = () => {
-    queryUrl.set('institution_id', props.id);
-    navigate({
-      pathname: props.url,
-      search: queryUrl.toString(),
-    });
+    const targetIdentifier = props.acronym?.trim() || props.id;
+    navigate(`/instituicao/${encodeURIComponent(targetIdentifier)}`);
   };
 
   const { onOpen } = useModal();

@@ -21,6 +21,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../context/context';
+import { useInstitutionBolsistas } from './hooks/use-institution-queries';
 import { Skeleton } from '../ui/skeleton';
 import { Alert } from '../ui/alert';
 import { Input } from '../ui/input';
@@ -132,50 +133,21 @@ export function BolsistasInstitution({
   institutionId,
   institutionName,
 }: BolsistasInstitutionProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [total, setTotal] = useState<Research[]>([]);
-  const { urlGeral } = useContext(UserContext);
+  const { data: rawBolsistas = [], isLoading } = useInstitutionBolsistas();
+  const total = rawBolsistas as Research[];
+
   const [count, setCount] = useState(24);
   const [search, setSearch] = useState('');
   const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
   const [typeVisu, setTypeVisu] = useState('block');
   const [isOn, setIsOn] = useState(true);
-  const [jsonData, setJsonData] = useState<any[]>([]);
+  const jsonData = total;
   const [open, setOpen] = useState(false);
   const [search2, setSearch2] = useState('');
   const [cityData, setCityData] = useState<CityData[]>([]);
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  const urlBolsistas = `${urlGeral}researcher/foment`;
-
-  useEffect(() => {
-    setIsLoading(true);
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlBolsistas, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setTotal(data);
-          setIsLoading(false);
-          setJsonData(data);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [urlBolsistas]);
 
   // Filtrar bolsistas por instituição
   const filteredByInstitution = Array.isArray(total)

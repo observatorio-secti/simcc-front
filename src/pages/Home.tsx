@@ -16,7 +16,8 @@ export function Home() {
   } = useContext(UserContext);
   const location = useLocation();
   const { searchId } = useParams<{
-    searchId: string;
+    searchId?: string;
+    acronym?: string;
     institution_id?: string;
   }>();
 

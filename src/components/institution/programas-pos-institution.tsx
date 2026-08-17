@@ -12,8 +12,9 @@ import { ChartBar, MagnifyingGlass, Rows, SquaresFour } from 'phosphor-react';
 import { Button } from '../ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { UserContext } from '../../context/context';
+import { useInstitutionGraduatePrograms } from './hooks/use-institution-queries';
 import { Skeleton } from '../ui/skeleton';
 import { Alert } from '../ui/alert';
 import { Input } from '../ui/input';
@@ -92,52 +93,22 @@ export function ProgramasPosInstitution({
   const getColorByArea = (area: string): string =>
     qualisColor.get(normalizeArea(area)) || 'bg-gray-500';
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [total, setTotal] = useState<GraduateProgram[]>([]);
-  const { urlGeral } = useContext(UserContext);
+  const { data: rawPrograms = [], isLoading } = useInstitutionGraduatePrograms();
+  const total = useMemo(() => {
+    return rawPrograms.filter((item: any) => item.visible === true);
+  }, [rawPrograms]);
+
   const [count, setCount] = useState(12);
   const [search, setSearch] = useState('');
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [typeVisu, setTypeVisu] = useState('block');
   const [isOn, setIsOn] = useState(true);
-  const [jsonData, setJsonData] = useState<any[]>([]);
+  const jsonData = total;
   const [open, setOpen] = useState(false);
   const [search2, setSearch2] = useState('');
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  const urlGraduateProgram = `${urlGeral}graduate_program_profnit?id=`;
-
-  useEffect(() => {
-    setIsLoading(true);
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlGraduateProgram, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          const visiblePrograms = data.filter(
-            (item: GraduateProgram) => item.visible === true,
-          );
-          setTotal(visiblePrograms);
-          setIsLoading(false);
-          setJsonData(visiblePrograms);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [urlGraduateProgram]);
 
   // Filtrar programas por instituição
   const filteredByInstitution = Array.isArray(total)

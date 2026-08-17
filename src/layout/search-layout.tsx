@@ -271,13 +271,12 @@ export default function SearchLayout({
                           ? '/' // O primeiro item sempre vai para a página inicial
                           : `/${pathSegments.slice(0, index + 1).join('/')}`;
 
-                      // Se for o segmento "instituicao", criar link para a página de instituição
                       if (
                         segment === 'instituicao' &&
                         fromInstitution &&
                         institutionId
                       ) {
-                        href = `/instituicao?institution_id=${institutionId}`;
+                        href = `/instituicao/${institutionId}`;
                       }
 
                       return (

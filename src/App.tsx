@@ -422,7 +422,7 @@ function App() {
                   <Route path="/pos-graduacao" element={<Home />} />
                   <Route path="/grupos-pesquisa" element={<Home />} />
                   <Route
-                    path="/instituicao/:institution_id?"
+                    path="/instituicao/:acronym?"
                     element={<Home />}
                   />
                   <Route path="/indicadores" element={<Home />} />

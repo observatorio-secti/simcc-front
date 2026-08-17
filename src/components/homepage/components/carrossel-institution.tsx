@@ -153,7 +153,7 @@ export function CarrosselInstitution() {
               key={index}
               className="!basis-auto shrink-0 grow-0 w-auto px-2"
             >
-              <Link to={`/instituicao?institution_id=${inst.id}`}>
+              <Link to={`/instituicao/${encodeURIComponent(inst.name || inst.id)}`}>
                 <img
                   src={theme === 'dark' ? inst.imgDark : inst.img}
                   alt={`Logo ${inst.name}`}

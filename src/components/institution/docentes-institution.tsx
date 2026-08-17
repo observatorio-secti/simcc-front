@@ -128,6 +128,11 @@ const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
+import {
+  useInstitutionResearcherMetrics,
+  useInstitutionResearchers,
+} from './hooks/use-institution-queries';
+
 interface Total {
   researcher_count: number;
   orcid_count: number;
@@ -135,78 +140,25 @@ interface Total {
   among: number;
 }
 
-export function DocentesInstitution() {
-  const { urlGeral } = useContext(UserContext);
+interface DocentesInstitutionProps {
+  institutionId?: string;
+}
+
+export function DocentesInstitution({
+  institutionId: propInstitutionId,
+}: DocentesInstitutionProps = {}) {
   const queryUrl = useQuery();
+  const institutionId = propInstitutionId || queryUrl.get('institution_id') || '';
 
-  const institutionId = queryUrl.get('institution_id');
-  // REMOVIDO: Leitura dos parâmetros de paginação da URL
-  // const Page = queryUrl.get('page') || '1';
-  // const Length = queryUrl.get('length') || '24';
+  const { data: total, isLoading: loadingMetrics } =
+    useInstitutionResearcherMetrics(institutionId);
+  const { data: graduatePrograms = [], isLoading: loadingResearchers } =
+    useInstitutionResearchers(institutionId);
 
-  const [total, setTotal] = useState<Total>();
-  const [graduatePrograms, setGraduatePrograms] = useState<Pesquisador[]>([]);
-  const [loading, setLoading] = useState(true);
+  const loading = loadingMetrics || loadingResearchers;
   const [typeVisu, setTypeVisu] = useState('block');
   const [search, setSearch] = useState('');
   const [isOn, setIsOn] = useState(true);
-
-  const urlTotais = useMemo(() => {
-    return `${urlGeral}researcher_metrics?type=&term=&area=&graduate_program=&city=&institution=&modality=&graduation=&departament=&year=1900&institution_id=${institutionId}`;
-  }, [urlGeral, institutionId]);
-
-  // Endpoint paginado: busca todos os pesquisadores da instituição,
-  // contornando o limite fixo de 100 itens do researcherName no backend.
-  const urlResearchersPaginated = useMemo(() => {
-    return `${urlGeral}researcher?terms=&university=&institution_id=${institutionId}`;
-  }, [urlGeral, institutionId]);
-
-  // Efeito para buscar os totais (sem alterações)
-  useEffect(() => {
-    const fetchTotals = async () => {
-      if (!institutionId) return;
-      try {
-        const response = await fetch(urlTotais, { mode: 'cors' });
-        const data = await response.json();
-        if (data) {
-          setTotal(data[0]);
-        }
-      } catch (err) {
-        console.log('Erro ao buscar totais:', err);
-      }
-    };
-    fetchTotals();
-  }, [urlTotais, institutionId]);
-
-  // Efeito para buscar a lista de pesquisadores com paginação
-  useEffect(() => {
-    const fetchResearchers = async () => {
-      if (!institutionId) return;
-      setLoading(true);
-      try {
-        const allResearchers: Pesquisador[] = [];
-        let page = 1;
-        let batch: Pesquisador[] = [];
-        do {
-          const response = await fetch(
-            `${urlResearchersPaginated}&page=${page}`,
-            { mode: 'cors' },
-          );
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          batch = await response.json();
-          allResearchers.push(...batch);
-          page++;
-          if (page > 100) break;
-        } while (batch.length > 0);
-        setGraduatePrograms(allResearchers);
-      } catch (err) {
-        console.log('Erro ao buscar pesquisadores:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchResearchers();
-  }, [urlResearchersPaginated, institutionId]);
 
   const items = Array.from({ length: 12 }, (_, index) => (
     <Skeleton key={index} className="w-full rounded-md h-[300px]" />

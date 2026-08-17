@@ -17,6 +17,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../context/context';
+import { useInstitutionResearchGroups } from './hooks/use-institution-queries';
 import { Skeleton } from '../ui/skeleton';
 import { cn } from '../../lib';
 import { Alert } from '../ui/alert';
@@ -155,49 +156,20 @@ export function GruposPesquisaInstitution({
     return area.toUpperCase();
   };
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [total, setTotal] = useState<Patrimonio[]>([]);
-  const { urlGeral } = useContext(UserContext);
+  const { data: rawGroups = [], isLoading } = useInstitutionResearchGroups();
+  const total = rawGroups as Patrimonio[];
+
   const [count, setCount] = useState(12);
   const [search, setSearch] = useState('');
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const [typeVisu, setTypeVisu] = useState('block');
   const [isOn, setIsOn] = useState(true);
-  const [jsonData, setJsonData] = useState<any[]>([]);
+  const jsonData = total;
   const [open, setOpen] = useState(false);
   const [search2, setSearch2] = useState('');
 
   const location = useLocation();
   const navigate = useNavigate();
-
-  const urlPatrimonioInsert = `${urlGeral}research_group`;
-
-  useEffect(() => {
-    setIsLoading(true);
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlPatrimonioInsert, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setTotal(data);
-          setIsLoading(false);
-          setJsonData(data);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [urlPatrimonioInsert]);
 
   // Filtrar grupos por instituição
   const filteredByInstitution = Array.isArray(total)
