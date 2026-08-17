@@ -1,11 +1,34 @@
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../../components/ui/chart";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
-import { Info } from "lucide-react";
-import { Alert } from "../ui/alert";
-import { Patrimonio } from "./grupos-pesquisa";
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  LabelList,
+  Cell,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '../../components/ui/chart';
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../ui/tooltip';
+import { Info } from 'lucide-react';
+import { Alert } from '../ui/alert';
+import { Patrimonio } from './grupos-pesquisa';
 
 type ResearchData = {
   group: Patrimonio[];
@@ -13,20 +36,24 @@ type ResearchData = {
 
 const chartConfig = {
   institution: {
-    label: "Instituição",
-    color: "#559FB8",
+    label: 'Instituição',
+    color: '#559FB8',
   },
 } satisfies ChartConfig;
 
 export function GraficoInstituicaoGrupos(props: ResearchData) {
-  const [chartData, setChartData] = useState<{ institution: string; count: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { institution: string; count: number }[]
+  >([]);
 
   useEffect(() => {
     if (props.group) {
       const counts: { [institution: string]: number } = {};
 
       props.group.forEach((group) => {
-        const institution = group.institution.toUpperCase();
+        const institution = (
+          group.institution || 'SEM INSTITUIÇÃO'
+        ).toUpperCase();
 
         if (!counts[institution]) {
           counts[institution] = 0;
@@ -48,8 +75,12 @@ export function GraficoInstituicaoGrupos(props: ResearchData) {
     <Alert>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div>
-          <CardTitle className="text-sm font-medium">Quantidade de grupos por instituição</CardTitle>
-          <CardDescription>Total de grupos de pesquisa associados a cada instituição</CardDescription>
+          <CardTitle className="text-sm font-medium">
+            Quantidade de grupos por instituição
+          </CardTitle>
+          <CardDescription>
+            Total de grupos de pesquisa associados a cada instituição
+          </CardDescription>
         </div>
 
         <TooltipProvider>
@@ -75,12 +106,13 @@ export function GraficoInstituicaoGrupos(props: ResearchData) {
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-           
-               textAnchor="middle"
-              
+                textAnchor="middle"
               />
               <CartesianGrid vertical={false} horizontal={false} />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dashed" />}
+              />
               <Bar dataKey="count" radius={4}>
                 {chartData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill="#559FB8" />

@@ -1,36 +1,29 @@
-"use client"
+'use client';
 
-import { Link } from "react-router-dom";
-import { LucideIcon } from "lucide-react"
+import { Link } from 'react-router-dom';
+import { LucideIcon } from 'lucide-react';
 
-import { cn } from "../../lib"
-import { buttonVariants } from "../ui/button"
-import { useLocation } from "react-router-dom";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "../ui/tooltip"
-import { useContext } from "react";
-import { UserContext } from "../../context/context";
+import { cn } from '../../lib';
+import { buttonVariants } from '../ui/button';
+import { useLocation } from 'react-router-dom';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { useContext } from 'react';
+import { UserContext } from '../../context/context';
 
 interface NavProps {
-  isCollapsed: boolean
+  isCollapsed: boolean;
   links: {
-    title: string
-    label?: string
-    icon: LucideIcon
-    link: string
-  }[]
+    title: string;
+    label?: string;
+    icon: LucideIcon;
+    link: string;
+  }[];
 }
 
-
-
 export function NavigationSidebar({ links, isCollapsed }: NavProps) {
-
   const location = useLocation();
 
-  const {setItensSelecionados, setSearchType} = useContext(UserContext)
+  const { setItensSelecionados, setSearchType } = useContext(UserContext);
 
   return (
     <div
@@ -43,16 +36,20 @@ export function NavigationSidebar({ links, isCollapsed }: NavProps) {
             <Tooltip key={index} delayDuration={0}>
               <TooltipTrigger asChild>
                 <Link
-                onClick={() => {
-                    setSearchType('article')
-                    setItensSelecionados([])
-                }}
+                  onClick={() => {
+                    setSearchType('article');
+                    setItensSelecionados([]);
+                  }}
                   to={`${link.link}`}
                   className={cn(
-                    buttonVariants({ variant:location.pathname == link.link ? ('default'):('ghost'), size: "icon" }),
-                    "h-9 w-9",
+                    buttonVariants({
+                      variant:
+                        location.pathname == link.link ? 'default' : 'ghost',
+                      size: 'icon',
+                    }),
+                    'h-9 w-9',
                     location.pathname == link.link &&
-                      "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                      'dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white',
                   )}
                 >
                   <link.icon className="h-4 w-4" />
@@ -73,14 +70,17 @@ export function NavigationSidebar({ links, isCollapsed }: NavProps) {
               key={index}
               to={`${link.link}`}
               onClick={() => {
-                setSearchType('article')
-                setItensSelecionados([])
-            }}
+                setSearchType('article');
+                setItensSelecionados([]);
+              }}
               className={cn(
-                buttonVariants({ variant:location.pathname == link.link ? ('default'):('ghost'), size: "sm" }),
+                buttonVariants({
+                  variant: location.pathname == link.link ? 'default' : 'ghost',
+                  size: 'sm',
+                }),
                 location.pathname == link.link &&
-                  "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
-                "justify-start"
+                  'dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white',
+                'justify-start',
               )}
             >
               <link.icon className="mr-2 h-4 w-4" />
@@ -88,18 +88,18 @@ export function NavigationSidebar({ links, isCollapsed }: NavProps) {
               {link.label && (
                 <span
                   className={cn(
-                    "ml-auto",
+                    'ml-auto',
                     location.pathname == link.link &&
-                      "text-background dark:text-white"
+                      'text-background dark:text-white',
                   )}
                 >
                   {link.label}
                 </span>
               )}
             </Link>
-          )
+          ),
         )}
       </nav>
     </div>
-  )
+  );
 }

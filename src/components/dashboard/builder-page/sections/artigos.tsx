@@ -1,26 +1,30 @@
-import { Quotes, Rows, SquaresFour } from "phosphor-react";
-import { HeaderResultTypeHome } from "../../../homepage/categorias/header-result-type-home";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../../ui/accordion";
-import { Button } from "../../../ui/button";
-import { Input } from "../../../ui/input";
-import { Switch } from "../../../ui/switch";
-import { Base } from "../base";
-import { Keepo } from "../builder-page";
-import { useQuery } from "../tabelas/tabela-artigos";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { ArticleBlock } from "../../../homepage/categorias/articles-home/articles-block";
-import { Skeleton } from "../../../ui/skeleton";
-import { TableReseracherArticleshome } from "../../../homepage/categorias/articles-home/table-articles";
-import { useContext, useEffect, useState } from "react";
-import { Publicacao } from "../../../homepage/categorias/articles-home";
-import { UserContext } from "../../../../context/context";
-import { FilterArticle } from "../../../homepage/categorias/articles-home/filters-articles";
-import { File } from "lucide-react";
+import { Rows, SquaresFour } from 'phosphor-react';
+import { HeaderResultTypeHome } from '../../../homepage/categorias/header-result-type-home';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../../../ui/accordion';
+import { Button } from '../../../ui/button';
+import { Switch } from '../../../ui/switch';
+import { Base } from '../base';
+import { Keepo } from '../builder-page';
+import { useQuery } from '../tabelas/tabela-artigos';
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+import { ArticleBlock } from '../../../homepage/categorias/articles-home/articles-block';
+import { Skeleton } from '../../../ui/skeleton';
+import { TableReseracherArticleshome } from '../../../homepage/categorias/articles-home/table-articles';
+import { useContext, useEffect, useState } from 'react';
+import { Publicacao } from '../../../homepage/categorias/articles-home';
+import { UserContext } from '../../../../context/context';
+import { FilterArticle } from '../../../homepage/categorias/articles-home/filters-articles';
+import { File } from 'lucide-react';
 
 interface Props {
   keepoData: Keepo;
   setKeepoData: React.Dispatch<React.SetStateAction<Keepo>>;
-  moveItem: (index: number, direction: "up" | "down") => void;
+  moveItem: (index: number, direction: 'up' | 'down') => void;
   deleteItem: (index: number) => void;
   index: number;
   contentItem: any;
@@ -29,7 +33,7 @@ interface Props {
 type Filter = {
   year: number[];
   qualis: string[];
-}
+};
 
 export function ArtigosSection(props: Props) {
   const queryUrl = useQuery();
@@ -61,7 +65,7 @@ export function ArtigosSection(props: Props) {
   const yearString = filters.length > 0 ? filters[0].year.join(';') : '';
   const qualisString = filters.length > 0 ? filters[0].qualis.join(';') : '';
 
-  let url = `${urlGeral}bibliographic_production_article?terms=&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${graduate_program_id || ''}&dep_id=${dep_id || ''}&page=${page}&length=12`;
+  const url = `${urlGeral}bibliographic_production_article?terms=&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${graduate_program_id || ''}&dep_id=${dep_id || ''}&page=${page}&length=12`;
 
   useEffect(() => {
     setPage(1);
@@ -74,13 +78,13 @@ export function ArtigosSection(props: Props) {
       try {
         if (page === 1) isLoading(true);
         const response = await fetch(url, {
-          mode: "cors",
+          mode: 'cors',
           headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-            "Content-Type": "text/plain",
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600',
+            'Content-Type': 'text/plain',
           },
         });
         const data = await response.json();
@@ -89,7 +93,7 @@ export function ArtigosSection(props: Props) {
           if (page === 1) {
             setPublicacoes(data);
           } else {
-            setPublicacoes(prev => [...prev, ...data]);
+            setPublicacoes((prev) => [...prev, ...data]);
           }
 
           if (data.length < 12) {
@@ -111,13 +115,22 @@ export function ArtigosSection(props: Props) {
   }, [url, page, urlGeral]);
 
   return (
-    <Base setKeepoData={props.setKeepoData} moveItem={props.moveItem} deleteItem={props.deleteItem} index={props.index} keepoData={props.keepoData}>
+    <Base
+      setKeepoData={props.setKeepoData}
+      moveItem={props.moveItem}
+      deleteItem={props.deleteItem}
+      index={props.index}
+      keepoData={props.keepoData}
+    >
       <FilterArticle onFilterUpdate={handleResearcherUpdate} />
 
       <Accordion defaultValue="item-1" type="single" collapsible>
-        <AccordionItem value="item-1" >
+        <AccordionItem value="item-1">
           <div className="flex mb-2">
-            <HeaderResultTypeHome title="Artigos" icon={<File size={24} className="text-gray-400" />}>
+            <HeaderResultTypeHome
+              title="Artigos"
+              icon={<File size={24} className="text-gray-400" />}
+            >
               <div className="gap-2 flex items-center text-xs text-gray-500 dark:text-gray-300">
                 <p>Artigos:</p>
                 Iguais
@@ -129,19 +142,28 @@ export function ArtigosSection(props: Props) {
               </div>
 
               <div className="hidden md:flex gap-2 mr-2">
-                <Button onClick={() => setTypeVisu('rows')} variant="outline" className={`bg-transparent border-0 ${typeVisu == 'rows' && ('bg-white dark:bg-neutral-800 border')}`} size={'icon'}>
+                <Button
+                  onClick={() => setTypeVisu('rows')}
+                  variant="outline"
+                  className={`bg-transparent border-0 ${typeVisu == 'rows' && 'bg-white dark:bg-neutral-800 border'}`}
+                  size={'icon'}
+                >
                   <Rows size={16} className=" whitespace-nowrap" />
                 </Button>
-                <Button onClick={() => setTypeVisu('block')} variant="outline" className={`bg-transparent border-0 ${typeVisu == 'block' && ('bg-white dark:bg-neutral-800 border')} `} size={'icon'}>
+                <Button
+                  onClick={() => setTypeVisu('block')}
+                  variant="outline"
+                  className={`bg-transparent border-0 ${typeVisu == 'block' && 'bg-white dark:bg-neutral-800 border'} `}
+                  size={'icon'}
+                >
                   <SquaresFour size={16} className=" whitespace-nowrap" />
                 </Button>
               </div>
             </HeaderResultTypeHome>
-            <AccordionTrigger>
-            </AccordionTrigger>
+            <AccordionTrigger></AccordionTrigger>
           </div>
 
-          <AccordionContent >
+          <AccordionContent>
             {typeVisu == 'block' ? (
               loading && page === 1 ? (
                 <ResponsiveMasonry
@@ -149,7 +171,7 @@ export function ArtigosSection(props: Props) {
                     350: 1,
                     750: 2,
                     900: 3,
-                    1200: 4
+                    1200: 4,
                   }}
                 >
                   <Masonry gutter="16px">
@@ -163,21 +185,17 @@ export function ArtigosSection(props: Props) {
                   articles={publicacoes}
                   distinct={distinct}
                   hasMore={hasMore}
-                  onLoadMore={() => setPage(prev => prev + 1)}
+                  onLoadMore={() => setPage((prev) => prev + 1)}
                 />
               )
+            ) : loading && page === 1 ? (
+              <Skeleton className="w-full rounded-md h-[400px]" />
             ) : (
-              loading && page === 1 ? (
-                <Skeleton className="w-full rounded-md h-[400px]" />
-              ) : (
-                <TableReseracherArticleshome
-                  articles={publicacoes}
-                />
-              )
+              <TableReseracherArticleshome articles={publicacoes} />
             )}
           </AccordionContent>
         </AccordionItem>
       </Accordion>
     </Base>
-  )
+  );
 }

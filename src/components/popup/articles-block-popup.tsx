@@ -1,21 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
-import { Button } from "../ui/button";
-import { Plus } from "phosphor-react";
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+import { Button } from '../ui/button';
+import { Plus } from 'phosphor-react';
 
-import { ArticleItem } from "../homepage/categorias/articles-home/article-item";
-import { useModalSecundary } from "../hooks/use-modal-store-secundary";
+import { ArticleItem } from '../homepage/categorias/articles-home/article-item';
+import { useModalSecundary } from '../hooks/use-modal-store-secundary';
 
 type Articles = {
   articles: any[];
-  distinct: boolean
+  distinct: boolean;
   onRefresh?: () => void;
-}
+};
 
 export function ArticleBlockPopUp(props: Articles) {
-
-  const [count, setCount] = useState(12)
+  const [count, setCount] = useState(12);
   const { isOpen, type: typeModal, onClose } = useModalSecundary();
 
   const [columns, setColumns] = useState<number>(3); // Definindo o valor inicial de colunas
@@ -34,15 +33,14 @@ export function ArticleBlockPopUp(props: Articles) {
     };
 
     handleResize(); // Iniciar com a largura da janela
-    window.addEventListener("resize", handleResize); // Atualizar ao redimensionar
+    window.addEventListener('resize', handleResize); // Atualizar ao redimensionar
 
-    return () => window.removeEventListener("resize", handleResize); // Limpeza ao desmontar
+    return () => window.removeEventListener('resize', handleResize); // Limpeza ao desmontar
   }, []);
-
 
   useEffect(() => {
     // When the edit modal closes, trigger a refresh if provided
-    if (!isOpen && typeModal === "edit-article" && props.onRefresh) {
+    if (!isOpen && typeModal === 'edit-article' && props.onRefresh) {
       props.onRefresh();
     }
   }, [isOpen, typeModal, props.onRefresh]);
@@ -55,12 +53,11 @@ export function ArticleBlockPopUp(props: Articles) {
           750: 1,
           900: 2,
           1200: 3,
-          1700: 4
+          1700: 4,
         }}
       >
         <Masonry gutter="16px" className="" columnsCount={columns}>
           {props.articles.slice(0, count).map((props: any) => {
-
             return (
               <ArticleItem
                 key={props.id}
@@ -99,9 +96,13 @@ export function ArticleBlockPopUp(props: Articles) {
       </ResponsiveMasonry>
 
       {props.articles.length > count && (
-        <div className="w-full flex justify-center mt-8"><Button onClick={() => setCount(count + 12)}><Plus size={16} />Mostrar mais</Button></div>
+        <div className="w-full flex justify-center mt-8">
+          <Button onClick={() => setCount(count + 12)}>
+            <Plus size={16} />
+            Mostrar mais
+          </Button>
+        </div>
       )}
-
     </div>
-  )
+  );
 }

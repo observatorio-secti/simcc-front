@@ -1,24 +1,45 @@
-import { ChevronDown, ChevronUp, Download, GraduationCap, Plus, SlidersHorizontal, Trash, X } from "lucide-react";
-import { ChartBar, MagnifyingGlass, Rows, SquaresFour } from "phosphor-react";
-import { Button } from "../ui/button";
-import { useLocation, useNavigate } from "react-router-dom";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../context/context";
-import { Skeleton } from "../ui/skeleton";
-import { Alert } from "../ui/alert";
-import { Input } from "../ui/input";
-import { CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
-import { HeaderResultTypeHome } from "../homepage/categorias/header-result-type-home";
-import { DataTable } from "../homepage/categorias/researchers-home/data-table";
-import { columnsGraduate } from "../graduate-program/columns-graduate";
-import { Badge } from "../ui/badge";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { ScrollArea } from "../ui/scroll-area";
-import { areasComCores, ProgramItem } from "../graduate-program/program-item";
-import { GraficoAreaProgramas } from "../graduate-program/graficos-tabelas/grafico-area-programa";
-import { GraficoRatingProgramas } from "../graduate-program/graficos-tabelas/grafico-rating-programas";
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  GraduationCap,
+  Plus,
+  SlidersHorizontal,
+  Trash,
+  X,
+} from 'lucide-react';
+import { ChartBar, MagnifyingGlass, Rows, SquaresFour } from 'phosphor-react';
+import { Button } from '../ui/button';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../../context/context';
+import { Skeleton } from '../ui/skeleton';
+import { Alert } from '../ui/alert';
+import { Input } from '../ui/input';
+import { CardContent, CardHeader, CardTitle } from '../ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../ui/accordion';
+import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-home';
+import { DataTable } from '../homepage/categorias/researchers-home/data-table';
+import { columnsGraduate } from '../graduate-program/columns-graduate';
+import { Badge } from '../ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { ScrollArea } from '../ui/scroll-area';
+import { areasComCores, ProgramItem } from '../graduate-program/program-item';
+import { GraficoAreaProgramas } from '../graduate-program/graficos-tabelas/grafico-area-programa';
+import { GraficoRatingProgramas } from '../graduate-program/graficos-tabelas/grafico-rating-programas';
 
 export interface GraduateProgram {
   area: string;
@@ -51,17 +72,22 @@ interface ProgramasPosInstitutionProps {
   institutionName?: string;
 }
 
-export function ProgramasPosInstitution({ institutionId, institutionName }: ProgramasPosInstitutionProps) {
+export function ProgramasPosInstitution({
+  institutionId,
+  institutionName,
+}: ProgramasPosInstitutionProps) {
   const normalizeArea = (area: string): string =>
     area
       .toUpperCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^A-Z0-9 ]/g, "")
-      .replace(/\s+/g, " ")
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^A-Z0-9 ]/g, '')
+      .replace(/\s+/g, ' ')
       .trim();
 
-  const qualisColor = new Map(areasComCores.map(([area, color]) => [normalizeArea(area), color]));
+  const qualisColor = new Map(
+    areasComCores.map(([area, color]) => [normalizeArea(area), color]),
+  );
 
   const getColorByArea = (area: string): string =>
     qualisColor.get(normalizeArea(area)) || 'bg-gray-500';
@@ -88,18 +114,20 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
     const fetchData = async () => {
       try {
         const response = await fetch(urlGraduateProgram, {
-          mode: "cors",
+          mode: 'cors',
           headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-            "Content-Type": "text/plain",
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600',
+            'Content-Type': 'text/plain',
           },
         });
         const data = await response.json();
         if (data) {
-          const visiblePrograms = data.filter((item: GraduateProgram) => item.visible === true);
+          const visiblePrograms = data.filter(
+            (item: GraduateProgram) => item.visible === true,
+          );
           setTotal(visiblePrograms);
           setIsLoading(false);
           setJsonData(visiblePrograms);
@@ -112,29 +140,37 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
   }, [urlGraduateProgram]);
 
   // Filtrar programas por instituição
-  const filteredByInstitution = Array.isArray(total) ? total.filter(item => {
-    const normalizeString = (str: string) => str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim();
+  const filteredByInstitution = Array.isArray(total)
+    ? total.filter((item) => {
+        const normalizeString = (str: string) =>
+          str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
 
-    const itemInstitution = normalizeString(item.institution);
-    const targetInstitution = normalizeString(institutionName || '');
-    const targetId = normalizeString(institutionId);
+        const itemInstitution = normalizeString(item.institution);
+        const targetInstitution = normalizeString(institutionName || '');
+        const targetId = normalizeString(institutionId);
 
-    return itemInstitution.includes(targetInstitution) || 
-           itemInstitution.includes(targetId) ||
-           targetInstitution.includes(itemInstitution);
-  }) : [];
+        return (
+          itemInstitution.includes(targetInstitution) ||
+          itemInstitution.includes(targetId) ||
+          targetInstitution.includes(itemInstitution)
+        );
+      })
+    : [];
 
-  const areas = Array.isArray(filteredByInstitution) ? [...new Set(filteredByInstitution.map(item => item.area))] : [];
+  const areas = Array.isArray(filteredByInstitution)
+    ? [...new Set(filteredByInstitution.map((item) => item.area))]
+    : [];
 
-  const filteredTotal = filteredByInstitution.filter(item => {
-    const normalizeString = (str: string) => str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+  const filteredTotal = filteredByInstitution.filter((item) => {
+    const normalizeString = (str: string) =>
+      str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
 
     const searchString = normalizeString(item.name);
     const normalizedSearch = normalizeString(search);
@@ -147,7 +183,7 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
 
   const handleAreaChange = (value: string) => {
     setSelectedAreas((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
     );
   };
 
@@ -163,8 +199,10 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
     const csv = [
       '\uFEFF' + header.join(';'),
       ...items.map((item) =>
-        header.map((fieldName) => JSON.stringify(item[fieldName], replacer)).join(';')
-      )
+        header
+          .map((fieldName) => JSON.stringify(item[fieldName], replacer))
+          .join(';'),
+      ),
     ].join('\r\n');
 
     return csv;
@@ -173,7 +211,9 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
   const handleDownloadJson = async () => {
     try {
       const csvData = convertJsonToCsv(filteredByInstitution);
-      const blob = new Blob([csvData], { type: 'text/csv;charset=windows-1252;' });
+      const blob = new Blob([csvData], {
+        type: 'text/csv;charset=windows-1252;',
+      });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.download = `programas-pos-${institutionName}.csv`;
@@ -184,29 +224,42 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
     }
   };
 
-  const filteredTotal2 = Array.isArray(areas) ? areas.filter(item => {
-    const normalizeString = (str: any) => str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+  const filteredTotal2 = Array.isArray(areas)
+    ? areas.filter((item) => {
+        const normalizeString = (str: any) =>
+          str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
 
-    const searchString = normalizeString(item);
-    const normalizedSearch = normalizeString(search2);
+        const searchString = normalizeString(item);
+        const normalizedSearch = normalizeString(search2);
 
-    return searchString.includes(normalizedSearch);
-  }) : [];
+        return searchString.includes(normalizedSearch);
+      })
+    : [];
 
   return (
     <main className="flex flex-1 flex-col">
       <div className="top-[68px] sticky z-[9] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
-        <div className={`w-full px-8 border-b border-b-neutral-200 dark:border-b-neutral-800`}>
+        <div
+          className={`w-full px-8 border-b border-b-neutral-200 dark:border-b-neutral-800`}
+        >
           {isOn && (
             <div className="w-full flex justify-between items-center">
               <div className="w-full pt-4 flex justify-between items-center">
                 <Alert className="h-14 mt-4 mb-2 p-2 flex items-center justify-between w-full">
                   <div className="flex items-center gap-2 w-full flex-1">
-                    <MagnifyingGlass size={16} className="whitespace-nowrap w-10" />
-                    <Input onChange={(e) => setSearch(e.target.value)} value={search} type="text" className="border-0 w-full" />
+                    <MagnifyingGlass
+                      size={16}
+                      className="whitespace-nowrap w-10"
+                    />
+                    <Input
+                      onChange={(e) => setSearch(e.target.value)}
+                      value={search}
+                      type="text"
+                      className="border-0 w-full"
+                    />
                   </div>
                 </Alert>
               </div>
@@ -218,7 +271,11 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
 
             <div className="hidden xl:flex xl:flex-nowrap gap-2">
               <div className="md:flex md:flex-nowrap gap-2">
-                <Button onClick={() => handleDownloadJson()} variant="ghost" className="">
+                <Button
+                  onClick={() => handleDownloadJson()}
+                  variant="ghost"
+                  className=""
+                >
                   <Download size={16} className="" />
                   Baixar resultado
                 </Button>
@@ -240,7 +297,9 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
                           checked={selectedAreas.includes(area)}
                           onCheckedChange={() => handleAreaChange(area)}
                         >
-                          <Alert className={`w-4 rounded-md border-0 h-4 p-0 mr-2 ${getColorByArea(area)}`} />
+                          <Alert
+                            className={`w-4 rounded-md border-0 h-4 p-0 mr-2 ${getColorByArea(area)}`}
+                          />
                           {area}
                         </DropdownMenuCheckboxItem>
                       ))}
@@ -250,8 +309,16 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
               </div>
 
               <div></div>
-              <Button variant="ghost" size="icon" onClick={() => setIsOn(!isOn)}>
-                {isOn ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOn(!isOn)}
+              >
+                {isOn ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -259,7 +326,9 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
       </div>
 
       <div className="p-4 md:p-8">
-        <div className={`${selectedAreas.length > 0 ? ('flex') : ('hidden')} flex flex-wrap gap-3 mb-6 items-center`}>
+        <div
+          className={`${selectedAreas.length > 0 ? 'flex' : 'hidden'} flex flex-wrap gap-3 mb-6 items-center`}
+        >
           <p className="text-sm font-medium">Filtros aplicados:</p>
           {selectedAreas.map((item) => (
             <Badge
@@ -276,8 +345,13 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
             </Badge>
           ))}
 
-          <Badge variant={'secondary'} onClick={() => clearFilters()} className="rounded-md cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-900 border-0 py-2 px-3 font-normal flex items-center justify-center gap-2">
-            <Trash size={12} />Limpar filtros
+          <Badge
+            variant={'secondary'}
+            onClick={() => clearFilters()}
+            className="rounded-md cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-900 border-0 py-2 px-3 font-normal flex items-center justify-center gap-2"
+          >
+            <Trash size={12} />
+            Limpar filtros
           </Badge>
         </div>
 
@@ -296,11 +370,18 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
           </CardContent>
         </Alert>
 
-        <Accordion defaultValue="item-1" type="single" collapsible className="mb-6">
+        <Accordion
+          defaultValue="item-1"
+          type="single"
+          collapsible
+          className="mb-6"
+        >
           <AccordionItem value="item-1">
             <div className="flex mb-2">
-              <HeaderResultTypeHome title="Gráficos das pós-graduações" icon={<ChartBar size={24} className="text-gray-400" />}>
-              </HeaderResultTypeHome>
+              <HeaderResultTypeHome
+                title="Gráficos das pós-graduações"
+                icon={<ChartBar size={24} className="text-gray-400" />}
+              ></HeaderResultTypeHome>
               <AccordionTrigger></AccordionTrigger>
             </div>
             <AccordionContent className="p-0">
@@ -322,12 +403,23 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
         <Accordion defaultValue="item-1" type="single" collapsible>
           <AccordionItem value="item-1">
             <div className="flex mb-2 mt-4">
-              <HeaderResultTypeHome title="Programas de pós-graduação" icon={<GraduationCap size={24} className="text-gray-400" />}>
+              <HeaderResultTypeHome
+                title="Programas de pós-graduação"
+                icon={<GraduationCap size={24} className="text-gray-400" />}
+              >
                 <div className="hidden md:flex gap-3 mr-3">
-                  <Button onClick={() => setTypeVisu('rows')} variant={typeVisu === 'block' ? 'ghost' : 'outline'} size={'icon'}>
+                  <Button
+                    onClick={() => setTypeVisu('rows')}
+                    variant={typeVisu === 'block' ? 'ghost' : 'outline'}
+                    size={'icon'}
+                  >
                     <Rows size={16} className="whitespace-nowrap" />
                   </Button>
-                  <Button onClick={() => setTypeVisu('block')} variant={typeVisu === 'block' ? 'outline' : 'ghost'} size={'icon'}>
+                  <Button
+                    onClick={() => setTypeVisu('block')}
+                    variant={typeVisu === 'block' ? 'outline' : 'ghost'}
+                    size={'icon'}
+                  >
                     <SquaresFour size={16} className="whitespace-nowrap" />
                   </Button>
                 </div>
@@ -344,7 +436,7 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
                       750: 2,
                       900: 2,
                       1200: 3,
-                      1700: 4
+                      1700: 4,
                     }}
                   >
                     <Masonry gutter="16px" className="pb-4 md:pb-8">
@@ -364,10 +456,13 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
                         750: 2,
                         900: 2,
                         1200: 3,
-                        1700: 4
+                        1700: 4,
                       }}
                     >
-                      <Masonry gutter="16px" className="pb-4 md:pb-8 z-[1] w-full">
+                      <Masonry
+                        gutter="16px"
+                        className="pb-4 md:pb-8 z-[1] w-full"
+                      >
                         {filteredTotal.slice(0, count).map((props, index) => (
                           <ProgramItem
                             key={index}
@@ -402,7 +497,10 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
 
                     {filteredTotal.length > count && (
                       <div className="w-full flex justify-center pb-8">
-                        <Button className="w-fit" onClick={() => setCount(count + 12)}>
+                        <Button
+                          className="w-fit"
+                          onClick={() => setCount(count + 12)}
+                        >
                           <Plus size={16} />
                           Mostrar mais
                         </Button>
@@ -410,12 +508,10 @@ export function ProgramasPosInstitution({ institutionId, institutionName }: Prog
                     )}
                   </div>
                 )
+              ) : isLoading ? (
+                <Skeleton className="w-full rounded-md h-[400px]" />
               ) : (
-                isLoading ? (
-                  <Skeleton className="w-full rounded-md h-[400px]" />
-                ) : (
-                  <DataTable columns={columnsGraduate} data={filteredTotal} />
-                )
+                <DataTable columns={columnsGraduate} data={filteredTotal} />
               )}
             </AccordionContent>
           </AccordionItem>

@@ -1,7 +1,7 @@
-"use client";
-import { cn } from "../../lib"
-import { useMotionValue, motion, useMotionTemplate } from "framer-motion";
-import React from "react";
+'use client';
+import { cn } from '../../lib';
+import { useMotionValue, motion, useMotionTemplate } from 'framer-motion';
+import React from 'react';
 
 export const HeroHighlight = ({
   children,
@@ -12,8 +12,8 @@ export const HeroHighlight = ({
   className?: string;
   containerClassName?: string;
 }) => {
-  let mouseX = useMotionValue(0);
-  let mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
   function handleMouseMove({
     currentTarget,
@@ -21,19 +21,13 @@ export const HeroHighlight = ({
     clientY,
   }: React.MouseEvent<HTMLDivElement>) {
     if (!currentTarget) return;
-    let { left, top } = currentTarget.getBoundingClientRect();
+    const { left, top } = currentTarget.getBoundingClientRect();
 
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
   }
   return (
-    <div
-      className={cn(
-        "",
-        containerClassName
-      )}
-      onMouseMove={handleMouseMove}
-    >
+    <div className={cn('', containerClassName)} onMouseMove={handleMouseMove}>
       <div className="" />
       <motion.div
         className="pointer-events-none bg-dot-thick-indigo-500 dark:bg-dot-thick-indigo-500   absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100"
@@ -55,7 +49,7 @@ export const HeroHighlight = ({
         }}
       />
 
-      <div className={cn("relative ", className)}>{children}</div>
+      <div className={cn('relative ', className)}>{children}</div>
     </div>
   );
 };
@@ -70,24 +64,24 @@ export const Highlight = ({
   return (
     <motion.span
       initial={{
-        backgroundSize: "0% 100%",
+        backgroundSize: '0% 100%',
       }}
       animate={{
-        backgroundSize: "100% 100%",
+        backgroundSize: '100% 100%',
       }}
       transition={{
         duration: 1,
-        ease: "linear",
+        ease: 'linear',
         delay: 0.5,
       }}
       style={{
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "left center",
-        display: "inline",
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'left center',
+        display: 'inline',
       }}
       className={cn(
         `relative inline-block pb-1   rounded-lg bg-gradient-to-r from-eng-blue to-eng-blue px-4  dark:from-eng-blue dark:to-eng-blue`,
-        className
+        className,
       )}
     >
       {children}

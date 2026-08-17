@@ -1,7 +1,3 @@
 export function Tv() {
-    return(
-        <main>
-            
-        </main>
-    )
+  return <main></main>;
 }

@@ -1,5 +1,4 @@
-import { ColumnDef } from "@tanstack/react-table";
-
+import { ColumnDef } from '@tanstack/react-table';
 
 //import { UserContext } from "../../../../context/context"
 
@@ -12,13 +11,11 @@ export type Institutions = {
 
 export const columns: ColumnDef<Institutions>[] = [
   {
-    accessorKey: "institution",
-    header: "Instituição",
+    accessorKey: 'institution',
+    header: 'Instituição',
   },
   {
-    accessorKey: "among",
-    header: "Nº Ocorrências",
-  }
-
- 
+    accessorKey: 'among',
+    header: 'Nº Ocorrências',
+  },
 ];

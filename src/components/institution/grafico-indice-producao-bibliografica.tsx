@@ -1,10 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid, Tooltip, ResponsiveContainer,
-} from "recharts";
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
 import {
-  ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent,
-} from "../../components/ui/chart";
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '../../components/ui/chart';
 
 type Dados = {
   count_article: number;
@@ -57,13 +66,20 @@ type Articles = {
 };
 
 const chartConfig = {
-  totalArticles: { label: "Total Artigos", color: "#006837" },
-  totalBooks: { label: "Total Livros", color: "#8FC53E" },
-  totalChapters: { label: "Total Capítulos de Livros", color: "#ACC483" },
+  totalArticles: { label: 'Total Artigos', color: '#006837' },
+  totalBooks: { label: 'Total Livros', color: '#8FC53E' },
+  totalChapters: { label: 'Total Capítulos de Livros', color: '#ACC483' },
 } satisfies ChartConfig;
 
 export function GraficoIndiceProdBibli(props: Articles) {
-  const [chartData, setChartData] = useState<{ year: string; totalArticles: number; totalBooks: number; totalChapters: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    {
+      year: string;
+      totalArticles: number;
+      totalBooks: number;
+      totalChapters: number;
+    }[]
+  >([]);
 
   useEffect(() => {
     if (props.articles && props.pesosProducao) {
@@ -82,11 +98,30 @@ export function GraficoIndiceProdBibli(props: Articles) {
         cap_livro: parseFloat(props.pesosProducao.book_chapter) || 0,
       };
 
-      const counts: { [year: string]: { totalArticles: number; totalBooks: number; totalChapters: number } } = {};
+      const counts: {
+        [year: string]: {
+          totalArticles: number;
+          totalBooks: number;
+          totalChapters: number;
+        };
+      } = {};
 
       props.articles.forEach((publicacao) => {
         const year = publicacao.year.toString();
-        const { A1, A2, A3, A4, B1, B2, B3, B4, C, SQ, count_book, count_book_chapter } = publicacao;
+        const {
+          A1,
+          A2,
+          A3,
+          A4,
+          B1,
+          B2,
+          B3,
+          B4,
+          C,
+          SQ,
+          count_book,
+          count_book_chapter,
+        } = publicacao;
         const qualisData = { A1, A2, A3, A4, B1, B2, B3, B4, C, SQ };
 
         if (!counts[year]) {
@@ -96,7 +131,8 @@ export function GraficoIndiceProdBibli(props: Articles) {
         let totalArticles = 0;
 
         Object.keys(qualisData).forEach((qualisKey) => {
-          const weight = pesosNumericos[qualisKey as keyof typeof pesosNumericos];
+          const weight =
+            pesosNumericos[qualisKey as keyof typeof pesosNumericos];
           if (!isNaN(weight) && weight > 0) {
             const value = qualisData[qualisKey as keyof typeof qualisData];
             if (value !== 0) {
@@ -114,12 +150,14 @@ export function GraficoIndiceProdBibli(props: Articles) {
         counts[year].totalChapters += totalChapters;
       });
 
-      const data = Object.entries(counts).map(([year, { totalArticles, totalBooks, totalChapters }]) => ({
-        year,
-        totalArticles,
-        totalBooks,
-        totalChapters,
-      }));
+      const data = Object.entries(counts).map(
+        ([year, { totalArticles, totalBooks, totalChapters }]) => ({
+          year,
+          totalArticles,
+          totalBooks,
+          totalChapters,
+        }),
+      );
 
       setChartData(data);
     }
@@ -128,30 +166,42 @@ export function GraficoIndiceProdBibli(props: Articles) {
   return (
     <ChartContainer config={chartConfig} className="mr-4 lg:mt-16">
       <ResponsiveContainer>
-        <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-          <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+        >
+          <XAxis
+            dataKey="year"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+          />
           <YAxis tickLine={false} tickMargin={10} axisLine={false} />
           <CartesianGrid vertical={false} horizontal={false} />
 
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-          {Object.keys(chartConfig).map((key) => (
-            chartData.some(d => d[key] > 0) && (
-              <Bar
-                key={key}
-                dataKey={key}
-                fill={chartConfig[key].color}
-                stackId="a"
-                radius={4}
-              >
-                <LabelList
-                  position="top"
-                  formatter={(value) => (value ? value.toFixed(2) : '0')}
-                  fontSize={12}
-                  className="fill-foreground"
-                />
-              </Bar>
-            )
-          ))}
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
+          {Object.keys(chartConfig).map(
+            (key) =>
+              chartData.some((d) => d[key] > 0) && (
+                <Bar
+                  key={key}
+                  dataKey={key}
+                  fill={chartConfig[key].color}
+                  stackId="a"
+                  radius={4}
+                >
+                  <LabelList
+                    position="top"
+                    formatter={(value) => (value ? value.toFixed(2) : '0')}
+                    fontSize={12}
+                    className="fill-foreground"
+                  />
+                </Bar>
+              ),
+          )}
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>

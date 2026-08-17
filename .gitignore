@@ -26,3 +26,4 @@ dist-ssr
 *.sw?
 chave.json
 
+tsconfig.tsbuildinfo

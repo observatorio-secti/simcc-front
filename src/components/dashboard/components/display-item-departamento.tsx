@@ -1,2 +1,1 @@
-export function DisplayItemDepartamento(props) {
-}
+export function DisplayItemDepartamento(props) {}

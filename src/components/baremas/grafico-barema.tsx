@@ -1,27 +1,31 @@
-import { useContext, useEffect, useMemo, useState } from "react";
-
+import { useEffect, useMemo, useState } from 'react';
 
 type Institutions = {
-  pesquisadores: any[]
-}
+  pesquisadores: any[];
+};
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts";
-
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '../ui/chart';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 export function GraficoBarema(props: Institutions) {
   // gráfico
   const [chartOptions, setChartOptions] = useState({});
 
-  console.log("info: ", props.pesquisadores)
+  console.log('info: ', props.pesquisadores);
 
   type Dados = {
     nome: string;
     total: number;
-  }
+  };
 
-  useEffect(() => {
-  }, [props.pesquisadores])
+  useEffect(() => {}, [props.pesquisadores]);
 
   const dados = useMemo(() => {
     const tempDados: Dados[] = [];
@@ -30,20 +34,20 @@ export function GraficoBarema(props: Institutions) {
       props.pesquisadores.map((p) => {
         return tempDados.push({
           nome: p.name,
-          total: p.total
+          total: p.total,
         });
-      })
+      });
     }
 
-    console.log("dados: ", tempDados)
+    console.log('dados: ', tempDados);
     return tempDados;
   }, [props.pesquisadores]);
 
   const chartConfig = {
     pesquisador: {
-      label: "Pesquisador",
-    }
-  }
+      label: 'Pesquisador',
+    },
+  };
 
   return (
     <ChartContainer className="max-h-[300px] w-full" config={chartConfig}>
@@ -52,10 +56,13 @@ export function GraficoBarema(props: Institutions) {
           <XAxis dataKey="nome" />
           <YAxis domain={['auto', 'auto']} />
           <CartesianGrid vertical={false} horizontal={false} />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
           <Bar dataKey="total" fill="#719CB8" radius={4} />'
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>
-  )
+  );
 }

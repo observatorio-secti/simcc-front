@@ -1,8 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-
-
+import { useEffect, useState } from 'react';
 
 export const SidebarProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -15,9 +13,5 @@ export const SidebarProvider = () => {
     return null;
   }
 
-  return (
-    <>
-
-    </>
-  )
-}
+  return <></>;
+};

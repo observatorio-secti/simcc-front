@@ -1,7 +1,21 @@
-import { useEffect, useState } from "react";
-import { Alert } from "../../ui/alert";
-import { BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../ui/chart";
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../ui/chart';
 
 type Dados = {
   count_article: number;
@@ -30,7 +44,6 @@ type Dados = {
   C: number;
   SQ: number;
 };
-
 
 type PesosProducao = {
   a1: string;
@@ -63,17 +76,19 @@ type BooksAndChaptersProps = {
 };
 
 const chartConfig = {
-  livro: { label: "Livro", color: "#792F4C" },
-  cap_livro: { label: "Capítulo de livro", color: "#DBAFD0" },
+  livro: { label: 'Livro', color: '#792F4C' },
+  cap_livro: { label: 'Capítulo de livro', color: '#DBAFD0' },
 } satisfies ChartConfig;
 
 export function GraficoQtdLivrosCapitulos(props: BooksAndChaptersProps) {
-  const [chartData, setChartData] = useState<{ year: string; livro: number; cap_livro: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { year: string; livro: number; cap_livro: number }[]
+  >([]);
   useEffect(() => {
     if (props.articles) {
-
       // Compute weighted sums
-      const counts: { [year: string]: { livro: number; cap_livro: number } } = {};
+      const counts: { [year: string]: { livro: number; cap_livro: number } } =
+        {};
 
       props.articles.forEach((publicacao) => {
         const year = publicacao.year.toString();
@@ -103,27 +118,45 @@ export function GraficoQtdLivrosCapitulos(props: BooksAndChaptersProps) {
   }, [props.articles]);
 
   return (
-
     <ChartContainer config={chartConfig} className="h-[260px] w-full">
       <ResponsiveContainer>
-        <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-          <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+        >
+          <XAxis
+            dataKey="year"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+          />
           <YAxis tickLine={false} tickMargin={10} axisLine={false} />
           <CartesianGrid vertical={false} horizontal={false} />
           <ChartLegend content={<ChartLegendContent />} />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-          <Bar dataKey="livro" radius={4} fill={chartConfig['livro'].color} stackId="a">
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
+          <Bar
+            dataKey="livro"
+            radius={4}
+            fill={chartConfig['livro'].color}
+            stackId="a"
+          >
             <LabelList
-
               position="top"
               formatter={(value) => (value ? value : '0')}
               fontSize={12}
               className="fill-foreground"
             />
           </Bar>
-          <Bar dataKey="cap_livro" radius={4} fill={chartConfig['cap_livro'].color} stackId="a">
+          <Bar
+            dataKey="cap_livro"
+            radius={4}
+            fill={chartConfig['cap_livro'].color}
+            stackId="a"
+          >
             <LabelList
-
               position="top"
               formatter={(value) => (value ? value : '0')}
               fontSize={12}
@@ -133,6 +166,5 @@ export function GraficoQtdLivrosCapitulos(props: BooksAndChaptersProps) {
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>
-
   );
 }

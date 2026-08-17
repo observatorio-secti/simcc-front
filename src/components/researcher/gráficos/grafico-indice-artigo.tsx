@@ -1,6 +1,21 @@
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../components/ui/chart";
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  LabelList,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../../components/ui/chart';
 
 type Dados = {
   count_article: number;
@@ -59,16 +74,16 @@ type ChartDataItem = {
 };
 
 const chartConfig = {
-  A1: { label: "Qualis A1", color: "#006837" },
-  A2: { label: "Qualis A2", color: "#8FC53E" },
-  A3: { label: "Qualis A3", color: "#ACC483" },
-  A4: { label: "Qualis A4", color: "#BDC4B1" },
-  B1: { label: "Qualis B1", color: "#F15A24" },
-  B2: { label: "Qualis B2", color: "#F5831F" },
-  B3: { label: "Qualis B3", color: "#F4AD78" },
-  B4: { label: "Qualis B4", color: "#F4A992" },
-  C: { label: "Qualis C", color: "#EC1C22" },
-  SQ: { label: "Sem qualis", color: "#560B11" },
+  A1: { label: 'Qualis A1', color: '#006837' },
+  A2: { label: 'Qualis A2', color: '#8FC53E' },
+  A3: { label: 'Qualis A3', color: '#ACC483' },
+  A4: { label: 'Qualis A4', color: '#BDC4B1' },
+  B1: { label: 'Qualis B1', color: '#F15A24' },
+  B2: { label: 'Qualis B2', color: '#F5831F' },
+  B3: { label: 'Qualis B3', color: '#F4AD78' },
+  B4: { label: 'Qualis B4', color: '#F4A992' },
+  C: { label: 'Qualis C', color: '#EC1C22' },
+  SQ: { label: 'Sem qualis', color: '#560B11' },
 } satisfies ChartConfig;
 
 export function GraficoIndiceArticle(props: Articles) {
@@ -92,7 +107,7 @@ export function GraficoIndiceArticle(props: Articles) {
       const counts: { [year: string]: { [qualis: string]: number } } = {};
 
       props.articles.forEach((publicacao) => {
-        const year = publicacao.year?.toString() || "Unknown";
+        const year = publicacao.year?.toString() || 'Unknown';
         const {
           A1 = 0,
           A2 = 0,
@@ -115,15 +130,21 @@ export function GraficoIndiceArticle(props: Articles) {
           const weight = pesosNumericos[qualisKey];
           if (!isNaN(weight) && weight > 0) {
             const value = qualisData[qualisKey as keyof typeof qualisData] || 0;
-            counts[year][qualisKey] = (counts[year][qualisKey] || 0) + value * weight;
+            counts[year][qualisKey] =
+              (counts[year][qualisKey] || 0) + value * weight;
           }
         });
       });
 
-      const data: ChartDataItem[] = Object.entries(counts).map(([year, qualisCounts]) => {
-        const total = Object.values(qualisCounts).reduce((sum, val) => sum + val, 0);
-        return { year, ...qualisCounts, total };
-      });
+      const data: ChartDataItem[] = Object.entries(counts).map(
+        ([year, qualisCounts]) => {
+          const total = Object.values(qualisCounts).reduce(
+            (sum, val) => sum + val,
+            0,
+          );
+          return { year, ...qualisCounts, total };
+        },
+      );
 
       setChartData(data.sort((a, b) => a.year.localeCompare(b.year)));
     }
@@ -134,24 +155,45 @@ export function GraficoIndiceArticle(props: Articles) {
   return (
     <ChartContainer config={chartConfig} className="h-[260px] w-full">
       <ResponsiveContainer>
-        <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-          <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+        >
+          <XAxis
+            dataKey="year"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+          />
           <YAxis tickLine={false} tickMargin={10} axisLine={false} />
           <CartesianGrid vertical={false} horizontal={false} />
-          <ChartLegend className="flex flex-wrap" content={<ChartLegendContent />} />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+          <ChartLegend
+            className="flex flex-wrap"
+            content={<ChartLegendContent />}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
 
           {/* Renderiza as barras empilhadas */}
           {availableQualis.map((key) => (
-            <Bar key={key} dataKey={key} fill={chartConfig[key].color} stackId="a" radius={4}>
+            <Bar
+              key={key}
+              dataKey={key}
+              fill={chartConfig[key].color}
+              stackId="a"
+              radius={4}
+            >
               {/* Renderizar SOMENTE a soma total de cada barra no topo, uma única vez */}
               <LabelList
                 dataKey="total"
                 position="top"
                 fontSize={12}
                 formatter={(value) => {
-                  const isLastBar = key === availableQualis[availableQualis.length - 1];
-                  return isLastBar && value > 0 ? value.toFixed(2) : "";
+                  const isLastBar =
+                    key === availableQualis[availableQualis.length - 1];
+                  return isLastBar && value > 0 ? value.toFixed(2) : '';
                 }}
               />
             </Bar>

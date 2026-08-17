@@ -1,21 +1,18 @@
-"use client";
-import React, { useContext } from "react";
+'use client';
+import React from 'react';
 import {
   motion,
   useScroll,
   useTransform,
   useSpring,
   MotionValue,
-} from "framer-motion";
+} from 'framer-motion';
 
-import { Link } from "react-router-dom";
-import { LogoConectee } from "../svg/LogoConectee";
+import { Link } from 'react-router-dom';
 
-import { LogoIapos } from "../svg/LogoIapos";
-import { useTheme } from "next-themes";
-import { LogoConecteeWhite } from "../svg/LogoConecteeWhite";
-import { LogoIaposWhite } from "../svg/LogoIaposWhite";
-import { UserContext } from "../../context/context";
+import { LogoIapos } from '../svg/LogoIapos';
+import { useTheme } from 'next-themes';
+import { LogoIaposWhite } from '../svg/LogoIaposWhite';
 
 export const HeroParallax = ({
   products,
@@ -32,34 +29,34 @@ export const HeroParallax = ({
   const ref = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start start", "end start"],
+    offset: ['start start', 'end start'],
   });
 
   const springConfig = { stiffness: 300, damping: 30, bounce: 100 };
 
   const translateX = useSpring(
     useTransform(scrollYProgress, [0, 1], [0, 1000]),
-    springConfig
+    springConfig,
   );
   const translateXReverse = useSpring(
     useTransform(scrollYProgress, [0, 1], [0, -1000]),
-    springConfig
+    springConfig,
   );
   const rotateX = useSpring(
     useTransform(scrollYProgress, [0, 0.2], [15, 0]),
-    springConfig
+    springConfig,
   );
   const opacity = useSpring(
     useTransform(scrollYProgress, [0, 0.2], [0.2, 1]),
-    springConfig
+    springConfig,
   );
   const rotateZ = useSpring(
     useTransform(scrollYProgress, [0, 0.2], [20, 0]),
-    springConfig
+    springConfig,
   );
   const translateY = useSpring(
     useTransform(scrollYProgress, [0, 0.2], [-700, 500]),
-    springConfig
+    springConfig,
   );
   return (
     <div
@@ -108,21 +105,16 @@ export const HeroParallax = ({
   );
 };
 
-
-
-
 export const Header = () => {
-    const {version} = useContext(UserContext)
-
-const {theme} = useTheme()
+  const { theme } = useTheme();
 
   return (
     <div className="max-w-7xl relative mx-auto py-20 md:py-40 px-4 w-full  left-0 top-0">
-       {theme == 'dark' ? (
-         <div className="h-6 mb-4">{version?(<LogoConecteeWhite/>):(<LogoIaposWhite/>)}</div>
-       ):(
-        <div className="h-6 mb-4">{version?(<LogoConectee/>):(<LogoIapos/>)}</div>
-       )}
+      {theme == 'dark' ? (
+        <div className="h-6 mb-4">{<LogoIaposWhite />}</div>
+      ) : (
+        <div className="h-6 mb-4">{<LogoIapos />}</div>
+      )}
       <h1 className="text-2xl md:text-5xl font-bold dark:text-white">
         Conheça tudo que a <br /> plataforma pode oferecer
       </h1>
@@ -157,10 +149,7 @@ export const ProductCard = ({
       key={product.title}
       className="group/product h-96 w-[30rem] relative flex-shrink-0"
     >
-      <Link
-        to={product.link}
-        className="block group-hover/product:shadow-2xl "
-      >
+      <Link to={product.link} className="block group-hover/product:shadow-2xl ">
         <img
           src={product.thumbnail}
           height="600"

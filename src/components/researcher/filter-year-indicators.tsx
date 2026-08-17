@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert } from "../ui/alert";
-import debounce from "lodash.debounce"; // Importing debounce
+import { useCallback, useEffect, useState } from 'react';
+import { Alert } from '../ui/alert';
+import debounce from 'lodash.debounce'; // Importing debounce
 
-import { CalendarBlank } from "phosphor-react";
-import { Slider } from "../ui/slider";
-import { useIsMobile } from "../../hooks/use-mobile";
+import { CalendarBlank } from 'phosphor-react';
+import { Slider } from '../ui/slider';
+import { useIsMobile } from '../../hooks/use-mobile';
 
 interface Props {
   onFilterUpdate: (newResearcher: Filter[]) => void;
 }
 
 type Filter = {
-  year: number[]
-  qualis: string[]
-}
+  year: number[];
+  qualis: string[];
+};
 
 export function FilterYearIndicators(props: Props) {
   const [itensSelecionados] = useState<string[]>([]);
@@ -27,7 +27,7 @@ export function FilterYearIndicators(props: Props) {
     debounce((newResearcher: Filter[]) => {
       props.onFilterUpdate(newResearcher);
     }, 500), // 500ms debounce
-    []
+    [],
   );
 
   // Atualizando filtros quando filterYear ou itensSelecionados mudarem

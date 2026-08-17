@@ -1,14 +1,22 @@
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
 
 // Função para buscar a imagem da instituição pelo nome
-export const getInstitutionImageName = async (institutionName: string): Promise<string | null> => {
+export const getInstitutionImageName = async (
+  institutionName: string,
+): Promise<string | null> => {
   if (!institutionName) return null; // Verifica se o nome foi passado
 
   const db = getFirestore(); // Inicializa o Firestore
-  const institutionsRef = collection(db, "institutions"); // Referência à coleção de instituições
+  const institutionsRef = collection(db, 'institutions'); // Referência à coleção de instituições
 
   // Cria uma consulta para buscar pela propriedade "name"
-  const q = query(institutionsRef, where("name", "==", institutionName));
+  const q = query(institutionsRef, where('name', '==', institutionName));
   const querySnapshot = await getDocs(q); // Executa a consulta
 
   if (!querySnapshot.empty) {

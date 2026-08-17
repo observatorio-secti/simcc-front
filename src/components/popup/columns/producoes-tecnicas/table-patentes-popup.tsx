@@ -1,6 +1,5 @@
-
-import { columns } from "./columns-patentes";
-import { DataTable } from "../popup-data-table";
+import { columns } from './columns-patentes';
+import { DataTable } from '../popup-data-table';
 
 type Patentes = {
   patentes: any[];

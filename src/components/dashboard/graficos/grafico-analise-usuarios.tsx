@@ -1,8 +1,20 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { XAxis, Tooltip, ResponsiveContainer, LabelList, BarChart, Bar } from "recharts";
-import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from "../../../components/ui/chart";
-import { parse, format as formatDate } from "date-fns"; // Importação para formatação de data
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import {
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+  LabelList,
+  BarChart,
+  Bar,
+} from 'recharts';
+import {
+  ChartContainer,
+  ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '../../../components/ui/chart';
+import { parse, format as formatDate } from 'date-fns'; // Importação para formatação de data
 
 interface AnalyticsData {
   date: string;
@@ -10,17 +22,17 @@ interface AnalyticsData {
 }
 
 const chartConfig: ChartConfig = {
-  '2': { label: "Category 2", color: "hsl(var(--chart-1))" },
-  "1A": { label: "Category 1A", color: "hsl(var(--chart-2))" },
-  "1B": { label: "Category 1B", color: "hsl(var(--chart-3))" },
-  "1C": { label: "Category 1C", color: "hsl(var(--chart-4))" },
-  "1D": { label: "Category 1D", color: "hsl(var(--chart-5))" },
-  'SR': { label: "Category SR", color: "hsl(var(--chart-6))" },
+  '2': { label: 'Category 2', color: 'hsl(var(--chart-1))' },
+  '1A': { label: 'Category 1A', color: 'hsl(var(--chart-2))' },
+  '1B': { label: 'Category 1B', color: 'hsl(var(--chart-3))' },
+  '1C': { label: 'Category 1C', color: 'hsl(var(--chart-4))' },
+  '1D': { label: 'Category 1D', color: 'hsl(var(--chart-5))' },
+  SR: { label: 'Category SR', color: 'hsl(var(--chart-6))' },
 };
 
-const REFRESH_TOKEN = import.meta.env.VITE_REFRESH_TOKEN
-const CLIENT_ID = import.meta.env.VITE_REFRESH_TOKEN
-const CLIENT_SECRET = import.meta.env.VITE_REFRESH_TOKEN
+const REFRESH_TOKEN = import.meta.env.VITE_REFRESH_TOKEN;
+const CLIENT_ID = import.meta.env.VITE_REFRESH_TOKEN;
+const CLIENT_SECRET = import.meta.env.VITE_REFRESH_TOKEN;
 
 const refreshAccessToken = async () => {
   try {
@@ -67,18 +79,24 @@ export function GraficoAnaliseUsuarios() {
               Authorization: `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
             },
-          }
+          },
         );
 
         const reports = response.data.rows || [];
         const formattedData = reports.map((row: any) => ({
-          date: formatDate(parse(row.dimensionValues?.[0].value, "yyyyMMdd", new Date()), "dd/MM/yyyy"),
+          date: formatDate(
+            parse(row.dimensionValues?.[0].value, 'yyyyMMdd', new Date()),
+            'dd/MM/yyyy',
+          ),
           users: Number(row.metricValues?.[0].value),
         }));
 
         // Ordena os dados pela data
         const sortedData = formattedData.sort((a, b) => {
-          return new Date(a.date.split('/').reverse().join('-')).getTime() - new Date(b.date.split('/').reverse().join('-')).getTime();
+          return (
+            new Date(a.date.split('/').reverse().join('-')).getTime() -
+            new Date(b.date.split('/').reverse().join('-')).getTime()
+          );
         });
 
         setData(sortedData);
@@ -99,12 +117,29 @@ export function GraficoAnaliseUsuarios() {
   return (
     <ChartContainer config={chartConfig} className="h-[300px] w-full">
       <ResponsiveContainer>
-        <BarChart data={data} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-          <XAxis dataKey="date" tickLine={false} tickMargin={10} axisLine={false} />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+        <BarChart
+          data={data}
+          margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+        >
+          <XAxis
+            dataKey="date"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
           <Tooltip />
           <Bar dataKey="users" fill="#719CB8" radius={4}>
-            <LabelList dataKey="users" position="top" offset={12} className="fill-foreground" fontSize={12} />
+            <LabelList
+              dataKey="users"
+              position="top"
+              offset={12}
+              className="fill-foreground"
+              fontSize={12}
+            />
           </Bar>
         </BarChart>
       </ResponsiveContainer>

@@ -1,35 +1,25 @@
-import { Buildings, Star } from "phosphor-react";
+import { Blocks, GraduationCapIcon, Landmark, User, Users } from 'lucide-react';
 
-import { Blocks, Briefcase, Building2, Calendar, GraduationCapIcon, Landmark, MapPin, MapPinIcon, User, Users } from "lucide-react";
-
-import { cn } from "../../lib"
-
-
-import { useLocation, useNavigate } from "react-router-dom";
-import { Alert } from "../ui/alert";
-import { InfiniteMovingCardsResearchers } from "../ui/infinite-moving-cards-researchers";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useModal } from "../hooks/use-modal-store";
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../context/context";
-import { getInstitutionImage } from "../homepage/categorias/institutions-home/institution-image";
-import { getInstitutionImageName } from "../homepage/categorias/institutions-home/institution-image-name";
-import { Button } from "../ui/button";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Alert } from '../ui/alert';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { useModal } from '../hooks/use-modal-store';
+import { useContext, useState } from 'react';
+import { UserContext } from '../../context/context';
 
 interface GraduateProgram {
-id:string
-  avatar:string
-   name: string;
-  count_r:string
-  count_gp:string
-  count_gpr:string
-  count_gps:string
-  count_d:string
-  count_t:string
-  researchers:string[]
-acronym:string
-  url:string
-
+  id: string;
+  avatar: string;
+  name: string;
+  count_r: string;
+  count_gp: string;
+  count_gpr: string;
+  count_gps: string;
+  count_d: string;
+  count_t: string;
+  researchers: string[];
+  acronym: string;
+  url: string;
 }
 
 // Lista de áreas com cores associadas
@@ -64,7 +54,10 @@ export const areasComCores: [string, string][] = [
   ['SAÚDE COLETIVA', 'bg-yellow-900'],
   ['EDUCAÇÃO FÍSICA', 'bg-yellow-950'],
   ['FISIOTERAPIA, FONOAUDIOLOGIA E TERAPIA OCUPACIONAL', 'bg-orange-200'],
-  ['EDUCAÇÃO FÍSICA, FISIOTERAPIA, FONOAUDIOLOGIA E TERAPIA OCUPACIONAL', 'bg-yellow-950'],
+  [
+    'EDUCAÇÃO FÍSICA, FISIOTERAPIA, FONOAUDIOLOGIA E TERAPIA OCUPACIONAL',
+    'bg-yellow-950',
+  ],
   // Ciências Agrárias
   ['CIÊNCIAS AGRÁRIAS I', 'bg-green-600'],
   ['ZOOTECNIA / RECURSOS PESQUEIROS', 'bg-green-700'],
@@ -73,7 +66,10 @@ export const areasComCores: [string, string][] = [
 
   // Ciências Sociais Aplicadas
   ['DIREITO', 'bg-purple-200'],
-  ['ADMINISTRAÇÃO PÚBLICA E DE EMPRESAS, CIÊNCIAS CONTÁBEIS E TURISMO', 'bg-purple-300'],
+  [
+    'ADMINISTRAÇÃO PÚBLICA E DE EMPRESAS, CIÊNCIAS CONTÁBEIS E TURISMO',
+    'bg-purple-300',
+  ],
   ['ECONOMIA', 'bg-purple-400'],
   ['ARQUITETURA, URBANISMO E DESIGN', 'bg-purple-500'],
   ['PLANEJAMENTO URBANO E REGIONAL / DEMOGRAFIA', 'bg-purple-600'],
@@ -101,30 +97,28 @@ export const areasComCores: [string, string][] = [
   ['MATERIAIS', 'bg-teal-400'],
   ['BIOTECNOLOGIA', 'bg-teal-500'],
   ['CIÊNCIAS AMBIENTAIS', 'bg-teal-600'],
-  ['CIÊNCIAS E HUMANIDADES PARA A EDUCAÇÃO BÁSICA', 'bg-teal-700']
+  ['CIÊNCIAS E HUMANIDADES PARA A EDUCAÇÃO BÁSICA', 'bg-teal-700'],
 ];
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
-}
-
+};
 
 export function InstitutionItem(props: GraduateProgram) {
-
-
   const normalizeArea = (area: string): string =>
     area
       .toUpperCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Remove acentos
-      .replace(/[^A-Z0-9 ]/g, "") // Remove caracteres especiais
-      .replace(/\s+/g, " ") // Substitui múltiplos espaços por um único espaço
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+      .replace(/[^A-Z0-9 ]/g, '') // Remove caracteres especiais
+      .replace(/\s+/g, ' ') // Substitui múltiplos espaços por um único espaço
       .trim();
-  
-  
+
   // Criamos o Map normalizando as chaves antes
-  const qualisColor = new Map(areasComCores.map(([area, color]) => [normalizeArea(area), color]));
-  
+  const qualisColor = new Map(
+    areasComCores.map(([area, color]) => [normalizeArea(area), color]),
+  );
+
   const getColorByArea = (area: string): string =>
     qualisColor.get(normalizeArea(area)) || 'bg-gray-500';
 
@@ -139,90 +133,106 @@ export function InstitutionItem(props: GraduateProgram) {
       pathname: props.url,
       search: queryUrl.toString(),
     });
-  }
+  };
 
-  const {onOpen} = useModal()
-  const {urlGeral, urlGeralAdm, simcc, version} = useContext(UserContext)
+  const { onOpen } = useModal();
+  const { urlGeral, urlGeralAdm, simcc } = useContext(UserContext);
 
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
-  
-   
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   return (
- <div onClick={() => handlePesquisaFinal()} className="flex w-full cursor-pointer" key={props.id}>
-  <Alert className="flex flex-col items-center bg-no-repeat bg-center bg-cover" style={{ backgroundImage: `url(${urlGeralAdm}institution/upload/${props.id}/cover)` }}>
-    <Avatar className="cursor-pointer z-[1] top-12 rounded-md relative border dark:border-neutral-800 h-20 w-20 flex-shrink-0">
-      <AvatarImage className="rounded-md" src={props.avatar} />
-      <AvatarFallback className="flex items-center justify-center">
-        <Landmark size={16} />
-      </AvatarFallback>
-    </Avatar>
+    <div
+      onClick={() => handlePesquisaFinal()}
+      className="flex w-full cursor-pointer"
+      key={props.id}
+    >
+      <Alert
+        className="flex flex-col items-center bg-no-repeat bg-center bg-cover"
+        style={{
+          backgroundImage: `url(${urlGeralAdm}institution/upload/${props.id}/cover)`,
+        }}
+      >
+        <Avatar className="cursor-pointer z-[1] top-12 rounded-md relative border dark:border-neutral-800 h-20 w-20 flex-shrink-0">
+          <AvatarImage className="rounded-md" src={props.avatar} />
+          <AvatarFallback className="flex items-center justify-center">
+            <Landmark size={16} />
+          </AvatarFallback>
+        </Avatar>
 
-    <Alert className="flex flex-col items-center pt-16 whitespace-normal">
-      <div className="flex gap-3">
-        {/* <<<<<< ESTE PAI PRECISA PODER ENCOLHER >>>>>> */}
-        <div className="items-center flex flex-col w-full min-w-0">
-          {/* largura do bloco do título */}
-          <div className="font-semibold text-lg w-full text-center">
-            {/* texto com ellipsis */}
-            {props.name} ({props.acronym})
-          </div>
-
-          <div className="flex gap-2 flex-wrap mt-1">
-            <div title="Docentes" className="text-gray-500 text-sm flex gap-1 items-center">
-              <Users size={12} className="flex-shrink-0" />
-              <span className="truncate">{props.count_r}</span>
-            </div>
-
-            <div title="Pós-graduações" className="text-gray-500 text-sm flex gap-1 items-center">
-              <GraduationCapIcon size={12} className="flex-shrink-0" />
-              <span className="truncate">{props.count_gp}</span>
-            </div>
-
-            <div title="Grupos de pesquisa" className="text-gray-500 text-sm flex gap-1 items-center">
-              <Blocks size={12} className="flex-shrink-0" />
-              <span className="truncate">{props.count_gps}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {props.researchers?.length > 0 && (
-        <div className="flex  items-center mt-8">
-        
-          <div className="flex items-center">
-            {props.researchers.slice(0, 5).map((item, index) => (
-              <Avatar
-                key={item}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onOpen('researcher-modal', { name: item });
-                }}
-                className="cursor-pointer rounded-full relative border dark:border-neutral-800 h-8 w-8 hover:z-10 transition-transform hover:scale-110"
-                style={{ marginLeft: index > 0 ? '-10px' : '0px' }}
-              >
-                <AvatarImage className="rounded-md h-8 w-8" src={`${urlGeral}ResearcherData/Image?name=${item}`} />
-                <AvatarFallback className="flex items-center justify-center">
-                  <User size={16} />
-                </AvatarFallback>
-              </Avatar>
-            ))}
-
-            {props.researchers.length > 5 && (
-              <div
-                className="h-8 w-8 flex items-center justify-center text-gray-500 bg-gray-100 dark:bg-neutral-800 rounded-full border dark:border-neutral-700 text-xs font-medium"
-                style={{ marginLeft: '-10px' }}
-              >
-                +{props.researchers.length - 5}
+        <Alert className="flex flex-col items-center pt-16 whitespace-normal">
+          <div className="flex gap-3">
+            {/* <<<<<< ESTE PAI PRECISA PODER ENCOLHER >>>>>> */}
+            <div className="items-center flex flex-col w-full min-w-0">
+              {/* largura do bloco do título */}
+              <div className="font-semibold text-lg w-full text-center">
+                {/* texto com ellipsis */}
+                {props.name} ({props.acronym})
               </div>
-            )}
+
+              <div className="flex gap-2 flex-wrap mt-1">
+                <div
+                  title="Docentes"
+                  className="text-gray-500 text-sm flex gap-1 items-center"
+                >
+                  <Users size={12} className="flex-shrink-0" />
+                  <span className="truncate">{props.count_r}</span>
+                </div>
+
+                <div
+                  title="Pós-graduações"
+                  className="text-gray-500 text-sm flex gap-1 items-center"
+                >
+                  <GraduationCapIcon size={12} className="flex-shrink-0" />
+                  <span className="truncate">{props.count_gp}</span>
+                </div>
+
+                <div
+                  title="Grupos de pesquisa"
+                  className="text-gray-500 text-sm flex gap-1 items-center"
+                >
+                  <Blocks size={12} className="flex-shrink-0" />
+                  <span className="truncate">{props.count_gps}</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
-    </Alert>
-  </Alert>
-</div>
 
+          {props.researchers?.length > 0 && (
+            <div className="flex  items-center mt-8">
+              <div className="flex items-center">
+                {props.researchers.slice(0, 5).map((item, index) => (
+                  <Avatar
+                    key={item}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onOpen('researcher-modal', { name: item });
+                    }}
+                    className="cursor-pointer rounded-full relative border dark:border-neutral-800 h-8 w-8 hover:z-10 transition-transform hover:scale-110"
+                    style={{ marginLeft: index > 0 ? '-10px' : '0px' }}
+                  >
+                    <AvatarImage
+                      className="rounded-md h-8 w-8"
+                      src={`${urlGeral}ResearcherData/Image?name=${item}`}
+                    />
+                    <AvatarFallback className="flex items-center justify-center">
+                      <User size={16} />
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
 
-  )
+                {props.researchers.length > 5 && (
+                  <div
+                    className="h-8 w-8 flex items-center justify-center text-gray-500 bg-gray-100 dark:bg-neutral-800 rounded-full border dark:border-neutral-700 text-xs font-medium"
+                    style={{ marginLeft: '-10px' }}
+                  >
+                    +{props.researchers.length - 5}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </Alert>
+      </Alert>
+    </div>
+  );
 }

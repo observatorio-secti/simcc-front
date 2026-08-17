@@ -1,7 +1,6 @@
+import { columns } from './columns';
 
-import { columns } from "./columns";
-
-import { DataTable } from "../../categorias/researchers-home/data-table";
+import { DataTable } from '../../categorias/researchers-home/data-table';
 
 type Institutions = {
   institutions: any[];
