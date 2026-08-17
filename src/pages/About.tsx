@@ -1,7 +1,5 @@
-import { About } from "../components/about/about";
+import { About } from '../components/about/about';
 
 export function AboutPage() {
-    return(
-        <About/>
-    )
+  return <About />;
 }

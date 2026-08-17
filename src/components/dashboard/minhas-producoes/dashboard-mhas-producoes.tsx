@@ -1,20 +1,24 @@
-import { useContext } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar"
-import { UserContext } from "../../../context/context"
-import { User } from "lucide-react"
-import { Alert } from "../../ui/alert"
-import { CardHeader } from "../../ui/card"
+import { useContext } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
+import { UserContext } from '../../../context/context';
+import { User } from 'lucide-react';
+import { Alert } from '../../ui/alert';
+import { CardHeader } from '../../ui/card';
 
 export function DashboardMinhasProducoes() {
-
-  const { user } = useContext(UserContext)
+  const { user } = useContext(UserContext);
   return (
     <main className="h-full w-full flex flex-col p-4 md:p-8">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-6">
           <Avatar className="cursor-pointer rounded-lg  h-24 w-24">
-            <AvatarImage className={'rounded-md h-24 w-24'} src={`${user?.photo_url}`} />
-            <AvatarFallback className="flex items-center justify-center"><User size={16} /></AvatarFallback>
+            <AvatarImage
+              className={'rounded-md h-24 w-24'}
+              src={`${user?.photo_url}`}
+            />
+            <AvatarFallback className="flex items-center justify-center">
+              <User size={16} />
+            </AvatarFallback>
           </Avatar>
 
           <div>
@@ -28,30 +32,24 @@ export function DashboardMinhasProducoes() {
           </div>
         </div>
 
-        <div>
-
-        </div>
+        <div></div>
       </div>
-
 
       <div className="grid lg:grid-cols-3 gap-8 mt-8">
         <Alert className="bg-eng-blue dark:bg-eng-blue">
           <CardHeader>
             <div className="flex mb-1 gap-3 justify-between">
-              <h3 className="font-semibold text-2xl text-white">Índices de produção</h3>
+              <h3 className="font-semibold text-2xl text-white">
+                Índices de produção
+              </h3>
 
-              <div className="flex items-center gap-3">
-
-
-              </div>
+              <div className="flex items-center gap-3"></div>
             </div>
           </CardHeader>
         </Alert>
 
-        <div>
-
-        </div>
+        <div></div>
       </div>
     </main>
-  )
+  );
 }

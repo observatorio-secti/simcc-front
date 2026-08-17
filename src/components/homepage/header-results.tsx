@@ -13,9 +13,9 @@ interface Csv {
 }
 
 export function HeaderResult() {
-
   const db = getFirestore();
-  const { searchType, itemsSelecionados, setItensSelecionados } = useContext(UserContext);
+  const { searchType, itemsSelecionados, setItensSelecionados } =
+    useContext(UserContext);
   const [filteredItems, setFilteredItems] = useState<Csv[]>([]);
   const [loading, setLoading] = useState(true); // Adiciona um estado de carregamento
 
@@ -23,11 +23,14 @@ export function HeaderResult() {
     try {
       const search = searchType?.toUpperCase() || 'ARTICLE';
 
-      const filesRef = collection(db, import.meta.env.VITE_BANCO_FIREBASE_SEARCH);
+      const filesRef = collection(
+        db,
+        import.meta.env.VITE_BANCO_FIREBASE_SEARCH,
+      );
       const q = query(
         filesRef,
         where('term_normalize', '>=', prefix),
-        where('term_normalize', '<=', prefix + '\uf8ff')
+        where('term_normalize', '<=', prefix + '\uf8ff'),
       );
 
       const querySnapshot = await getDocs(q);
@@ -55,44 +58,47 @@ export function HeaderResult() {
     return value;
   };
 
-  const [type, setType] = useState('')
+  const [type, setType] = useState('');
 
   useEffect(() => {
     switch (searchType) {
       case 'article':
-        return setType('ARTICLE')
+        return setType('ARTICLE');
       case 'abstract':
-        return setType('ABSTRACT')
+        return setType('ABSTRACT');
       case 'patent':
-        return setType('PATENT')
+        return setType('PATENT');
       case 'book':
-        return setType('BOOK')
+        return setType('BOOK');
       case 'speaker':
-        return setType('SPEAKER')
+        return setType('SPEAKER');
       case 'area':
-        return setType('AREA')
+        return setType('AREA');
       case 'name':
-        return setType('NAME')
-
+        return setType('NAME');
     }
   }, []);
 
   useEffect(() => {
     const fetchFilteredItems = async () => {
-      setFilteredItems([])
+      setFilteredItems([]);
       let allResults: Csv[] = [];
 
       for (const item of itemsSelecionados) {
         const normalizedValue = normalizeInput(item.term);
         const prefix = normalizedValue.slice(0, 3);
-        console.log(prefix)
+        console.log(prefix);
         const results = await searchFilesByTermPrefix(prefix);
         allResults = [...allResults, ...results.slice(0, 6)];
       }
 
       // Filtra os itens selecionados
-      const filtered = allResults
-        .filter((result) => !itemsSelecionados.some((item) => normalizeInput(item.term) === result.term_normalize))
+      const filtered = allResults.filter(
+        (result) =>
+          !itemsSelecionados.some(
+            (item) => normalizeInput(item.term) === result.term_normalize,
+          ),
+      );
       // Limitar a 5 resultados
 
       setFilteredItems(filtered);
@@ -100,8 +106,6 @@ export function HeaderResult() {
 
     fetchFilteredItems();
   }, [itemsSelecionados, searchType]);
-
-
 
   return (
     <div>
@@ -115,13 +119,18 @@ export function HeaderResult() {
                     <p className="text-sm font-medium">Sugestões:</p>
                     {Array.from(
                       new Map(
-                        filteredItems.map((item) => [item.term_normalize || item.term, item])
-                      ).values()
+                        filteredItems.map((item) => [
+                          item.term_normalize || item.term,
+                          item,
+                        ]),
+                      ).values(),
                     ).map((props, index) => (
                       <div
                         key={index}
                         onClick={() => {
-                          setItensSelecionados([{ term: props.term_normalize }]);
+                          setItensSelecionados([
+                            { term: props.term_normalize },
+                          ]);
                         }}
                         className="flex whitespace-nowrap gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs"
                       >
@@ -132,7 +141,10 @@ export function HeaderResult() {
                 </div>
               </div>
             </div>
-            <ScrollBar className="pb-4 md:pb-0 md:hidden" orientation="horizontal" />
+            <ScrollBar
+              className="pb-4 md:pb-0 md:hidden"
+              orientation="horizontal"
+            />
           </ScrollArea>
         </div>
       )}

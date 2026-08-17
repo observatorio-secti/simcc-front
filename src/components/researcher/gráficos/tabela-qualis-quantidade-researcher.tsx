@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from 'react';
 
-import { ColumnDef } from "@tanstack/react-table";
-import { UserContext } from "../../../context/context";
-import { DataTable } from "../../popup/columns/popup-data-table";
+import { ColumnDef } from '@tanstack/react-table';
+import { UserContext } from '../../../context/context';
+import { DataTable } from '../../popup/columns/popup-data-table';
 
 interface Props {
   graduate_program_id: string;
@@ -37,13 +37,13 @@ export function TabelaQualisQuantidadeResarcher(props: Props) {
   const fetchData = async () => {
     try {
       const response = await fetch(urlDados, {
-        mode: "cors",
+        mode: 'cors',
         headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Max-Age": "3600",
-          "Content-Type": "text/plain",
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Max-Age': '3600',
+          'Content-Type': 'text/plain',
         },
       });
       const data: Dados[] = await response.json();
@@ -64,58 +64,57 @@ export function TabelaQualisQuantidadeResarcher(props: Props) {
   // Definição das colunas com anos como linhas
   const columns: ColumnDef<Dados>[] = [
     {
-      accessorKey: "year",
-      header: "Ano",
+      accessorKey: 'year',
+      header: 'Ano',
     },
     {
-      accessorKey: "qualis.A1",
-      header: "A1",
+      accessorKey: 'qualis.A1',
+      header: 'A1',
     },
     {
-      accessorKey: "qualis.A2",
-      header: "A2",
+      accessorKey: 'qualis.A2',
+      header: 'A2',
     },
     {
-      accessorKey: "qualis.A3",
-      header: "A3",
+      accessorKey: 'qualis.A3',
+      header: 'A3',
     },
     {
-      accessorKey: "qualis.A4",
-      header: "A4",
+      accessorKey: 'qualis.A4',
+      header: 'A4',
     },
     {
-      accessorKey: "qualis.B1",
-      header: "B1",
+      accessorKey: 'qualis.B1',
+      header: 'B1',
     },
     {
-      accessorKey: "qualis.B2",
-      header: "B2",
+      accessorKey: 'qualis.B2',
+      header: 'B2',
     },
     {
-      accessorKey: "qualis.B3",
-      header: "B3",
+      accessorKey: 'qualis.B3',
+      header: 'B3',
     },
     {
-      accessorKey: "qualis.B4",
-      header: "B4",
+      accessorKey: 'qualis.B4',
+      header: 'B4',
     },
     {
-      accessorKey: "qualis.C",
-      header: "C",
+      accessorKey: 'qualis.C',
+      header: 'C',
     },
     {
-      accessorKey: "qualis.SQ",
-      header: "SQ",
+      accessorKey: 'qualis.SQ',
+      header: 'SQ',
     },
     {
-      accessorKey: "citations",
-      header: "Citações",
+      accessorKey: 'citations',
+      header: 'Citações',
     },
   ];
 
   return (
     <div className="space-y-4">
-
       <DataTable
         columns={columns}
         data={dados} // Dados ordenados em ordem decrescente por ano

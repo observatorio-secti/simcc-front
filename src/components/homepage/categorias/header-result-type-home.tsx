@@ -1,7 +1,7 @@
 interface Props {
-  title: string,
-  children?: any
-  icon: any
+  title: string;
+  children?: any;
+  icon: any;
 }
 
 export function HeaderResultTypeHome(props: Props) {
@@ -12,10 +12,7 @@ export function HeaderResultTypeHome(props: Props) {
         <p className=" font-medium">{props.title}</p>
       </div>
 
-      <div className="flex gap-3  items-center h-full">
-        {props.children}
-      </div>
-
+      <div className="flex gap-3  items-center h-full">{props.children}</div>
     </div>
-  )
+  );
 }

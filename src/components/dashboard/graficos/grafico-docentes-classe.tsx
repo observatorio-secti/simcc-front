@@ -1,8 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Alert } from "../../ui/alert";
-import { BarChart, Bar, XAxis, YAxis, LabelList, ResponsiveContainer } from "recharts";
-import { ChartContainer, ChartConfig, ChartTooltip, ChartTooltipContent } from "../../../components/ui/chart";
-import { Research } from "../../listagens/researchers-home";
+import React, { useEffect, useState } from 'react';
+import { Alert } from '../../ui/alert';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  LabelList,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  ChartContainer,
+  ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '../../../components/ui/chart';
+import { Research } from '../../listagens/researchers-home';
 
 interface Docentes {
   technician_id: string;
@@ -25,24 +37,25 @@ interface Docentes {
 
 // Definição da ordem correta dos cargos
 const cargoOrder = [
-  "PROF TITULAR",
-  "PROFESSOR TITULAR-LIVRE",
-  "PROF ASSOCIADO",
-  "PROF ADJUNTO",
-  "PROF AUXILIAR",
-  "PROF ASSISTENTE",
-
+  'PROF TITULAR',
+  'PROFESSOR TITULAR-LIVRE',
+  'PROF ASSOCIADO',
+  'PROF ADJUNTO',
+  'PROF AUXILIAR',
+  'PROF ASSISTENTE',
 ];
 
 const chartConfig = {
   cargo: {
-    label: "Cargos",
-    color: "#559DB6",
+    label: 'Cargos',
+    color: '#559DB6',
   },
 } satisfies ChartConfig;
 
 export function GraficoDocentesCargo({ docentes }: { docentes: Research[] }) {
-  const [chartData, setChartData] = useState<{ cargo: string; count: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { cargo: string; count: number }[]
+  >([]);
 
   useEffect(() => {
     const counts: { [key: string]: number } = {};
@@ -79,9 +92,17 @@ export function GraficoDocentesCargo({ docentes }: { docentes: Research[] }) {
               axisLine={false}
               fontSize={12}
             />
-            <XAxis type="number" tickLine={false} axisLine={false} fontSize={12} />
+            <XAxis
+              type="number"
+              tickLine={false}
+              axisLine={false}
+              fontSize={12}
+            />
 
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="dashed" />}
+            />
 
             <Bar dataKey="count" radius={4} fill={chartConfig.cargo.color}>
               <LabelList

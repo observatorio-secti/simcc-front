@@ -1,34 +1,58 @@
-import { useEffect, useState, useContext } from "react";
-import { UserContext } from "../../../context/context";
-import { Alert } from "../../ui/alert";
-import { BarChart, Bar, XAxis, ResponsiveContainer, LabelList, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../../../components/ui/chart";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "../../ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../ui/tooltip";
-import { Info } from "lucide-react";
+import { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../../../context/context';
+import { Alert } from '../../ui/alert';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  ResponsiveContainer,
+  LabelList,
+  Cell,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '../../../components/ui/chart';
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../../ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../ui/tooltip';
+import { Info } from 'lucide-react';
 
 const areaColors: Record<string, string> = {
-  "CIENCIAS AGRARIAS": "#EF4444",
-  "CIENCIAS EXATAS E DA TERRA": "#34D399",
-  "CIENCIAS DA SAUDE": "#20BDBE",
-  "CIENCIAS HUMANAS": "#F5831F",
-  "CIENCIAS BIOLOGICAS": "#EB008B",
-  "ENGENHARIAS": "#FCB712",
-  "CIENCIAS SOCIAIS APLICADAS": "#009245",
-  "LINGUISTICA LETRAS E ARTES": "#A67C52",
-  "OUTROS": "#1B1464",
-  "DEFAULT": "#000000",
+  'CIENCIAS AGRARIAS': '#EF4444',
+  'CIENCIAS EXATAS E DA TERRA': '#34D399',
+  'CIENCIAS DA SAUDE': '#20BDBE',
+  'CIENCIAS HUMANAS': '#F5831F',
+  'CIENCIAS BIOLOGICAS': '#EB008B',
+  ENGENHARIAS: '#FCB712',
+  'CIENCIAS SOCIAIS APLICADAS': '#009245',
+  'LINGUISTICA LETRAS E ARTES': '#A67C52',
+  OUTROS: '#1B1464',
+  DEFAULT: '#000000',
 };
 
 const chartConfig = {
   areas: {
-    label: "Áreas de Atuação",
+    label: 'Áreas de Atuação',
   },
 } satisfies ChartConfig;
 
 export function GraficoAreaPesquisares() {
   const { urlGeral } = useContext(UserContext);
-  const [chartData, setChartData] = useState<{ area: string; count: number }[]>([]);
+  const [chartData, setChartData] = useState<{ area: string; count: number }[]>(
+    [],
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,14 +60,16 @@ export function GraficoAreaPesquisares() {
         const response = await fetch(`${urlGeral}metrics/great-area/chart`);
         const data = await response.json();
 
-        const formattedData = data.map((item: { great_area: string; count: number }) => ({
-          area: item.great_area,
-          count: item.count,
-        }));
+        const formattedData = data.map(
+          (item: { great_area: string; count: number }) => ({
+            area: item.great_area,
+            count: item.count,
+          }),
+        );
 
         setChartData(formattedData);
       } catch (error) {
-        console.error("Erro na busca dos dados do gráfico:", error);
+        console.error('Erro na busca dos dados do gráfico:', error);
       }
     };
 
@@ -53,7 +79,7 @@ export function GraficoAreaPesquisares() {
   }, [urlGeral]);
 
   const getAreaColor = (area: string) => {
-    return areaColors[area] || areaColors["DEFAULT"];
+    return areaColors[area] || areaColors['DEFAULT'];
   };
 
   return (
@@ -63,18 +89,22 @@ export function GraficoAreaPesquisares() {
           <CardTitle className="text-sm font-medium">
             Quantidade total por área
           </CardTitle>
-          <CardDescription>Soma de área cadastrada no Lattes pelos pesquisadores</CardDescription>
+          <CardDescription>
+            Soma de área cadastrada no Lattes pelos pesquisadores
+          </CardDescription>
         </div>
 
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger> <Info className="h-4 w-4 text-muted-foreground" /></TooltipTrigger>
+            <TooltipTrigger>
+              {' '}
+              <Info className="h-4 w-4 text-muted-foreground" />
+            </TooltipTrigger>
             <TooltipContent>
               <p>Fonte: Currículo Lattes</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
@@ -83,14 +113,18 @@ export function GraficoAreaPesquisares() {
               data={chartData}
               margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
             >
-              <XAxis dataKey="area" tickLine={false} tickMargin={10} axisLine={false} />
+              <XAxis
+                dataKey="area"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+              />
 
-              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-              <Bar
-                radius={4}
-                dataKey="count"
-                fill="#8884d8"
-              >
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dashed" />}
+              />
+              <Bar radius={4} dataKey="count" fill="#8884d8">
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={getAreaColor(entry.area)} />
                 ))}

@@ -1,40 +1,36 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { ArticlesModal } from "../modals/articles-modal";
+import { ArticlesModal } from '../modals/articles-modal';
 
-
-import { useModalSecundary } from "../hooks/use-modal-store-secundary";
-import { CookiesModal } from "../modals/cookies";
-import { EditArticle } from "../modals/edit-article";
-import { ProjectModal } from "../modals/project-modal";
-import { CoautoresModal } from "../modals/coautores-modal";
-import { EditorpageModal } from "../modals/editor-page";
-import { ShareArticleModal } from "../modals/share-article-modal";
-
+import { useModalSecundary } from '../hooks/use-modal-store-secundary';
+import { EditArticle } from '../modals/edit-article';
+import { ProjectModal } from '../modals/project-modal';
+import { CoautoresModal } from '../modals/coautores-modal';
+import { EditorpageModal } from '../modals/editor-page';
+import { ShareArticleModal } from '../modals/share-article-modal';
 
 const ModalContentSecundary = () => {
   const { type } = useModalSecundary();
 
   switch (type) {
     case 'articles-modal':
-      return <ArticlesModal />
+      return <ArticlesModal />;
     case 'edit-article':
-      return <EditArticle />
+      return <EditArticle />;
     case 'project-modal':
-      return <ProjectModal />
+      return <ProjectModal />;
     case 'coautores':
-      return <CoautoresModal />
+      return <CoautoresModal />;
     case 'editor-page':
-      return <EditorpageModal />
+      return <EditorpageModal />;
     case 'share-article':
-      return <ShareArticleModal />
+      return <ShareArticleModal />;
     default:
       return null;
   }
 };
-
 
 export const ModalProviderSecundary = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -47,5 +43,5 @@ export const ModalProviderSecundary = () => {
     return null;
   }
 
-  return <ModalContentSecundary />
-}
+  return <ModalContentSecundary />;
+};

@@ -1,7 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Alert } from "../../ui/alert";
-import { BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../components/ui/chart";
+import React, { useEffect, useState } from 'react';
+import { Alert } from '../../ui/alert';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../../components/ui/chart';
 
 type Livro = {
   authors: string;
@@ -12,25 +26,30 @@ type Livro = {
   relevance: boolean;
   scientific_divulgation: boolean;
   title: string;
-  title_en: string ;
+  title_en: string;
   year_: string;
 };
 
-
 const chartConfig = {
-  'publicacoes': {
-    label: "Projeto de pesquisa",
-    color: "#DE2834",
+  publicacoes: {
+    label: 'Projeto de pesquisa',
+    color: '#DE2834',
   },
 } satisfies ChartConfig;
 
-export function GraficoTrabalhoEvento({ publicacoes }: { publicacoes: Livro[] }) {
-  const [chartData, setChartData] = useState<{ year: string; count: number }[]>([]);
+export function GraficoTrabalhoEvento({
+  publicacoes,
+}: {
+  publicacoes: Livro[];
+}) {
+  const [chartData, setChartData] = useState<{ year: string; count: number }[]>(
+    [],
+  );
 
   useEffect(() => {
     const counts: { [key: string]: number } = {};
 
-    publicacoes.forEach(publicacao => {
+    publicacoes.forEach((publicacao) => {
       const year = publicacao.year_;
       counts[year] = (counts[year] || 0) + 1;
     });
@@ -49,15 +68,32 @@ export function GraficoTrabalhoEvento({ publicacoes }: { publicacoes: Livro[] })
     <Alert className="pt-12">
       <ChartContainer config={chartConfig} className="h-[250px] w-full">
         <ResponsiveContainer>
-          <BarChart data={chartData}  margin={{ top: 20,  right: -5, left: -5, bottom: 0 }}>
-          <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: -5, left: -5, bottom: 0 }}
+          >
+            <XAxis
+              dataKey="year"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
 
-          
             <CartesianGrid vertical={false} horizontal={false} />
             <ChartLegend content={<ChartLegendContent />} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="count" fill={chartConfig.publicacoes.color} radius={4}>
-              <LabelList dataKey="count" position="top" offset={12} className="fill-foreground" fontSize={12} />
+            <Bar
+              dataKey="count"
+              fill={chartConfig.publicacoes.color}
+              radius={4}
+            >
+              <LabelList
+                dataKey="count"
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>

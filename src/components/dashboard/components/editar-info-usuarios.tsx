@@ -1,18 +1,18 @@
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../../context/context";
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../../../context/context';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../../../components/ui/accordion";
-import { RefreshCcw, User as UserIcon } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
-import { Alert } from "../../ui/alert";
-import { Label } from "../../ui/label";
-import { Input } from "../../ui/input";
-import { Button } from "../../ui/button";
-import { toast } from "sonner";
+} from '../../../components/ui/accordion';
+import { RefreshCcw, User as UserIcon } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
+import { Alert } from '../../ui/alert';
+import { Label } from '../../ui/label';
+import { Input } from '../../ui/input';
+import { Button } from '../../ui/button';
+import { toast } from 'sonner';
 
 interface User {
   institution_id: string;
@@ -41,10 +41,10 @@ interface Roles {
 }
 
 export interface Props {
-  name: string
-  institution_id: string
-  acronym:string
-  lattes_id:string
+  name: string;
+  institution_id: string;
+  acronym: string;
+  lattes_id: string;
 }
 
 export function EditarInfoUsuarios() {
@@ -59,7 +59,6 @@ export function EditarInfoUsuarios() {
   console.log(urlUser);
 
   const fetchDataTable = async () => {
-   
     try {
       const response = await fetch(urlGetResearcher, {
         mode: 'cors',
@@ -74,12 +73,9 @@ export function EditarInfoUsuarios() {
       const data = await response.json();
       if (data) {
         setResearcher(data);
-      
-     
       }
     } catch (err) {
       console.log(err);
-   
     }
   };
 
@@ -87,27 +83,29 @@ export function EditarInfoUsuarios() {
     fetchDataTable();
   }, [urlGetResearcher]);
 
-
   const fetchData = async () => {
     try {
       const response = await fetch(urlUser, {
-        mode: "cors",
+        mode: 'cors',
         headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Max-Age": "3600",
-          "Content-Type": "text/plain",
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Max-Age': '3600',
+          'Content-Type': 'text/plain',
         },
       });
       const data = await response.json();
       if (data) {
         setUsers(data);
         // Initialize form data with user data
-        const initialFormData = data.reduce((acc: Record<string, Partial<User>>, user: User) => {
-          acc[user.user_id] = { ...user };
-          return acc;
-        }, {});
+        const initialFormData = data.reduce(
+          (acc: Record<string, Partial<User>>, user: User) => {
+            acc[user.user_id] = { ...user };
+            return acc;
+          },
+          {},
+        );
         setFormData(initialFormData);
       }
     } catch (err) {
@@ -121,7 +119,11 @@ export function EditarInfoUsuarios() {
 
   console.log(users);
 
-  const handleInputChange = (userId: string, field: keyof User, value: string) => {
+  const handleInputChange = (
+    userId: string,
+    field: keyof User,
+    value: string,
+  ) => {
     setFormData({
       ...formData,
       [userId]: {
@@ -135,11 +137,11 @@ export function EditarInfoUsuarios() {
     try {
       const data = formData[userId];
       if (data && data.display_name?.length === 0) {
-        toast("O nome não pode ser vazio", {
-          description: "Por favor, tente novamente",
+        toast('O nome não pode ser vazio', {
+          description: 'Por favor, tente novamente',
           action: {
-            label: "Fechar",
-            onClick: () => console.log("Fechar"),
+            label: 'Fechar',
+            onClick: () => console.log('Fechar'),
           },
         });
         return;
@@ -148,34 +150,34 @@ export function EditarInfoUsuarios() {
       const urlGruposPesquisaInsert = `${urlGeralAdm}s/user`;
 
       const response = await fetch(urlGruposPesquisaInsert, {
-        mode: "cors",
-        method: "PUT",
+        mode: 'cors',
+        method: 'PUT',
         headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "PUT",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Max-Age": "3600",
-          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'PUT',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Max-Age': '3600',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify([data]),
       });
 
       if (response.ok) {
-        toast("Dados enviados com sucesso", {
-          description: "Todos os dados foram enviados.",
+        toast('Dados enviados com sucesso', {
+          description: 'Todos os dados foram enviados.',
           action: {
-            label: "Fechar",
-            onClick: () => console.log("Fechar"),
+            label: 'Fechar',
+            onClick: () => console.log('Fechar'),
           },
         });
       }
     } catch (error) {
-      console.error("Erro ao processar a requisição:", error);
-      toast("Erro ao processar a requisição", {
-        description: "Tente novamente mais tarde.",
+      console.error('Erro ao processar a requisição:', error);
+      toast('Erro ao processar a requisição', {
+        description: 'Tente novamente mais tarde.',
         action: {
-          label: "Fechar",
-          onClick: () => console.log("Fechar"),
+          label: 'Fechar',
+          onClick: () => console.log('Fechar'),
         },
       });
     }
@@ -191,14 +193,19 @@ export function EditarInfoUsuarios() {
                 <div className="h-10">
                   <div className="flex items-center gap-2">
                     <Avatar className="cursor-pointer rounded-md h-8 w-8">
-                      <AvatarImage className="rounded-md h-8 w-8" src={`${user.photo_url}`} />
+                      <AvatarImage
+                        className="rounded-md h-8 w-8"
+                        src={`${user.photo_url}`}
+                      />
                       <AvatarFallback className="flex items-center justify-center">
                         <UserIcon size={12} />
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="font-medium">{user.display_name}</p>
-                      <div className="text-xs text-gray-500">({user.email})</div>
+                      <div className="text-xs text-gray-500">
+                        ({user.email})
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -210,8 +217,14 @@ export function EditarInfoUsuarios() {
                   <div className="flex w-full flex-col gap-2 mt-4">
                     <Label>Nome completo</Label>
                     <Input
-                      value={formData[user.user_id]?.display_name || ""}
-                      onChange={(e) => handleInputChange(user.user_id, "display_name", e.target.value)}
+                      value={formData[user.user_id]?.display_name || ''}
+                      onChange={(e) =>
+                        handleInputChange(
+                          user.user_id,
+                          'display_name',
+                          e.target.value,
+                        )
+                      }
                       type="text"
                     />
                   </div>
@@ -221,8 +234,14 @@ export function EditarInfoUsuarios() {
                   <div className="flex w-full flex-col gap-2 mt-4">
                     <Label>LinkedIn</Label>
                     <Input
-                      value={formData[user.user_id]?.linkedin || ""}
-                      onChange={(e) => handleInputChange(user.user_id, "linkedin", e.target.value)}
+                      value={formData[user.user_id]?.linkedin || ''}
+                      onChange={(e) =>
+                        handleInputChange(
+                          user.user_id,
+                          'linkedin',
+                          e.target.value,
+                        )
+                      }
                       type="text"
                     />
                   </div>
@@ -230,8 +249,14 @@ export function EditarInfoUsuarios() {
                   <div className="flex w-full flex-col gap-2 mt-4">
                     <Label>Id da instituição</Label>
                     <Input
-                      value={formData[user.user_id]?.institution_id || ""}
-                      onChange={(e) => handleInputChange(user.user_id, "institution_id", e.target.value)}
+                      value={formData[user.user_id]?.institution_id || ''}
+                      onChange={(e) =>
+                        handleInputChange(
+                          user.user_id,
+                          'institution_id',
+                          e.target.value,
+                        )
+                      }
                       type="text"
                     />
                   </div>
@@ -239,8 +264,14 @@ export function EditarInfoUsuarios() {
                   <div className="flex w-full flex-col gap-2 mt-4">
                     <Label>Id Lattes</Label>
                     <Input
-                      value={formData[user.user_id]?.lattes_id || ""}
-                      onChange={(e) => handleInputChange(user.user_id, "lattes_id", e.target.value)}
+                      value={formData[user.user_id]?.lattes_id || ''}
+                      onChange={(e) =>
+                        handleInputChange(
+                          user.user_id,
+                          'lattes_id',
+                          e.target.value,
+                        )
+                      }
                       type="text"
                     />
                   </div>

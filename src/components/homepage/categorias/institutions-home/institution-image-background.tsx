@@ -1,11 +1,13 @@
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 // Função para buscar a imagem da instituição pelo ID
-export const getInstitutionImageBackground = async (institutionId: string): Promise<string | null> => {
+export const getInstitutionImageBackground = async (
+  institutionId: string,
+): Promise<string | null> => {
   if (!institutionId) return null; // Verifica se o ID foi passado
 
   const db = getFirestore(); // Inicializa o Firestore
-  const docRef = doc(db, "institutions", institutionId); // Referência ao documento da instituição
+  const docRef = doc(db, 'institutions', institutionId); // Referência ao documento da instituição
   const docSnap = await getDoc(docRef); // Obtém o documento
 
   if (docSnap.exists()) {
@@ -15,5 +17,3 @@ export const getInstitutionImageBackground = async (institutionId: string): Prom
     return null;
   }
 };
-
-

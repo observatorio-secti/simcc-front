@@ -9,7 +9,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 
 import {
   Table,
@@ -18,20 +18,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../components/ui/table";
+} from '../../components/ui/table';
 
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from '../../components/ui/dropdown-menu';
 
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 
-import { useState } from "react";
-import { Columns, FileCsv } from "phosphor-react";
+import { useState } from 'react';
+import { Columns, FileCsv } from 'phosphor-react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -64,35 +64,36 @@ export function DataTable<TData, TValue>({
   });
 
   const handleBtnCsv = () => {
-        try {
-  
-    const convertJsonToCsv = (json: any[]): string => {
-      const items = json;
-      const replacer = (key: string, value: any) => (value === null ? '' : value); // Handle null values
-      const header = Object.keys(items[0]);
-      const csv = [
-        '\uFEFF' + header.join(';'), // Add BOM and CSV header
-        ...items.map((item) =>
-          header.map((fieldName) => JSON.stringify(item[fieldName], replacer)).join(';')
-        ) // CSV data
-      ].join('\r\n');
-  
-      return csv;
-    };
-  
-  
-        const csvData = convertJsonToCsv(data);
-        const blob = new Blob([csvData], { type: 'text/csv;charset=windows-1252;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = `todos_pesquisadores.csv`;
-        link.href = url;
-        link.click();
+    try {
+      const convertJsonToCsv = (json: any[]): string => {
+        const items = json;
+        const replacer = (key: string, value: any) =>
+          value === null ? '' : value; // Handle null values
+        const header = Object.keys(items[0]);
+        const csv = [
+          '\uFEFF' + header.join(';'), // Add BOM and CSV header
+          ...items.map((item) =>
+            header
+              .map((fieldName) => JSON.stringify(item[fieldName], replacer))
+              .join(';'),
+          ), // CSV data
+        ].join('\r\n');
 
-      } catch (error) {
-        console.error('Error:', error);
-      }
+        return csv;
+      };
 
+      const csvData = convertJsonToCsv(data);
+      const blob = new Blob([csvData], {
+        type: 'text/csv;charset=windows-1252;',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `todos_pesquisadores.csv`;
+      link.href = url;
+      link.click();
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -100,50 +101,53 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center pb-4">
         <Input
           placeholder="Filtrar pesquisador..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn('name')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
 
-<div className="flex gap-3 ml-auto">
-<Button onClick={() => handleBtnCsv()} variant="outline" className="ml-auto">
-<FileCsv size={16} />
-              Download CSV
-            </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            
-            <Button variant="outline" className="ml-auto">
-            <Columns size={16} />
-              Colunas
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-</div>
+        <div className="flex gap-3 ml-auto">
+          <Button
+            onClick={() => handleBtnCsv()}
+            variant="outline"
+            className="ml-auto"
+          >
+            <FileCsv size={16} />
+            Download CSV
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                <Columns size={16} />
+                Colunas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="rounded-md border dark:border-none">
-        <Table >
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -154,7 +158,7 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -167,13 +171,13 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

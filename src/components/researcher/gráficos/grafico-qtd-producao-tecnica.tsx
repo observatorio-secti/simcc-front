@@ -1,6 +1,20 @@
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../ui/chart";
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  LabelList,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../ui/chart';
 
 type Dados = {
   count_software: number;
@@ -15,15 +29,21 @@ type ProdTecProps = {
 };
 
 const chartConfig = {
-  software: { label: "Software", color: "#096670" },
-  patente_concedida: { label: "Patente Conc", color: "#6BC26B" },
-  patente_nao_concedida: { label: "Patente Não Conc", color: "#CE3830" },
-  rel_tec: { label: "Rel Técnico", color: "#662D91" },
+  software: { label: 'Software', color: '#096670' },
+  patente_concedida: { label: 'Patente Conc', color: '#6BC26B' },
+  patente_nao_concedida: { label: 'Patente Não Conc', color: '#CE3830' },
+  rel_tec: { label: 'Rel Técnico', color: '#662D91' },
 } satisfies ChartConfig;
 
 export function GraficoQtdProducaoTecnica(props: ProdTecProps) {
   const [chartData, setChartData] = useState<
-    { year: string; software: number; patente_concedida: number; patente_nao_concedida: number; rel_tec: number }[]
+    {
+      year: string;
+      software: number;
+      patente_concedida: number;
+      patente_nao_concedida: number;
+      rel_tec: number;
+    }[]
   >([]);
 
   useEffect(() => {
@@ -41,7 +61,7 @@ export function GraficoQtdProducaoTecnica(props: ProdTecProps) {
           item.software > 0 ||
           item.patente_concedida > 0 ||
           item.patente_nao_concedida > 0 ||
-          item.rel_tec > 0
+          item.rel_tec > 0,
       ); // Remove anos onde todos os valores são 0
 
     setChartData(data);
@@ -50,36 +70,58 @@ export function GraficoQtdProducaoTecnica(props: ProdTecProps) {
   return (
     <ChartContainer config={chartConfig} className="h-[260px] w-full">
       <ResponsiveContainer>
-        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-          <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+        >
+          <XAxis
+            dataKey="year"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+          />
           <YAxis hide={true} />
-          <ChartLegend className="flex flex-wrap" content={<ChartLegendContent />} />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+          <ChartLegend
+            className="flex flex-wrap"
+            content={<ChartLegendContent />}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
 
           {/* Barras empilhadas */}
           <Bar dataKey="software" stackId="a" fill={chartConfig.software.color}>
             <LabelList
               dataKey="software"
               position="top"
-              formatter={(value) => (value > 0 ? value.toString() : "")}
+              formatter={(value) => (value > 0 ? value.toString() : '')}
               fontSize={12}
               className="fill-foreground"
             />
           </Bar>
-          <Bar dataKey="patente_concedida" stackId="a" fill={chartConfig.patente_concedida.color}>
+          <Bar
+            dataKey="patente_concedida"
+            stackId="a"
+            fill={chartConfig.patente_concedida.color}
+          >
             <LabelList
               dataKey="patente_concedida"
               position="top"
-              formatter={(value) => (value > 0 ? value.toString() : "")}
+              formatter={(value) => (value > 0 ? value.toString() : '')}
               fontSize={12}
               className="fill-foreground"
             />
           </Bar>
-          <Bar dataKey="patente_nao_concedida" stackId="a" fill={chartConfig.patente_nao_concedida.color}>
+          <Bar
+            dataKey="patente_nao_concedida"
+            stackId="a"
+            fill={chartConfig.patente_nao_concedida.color}
+          >
             <LabelList
               dataKey="patente_nao_concedida"
               position="top"
-              formatter={(value) => (value > 0 ? value.toString() : "")}
+              formatter={(value) => (value > 0 ? value.toString() : '')}
               fontSize={12}
               className="fill-foreground"
             />
@@ -88,7 +130,7 @@ export function GraficoQtdProducaoTecnica(props: ProdTecProps) {
             <LabelList
               dataKey="rel_tec"
               position="top"
-              formatter={(value) => (value > 0 ? value.toString() : "")}
+              formatter={(value) => (value > 0 ? value.toString() : '')}
               fontSize={12}
               className="fill-foreground"
             />

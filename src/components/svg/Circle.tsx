@@ -1,11 +1,7 @@
-
 export function Circle() {
-
   return (
-
-<svg
+    <svg
       xmlns="http://www.w3.org/2000/svg"
-
       height="full"
       fill="none"
       viewBox="0 0 817 670"
@@ -22,5 +18,5 @@ export function Circle() {
         </clipPath>
       </defs>
     </svg>
-    );
-  }
+  );
+}

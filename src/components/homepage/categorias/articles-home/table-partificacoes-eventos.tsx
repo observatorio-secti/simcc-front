@@ -1,6 +1,5 @@
-import { DataTable } from "../researchers-home/data-table";
-import { columnsParcicipacaoEvento } from "../../../popup/columns/columns-participacao-eventos";
-import { columns } from "../../../popup/columns/columns-articles";
+import { DataTable } from '../researchers-home/data-table';
+import { columnsParcicipacaoEvento } from '../../../popup/columns/columns-participacao-eventos';
 
 type Participacoes = {
   p: any[];

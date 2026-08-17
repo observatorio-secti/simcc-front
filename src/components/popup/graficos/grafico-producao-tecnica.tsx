@@ -1,7 +1,22 @@
-import { useEffect, useState } from "react";
-import { Alert } from "../../ui/alert";
-import { BarChart, Bar, XAxis, LabelList, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../components/ui/chart";
+import { useEffect, useState } from 'react';
+import { Alert } from '../../ui/alert';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../../components/ui/chart';
 
 type Livros = {
   id: string;
@@ -20,21 +35,31 @@ type Patente = {
 
 const chartConfig = {
   software: {
-    label: "Software",
-    color: "#096670",
+    label: 'Software',
+    color: '#096670',
   },
   publicacoes: {
-    label: "Patentes",
-    color: "#66B4D0",
+    label: 'Patentes',
+    color: '#66B4D0',
   },
   marca: {
-    label: "Marcas",
-    color: "#1B1464",
+    label: 'Marcas',
+    color: '#1B1464',
   },
 } satisfies ChartConfig;
 
-export function GraficoProducaoTecnica({ software, publicacoes, marca }: { software: Livros[], publicacoes: Patente[], marca: Livros[] }) {
-  const [chartData, setChartData] = useState<{ year: number;[key: string]: number }[]>([]);
+export function GraficoProducaoTecnica({
+  software,
+  publicacoes,
+  marca,
+}: {
+  software: Livros[];
+  publicacoes: Patente[];
+  marca: Livros[];
+}) {
+  const [chartData, setChartData] = useState<
+    { year: number; [key: string]: number }[]
+  >([]);
 
   useEffect(() => {
     const counts: { [year: string]: { [key: string]: number } } = {};
@@ -64,9 +89,11 @@ export function GraficoProducaoTecnica({ software, publicacoes, marca }: { softw
       marca: counts.marca || 0,
     }));
 
-    const transformedData = data.map(item => ({
+    const transformedData = data.map((item) => ({
       year: item.year,
-      ...Object.fromEntries(Object.entries(item).filter(([key]) => key !== 'year'))
+      ...Object.fromEntries(
+        Object.entries(item).filter(([key]) => key !== 'year'),
+      ),
     }));
 
     setChartData(transformedData);
@@ -76,12 +103,23 @@ export function GraficoProducaoTecnica({ software, publicacoes, marca }: { softw
     <Alert className="pt-12">
       <ChartContainer config={chartConfig} className="h-[250px] w-full">
         <ResponsiveContainer>
-          <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-            <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+          >
+            <XAxis
+              dataKey="year"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
 
             <CartesianGrid vertical={false} horizontal={false} />
             <ChartLegend content={<ChartLegendContent />} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="dashed" />}
+            />
             {Object.keys(chartConfig).map((key, index) => (
               <Bar
                 key={key}
@@ -91,10 +129,17 @@ export function GraficoProducaoTecnica({ software, publicacoes, marca }: { softw
                 radius={4}
               >
                 {index === Object.keys(chartConfig).length - 1 && (
-                  <LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
+                  <LabelList
+                    position="top"
+                    offset={12}
+                    className="fill-foreground"
+                    fontSize={12}
+                  />
                 )}
                 {chartData.map((entry, index) =>
-                  entry[key] > 0 ? <Cell key={`cell-${index}`} fill={chartConfig[key].color} /> : null
+                  entry[key] > 0 ? (
+                    <Cell key={`cell-${index}`} fill={chartConfig[key].color} />
+                  ) : null,
                 )}
               </Bar>
             ))}

@@ -1,12 +1,35 @@
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "../../../components/ui/chart";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "../../ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../ui/tooltip";
-import { Info } from "lucide-react";
-import { Alert } from "../../ui/alert";
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  LabelList,
+  Cell,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '../../../components/ui/chart';
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../../ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../ui/tooltip';
+import { Info } from 'lucide-react';
+import { Alert } from '../../ui/alert';
 
-import { GraduateProgram } from "../graduate-program";
+import { GraduateProgram } from '../graduate-program';
 
 type ResearchData = {
   group: GraduateProgram[];
@@ -14,13 +37,15 @@ type ResearchData = {
 
 const chartConfig = {
   institution: {
-    label: "Instituição",
-    color: "#559FB8",
+    label: 'Instituição',
+    color: '#559FB8',
   },
 } satisfies ChartConfig;
 
 export function GraficoInstituicaoProgramas(props: ResearchData) {
-  const [chartData, setChartData] = useState<{ institution: string; count: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { institution: string; count: number }[]
+  >([]);
 
   useEffect(() => {
     if (props.group) {
@@ -49,8 +74,12 @@ export function GraficoInstituicaoProgramas(props: ResearchData) {
     <Alert>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div>
-          <CardTitle className="text-sm font-medium">Quantidade de programas de pós-graduação por instituição</CardTitle>
-          <CardDescription>Total de programas de pós-graduação associados a cada instituição</CardDescription>
+          <CardTitle className="text-sm font-medium">
+            Quantidade de programas de pós-graduação por instituição
+          </CardTitle>
+          <CardDescription>
+            Total de programas de pós-graduação associados a cada instituição
+          </CardDescription>
         </div>
 
         <TooltipProvider>
@@ -76,12 +105,13 @@ export function GraficoInstituicaoProgramas(props: ResearchData) {
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-           
-               textAnchor="middle"
-              
+                textAnchor="middle"
               />
               <CartesianGrid vertical={false} horizontal={false} />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dashed" />}
+              />
               <Bar dataKey="count" radius={4}>
                 {chartData.map((_, index) => (
                   <Cell key={`cell-${index}`} fill="#559FB8" />

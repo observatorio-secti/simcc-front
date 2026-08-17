@@ -1,35 +1,33 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { ArticlesHome } from "../homepage/categorias/articles-home";
-import { ResearchersHome } from "../homepage/categorias/researchers-home";
+import { useEffect, useState } from 'react';
+import { ArticlesHome } from '../homepage/categorias/articles-home';
+import { ResearchersHome } from '../homepage/categorias/researchers-home';
 
-import { useModalResult } from "../hooks/use-modal-result";
-import { PatentHome } from "../homepage/categorias/patent-home";
-import { BookHome } from "../homepage/categorias/book-home";
-import { SpeakerHome } from "../homepage/categorias/speaker-home";
-import { InstitutionsHome } from "../homepage/categorias/institutions-home";
-
+import { useModalResult } from '../hooks/use-modal-result';
+import { PatentHome } from '../homepage/categorias/patent-home';
+import { BookHome } from '../homepage/categorias/book-home';
+import { SpeakerHome } from '../homepage/categorias/speaker-home';
+import { InstitutionsHome } from '../homepage/categorias/institutions-home';
 
 const ModalContent = () => {
   const { type } = useModalResult();
 
   switch (type) {
     case 'articles-home':
-      return <ArticlesHome />
+      return <ArticlesHome />;
     case 'researchers-home':
-      return <ResearchersHome />
+      return <ResearchersHome />;
     case 'patent-home':
-      return <PatentHome />
+      return <PatentHome />;
     case 'book-home':
-      return <BookHome />
+      return <BookHome />;
     case 'speaker-home':
-      return <SpeakerHome />
+      return <SpeakerHome />;
     case 'institutions-home':
-      return <InstitutionsHome />
+      return <InstitutionsHome />;
   }
-
-}
+};
 export const ResultProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -41,6 +39,5 @@ export const ResultProvider = () => {
     return null;
   }
 
-  return <ModalContent />
-
-}
+  return <ModalContent />;
+};

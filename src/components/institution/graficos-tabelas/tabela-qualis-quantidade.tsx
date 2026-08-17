@@ -1,14 +1,8 @@
-import { useContext, useEffect, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
-import { UserContext } from "../../../context/context";
-import { DataTable } from "../../dashboard/data-table";
-import { ColumnDef } from "@tanstack/react-table";
-import { Label } from "../../ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
-import { useQuery } from "../../dashboard/builder-page/tabelas/tabela-artigos";
-
-
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../../../context/context';
+import { DataTable } from '../../dashboard/data-table';
+import { ColumnDef } from '@tanstack/react-table';
+import { useQuery } from '../../dashboard/builder-page/tabelas/tabela-artigos';
 
 type Dados = {
   citations: number;
@@ -32,7 +26,6 @@ interface Props {
   setAnos: (anos: number[]) => void;
 }
 
-
 export function TabelaQualisQuantidade(props: Props) {
   const [dados, setDados] = useState<Dados[]>([]);
 
@@ -42,22 +35,20 @@ export function TabelaQualisQuantidade(props: Props) {
 
   const graduate_program_id = queryUrl.get('graduate_program_id');
 
-
   const dep_id = queryUrl.get('dep_id');
 
   const { urlGeral } = useContext(UserContext);
   const urlDados = `${urlGeral}graduate_program/${graduate_program_id && graduate_program_id}/article_production?year=${year}`;
   const fetchData = async () => {
-
     try {
       const response = await fetch(urlDados, {
-        mode: "cors",
+        mode: 'cors',
         headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Max-Age": "3600",
-          "Content-Type": "text/plain",
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET',
+          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Max-Age': '3600',
+          'Content-Type': 'text/plain',
         },
       });
       const data: Dados[] = await response.json();
@@ -65,7 +56,9 @@ export function TabelaQualisQuantidade(props: Props) {
         setDados(data);
 
         // Extrair os anos únicos
-        const uniqueYears = Array.from(new Set(data.map((item) => item.year))).sort((a, b) => a - b);
+        const uniqueYears = Array.from(
+          new Set(data.map((item) => item.year)),
+        ).sort((a, b) => a - b);
         // Enviar os anos únicos para o componente pai
         props.setAnos(uniqueYears);
 
@@ -82,58 +75,58 @@ export function TabelaQualisQuantidade(props: Props) {
   useEffect(() => {
     fetchData();
   }, [urlDados]);
-  console.log(urlDados)
-  console.log(dados)
+  console.log(urlDados);
+  console.log(dados);
 
   // Definição das colunas para o DataTable
   const columns: ColumnDef<Dados>[] = [
     {
-      accessorKey: "name",
-      header: "Nome",
+      accessorKey: 'name',
+      header: 'Nome',
     },
     {
-      accessorKey: "A1",
-      header: "A1",
+      accessorKey: 'A1',
+      header: 'A1',
     },
     {
-      accessorKey: "A2",
-      header: "A2",
+      accessorKey: 'A2',
+      header: 'A2',
     },
     {
-      accessorKey: "A3",
-      header: "A3",
+      accessorKey: 'A3',
+      header: 'A3',
     },
     {
-      accessorKey: "A4",
-      header: "A4",
+      accessorKey: 'A4',
+      header: 'A4',
     },
     {
-      accessorKey: "B1",
-      header: "B1",
+      accessorKey: 'B1',
+      header: 'B1',
     },
     {
-      accessorKey: "B2",
-      header: "B2",
+      accessorKey: 'B2',
+      header: 'B2',
     },
     {
-      accessorKey: "B3",
-      header: "B3",
+      accessorKey: 'B3',
+      header: 'B3',
     },
     {
-      accessorKey: "B4",
-      header: "B4",
+      accessorKey: 'B4',
+      header: 'B4',
     },
     {
-      accessorKey: "C",
-      header: "C",
+      accessorKey: 'C',
+      header: 'C',
     },
     {
-      accessorKey: "SQ",
-      header: "SQ",
+      accessorKey: 'SQ',
+      header: 'SQ',
     },
     {
-      accessorKey: "citations",
-      header: "Citações",
+      accessorKey: 'citations',
+      header: 'Citações',
     },
   ];
 
@@ -141,11 +134,14 @@ export function TabelaQualisQuantidade(props: Props) {
     <div className="space-y-4 w-full pb-4">
       {/* Seletor de anos */}
 
-
       {/* DataTable */}
       <DataTable
         columns={columns}
-        data={Array.isArray(dados) ? dados.filter((item) => item.year === props.anoSelecionado) : []}
+        data={
+          Array.isArray(dados)
+            ? dados.filter((item) => item.year === props.anoSelecionado)
+            : []
+        }
       />
     </div>
   );

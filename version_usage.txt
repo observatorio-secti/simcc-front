@@ -1,0 +1,261 @@
+src/App.tsx:106:  const [version, setVersion] = useState(
+src/App.tsx:403:              version,
+src/assets/logo_cimatec.svg:1:<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+src/assets/logo_cimatec.svg:3:<svg width="100%" height="100%" viewBox="0 0 3508 1121" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+src/components/about/home-about.tsx:9:  const { version } = useContext(UserContext);
+src/components/about/home-about.tsx:11:  const institution = version ? 'a Escola de Engenharia da UFMG' : 'o SECTI-BA';
+src/components/about/home-about.tsx:12:  const platform = version ? 'Conectee' : 'Simcc';
+src/components/app-sidebar-admin.tsx:40:  const { urlGeral, user, version, permission } = useContext(UserContext);
+src/components/app-sidebar-admin.tsx:106:          ...(version
+src/components/app-sidebar-docs.tsx:32:  const { urlGeral, user, version, loggedIn } = useContext(UserContext);
+src/components/app-sidebar.tsx:35:  const { urlGeral, user, version, loggedIn } = useContext(UserContext);
+src/components/authentication/Password.tsx:21:  const { setLoggedIn, urlGeralAdm, version } = useContext(UserContext);
+src/components/authentication/Password.tsx:114:        {version ? (
+src/components/authentication/Password.tsx:128:          {version && (
+src/components/authentication/UpdatePassword.tsx:22:  const { setLoggedIn, urlGeralAdm, version } = useContext(UserContext);
+src/components/authentication/UpdatePassword.tsx:132:        {version ? (
+src/components/authentication/UpdatePassword.tsx:146:          {version && (
+src/components/authentication/signIn.tsx:34:  const { setLoggedIn, urlGeralAdm, version } = useContext(UserContext);
+src/components/authentication/signIn.tsx:371:        {version ? (
+src/components/authentication/signIn.tsx:385:          {version && (
+src/components/authentication/signIn.tsx:399:            {version ? (
+src/components/authentication/signUp.tsx:35:  const { setLoggedIn, version } = useContext(UserContext);
+src/components/authentication/signUp.tsx:302:        {version ? (
+src/components/authentication/signUp.tsx:316:          {version && (
+src/components/baremas/baremas-home.tsx:1075:  const { version } = useContext(UserContext);
+src/components/baremas/baremas-home.tsx:1082:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/baremas/baremas-home.tsx:1086:          content={`Baremas | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/add-researcher-dashboard.tsx:233:  const { version, urlGeral } = useContext(UserContext);
+src/components/dashboard/add-researcher-dashboard.tsx:271:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/dashboard/add-researcher-dashboard.tsx:275:          content={`Pesquisadores | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/add-researcher-dashboard.tsx:298:                {version && (
+src/components/dashboard/builder-page/builder-page.tsx:580:  const { version } = useContext(UserContext);
+src/components/dashboard/builder-page/builder-page.tsx:624:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/dashboard/builder-page/builder-page.tsx:628:          content={`Construtor de página | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/geral-view-dashboard/geral-view-dashboard.tsx:249:        collection(db, version ? 'background' : 'background_iapos'),
+src/components/dashboard/geral-view-dashboard/geral-view-dashboard.tsx:258:          version ? 'background' : 'background_iapos',
+src/components/dashboard/geral-view-dashboard/geral-view-dashboard.tsx:284:        collection(db, version ? 'background' : 'background_iapos'),
+src/components/dashboard/geral-view-dashboard/geral-view-dashboard.tsx:305:  const { version } = useContext(UserContext);
+src/components/dashboard/geral-view-dashboard/geral-view-dashboard.tsx:310:        <title>Módulo administrativo | {version ? 'Conectee' : 'Simcc'} </title>
+src/components/dashboard/geral-view-dashboard/geral-view-dashboard.tsx:313:          content={`Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/geral-view-dashboard/geral-view-dashboard.tsx:387:                className={`grid gap-4 md:grid-cols-2 md:gap-8 ${version ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}
+src/components/dashboard/geral-view-dashboard/geral-view-dashboard.tsx:408:                {version && (
+src/components/dashboard/home-dashboard.tsx:21:  const { role, permission, user, version } = useContext(UserContext);
+src/components/dashboard/home-dashboard.tsx:123:          Dashboard | Módulo administrativo | {version ? 'Conectee' : 'Simcc'}
+src/components/dashboard/home-dashboard.tsx:127:          content={`Dashboard | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:383:  const { version } = useContext(UserContext);
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:482:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:486:          content={`Indicadores da instituição | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:518:                  {version && (
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:528:                  {version && (
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:636:                className={`grid gap-4 md:grid-cols-2 md:gap-8  ${version ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:653:                {version && (
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:737:              {version && (
+src/components/dashboard/indicadores-instituicao/indicadores-dashboard.tsx:741:              {version && (
+src/components/dashboard/info-dashboard-page.tsx:34:  const { version } = useContext(UserContext);
+src/components/dashboard/info-dashboard-page.tsx:40:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/dashboard/info-dashboard-page.tsx:44:          content={`Informações | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/parametros-pesquisa/parametros-pesquisa.tsx:24:  const { version } = useContext(UserContext);
+src/components/dashboard/parametros-pesquisa/parametros-pesquisa.tsx:31:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/dashboard/parametros-pesquisa/parametros-pesquisa.tsx:35:          content={`Parâmetros de pesquisa | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/pesos-avaliacao/peso-producoes.tsx:289:  const { version } = useContext(UserContext);
+src/components/dashboard/pesos-avaliacao/peso-producoes.tsx:427:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/dashboard/pesos-avaliacao/peso-producoes.tsx:431:          content={`Pesos de produção | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/pos-graduacao/display-item.tsx:121:  const { version, urlGeral } = useContext(UserContext);
+src/components/dashboard/pos-graduacao/display-item.tsx:199:            ? `${props.name} | ${version ? 'Conectee' : 'Simcc'}`
+src/components/dashboard/pos-graduacao/display-item.tsx:200:            : `${version ? 'Conectee' : 'Simcc'} | ${version ? 'Escola de Engenharia UFMG' : 'SECTI-BA'}`}
+src/components/dashboard/pos-graduacao/display-item.tsx:206:              ? `${props.name} | ${version ? 'Conectee' : 'Simcc'}`
+src/components/dashboard/pos-graduacao/display-item.tsx:207:              : `${version ? 'Conectee' : 'Simcc'} | ${version ? 'Escola de Engenharia UFMG' : 'SECTI-BA'}`
+src/components/dashboard/pos-graduacao/pos-graduacao-view-dashboard.tsx:114:  const { version } = useContext(UserContext);
+src/components/dashboard/pos-graduacao/pos-graduacao-view-dashboard.tsx:121:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/dashboard/pos-graduacao/pos-graduacao-view-dashboard.tsx:125:          content={`Pós-graduações | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dashboard/sessao-pessoal/sessao-pessoal.tsx:50:  const { version } = useContext(UserContext);
+src/components/dashboard/sessao-pessoal/sessao-pessoal.tsx:57:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/dashboard/sessao-pessoal/sessao-pessoal.tsx:61:          content={`Seção de pessoal | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/departamentos/departamentos-page.tsx:121:  const { version } = useContext(UserContext);
+src/components/departamentos/departamentos-page.tsx:168:            <title>Departamentos | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/departamentos/departamentos-page.tsx:171:              content={`Departamentos | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/dicionario/dicionario.tsx:152:  const { version } = useContext(UserContext);
+src/components/dicionario/dicionario.tsx:157:        <title>Dicionário | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/dicionario/dicionario.tsx:160:          content={`Dicionário | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/docs-api/dicionario-cores.tsx:21:  const { version } = useContext(UserContext);
+src/components/docs-api/dicionario-cores.tsx:22:  const platform = version ? 'Conectee' : 'Simcc';
+src/components/docs-api/dicionario-cores.tsx:23:  const version2 = getVersion();
+src/components/docs-api/dicionario-cores.tsx:780:              Versão da plataforma: {version2}
+src/components/docs-api/politica-privacidade.tsx:12:  const { version } = useContext(UserContext);
+src/components/docs-api/politica-privacidade.tsx:13:  const platform = version ? 'Conectee' : 'Simcc';
+src/components/docs-api/politica-privacidade.tsx:14:  const version2 = getVersion();
+src/components/docs-api/politica-privacidade.tsx:38:              Versão da plataforma: {version2}
+src/components/docs-api/politica-privacidade.tsx:457:            {version ? 'Escola de Engenharia da UFMG' : 'SECTI'} ou diretamente
+src/components/docs-api/politica-privacidade.tsx:459:            {version ? (
+src/components/docs-api/politica-privacidade.tsx:603:        {version ? (
+src/components/docs-api/termos-uso.tsx:13:  const { version } = useContext(UserContext);
+src/components/docs-api/termos-uso.tsx:14:  const institution = version ? 'a Escola de Engenharia da UFMG' : 'o SECTI-BA';
+src/components/docs-api/termos-uso.tsx:15:  const platform = version ? 'Conectee' : 'Simcc';
+src/components/docs-api/termos-uso.tsx:16:  const version2 = getVersion();
+src/components/docs-api/termos-uso.tsx:42:              Versão da plataforma: {version2}
+src/components/docs-api/videos.tsx:12:  const { version } = useContext(UserContext);
+src/components/docs-api/videos.tsx:13:  const platform = version ? 'Conectee' : 'Simcc';
+src/components/docs-api/videos.tsx:14:  const version2 = getVersion();
+src/components/docs-api/videos.tsx:17:    ...(version
+src/components/docs-api/videos.tsx:150:              Versão da plataforma: {version2}
+src/components/enviar-notificacoes/enviar-notificacoes.tsx:74:  const { version } = useContext(UserContext);
+src/components/enviar-notificacoes/enviar-notificacoes.tsx:81:          {version ? 'Conectee' : 'Simcc'}{' '}
+src/components/enviar-notificacoes/enviar-notificacoes.tsx:85:          content={`Enviar notificações | Módulo administrativo | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/errors/404.tsx:31:  const { version } = useContext(UserContext);
+src/components/errors/404.tsx:45:        {version ? (
+src/components/errors/Unauthorized.tsx:17:  const { version } = useContext(UserContext);
+src/components/errors/Unauthorized.tsx:43:        {version ? (
+src/components/footer/footer-home.tsx:13:  const { version } = useContext(UserContext);
+src/components/footer/footer-home.tsx:27:            {version ? <LogoConecteeWhite /> : <LogoIaposWhite />}
+src/components/footer/footer-home.tsx:41:          {version ? (
+src/components/footer/footer.tsx:8:  const { version } = useContext(UserContext);
+src/components/graduate-program/bahia-map.tsx:47:  const { version, urlGeral, setUrlGeral, simcc } = useContext(UserContext);
+src/components/graduate-program/bahia-map.tsx:143:        map: !version ? normalizedGeoJSON : mgStateGeoJSON,
+src/components/graduate-program/bahia-map.tsx:189:  }, [graduatePrograms, version]); // Dependência de graduatePrograms para re-executar quando os dados mudarem
+src/components/graduate-program/graduate-program.tsx:779:  const { version, simcc } = useContext(UserContext);
+src/components/graduate-program/graduate-program.tsx:872:        <title>Pós-graduações | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/graduate-program/graduate-program.tsx:875:          content={`Pós-graduações | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/graduate-program/homepage-program.tsx:300:  const { urlGeral, version, urlGeralAdm } = useContext(UserContext);
+src/components/graduate-program/indicators-graduate.tsx:9:  const { version } = useContext(UserContext);
+src/components/graduate-program/indicators-graduate.tsx:14:  if (!version) {
+src/components/graduate-program/indicators-graduate.tsx:22:  if (!version) {
+src/components/graduate-program/visualizacao-programa.tsx:222:  const { version } = useContext(UserContext);
+src/components/graduate-program/visualizacao-programa.tsx:229:            ? `${graduatePrograms[0].name} | ${version ? 'Conectee' : 'Simcc'}`
+src/components/graduate-program/visualizacao-programa.tsx:230:            : `${version ? 'Conectee' : 'Simcc'} | ${version ? 'Escola de Engenharia UFMG' : 'SECTI-BA'}`}
+src/components/graduate-program/visualizacao-programa.tsx:237:              : `${version ? 'Conectee' : 'Simcc'} | ${version ? 'Escola de Engenharia UFMG' : 'SECTI-BA'}`
+src/components/grupos-pesquisa/grupos-pesquisa.tsx:301:  const { version } = useContext(UserContext);
+src/components/grupos-pesquisa/grupos-pesquisa.tsx:390:            <title>Grupos de pesquisa | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/grupos-pesquisa/grupos-pesquisa.tsx:393:              content={`Grupos de pesquisa | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/grupos-pesquisa/visualizacao-grupo-pesquisa.tsx:409:  const { version } = useContext(UserContext);
+src/components/grupos-pesquisa/visualizacao-grupo-pesquisa.tsx:416:            ? `${graduatePrograms[0].name} | ${version ? 'Conectee' : 'Simcc'}`
+src/components/grupos-pesquisa/visualizacao-grupo-pesquisa.tsx:417:            : `${version ? 'Conectee' : 'Simcc'} | ${version ? 'Escola de Engenharia UFMG' : 'SECTI-BA'}`}
+src/components/grupos-pesquisa/visualizacao-grupo-pesquisa.tsx:424:              : `${version ? 'Conectee' : 'Simcc'} | ${version ? 'Escola de Engenharia UFMG' : 'SECTI-BA'}`
+src/components/header/Header.tsx:51:    version,
+src/components/header/Header.tsx:83:            {version ? (
+src/components/header/Header.tsx:243:              {version && (
+src/components/homepage/categorias/researchers-home.tsx:598:  const { version } = useContext(UserContext);
+src/components/homepage/categorias/researchers-home.tsx:848:      {version && (
+src/components/homepage/categorias/researchers-home.tsx:1089:  const { version, pesquisadoresSelecionados, idGraduateProgram } =
+src/components/homepage/components/banner.tsx:32:  const { version } = useContext(UserContext);
+src/components/homepage/components/banner.tsx:38:        version ? 'background' : 'background_iapos',
+src/components/homepage/components/instrucoes.tsx:6:  const { version } = useContext(UserContext);
+src/components/homepage/components/newsletter.tsx:9:  const { version, urlGeralAdm } = useContext(UserContext);
+src/components/homepage/components/newsletter.tsx:51:          Newsletter semanal do {version ? 'Conectee' : 'Simcc'}
+src/components/homepage/components/newsletter.tsx:74:          Privacidade do {version ? 'Conectee' : 'Simcc'}. É possível cancelar a
+src/components/homepage/inital-home.tsx:166:  const { setItensSelecionados, version } = useContext(UserContext);
+src/components/homepage/inital-home.tsx:342:        <title>{`Página Inicial | ${version ? 'Conectee' : 'Simcc'}`}</title>
+src/components/homepage/inital-home.tsx:345:          content={`Página Inicial | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/homepage/paines-dados-externos.tsx:12:  const { version } = useContext(UserContext);
+src/components/homepage/paines-dados-externos.tsx:67:    ...(version
+src/components/homepage/paines-dados-externos.tsx:100:          Painéis de dados externos | {version ? 'Conectee' : 'Simcc'}
+src/components/homepage/paines-dados-externos.tsx:104:          content={`Painéis de dados externos | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/homepage/result-home.tsx:213:  const { version } = useContext(UserContext);
+src/components/homepage/result-home.tsx:248:          | {version ? 'Conectee' : 'Simcc'}
+src/components/homepage/result-home.tsx:252:          content={`Pesquisa | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/indicators/content-indicators.tsx:30:  const { version } = useContext(UserContext);
+src/components/indicators/content-indicators.tsx:42:      condition: !version,
+src/components/indicators/content-indicators.tsx:49:      condition: !version,
+src/components/indicators/content-indicators.tsx:56:      condition: !version,
+src/components/indicators/content-indicators.tsx:63:      condition: version,
+src/components/indicators/content-indicators.tsx:66:    { id: 'tecnicos', label: 'Técnicos', icon: UserCog, condition: version },
+src/components/indicators/content-indicators.tsx:99:        <title>Indicadores | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/indicators/content-indicators.tsx:102:          content={`Indicadores | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/indicators/content-indicators.tsx:155:            {!version && (
+src/components/indice-pesquisador/indice-pesquisador.tsx:110:  const { version } = useContext(UserContext);
+src/components/indice-pesquisador/indice-pesquisador.tsx:115:        <title>Índice do pesquisador | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/indice-pesquisador/indice-pesquisador.tsx:118:          content={`Índice do pesquisador | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/info/duvidas.tsx:11:  const { version } = useContext(UserContext);
+src/components/info/duvidas.tsx:49:        {version && (
+src/components/info/info copy.tsx:238:  const version = getVersion();
+src/components/info/info copy.tsx:248:        <title>Informações | {version ? 'Simcc' : 'Simcc'}</title>
+src/components/info/info copy.tsx:251:          content={`Informações | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/info/info copy.tsx:398:                    Versão da plataforma: {version}
+src/components/info/info copy.tsx:434:              {version
+src/components/info/info copy.tsx:440:              {version ? 'observatorio@secti.ba.gov.br' : 'o SECTI-BA'}
+src/components/info/info.tsx:34:  const { urlGeral, version } = useContext(UserContext);
+src/components/info/info.tsx:231:  const platform = version ? 'Conectee' : 'Simcc';
+src/components/info/info.tsx:232:  const version2 = getVersion();
+src/components/info/info.tsx:237:        <title>Informações | {version ? 'Simcc' : 'Simcc'}</title>
+src/components/info/info.tsx:240:          content={`Informações | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/info/info.tsx:266:              Versão da plataforma: {version2}
+src/components/info/info.tsx:448:            {version
+src/components/info/info.tsx:454:            {version
+src/components/institution/bahia-map.tsx:47:  const { version, urlGeral, setUrlGeral, simcc } = useContext(UserContext);
+src/components/institution/bahia-map.tsx:143:        map: !version ? normalizedGeoJSON : mgStateGeoJSON,
+src/components/institution/bahia-map.tsx:189:  }, [graduatePrograms, version]); // Dependência de graduatePrograms para re-executar quando os dados mudarem
+src/components/institution/homepage-program.tsx:319:  const { urlGeral, version, urlGeralAdm } = useContext(UserContext);
+src/components/institution/homepage-program.tsx:582:            <strong>{version ? 'Conectee' : 'Simcc'}</strong> consideram apenas
+src/components/institution/indicators-graduate.tsx:12:  const { version } = useContext(UserContext);
+src/components/institution/indicators-graduate.tsx:17:  if (!version) {
+src/components/institution/indicators-graduate.tsx:25:  if (!version) {
+src/components/institution/indicators-graduate.tsx:39:      condition: !version,
+src/components/institution/indicators-graduate.tsx:47:      condition: version,
+src/components/institution/institution-item.tsx:139:  const { urlGeral, urlGeralAdm, simcc, version } = useContext(UserContext);
+src/components/institution/institution.tsx:127:  const { version, simcc } = useContext(UserContext);
+src/components/institution/institution.tsx:242:        <title>Instituições | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/institution/institution.tsx:245:          content={`Instituições | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/institution/linhas-pesquisa-programa.tsx:32:  const { urlGeral, version, searchType } = useContext(UserContext);
+src/components/institution/visualizacao-instituicao.tsx:127:  const { version } = useContext(UserContext);
+src/components/institution/visualizacao-instituicao.tsx:130:    ? `${graduatePrograms.name} | ${version ? 'Conectee' : 'Simcc'}`
+src/components/institution/visualizacao-instituicao.tsx:131:    : `${version ? 'Conectee' : 'Simcc'} | ${version ? 'Escola de Engenharia UFMG' : 'SECTI-BA'}`;
+src/components/institution/visualizacao-instituicao.tsx:134:    : `${version ? 'Conectee' : 'Simcc'} | ${version ? 'Escola de Engenharia UFMG' : 'SECTI-BA'}`;
+src/components/listagens/bolsistas-home.tsx:415:  const { version } = useContext(UserContext);
+src/components/listagens/bolsistas-home.tsx:726:                  {version && (
+src/components/listagens/bolsistas-home.tsx:849:  const { version, pesquisadoresSelecionados, idGraduateProgram } =
+src/components/listagens/researchers-home.tsx:420:  const { version } = useContext(UserContext);
+src/components/listagens/researchers-home.tsx:748:                  {version && (
+src/components/listagens/researchers-home.tsx:872:  const { version, pesquisadoresSelecionados, idGraduateProgram } =
+src/components/listagens/todos-pesquisadores.tsx:100:  const { urlGeral, version, searchType } = useContext(UserContext);
+src/components/listagens/todos-pesquisadores.tsx:200:    { id: 'tecnicos', label: 'Técnicos', icon: UserCog, condition: version },
+src/components/listagens/todos-pesquisadores.tsx:237:  }, [location.search, version]);
+src/components/listagens/todos-pesquisadores.tsx:277:        <title>Listagens | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/listagens/todos-pesquisadores.tsx:280:          content={`Listagens | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/loading.tsx:34:    version,
+src/components/loading.tsx:202:            {version ? (
+src/components/maria/maria.tsx:189:  const { version } = useContext(UserContext);
+src/components/maria/maria.tsx:193:        <title>Pesquisa com IA | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/maria/maria.tsx:196:          content={`Pesquisa com IA | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/maria/maria.tsx:360:              A {version ? 'GaIA' : 'MarIA'} pode apresentar informações
+src/components/mobile.tsx:12:  const { version } = useContext(UserContext);
+src/components/mobile.tsx:21:        {version ? (
+src/components/modals/add-background.tsx:50:  const { version } = useContext(UserContext);
+src/components/modals/add-background.tsx:148:              version ? 'background' : 'background_iapos',
+src/components/modals/add-background.tsx:194:      const collectionName = version ? 'background' : 'background_iapos';
+src/components/modals/articles-modal.tsx:129:  const { urlGeral, itemsSelecionados, version } = useContext(UserContext);
+src/components/modals/articles-modal.tsx:529:                    Gerar resumo com a {version ? 'Gaia' : 'MarIA'}
+src/components/modals/articles-modal.tsx:575:                          A {version ? 'Gaia' : 'MarIA'} pode cometer erros.
+src/components/modals/search-modal.tsx:76:    version,
+src/components/modals/user-profile-initial.tsx:250:  const { version } = useContext(UserContext);
+src/components/modals/user-profile-initial.tsx:373:                    Apresentamos a plataforma {version ? 'Conectee' : 'Simcc'}
+src/components/modals/user-profile-initial.tsx:376:                    O {version ? 'Conectee' : 'Simcc'} é uma plataforma
+src/components/novas-publicacoes/new-articles copy.tsx:163:  const { urlGeral, version, urlGeralAdm } = useContext(UserContext);
+src/components/novas-publicacoes/new-articles copy.tsx:425:        <title>Produções recentes | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/novas-publicacoes/new-articles copy.tsx:428:          content={`Produções recentes | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/novas-publicacoes/new-articles copy.tsx:474:                  {version ? <LogoConecteeWhite /> : <LogoIaposWhite />}
+src/components/novas-publicacoes/new-articles copy.tsx:478:                  {version ? <LogoConectee /> : <LogoIapos />}
+src/components/novas-publicacoes/new-articles.tsx:161:  const { urlGeral, version, urlGeralAdm } = useContext(UserContext);
+src/components/novas-publicacoes/new-articles.tsx:423:        <title>Produções recentes | {version ? 'Conectee' : 'Simcc'}</title>
+src/components/novas-publicacoes/new-articles.tsx:426:          content={`Produções recentes | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/novas-publicacoes/new-articles.tsx:472:                  {version ? <LogoConecteeWhite /> : <LogoIaposWhite />}
+src/components/novas-publicacoes/new-articles.tsx:476:                  {version ? <LogoConectee /> : <LogoIapos />}
+src/components/novas-publicacoes/pop-up-anuncio.tsx:6:  const { version } = useContext(UserContext);
+src/components/novas-publicacoes/pop-up-anuncio.tsx:13:            {version ? 'conectee.eng.ufmg.br' : 'iapos.cimatec.com.br'}
+src/components/popup/informacoes-gerais-researcher.tsx:182:  const { version } = useContext(UserContext);
+src/components/popup/informacoes-gerais-researcher.tsx:279:        {!version && (
+src/components/popup/information-researcher.tsx:71:  const { itemsSelecionados, version } = useContext(UserContext);
+src/components/popup/information-researcher.tsx:248:              {version && (
+src/components/researcher/researcher-page.tsx:573:  const { version } = useContext(UserContext);
+src/components/researcher/researcher-page.tsx:590:          {researcher_name} | {version ? 'Conectee' : 'Simcc'}
+src/components/researcher/researcher-page.tsx:594:          content={`${researcher_name} | ${version ? 'Conectee' : 'Simcc'}`}
+src/components/search/search.tsx:122:    version,
+src/components/search/search.tsx:385:                                        <Label className="flex gap-2 items-center">{version ? ('GaIA') : ('MarIA')}<Chats size={16} className="" /></Label>
+src/components/ui/hero-parallax.tsx:112:  const { version } = useContext(UserContext);
+src/components/ui/hero-parallax.tsx:120:          {version ? <LogoConecteeWhite /> : <LogoIaposWhite />}
+src/components/ui/hero-parallax.tsx:124:          {version ? <LogoConectee /> : <LogoIapos />}
+src/context/context.tsx:137:  version: boolean;
+src/context/context.tsx:232:  version: false,
+src/layout/docs-layout.tsx:42:    version,
+src/layout/search-layout.tsx:59:    version,
+src/layout/search-layout.tsx:162:    ...(version
+src/pages/TermosUso.tsx:13:  const { version, defaultLayout, navCollapsedSize, isCollapsed } =

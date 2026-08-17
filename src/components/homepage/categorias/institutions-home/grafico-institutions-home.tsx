@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
-import { Alert } from "../../../ui/alert";
-import { BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../../components/ui/chart";
+import { useEffect, useState } from 'react';
+import { Alert } from '../../../ui/alert';
+import { BarChart, Bar, XAxis, LabelList, ResponsiveContainer } from 'recharts';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '../../../../components/ui/chart';
 
 type Instituicoes = {
   among: string;
@@ -16,13 +20,15 @@ type InstitutionsProps = {
 
 const chartConfig = {
   institutions: {
-    label: "Instituições",
-    color: "#559FB8",
+    label: 'Instituições',
+    color: '#559FB8',
   },
 };
 
 export function GraficoInstitutionsHome(props: InstitutionsProps) {
-  const [chartData, setChartData] = useState<{ institution: string; among: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { institution: string; among: number }[]
+  >([]);
 
   useEffect(() => {
     if (props.institutions) {
@@ -48,8 +54,6 @@ export function GraficoInstitutionsHome(props: InstitutionsProps) {
               tickMargin={10}
               axisLine={false}
             />
-          
-     
 
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Bar
