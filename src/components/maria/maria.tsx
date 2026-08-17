@@ -18,6 +18,8 @@ import {
   ChevronDown,
   Layers,
   AlertCircle,
+  Target,
+  Hash,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
@@ -124,47 +126,117 @@ const STARTER_PROMPTS = [
   { icon: BookOpen, label: 'Livros e capítulos em biotecnologia', query: 'Livros e capítulos publicados em biotecnologia' },
 ];
 
-// --- Utilitário de Renderização Markdown Simples & Seguro ---
+// --- Parser de Markdown Otimizado ---
+function parseMarkdownToHtml(markdown: string): string {
+  if (!markdown) return '';
+
+  let text = markdown
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // Blocos de código
+  text = text.replace(
+    /```([\s\S]*?)```/g,
+    '<pre class="p-3 my-2 bg-slate-900 text-slate-100 rounded-lg overflow-x-auto font-mono text-xs"><code>$1</code></pre>'
+  );
+
+  // Código inline
+  text = text.replace(
+    /`([^`\n]+)`/g,
+    '<code class="px-1.5 py-0.5 bg-slate-100 dark:bg-neutral-800 text-[#07677e] dark:text-[#559FB8] rounded font-mono text-xs font-medium">$1</code>'
+  );
+
+  // Cabeçalhos
+  text = text.replace(/^### (.*$)/gim, '<h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-3 mb-1 font-lexend">$1</h3>');
+  text = text.replace(/^## (.*$)/gim, '<h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 mt-3.5 mb-1.5 font-lexend border-b border-slate-200 dark:border-neutral-800 pb-1">$1</h2>');
+  text = text.replace(/^# (.*$)/gim, '<h1 class="text-lg font-bold text-slate-900 dark:text-slate-100 mt-4 mb-2 font-lexend">$1</h1>');
+
+  // Citações
+  text = text.replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-[#719CB8] pl-3 py-1 my-2 bg-slate-50 dark:bg-neutral-800/50 text-slate-700 dark:text-slate-300 italic text-sm rounded-r">$1</blockquote>');
+
+  // Negrito e Itálico
+  text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-slate-900 dark:text-slate-100">$1</strong>');
+  text = text.replace(/\*(.*?)\*/g, '<em class="italic text-slate-800 dark:text-slate-200">$1</em>');
+
+  // Links
+  text = text.replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#07677e] dark:text-[#559FB8] hover:underline font-medium inline-flex items-center gap-0.5">$1</a>');
+
+  // Listas agrupadas compactas
+  const lines = text.split('\n');
+  const resultLines: string[] = [];
+  let inUnorderedList = false;
+  let inOrderedList = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const isUnordered = /^\s*[-*]\s+(.*)$/.test(line);
+    const isOrdered = /^\s*\d+\.\s+(.*)$/.test(line);
+
+    if (isUnordered) {
+      if (inOrderedList) {
+        resultLines.push('</ol>');
+        inOrderedList = false;
+      }
+      if (!inUnorderedList) {
+        resultLines.push('<ul class="my-1 pl-4 list-disc space-y-0.5">');
+        inUnorderedList = true;
+      }
+      const itemContent = line.replace(/^\s*[-*]\s+/, '');
+      resultLines.push(`<li class="my-0.5 leading-normal text-slate-700 dark:text-slate-300">${itemContent}</li>`);
+    } else if (isOrdered) {
+      if (inUnorderedList) {
+        resultLines.push('</ul>');
+        inUnorderedList = false;
+      }
+      if (!inOrderedList) {
+        resultLines.push('<ol class="my-1 pl-4 list-decimal space-y-0.5">');
+        inOrderedList = true;
+      }
+      const itemContent = line.replace(/^\s*\d+\.\s+/, '');
+      resultLines.push(`<li class="my-0.5 leading-normal text-slate-700 dark:text-slate-300">${itemContent}</li>`);
+    } else {
+      if (inUnorderedList) {
+        resultLines.push('</ul>');
+        inUnorderedList = false;
+      }
+      if (inOrderedList) {
+        resultLines.push('</ol>');
+        inOrderedList = false;
+      }
+
+      if (line.trim() === '') {
+        resultLines.push('<div class="h-1.5"></div>');
+      } else if (
+        line.startsWith('<h1') ||
+        line.startsWith('<h2') ||
+        line.startsWith('<h3') ||
+        line.startsWith('<blockquote') ||
+        line.startsWith('<pre')
+      ) {
+        resultLines.push(line);
+      } else {
+        resultLines.push(`<p class="my-1 leading-relaxed text-slate-800 dark:text-slate-200">${line}</p>`);
+      }
+    }
+  }
+
+  if (inUnorderedList) resultLines.push('</ul>');
+  if (inOrderedList) resultLines.push('</ol>');
+
+  return resultLines.join('\n');
+}
+
+// --- Componente de Renderização Markdown ---
 function SimpleMarkdownRenderer({ content, isStreaming }: { content: string; isStreaming?: boolean }) {
-  const rendered = useMemo(() => {
-    if (!content) return '';
-
-    // Escapa caracteres perigosos mantendo segurança
-    const escaped = content
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-
-    // Parser em camadas
-    const parsed = escaped
-      // Títulos
-      .replace(/^### (.*$)/gim, '<h3 class="text-base font-semibold text-slate-900 dark:text-slate-100 mt-4 mb-1.5 font-lexend">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mt-5 mb-2 font-lexend border-b border-slate-200 dark:border-neutral-800 pb-1">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 class="text-xl font-bold text-slate-900 dark:text-slate-100 mt-5 mb-2.5 font-lexend">$1</h1>')
-      // Blocos de citação
-      .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-[#719CB8] pl-3 py-1 my-2 bg-slate-50 dark:bg-neutral-800/50 text-slate-700 dark:text-slate-300 italic text-sm rounded-r">$1</blockquote>')
-      // Formatadores inline
-      .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-slate-900 dark:text-slate-100">$1</strong>')
-      .replace(/\*(.*?)\*/gim, '<em class="italic text-slate-800 dark:text-slate-200">$1</em>')
-      .replace(/`([^`]+)`/gim, '<code class="px-1.5 py-0.5 bg-slate-100 dark:bg-neutral-800 text-[#07677e] dark:text-[#559FB8] rounded font-mono text-xs font-medium">$1</code>')
-      // Links
-      .replace(/\[(.*?)\]\((https?:\/\/[^\s]+)\)/gim, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#07677e] dark:text-[#559FB8] hover:underline font-medium inline-flex items-center gap-0.5">$1</a>')
-      // Listas não ordenadas
-      .replace(/^\s*[-*]\s+(.*$)/gim, '<li class="ml-4 list-disc text-slate-700 dark:text-slate-300 mb-1">$1</li>')
-      // Listas numeradas
-      .replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li class="ml-4 list-decimal text-slate-700 dark:text-slate-300 mb-1">$1</li>')
-      // Quebras de linha
-      .replace(/\n\n/g, '<div class="h-3"></div>')
-      .replace(/\n/g, '<br />');
-
-    return parsed;
-  }, [content]);
+  const renderedHtml = useMemo(() => parseMarkdownToHtml(content), [content]);
 
   return (
-    <div className="text-sm leading-relaxed text-slate-800 dark:text-slate-200 font-lexend space-y-1">
-      <span dangerouslySetInnerHTML={{ __html: rendered }} />
+    <div className="markdown-container text-sm leading-relaxed text-slate-800 dark:text-slate-200 font-lexend [&_ul]:my-1 [&_ul]:pl-4 [&_ul]:list-disc [&_ol]:my-1 [&_ol]:pl-4 [&_ol]:list-decimal [&_li]:my-0.5 [&_li]:leading-normal [&_li>p]:my-0 [&_li>p]:inline [&_p]:my-1 [&_p]:leading-relaxed">
+      <span dangerouslySetInnerHTML={{ __html: renderedHtml }} />
       {isStreaming && (
-        <span className="inline-block w-1.5 h-4 ml-1 bg-[#07677e] dark:bg-[#559FB8] animate-pulse align-middle rounded-sm" />
+        <span className="inline-block w-1.5 h-4 ml-1 bg-[#07677e] dark:bg-[#559FB8] animate-pulse align-middle rounded-xs" />
       )}
     </div>
   );
@@ -186,44 +258,45 @@ function MetadataBadges({ metadata }: { metadata: MariaMetadata }) {
   if (!hasBadges) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 pt-1 pb-3 border-b border-dashed border-slate-200 dark:border-neutral-800">
+    <div className="flex flex-wrap items-center gap-1.5 pb-2.5 border-b border-slate-200/80 dark:border-neutral-800">
       {intent && (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
-          🎯 {INTENT_LABELS[intent] || intent}
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
+          <Target className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+          {INTENT_LABELS[intent] || intent}
         </span>
       )}
 
       {f.institutions && f.institutions.length > 0 && (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
-          <Building2 className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+          <Building2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
           {f.institutions.join(', ')}
         </span>
       )}
 
       {f.researcher_name && (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
-          <User className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+          <User className="w-3 h-3 text-amber-600 dark:text-amber-400" />
           {f.researcher_name}
         </span>
       )}
 
       {f.production_types && f.production_types.length > 0 && (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60">
-          <Bookmark className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200 dark:border-sky-800/60">
+          <Bookmark className="w-3 h-3 text-sky-600 dark:text-sky-400" />
           {f.production_types.join(', ')}
         </span>
       )}
 
       {f.period && (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-300 border border-slate-200 dark:border-neutral-700">
-          <Calendar className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-300 border border-slate-200 dark:border-neutral-700">
+          <Calendar className="w-3 h-3 text-slate-600 dark:text-slate-400" />
           {f.period}
         </span>
       )}
 
       {f.city && (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-300 border border-slate-200 dark:border-neutral-700">
-          <MapPin className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-300 border border-slate-200 dark:border-neutral-700">
+          <MapPin className="w-3 h-3 text-slate-600 dark:text-slate-400" />
           {f.city}
         </span>
       )}
@@ -231,64 +304,72 @@ function MetadataBadges({ metadata }: { metadata: MariaMetadata }) {
   );
 }
 
-// --- Componente de Cards de Pesquisadores Identificados ---
-function ResearchersSection({ researchers }: { researchers: MariaResearcher[] }) {
+// --- Componente de Bento Grid: Pesquisadores Identificados ---
+function ResearchersBentoGrid({ researchers }: { researchers: MariaResearcher[] }) {
   const { urlGeral } = useContext(UserContext);
   const { onOpen } = useModal();
 
   if (!researchers || researchers.length === 0) return null;
 
   return (
-    <div className="space-y-2 mt-4">
-      <div className="flex items-center gap-2">
-        <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider font-lexend">
+    <div className="space-y-2 mt-1">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider font-lexend flex items-center gap-1.5">
+          <User className="w-3.5 h-3.5 text-[#07677e] dark:text-[#559FB8]" />
           Pesquisadores Identificados ({researchers.length})
         </h4>
+        <span className="text-[11px] text-slate-400">Clique para abrir o perfil</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
         {researchers.map((r, idx) => {
           const instText = r.institution_acronym
-            ? `${r.institution || ''} (${r.institution_acronym})`
-            : r.institution || 'Instituição não informada';
+            ? `${r.institution_acronym}`
+            : r.institution || 'Instituição';
 
           return (
             <div
               key={r.id || `${r.name}-${idx}`}
               onClick={() => onOpen('researcher-modal', { name: r.name })}
-              className="group bg-slate-50/80 dark:bg-neutral-950/70 border border-slate-200 dark:border-neutral-800 rounded-lg p-3 border-l-4 border-l-[#719CB8] hover:border-l-[#07677e] hover:shadow-md hover:border-slate-300 dark:hover:border-neutral-700 transition-all cursor-pointer flex flex-col justify-between"
+              style={{
+                animationDelay: `${Math.min(idx * 70, 500)}ms`,
+                animationFillMode: 'backwards',
+              }}
+              className="group animate-in fade-in-0 slide-in-from-bottom-2 duration-300 ease-out bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-lg p-2.5 border-l-4 border-l-[#719CB8] hover:border-l-[#07677e] hover:border-slate-300 dark:hover:border-neutral-700 hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center gap-2.5 mb-1.5">
-                  <Avatar className="h-8 w-8 rounded-md shrink-0 border border-slate-200 dark:border-neutral-800">
+                <div className="flex items-start gap-2 mb-1.5">
+                  <Avatar className="h-7 w-7 rounded-md shrink-0 border border-slate-200 dark:border-neutral-800">
                     <AvatarImage
                       src={`${urlGeral}ResearcherData/Image?name=${encodeURIComponent(r.name)}`}
                       alt={r.name}
                       className="rounded-md object-cover"
                     />
-                    <AvatarFallback className="rounded-md bg-slate-200 dark:bg-neutral-800 text-slate-600 dark:text-slate-300 text-xs font-semibold">
+                    <AvatarFallback className="rounded-md bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold">
                       {r.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <h5 className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate group-hover:text-[#07677e] dark:group-hover:text-[#559FB8] transition-colors font-lexend">
+                    <h5 className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate group-hover:text-[#07677e] dark:group-hover:text-[#559FB8] transition-colors font-lexend">
                       {r.name}
                     </h5>
-                    <p className="text-xs font-medium text-[#07677e] dark:text-[#559FB8] truncate">
+                    <span className="inline-flex items-center gap-1 text-[11px] text-[#07677e] dark:text-[#559FB8] font-medium truncate">
+                      <Building2 className="w-2.5 h-2.5 shrink-0" />
                       {instText}
-                    </p>
+                    </span>
                   </div>
                 </div>
 
                 {r.abstract && (
-                  <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-tight">
                     {r.abstract}
                   </p>
                 )}
               </div>
 
-              <div className="mt-2 pt-1.5 border-t border-slate-200/60 dark:border-neutral-800/60 flex items-center justify-end text-[11px] font-medium text-slate-500 group-hover:text-[#07677e] dark:group-hover:text-[#559FB8]">
-                <span>Ver perfil completo &rarr;</span>
+              <div className="mt-2 pt-1 border-t border-slate-100 dark:border-neutral-900 flex items-center justify-between text-[10px] text-slate-400 group-hover:text-[#07677e] dark:group-hover:text-[#559FB8]">
+                <span>Lattes ID: {r.lattes_id ? r.lattes_id.slice(0, 10) + '...' : 'Disponível'}</span>
+                <span className="font-semibold">&rarr;</span>
               </div>
             </div>
           );
@@ -319,7 +400,7 @@ const PRODUCTION_TYPE_CONFIG: Record<
     badgeClass: 'bg-yellow-50 text-yellow-800 dark:bg-yellow-950/70 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800',
   },
   PATENT: {
-    label: 'Patente / Registro',
+    label: 'Patente / INPI',
     icon: Lightbulb,
     badgeClass: 'bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 border-purple-200 dark:border-purple-800',
   },
@@ -335,19 +416,22 @@ const PRODUCTION_TYPE_CONFIG: Record<
   },
 };
 
-// --- Componente de Cards de Produções Científicas ---
-function ProductionsSection({ productions }: { productions: MariaProduction[] }) {
+// --- Componente Bento Grid: Produções Científicas e Tecnológicas Densas ---
+function ProductionsBentoGrid({ productions }: { productions: MariaProduction[] }) {
   if (!productions || productions.length === 0) return null;
 
   return (
-    <div className="space-y-2 mt-4">
-      <div className="flex items-center gap-2">
-        <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider font-lexend">
+    <div className="space-y-2 mt-2">
+      <div className="flex items-center justify-between">
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider font-lexend flex items-center gap-1.5">
+          <Bookmark className="w-3.5 h-3.5 text-[#07677e] dark:text-[#559FB8]" />
           Produções Científicas e Tecnológicas ({productions.length})
         </h4>
+        <span className="text-[11px] text-slate-400">Distribuição em grade compacta</span>
       </div>
 
-      <div className="space-y-2">
+      {/* Grid Bento Multi-coluna Horizontal com animação escalonada */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
         {productions.map((p, idx) => {
           const config = PRODUCTION_TYPE_CONFIG[p.type] || {
             label: p.type,
@@ -360,80 +444,98 @@ function ProductionsSection({ productions }: { productions: MariaProduction[] })
           return (
             <div
               key={p.id || `${p.title}-${idx}`}
-              className="bg-slate-50/80 dark:bg-neutral-950/70 border border-slate-200 dark:border-neutral-800 rounded-lg p-3.5 hover:border-slate-300 dark:hover:border-neutral-700 transition-colors"
+              style={{
+                animationDelay: `${Math.min(idx * 60, 600)}ms`,
+                animationFillMode: 'backwards',
+              }}
+              className="group animate-in fade-in-0 slide-in-from-bottom-2 duration-300 ease-out bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-lg p-3 hover:border-[#559FB8]/60 hover:shadow-xs transition-all flex flex-col justify-between space-y-2"
             >
-              <div className="flex items-center justify-between gap-2 mb-1.5">
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold border ${config.badgeClass}`}
-                >
-                  <IconComp className="w-3 h-3" />
-                  {config.label}
-                </span>
-
-                {p.year && (
-                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                    {p.year}
+              <div>
+                {/* Topo do Card: Tipo & Badge de Ano */}
+                <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${config.badgeClass}`}
+                  >
+                    <IconComp className="w-3 h-3 shrink-0" />
+                    {config.label}
                   </span>
+
+                  {p.year && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-300 border border-slate-200 dark:border-neutral-700">
+                      <Calendar className="w-2.5 h-2.5 text-slate-400" />
+                      {p.year}
+                    </span>
+                  )}
+                </div>
+
+                {/* Título da Produção */}
+                <h5 className="text-xs font-semibold text-slate-900 dark:text-slate-100 leading-snug font-lexend line-clamp-2 mb-1">
+                  {p.title}
+                </h5>
+
+                {/* Autores */}
+                {(p.authors || rName) && (
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                    <span className="font-medium text-slate-600 dark:text-slate-300">Autores:</span>{' '}
+                    {p.authors || rName}
+                  </p>
                 )}
               </div>
 
-              <h5 className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-snug font-lexend mb-1">
-                {p.title}
-              </h5>
-
-              {(p.authors || rName) && (
-                <p className="text-xs text-slate-600 dark:text-slate-400 mb-1.5">
-                  <span className="font-medium text-slate-700 dark:text-slate-300">Autores/Responsável:</span>{' '}
-                  {p.authors || rName}
-                </p>
-              )}
-
-              {p.details && (
-                <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-600 dark:text-slate-400 mt-2 pt-2 border-t border-slate-200/70 dark:border-neutral-800/70">
-                  {p.details.periodical && (
-                    <span>
-                      <strong>Periódico:</strong> {p.details.periodical}
-                      {p.details.qualis && (
-                        <span className="ml-1.5 px-1.5 py-0.2 bg-slate-200 dark:bg-neutral-800 text-slate-800 dark:text-slate-200 rounded text-[10px] font-bold">
-                          Qualis {p.details.qualis}
+              {/* Metadados Técnicos Densos */}
+              <div className="pt-2 border-t border-slate-100 dark:border-neutral-900 space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400 font-ubuntu">
+                {p.details && (
+                  <div className="space-y-1">
+                    {p.details.periodical && (
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="truncate" title={p.details.periodical}>
+                          {p.details.periodical}
                         </span>
-                      )}
-                    </span>
-                  )}
-                  {p.details.publisher && (
-                    <span>
-                      <strong>Editora:</strong> {p.details.publisher}
-                      {p.details.isbn && ` (ISBN: ${p.details.isbn})`}
-                    </span>
-                  )}
-                  {p.details.code && (
-                    <span>
-                      <strong>Registro/INPI:</strong> {p.details.code}
-                      {p.details.category && ` (${p.details.category})`}
-                    </span>
-                  )}
-                  {p.details.platform && (
-                    <span>
-                      <strong>Plataforma:</strong> {p.details.platform}
-                      {p.details.environment && ` [${p.details.environment}]`}
-                    </span>
-                  )}
-                </div>
-              )}
+                        {p.details.qualis && (
+                          <span className="shrink-0 px-1.5 py-0.2 bg-[#559FB8]/15 text-[#07677e] dark:text-[#559FB8] rounded text-[10px] font-bold">
+                            Qualis {p.details.qualis}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
-              {p.doi && (
-                <div className="mt-2">
-                  <a
-                    href={`https://doi.org/${p.doi}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-[#07677e] dark:text-[#559FB8] hover:underline font-medium"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    DOI: {p.doi}
-                  </a>
-                </div>
-              )}
+                    {p.details.publisher && (
+                      <div className="truncate" title={p.details.publisher}>
+                        <span className="font-medium text-slate-500">Editora:</span> {p.details.publisher}
+                      </div>
+                    )}
+
+                    {p.details.code && (
+                      <div className="flex items-center gap-1">
+                        <Hash className="w-3 h-3 text-slate-400 shrink-0" />
+                        <span className="font-medium">Reg:</span> {p.details.code}
+                        {p.details.category && ` (${p.details.category})`}
+                      </div>
+                    )}
+
+                    {p.details.platform && (
+                      <div className="truncate">
+                        <span className="font-medium">Plat:</span> {p.details.platform}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Link DOI se disponível */}
+                {p.doi && (
+                  <div className="pt-0.5 flex justify-end">
+                    <a
+                      href={`https://doi.org/${p.doi}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#07677e] dark:text-[#559FB8] hover:underline font-medium"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      DOI
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
@@ -447,7 +549,7 @@ function SourcesSection({ sources }: { sources: string[] }) {
   if (!sources || sources.length === 0) return null;
 
   return (
-    <details className="group mt-3 bg-slate-50/90 dark:bg-neutral-950/80 border border-slate-200 dark:border-neutral-800 rounded-lg text-xs transition-colors">
+    <details className="group mt-2 bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-lg text-xs transition-colors">
       <summary className="px-3 py-2 font-semibold text-slate-600 dark:text-slate-300 cursor-pointer list-none flex items-center justify-between select-none">
         <span className="flex items-center gap-1.5">
           <BookOpen className="w-3.5 h-3.5 text-[#07677e] dark:text-[#559FB8]" />
@@ -455,8 +557,8 @@ function SourcesSection({ sources }: { sources: string[] }) {
         </span>
         <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-open:rotate-180 transition-transform" />
       </summary>
-      <div className="px-3 pb-3 pt-1 border-t border-slate-200/60 dark:border-neutral-800/60">
-        <ul className="space-y-1 list-disc list-inside text-slate-600 dark:text-slate-400">
+      <div className="px-3 pb-3 pt-1 border-t border-slate-100 dark:border-neutral-900">
+        <ul className="space-y-1 list-disc list-inside text-[11px] text-slate-500 dark:text-slate-400">
           {sources.map((s, idx) => (
             <li key={idx} className="leading-relaxed">
               {s}
@@ -484,7 +586,7 @@ export function Maria() {
   const userName = user?.display_name || 'Você';
   const userPhoto = user?.photo_url;
 
-  // Session ID persistente por sessão da aplicação
+  // Session ID persistente
   const sessionId = useMemo(() => {
     return 'sess_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
   }, []);
@@ -505,7 +607,6 @@ export function Maria() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Interrompe streaming ativo ao desmontar
   useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
@@ -514,12 +615,11 @@ export function Maria() {
     };
   }, []);
 
-  // --- Função Central de Envio e Streaming SSE ---
+  // --- Envio e Streaming SSE ---
   const handleSendMessage = async (queryToSend?: string) => {
     const query = (queryToSend || question).trim();
     if (!query || isGenerating) return;
 
-    // 1. Cria a mensagem do usuário
     const userMsgId = 'user_' + Date.now();
     const newUserMessage: ChatMessage = {
       id: userMsgId,
@@ -528,7 +628,6 @@ export function Maria() {
       time: getCurrentTime(),
     };
 
-    // 2. Prepara a mensagem do assistente que receberá streaming
     const botMsgId = 'bot_' + Date.now();
     const newBotMessage: ChatMessage = {
       id: botMsgId,
@@ -542,7 +641,6 @@ export function Maria() {
     setQuestion('');
     setIsGenerating(true);
 
-    // Ajusta URL do backend (remove barras extras)
     const baseUrl = urlGeral ? (urlGeral.endsWith('/') ? urlGeral.slice(0, -1) : urlGeral) : '';
     const streamEndpoint = `${baseUrl}/ai/chat/ask/stream`;
 
@@ -583,7 +681,7 @@ export function Maria() {
 
         sseBuffer += decoder.decode(value, { stream: true });
         const lines = sseBuffer.split('\n');
-        sseBuffer = lines.pop() || ''; // Guarda linha incompleta para a próxima iteração
+        sseBuffer = lines.pop() || '';
 
         for (const line of lines) {
           const trimmed = line.trim();
@@ -726,9 +824,9 @@ export function Maria() {
               <h1 className="text-base md:text-lg font-bold text-slate-900 dark:text-slate-100 font-lexend">
                 MarIA
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                RAG Híbrido & Streaming Ativo
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#559FB8]/10 text-[#07677e] dark:text-[#559FB8] border border-[#559FB8]/30">
+                <Sparkles className="w-3 h-3 text-[#07677e] dark:text-[#559FB8]" />
+                Assistente IA
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -769,12 +867,12 @@ export function Maria() {
         </div>
       </header>
 
-      {/* Área Central de Conversa */}
-      <div className="flex-1 overflow-y-auto px-1 md:px-4 space-y-4 max-w-4xl w-full mx-auto">
+      {/* Área Central Expandida Bento Box */}
+      <div className="flex-1 overflow-y-auto px-1 md:px-4 space-y-4 max-w-6xl w-full mx-auto">
         {messages.length === 0 ? (
           /* Estado Inicial Hero */
           <div className="h-full flex flex-col justify-center items-center text-center py-8 md:py-16">
-            <div className="max-w-2xl space-y-4">
+            <div className="max-w-3xl space-y-4">
               <div className="flex justify-center mb-2">
                 <div className="h-16 w-16 p-2.5 rounded-2xl bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 shadow-sm flex items-center justify-center">
                   {theme === 'dark' ? <SymbolEEWhite /> : <SymbolEE />}
@@ -788,27 +886,31 @@ export function Maria() {
                 como posso apoiar sua pesquisa científica hoje?
               </h2>
 
-              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
                 Consulte em linguagem natural artigos, livros, patentes, softwares ou compare
                 linhas de pesquisa e competências acadêmicas entre instituições da Bahia.
               </p>
 
-              {/* Sugestões de Perguntas Iniciais */}
+              {/* Bento de Sugestões de Consulta */}
               <div className="pt-4">
                 <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2.5">
-                  Sugestões de Consulta
+                  Sugestões Rápidas de Consulta
                 </p>
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-left">
                   {STARTER_PROMPTS.map((starter, idx) => {
                     const StarterIcon = starter.icon;
                     return (
                       <button
                         key={idx}
                         onClick={() => handleSendMessage(starter.query)}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-slate-300 hover:border-[#559FB8] hover:text-[#07677e] dark:hover:text-[#559FB8] hover:bg-slate-50 dark:hover:bg-neutral-800 shadow-xs transition-all text-left"
+                        className="group flex items-center gap-2.5 p-3 rounded-lg bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 hover:border-[#559FB8] hover:shadow-xs transition-all cursor-pointer"
                       >
-                        <StarterIcon className="w-3.5 h-3.5 text-[#559FB8]" />
-                        {starter.label}
+                        <div className="h-8 w-8 rounded-md bg-slate-50 dark:bg-neutral-800 flex items-center justify-center shrink-0 group-hover:bg-[#559FB8]/10 transition-colors">
+                          <StarterIcon className="w-4 h-4 text-[#07677e] dark:text-[#559FB8]" />
+                        </div>
+                        <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-[#07677e] dark:group-hover:text-[#559FB8] transition-colors leading-tight">
+                          {starter.label}
+                        </span>
                       </button>
                     );
                   })}
@@ -817,8 +919,8 @@ export function Maria() {
             </div>
           </div>
         ) : (
-          /* Histórico de Mensagens */
-          <div className="space-y-4 pb-4">
+          /* Histórico de Mensagens Bento */
+          <div className="space-y-5 pb-4">
             {messages.map((msg) => {
               const isUser = msg.role === 'user';
 
@@ -833,17 +935,17 @@ export function Maria() {
                     </div>
                   )}
 
-                  <div className={`flex flex-col ${isUser ? 'items-end max-w-[85%]' : 'w-full'}`}>
-                    {/* Bubble */}
+                  <div className={`flex flex-col ${isUser ? 'items-end max-w-2xl' : 'w-full'}`}>
+                    {/* Bento Box da Mensagem */}
                     <div
-                      className={`p-4 rounded-xl shadow-xs transition-all ${
+                      className={`p-4 md:p-5 rounded-xl shadow-xs transition-all ${
                         isUser
                           ? 'bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-slate-900 dark:text-blue-50 rounded-tr-xs'
-                          : 'bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-slate-900 dark:text-slate-100 rounded-tl-xs w-full'
+                          : 'bg-slate-50/60 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 text-slate-900 dark:text-slate-100 rounded-tl-xs w-full space-y-3'
                       }`}
                     >
-                      {/* Cabeçalho da Mensagem */}
-                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                      {/* Cabeçalho */}
+                      <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 font-lexend">
                           {isUser ? userName : 'MarIA'}
                         </span>
@@ -852,11 +954,21 @@ export function Maria() {
                         </span>
                       </div>
 
-                      {/* Metadados (apenas assistente) */}
+                      {/* Metadados Identificados (Pílulas) */}
                       {!isUser && msg.metadata && <MetadataBadges metadata={msg.metadata} />}
 
-                      {/* Conteúdo de Texto Markdown */}
-                      <div className="mt-2">
+                      {/* 1. Bento Pesquisadores Identificados (Exibido no Topo) */}
+                      {!isUser && msg.metadata?.researchers && (
+                        <ResearchersBentoGrid researchers={msg.metadata.researchers} />
+                      )}
+
+                      {/* 2. Bento Produções Científicas e Tecnológicas (Exibido no Topo) */}
+                      {!isUser && msg.metadata?.productions && (
+                        <ProductionsBentoGrid productions={msg.metadata.productions} />
+                      )}
+
+                      {/* 3. Bloco de Síntese Textual Markdown */}
+                      <div className={!isUser ? 'bg-white dark:bg-neutral-950 p-3.5 md:p-4 rounded-lg border border-slate-200/80 dark:border-neutral-800/80 mt-2' : ''}>
                         {isUser ? (
                           <p className="text-sm whitespace-pre-wrap leading-relaxed text-slate-800 dark:text-slate-200 font-lexend">
                             {msg.content}
@@ -869,37 +981,27 @@ export function Maria() {
                         ) : msg.isStreaming ? (
                           <div className="flex items-center gap-2 text-xs text-slate-500 py-1">
                             <Sparkles className="w-3.5 h-3.5 animate-spin text-[#559FB8]" />
-                            <span>Consultando base científica e formulando resposta...</span>
+                            <span>Sintetizando análise científica com IA...</span>
                           </div>
                         ) : null}
                       </div>
 
-                      {/* Notificação de Interrupção pelo Usuário */}
+                      {/* Aviso de Interrupção */}
                       {msg.interrupted && (
-                        <p className="text-xs italic text-slate-500 dark:text-slate-400 mt-2">
+                        <p className="text-xs italic text-slate-500 dark:text-slate-400">
                           (Geração interrompida pelo usuário)
                         </p>
                       )}
 
                       {/* Erros se houver */}
                       {msg.error && (
-                        <div className="mt-2.5 p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/70 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+                        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/70 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
                           <AlertCircle className="w-4 h-4 shrink-0" />
                           <span>{msg.error}</span>
                         </div>
                       )}
 
-                      {/* Cards de Pesquisadores */}
-                      {!isUser && msg.metadata?.researchers && (
-                        <ResearchersSection researchers={msg.metadata.researchers} />
-                      )}
-
-                      {/* Cards de Produções */}
-                      {!isUser && msg.metadata?.productions && (
-                        <ProductionsSection productions={msg.metadata.productions} />
-                      )}
-
-                      {/* Fontes Consultadas */}
+                      {/* 4. Fontes Consultadas (Rodapé) */}
                       {!isUser && msg.metadata?.sources && (
                         <SourcesSection sources={msg.metadata.sources} />
                       )}
@@ -922,8 +1024,8 @@ export function Maria() {
         )}
       </div>
 
-      {/* Barra Inferior de Entrada de Pergunta */}
-      <footer className="pt-2 max-w-4xl w-full mx-auto">
+      {/* Barra Inferior de Entrada */}
+      <footer className="pt-2 max-w-6xl w-full mx-auto">
         <div className="relative border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-xl shadow-sm focus-within:ring-2 focus-within:ring-[#559FB8]/40 focus-within:border-[#559FB8] transition-all">
           <Label htmlFor="maria-prompt-input" className="sr-only">
             Pergunta para a MarIA
