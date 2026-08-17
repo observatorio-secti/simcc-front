@@ -60,13 +60,20 @@ export function VisualizacaoInstituicao({
   }>();
   const queryUrl = useQuery();
 
-  const effectiveIdentifier =
+  const rawIdentifier =
     propIdentifier ||
     params.acronym ||
     params.institution_id ||
     queryUrl.get('acronym') ||
     queryUrl.get('institution_id') ||
     '';
+
+  let effectiveIdentifier = rawIdentifier.trim();
+  try {
+    effectiveIdentifier = decodeURIComponent(effectiveIdentifier).trim();
+  } catch {
+    // fallback
+  }
 
   const { data: graduatePrograms, isLoading: loading } =
     useInstitution(effectiveIdentifier);

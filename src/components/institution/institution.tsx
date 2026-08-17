@@ -58,12 +58,19 @@ export function Institution() {
     institution_id?: string;
   }>();
 
-  const type_search =
+  const rawSearch =
     params.acronym ||
     params.institution_id ||
     queryUrl.get('acronym') ||
     queryUrl.get('institution_id') ||
     '';
+
+  let type_search = rawSearch.trim();
+  try {
+    type_search = decodeURIComponent(type_search).trim();
+  } catch {
+    // fallback
+  }
 
   const programSelecionado = type_search;
 

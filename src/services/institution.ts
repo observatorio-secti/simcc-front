@@ -157,55 +157,124 @@ export const getInstitutionById = async (id: string): Promise<Institution> => {
   return data;
 };
 
+const normalizeInstitutionString = (str?: string) =>
+  (str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+
+const cleanAlphanumeric = (str?: string) =>
+  normalizeInstitutionString(str).replace(/[^a-z0-9]/g, '');
+
 /**
- * Resolve os dados da instituição por Acrônimo (sigla) ou ID.
- * Dá prioridade à busca por acrônimo, permitindo busca case-insensitive,
- * com fallback para ID e correspondência de nome.
+ * Resolve os dados da instituição por Acrônimo (sigla), Nome ou ID de forma 100% dinâmica.
+ * Suporta correspondência exata, variações com hífen (ex: FIOCRUZ-IGM),
+ * prefixos, siglas embutidas no nome e IDs diretos.
  */
 export const getInstitutionByIdOrAcronym = async (
   identifier: string,
 ): Promise<Institution | null> => {
   if (!identifier) return null;
 
-  const normalized = identifier.trim().toLowerCase();
+  let cleanIdentifier = identifier.trim();
+  try {
+    cleanIdentifier = decodeURIComponent(cleanIdentifier).trim();
+  } catch {
+    // fallback se decode falhar
+  }
+
+  const normalized = normalizeInstitutionString(cleanIdentifier);
+  const alphaNormalized = cleanAlphanumeric(cleanIdentifier);
+
+  if (!normalized && !alphaNormalized) return null;
 
   try {
     const institutions = await getInstitutions();
     if (Array.isArray(institutions) && institutions.length > 0) {
-      // 1. Prioridade: busca por acrônimo (sigla)
-      const foundByAcronym = institutions.find(
-        (inst) => inst.acronym && inst.acronym.trim().toLowerCase() === normalized,
+      // 1. Correspondência exata por ID
+      const byId = institutions.find(
+        (inst) => inst.id && inst.id.toLowerCase() === cleanIdentifier.toLowerCase(),
       );
-      if (foundByAcronym) {
-        return foundByAcronym;
-      }
+      if (byId) return byId;
 
-      // 2. Busca por ID
-      const foundById = institutions.find(
-        (inst) => inst.id && inst.id.toLowerCase() === normalized,
-      );
-      if (foundById) {
-        return foundById;
-      }
+      // 2. Correspondência exata por Acrônimo / Sigla
+      const byExactAcronym = institutions.find((inst: any) => {
+        const acr = normalizeInstitutionString(inst.acronym || inst.sigla || inst.institution_acronym);
+        return acr && (acr === normalized || cleanAlphanumeric(acr) === alphaNormalized);
+      });
+      if (byExactAcronym) return byExactAcronym;
 
-      // 3. Busca por correspondência no nome
-      const foundByName = institutions.find(
-        (inst) => inst.name && inst.name.trim().toLowerCase() === normalized,
-      );
-      if (foundByName) {
-        return foundByName;
+      // 3. Correspondência exata por Nome
+      const byExactName = institutions.find((inst) => {
+        const name = normalizeInstitutionString(inst.name);
+        return name && (name === normalized || cleanAlphanumeric(name) === alphaNormalized);
+      });
+      if (byExactName) return byExactName;
+
+      // 4. Correspondência de prefixo / sufixo no acrônimo (ex: FIOCRUZ vs FIOCRUZ-IGM)
+      const byAcronymVariation = institutions.find((inst: any) => {
+        const acr = normalizeInstitutionString(inst.acronym || inst.sigla || inst.institution_acronym);
+        if (!acr) return false;
+        const acrAlpha = cleanAlphanumeric(acr);
+        if (!acrAlpha || !alphaNormalized) return false;
+
+        if (acrAlpha === alphaNormalized) return true;
+        if (alphaNormalized.startsWith(acrAlpha) || acrAlpha.startsWith(alphaNormalized)) return true;
+
+        const acrParts = acr.split(/[\s\-_/–:]+/).filter(Boolean);
+        const searchParts = normalized.split(/[\s\-_/–:]+/).filter(Boolean);
+        return (
+          acrParts.some((p) => searchParts.includes(p)) ||
+          searchParts.some((p) => acrParts.includes(p))
+        );
+      });
+      if (byAcronymVariation) return byAcronymVariation;
+
+      // 5. Acrônimo ou sigla no início ou formato "(SIGLA)" dentro do nome da instituição
+      const byNamePattern = institutions.find((inst) => {
+        const name = normalizeInstitutionString(inst.name);
+        if (!name) return false;
+
+        if (
+          name.startsWith(normalized + ' ') ||
+          name.startsWith(normalized + '-') ||
+          name.startsWith(normalized + '–') ||
+          name.startsWith(normalized + ':') ||
+          name.includes(`(${normalized})`) ||
+          name.includes(`[${normalized}]`)
+        ) {
+          return true;
+        }
+
+        const words = name.split(/[\s\-_/–:(),.]+/).filter(Boolean);
+        return words.includes(normalized);
+      });
+      if (byNamePattern) return byNamePattern;
+
+      // 6. Busca por substring se o termo tiver pelo menos 3 caracteres
+      if (normalized.length >= 3) {
+        const bySubstring = institutions.find((inst: any) => {
+          const name = normalizeInstitutionString(inst.name);
+          const acr = normalizeInstitutionString(inst.acronym || inst.sigla);
+          return (
+            (acr && (acr.includes(normalized) || normalized.includes(acr))) ||
+            (name && name.includes(normalized))
+          );
+        });
+        if (bySubstring) return bySubstring;
       }
     }
   } catch (error) {
     console.error('Erro ao buscar lista de instituições para resolver identificador:', error);
   }
 
-  // 4. Fallback: tentativa direta via API caso o identificador seja um ID direto
+  // 7. Fallback: tentativa direta via API caso o identificador seja um ID direto
   try {
-    const data = await getInstitutionById(identifier);
+    const data = await getInstitutionById(cleanIdentifier);
     if (data && data.id) return data;
   } catch (error) {
-    console.error(`Erro na chamada direta a institution/${identifier}:`, error);
+    console.error(`Erro na chamada direta a institution/${cleanIdentifier}:`, error);
   }
 
   return null;
