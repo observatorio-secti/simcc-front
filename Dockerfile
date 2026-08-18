@@ -2,6 +2,10 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+ARG VITE_BASE_PATH=/
+ENV VITE_BASE_PATH=$VITE_BASE_PATH
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 COPY package*.json ./
 
 RUN npm install --legacy-peer-deps --force
@@ -26,6 +30,7 @@ CMD ["node", "server.js"]
 FROM nginx:alpine AS nginx
 
 COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html/simcc
 COPY --from=builder /app/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
