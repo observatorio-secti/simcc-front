@@ -21,8 +21,8 @@ export function CloudWordResearcherHome(props: Research) {
   ];
   const distinctAmongCount = distinctAmongValues.length;
 
-  const maxFontSize = 220;
-  const minFontSize = 100;
+  const maxFontSize = 180;
+  const minFontSize = 60;
 
   return (
     <div className="gap-2 flex-wrap flex w-full items-end">
@@ -32,8 +32,8 @@ export function CloudWordResearcherHome(props: Research) {
           distinctAmongCount <= 1
             ? maxFontSize
             : maxFontSize -
-              ((maxFontSize - minFontSize) / (distinctAmongCount - 1)) *
-                rankIndex;
+            ((maxFontSize - minFontSize) / (distinctAmongCount - 1)) *
+            rankIndex;
 
         return (
           <CloudWordItemResearcher

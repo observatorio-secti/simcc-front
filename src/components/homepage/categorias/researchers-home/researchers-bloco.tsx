@@ -1,17 +1,22 @@
-// src/components/homepage/categorias/researchers-home/researchers-bloco.tsx
-
-import { ResearchItem } from './researcher-item';
+import { Plus } from 'phosphor-react';
+import { Loader2 } from 'lucide-react';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { Button } from '../../../ui/button';
-import { Plus } from 'phosphor-react';
+import { ResearchItem } from './researcher-item';
 
-type ResearchProps = {
+export interface ResearchersBlocoProps {
   researcher: any[];
   onLoadMore?: () => void;
   hasMore?: boolean;
-};
+  isFetchingNextPage?: boolean;
+}
 
-export function ResearchersBloco(props: ResearchProps) {
+export function ResearchersBloco({
+  researcher,
+  onLoadMore,
+  hasMore = false,
+  isFetchingNextPage = false,
+}: ResearchersBlocoProps) {
   return (
     <div className="pb-16">
       <ResponsiveMasonry
@@ -25,7 +30,14 @@ export function ResearchersBloco(props: ResearchProps) {
         }}
       >
         <Masonry gutter="16px">
-          {props.researcher.map((item: any, index: number) => {
+          {researcher.map((item: any, index: number) => {
+            const departmentValue =
+              typeof item.departments === 'string'
+                ? item.departments
+                : Array.isArray(item.departments) && item.departments.length > 0
+                  ? item.departments.map((d: any) => d.dep_sigla || d.dep_nom || d).join(', ')
+                  : item.departament || '';
+
             return (
               <ResearchItem
                 key={item.id || index}
@@ -42,7 +54,7 @@ export function ResearchersBloco(props: ResearchProps) {
                 city={item.city}
                 graduation={item.graduation}
                 patent={item.patent}
-                speaker={item.speaker}
+                speaker={item.speaker || ''}
                 h_index={item.h_index}
                 relevance_score={item.relevance_score}
                 works_count={item.works_count}
@@ -50,8 +62,8 @@ export function ResearchersBloco(props: ResearchProps) {
                 i10_index={item.i10_index}
                 scopus={item.scopus}
                 openalex={item.openalex}
-                departament={item.departament}
-                departments={item.departaments}
+                departament={item.departament || departmentValue}
+                departments={departmentValue}
                 subsidy={item.subsidy}
                 status={item.status}
                 graduate_programs={item.graduate_programs}
@@ -61,11 +73,24 @@ export function ResearchersBloco(props: ResearchProps) {
         </Masonry>
       </ResponsiveMasonry>
 
-      {props.hasMore && (
+      {hasMore && (
         <div className="w-full flex justify-center mt-8">
-          <Button onClick={props.onLoadMore}>
-            <Plus size={16} />
-            Mostrar mais
+          <Button
+            onClick={onLoadMore}
+            disabled={isFetchingNextPage}
+            className="gap-2"
+          >
+            {isFetchingNextPage ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Carregando mais...
+              </>
+            ) : (
+              <>
+                <Plus size={16} />
+                Mostrar mais
+              </>
+            )}
           </Button>
         </div>
       )}
