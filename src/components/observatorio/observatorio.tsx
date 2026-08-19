@@ -53,7 +53,7 @@ const initiativesList: Initiatives[] = [
     title: 'Indicadores Institucionais e Pós-graduação',
     description:
       'Visualize métricas e dados consolidados sobre as instituições de ensino, pesquisa e os programas de pós-graduação da Bahia.',
-    link: 'https://simcc.uesc.br/indicadores',
+    link: 'https://observatoriocti.secti.ba.gov.br/simcc/indicadores',
     icon: BarChart,
     status: 'active',
     imageUrl: INDICADORES,
@@ -63,7 +63,7 @@ const initiativesList: Initiatives[] = [
     title: 'SIMCC - Mapeamento de Competências',
     description:
       'Navegue pelo Sistema de Mapeamento de Competências Científicas para encontrar pesquisadores e especialidades em todo o estado.',
-    link: 'http://simcc.uesc.br/',
+    link: 'https://observatoriocti.secti.ba.gov.br/simcc/',
     icon: Map,
     status: 'active',
     imageUrl: SIMCC,
@@ -83,7 +83,7 @@ const initiativesList: Initiatives[] = [
     title: 'Programas de Pós-Graduação',
     description:
       'Explore informações detalhadas sobre os programas de mestrado e doutorado oferecidos pelas instituições de ensino superior da Bahia.',
-    link: 'https://simcc.uesc.br/pos-graduacao',
+    link: 'https://observatoriocti.secti.ba.gov.br/simcc/pos-graduacao',
     icon: GraduationCap,
     status: 'active',
     imageUrl: PESQUISA,
@@ -93,7 +93,7 @@ const initiativesList: Initiatives[] = [
     title: 'Produção Técnica e Inovação',
     description:
       'Acesse dados sobre patentes, registros de software e marcas que compõem a produção tecnológica e de inovação do estado.',
-    link: 'https://simcc.uesc.br/listagens?tab=patent',
+    link: 'https://observatoriocti.secti.ba.gov.br/simcc/listagens?tab=patent',
     icon: Lightbulb,
     status: 'active',
     imageUrl: PATENTE,
@@ -103,7 +103,7 @@ const initiativesList: Initiatives[] = [
     title: 'Grupos de Pesquisa',
     description:
       'Encontre e analise os grupos de pesquisa certificados da Bahia, suas linhas de atuação, membros e produção científica.',
-    link: 'https://simcc.uesc.br/grupos-pesquisa',
+    link: 'https://observatoriocti.secti.ba.gov.br/simcc/grupos-pesquisa',
     icon: Users,
     status: 'active',
     imageUrl: GRUPOS,
@@ -113,7 +113,7 @@ const initiativesList: Initiatives[] = [
     title: 'INCITE - Institutos de C&T&I',
     description:
       'Conheça os Institutos de Ciência, Inovação e Tecnologia do Estado, suas áreas de atuação e projetos estratégicos.',
-    link: 'https://simcc.uesc.br/incites',
+    link: 'https://observatoriocti.secti.ba.gov.br/simcc/incites',
     icon: Landmark,
     status: 'active',
     imageUrl: INCT,
@@ -123,7 +123,7 @@ const initiativesList: Initiatives[] = [
     title: 'Bolsistas de Produtividade',
     description:
       'Visualize dados sobre os pesquisadores com bolsa de produtividade, destacando a excelência científica na Bahia.',
-    link: 'https://simcc.uesc.br/listagens?tab=bolsistas',
+    link: 'https://observatoriocti.secti.ba.gov.br/simcc/listagens?tab=bolsistas',
     icon: Award,
     status: 'active',
     imageUrl: BOLSISTA,
@@ -133,7 +133,7 @@ const initiativesList: Initiatives[] = [
     title: 'Busca por IA',
     description:
       'Utilize nossa busca inteligente para encontrar informações em toda a plataforma usando linguagem natural.',
-    link: 'https://simcc.uesc.br/resultados-ia',
+    link: 'https://observatoriocti.secti.ba.gov.br/simcc/resultados-ia',
     icon: Sparkles,
     status: 'active',
     imageUrl: IA,
@@ -216,10 +216,7 @@ export const Observatorio = () => {
   };
 
   return (
-    <main
-      className="relative flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-cover bg-center"
-      style={{ backgroundImage: `url(${bg_popup})` }}
-    >
+    <main className="relative flex flex-col items-center justify-center min-h-screen p-4 md:p-8 bg-cover bg-center" style={{ backgroundImage: `url(${bg_popup})` }} >
       <div className="absolute inset-0 bg-white/40 dark:bg-black/60 backdrop-blur-sm z-0"></div>
 
       <div className="relative z-10 w-full">
