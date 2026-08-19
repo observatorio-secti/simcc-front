@@ -46,26 +46,6 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { AreaChart, Area, LineChart, Line } from 'recharts';
 
-type Count = {
-  count_article: number;
-  count_book: number;
-  count_book_chapter: number;
-  count_guidance: number;
-  count_patent: number;
-  count_report: number;
-  count_software: number;
-  count_guidance_complete: number;
-  count_guidance_in_progress: number;
-  count_patent_granted: number;
-  count_patent_not_granted: number;
-  count_brand: number;
-  year: number;
-};
-
-interface PalavrasChaves {
-  term: string;
-  among: number;
-}
 
 import { ChartConfig, ChartContainer } from '../../components/ui/chart';
 
@@ -75,54 +55,17 @@ import HC_wordcloud from 'highcharts/modules/wordcloud';
 import { useTheme } from 'next-themes';
 import { Search } from '../search/search';
 import { useModalResult } from '../hooks/use-modal-result';
-import { useModal } from '../hooks/use-modal-store';
 
 import { Helmet } from 'react-helmet';
 import {
-  useDepartamentRt,
-  useVisaoPrograma,
   useResearcherDadosGerais,
-  useMetricsScholarship,
   useWordsResearcher,
-  useFoment,
-  useOutstandingResearchers,
 } from './hooks/use-home-queries';
 
-interface Bolsistas {
-  aid_quantity: string;
-  call_title: string;
-  funding_program_name: string;
-  modality_code: string;
-  category_level_code: string;
-  institute_name: string;
-  modality_name: string;
-  name: string;
-  researcher_id: string;
-  scholarship_quantity: string;
-}
 
-interface ScholarshipMetrics {
-  modality_code: string;
-  category_level_code: string;
-  count: number;
-}
+
 
 HC_wordcloud(Highcharts);
-
-const chartConfig5 = {
-  'Produtividade em Pesquisa': {
-    label: 'Produtividade em Pesquisa',
-    color: '#809BB5',
-  },
-  'Desen. Tec. e Extensão Inovadora': {
-    label: 'Desen. Tec. e Extensão Inovadora',
-    color: '#A6BCCD',
-  },
-  'Outros docentes': {
-    label: 'Outros docentes',
-    color: '#354A5C',
-  },
-} satisfies ChartConfig;
 
 const chartConfig = {
   views: {
@@ -165,98 +108,16 @@ const chartConfig = {
 export function InitialHome() {
   const { setItensSelecionados } = useContext(UserContext);
 
-  const [year, setYear] = useState(new Date().getFullYear() - 4);
-
   const currentYear = new Date().getFullYear();
   const years: number[] = [];
   for (let i = currentYear; i > currentYear - 30; i--) {
     years.push(i);
   }
 
-  const { data: rt } = useDepartamentRt();
-  const { data: VisaoPrograma = [] } = useVisaoPrograma();
-  const { data: metrics = [] } = useMetricsScholarship();
-  const { data: dados = [] } = useResearcherDadosGerais(year);
+  const { data: dados = [] } = useResearcherDadosGerais(new Date().getFullYear() - 4);
   const { data: words = [] } = useWordsResearcher();
-  const { data: bolsistas = [] } = useFoment();
-  const { data: researcher = [], isLoading: isLoad } =
-    useOutstandingResearchers();
-
-  const sumTechnicianCounts = (technician: CoutRt[]): number => {
-    return technician.reduce((total, item) => total + item.count, 0);
-  };
-
-  const [totalTechnicianCounts, setTotalTechnicianCounts] = useState(0);
-
-  useEffect(() => {
-    if (rt && rt.technician) {
-      setTotalTechnicianCounts(sumTechnicianCounts(rt.technician));
-    }
-  }, [rt]);
 
   const { theme } = useTheme();
-
-  const { isOpen, type } = useModalHomepage();
-
-  const options = {
-    chart: {
-      backgroundColor: 'transparent',
-      height: '300px',
-      display: 'flex',
-      position: 'relative',
-    },
-    credits: {
-      enabled: false,
-    },
-    exporting: {
-      enabled: false, // Remove a opção de menu para baixar o gráfico
-    },
-    series: [
-      {
-        type: 'wordcloud',
-        data: words.map((word: PalavrasChaves) => ({
-          name: word.term,
-          weight: word.among,
-        })),
-
-        style: {
-          fontFamily: 'Lexend, sans-serif',
-        },
-      },
-    ],
-    title: {
-      text: '',
-    },
-    plotOptions: {
-      wordcloud: {
-        borderRadius: 3,
-        borderWidth: '1px',
-        borderColor: 'blue',
-        BackgroundColor: 'red',
-        colors: ['#9CBCCE', '#284B5D', '#709CB6'],
-      },
-    },
-  };
-
-  const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>(
-    'producao_bibliografica',
-  );
-
-  const total = useMemo(
-    () => ({
-      producao_bibliografica: dados.reduce(
-        (acc: number, curr: Count) =>
-          acc + curr.count_article + curr.count_book + curr.count_book_chapter,
-        0,
-      ),
-      producao_tecnica: dados.reduce(
-        (acc: number, curr: Count) =>
-          acc + curr.count_patent + curr.count_software + curr.count_brand,
-        0,
-      ),
-    }),
-    [dados],
-  );
 
   const [visibleChart, setVisibleChart] = useState(0);
   const chartKeys = [
@@ -281,60 +142,7 @@ export function InitialHome() {
     navigate(`/resultados?type_search=article&terms=${term}`);
   }
 
-  const totalCountR = Number(VisaoPrograma[0]?.researcher || 0);
-
-  const pqCount = metrics
-    .filter((item: ScholarshipMetrics) => item.modality_code === 'PQ')
-    .reduce((acc: number, curr: ScholarshipMetrics) => acc + curr.count, 0);
-
-  const dtCount = metrics
-    .filter((item: ScholarshipMetrics) => item.modality_code === 'DT')
-    .reduce((acc: number, curr: ScholarshipMetrics) => acc + curr.count, 0);
-
-  const totalBolsistas = metrics.reduce(
-    (acc: number, curr: ScholarshipMetrics) => acc + curr.count,
-    0,
-  );
-
-  const chartData = [
-    { name: 'Produtividade em Pesquisa', value: pqCount },
-    { name: 'Desen. Tec. e Extensão Inovadora', value: dtCount },
-    { name: 'Outros docentes', value: totalCountR - pqCount - dtCount },
-  ];
-
   const { onOpen: onOpenResult } = useModalResult();
-
-  const { onOpen } = useModal();
-
-  const accessLinks = [
-    {
-      to: '/indicadores',
-      icon: <BarChartBig size={16} />,
-      label: 'Indicadores',
-    },
-    {
-      to: '/pos-graduacao',
-      icon: <GraduationCap size={16} />,
-      label: 'Pós-graduação',
-    },
-    { to: '/dicionario', icon: <List size={16} />, label: 'Dicionário' },
-    {
-      to: '/grupos-pesquisa',
-      icon: <Blocks size={16} />,
-      label: 'Grupos de pesquisa',
-    },
-    { to: '/listagens', icon: <Download size={16} />, label: 'Listagens' },
-  ];
-
-  const randomResearchers = useMemo(() => {
-    return researcher.sort(() => Math.random() - 0.5).slice(0, 40);
-  }, [researcher]);
-
-  const mesAtual = new Date().toLocaleString('pt-BR', { month: 'long' });
-
-  const nomesAleatorios = Array.from({ length: 20 }, (_, i) => ({
-    name: `Pesquisador ${i + 1}`,
-  }));
 
   return (
     <div className=" items-center  flex flex-col   ">
