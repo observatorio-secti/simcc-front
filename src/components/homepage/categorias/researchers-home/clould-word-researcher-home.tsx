@@ -7,23 +7,29 @@ type CloudWordResearcherHomeProps = {
 
 const TOTAL_LEVELS = 6;
 const MAX_FONT_SIZE = 180;
-const MIN_FONT_SIZE = 60;
-const STEP = (MAX_FONT_SIZE - MIN_FONT_SIZE) / (TOTAL_LEVELS - 1);
+const MIN_FONT_SIZE = 120;
 
 export function CloudWordResearcherHome(props: CloudWordResearcherHomeProps) {
-  const sortedResearcher = [...props.researcher].sort(
+  const sortedResearcher = [...(props.researcher || [])].sort(
     (a, b) => b.among - a.among,
   );
   const distinctAmongValues = [
     ...new Set(sortedResearcher.map((item) => item.among)),
   ];
+  const distinctCount = distinctAmongValues.length;
+  const effectiveLevels = Math.min(distinctCount, TOTAL_LEVELS);
+  const step =
+    effectiveLevels > 1
+      ? (MAX_FONT_SIZE - MIN_FONT_SIZE) / (effectiveLevels - 1)
+      : 0;
 
   return (
     <div className="gap-2 flex-wrap flex w-full items-end">
       {sortedResearcher.slice(0, 10).map((item) => {
         const rankIndex = distinctAmongValues.indexOf(item.among);
-        const level = Math.min(rankIndex, TOTAL_LEVELS - 1);
-        const fontSize = MAX_FONT_SIZE - STEP * level;
+        const level = Math.min(rankIndex, effectiveLevels - 1);
+        const fontSize =
+          distinctCount <= 1 ? MAX_FONT_SIZE : MAX_FONT_SIZE - step * level;
 
         return (
           <CloudWordItemResearcher
