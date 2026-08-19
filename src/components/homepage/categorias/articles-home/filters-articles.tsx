@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert } from "../../../ui/alert";
 import { CalendarBlank, CheckSquare } from "phosphor-react";
-import { Slider } from "../../../ui/slider";
 import debounce from "lodash.debounce"; // Importing debounce
+import { ArticleQualisSelector, ArticleYearSlider, qualisOptions } from "./article-filter-fields";
 
 interface Props {
   onFilterUpdate: (newResearcher: Filter[]) => void;
@@ -14,49 +14,16 @@ type Filter = {
 };
 
 export function FilterArticle(props: Props) {
-  const qualisColor: { [key: string]: string } = {
-    A1: "bg-[#006837]",
-    A2: "bg-[#8FC53E]",
-    A3: "bg-[#ACC483]",
-    A4: "bg-[#BDC4B1]",
-    B1: "bg-[#F15A24]",
-    B2: "bg-[#F5831F]",
-    B3: "bg-[#F4AD78]",
-    B4: "bg-[#F4A992]",
-    C: "bg-[#EC1C22]",
-    SQ: "bg-[#560B11]",
-    NP: "bg-[#560B11]",
-  };
-
-  const [qualis] = useState([
-    { id: 1, itens: "A1" },
-    { id: 2, itens: "A2" },
-    { id: 3, itens: "A3" },
-    { id: 4, itens: "A4" },
-    { id: 5, itens: "B1" },
-    { id: 6, itens: "B2" },
-    { id: 7, itens: "B3" },
-    { id: 8, itens: "B4" },
-    { id: 10, itens: "C" },
-    { id: 11, itens: "SQ" },
-  ]);
-
   const [itensSelecionados, setItensSelecionados] = useState<string[]>([]);
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const [filterYear, setFilterYear] = useState([1990]);
 
-  const [checkboxStates, setCheckboxStates] = useState<{ [index: number]: boolean }>({});
   const [isFirstRender, setIsFirstRender] = useState(true);
 
-  const handleCheckboxChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const itemId = event.target.name;
-    const isChecked = event.target.checked;
-
-    setCheckboxStates((prevStates) => ({ ...prevStates, [itemId]: isChecked }));
-
+  const handleCheckboxChangeInput = (itemId: number, isChecked: boolean) => {
     setItensSelecionados((prevSelecionados) => {
-      const selectedQualis = qualis.find((q) => q.id === parseInt(itemId));
+      const selectedQualis = qualisOptions.find((q) => q.id === itemId);
       if (selectedQualis) {
         if (isChecked) {
           return [...prevSelecionados, selectedQualis.itens];
@@ -68,33 +35,6 @@ export function FilterArticle(props: Props) {
       }
     });
   };
-
-  const checkboxQualis = qualis.map((quali) => {
-    const isChecked = checkboxStates[quali.id];
-    return (
-      <li
-        key={quali.id}
-        className="checkboxLabel group list-none inline-flex group overflow-hidden"
-        onMouseDown={(e) => e.preventDefault()}
-      >
-        <label
-          className={`cursor-pointer gap-3 transition-all flex h-10 items-center px-4 rounded-md text-xs font-medium hover:bg-gray-100 dark:hover:bg-neutral-800 ${isChecked ? "bg-neutral-100 dark:bg-neutral-800" : ""
-            }`}
-        >
-          <div className={`rounded-sm h-4 w-4 ${qualisColor[quali.itens]}`}></div>
-          <span className="text-center block">{quali.itens}</span>
-          <input
-            type="checkbox"
-            name={quali.id.toString()}
-            className="absolute hidden group"
-            onChange={handleCheckboxChangeInput}
-            id={quali.itens}
-            checked={isChecked}
-          />
-        </label>
-      </li>
-    );
-  });
 
   const updateResearcher = useCallback(
     debounce((newResearcher: Filter[]) => {
@@ -125,7 +65,7 @@ export function FilterArticle(props: Props) {
           <p className=" font-medium">Selecione o Qualis</p>
         </div>
         <Alert className="w-fit">
-          <div className="gap-4 flex flex-wrap">{checkboxQualis}</div>
+          <ArticleQualisSelector selected={itensSelecionados} onToggle={handleCheckboxChangeInput} />
         </Alert>
       </div>
 
@@ -135,20 +75,8 @@ export function FilterArticle(props: Props) {
           <p className=" font-medium">Selecione o ano</p>
         </div>
 
-        <Alert className="w-full flex items-center gap-2 h-full">
-          <Slider
-            defaultValue={filterYear}
-            onValueChange={(value) => setFilterYear(value)}
-            max={year}
-            min={1990}
-            step={1}
-            className="color-blue-700"
-          ></Slider>
-
-          <p className="text-sm font-bold">{filterYear}</p>
-        </Alert>
+        <ArticleYearSlider value={filterYear} onChange={setFilterYear} />
       </div>
     </div>
   );
 }
-

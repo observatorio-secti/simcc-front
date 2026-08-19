@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useModalHomepage } from "../hooks/use-modal-homepage";
 import { ModalType, useModalResult } from "../hooks/use-modal-result";
 import { ResultProvider } from "../provider/result-provider";
@@ -15,6 +15,7 @@ import { HeaderResult } from "./header-results";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { ResultFiltersSlotContext } from "./result-filters-slot-context";
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
@@ -204,6 +205,11 @@ export function ResultHome() {
     const rootRef = useRef<HTMLDivElement>(null);
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
 
+    const [filtersSlot, setFiltersSlot] = useState<HTMLDivElement | null>(null);
+    const filtersSlotRef = useCallback((el: HTMLDivElement | null) => {
+        setFiltersSlot(el);
+    }, []);
+
     useEffect(() => {
         const header = stickyHeaderRef.current;
         const root = rootRef.current;
@@ -219,8 +225,9 @@ export function ResultHome() {
     }, [itemsSelecionados]);
 
     return (
-        <div ref={rootRef} className="min-h-full w-full flex flex-col">
-            <Helmet>
+        <ResultFiltersSlotContext.Provider value={filtersSlot}>
+            <div ref={rootRef} className="min-h-full w-full flex flex-col">
+                <Helmet>
                 <title>
                     {itemsSelecionados.length === 0
 
@@ -238,8 +245,12 @@ export function ResultHome() {
                 <meta name="robots" content="index, follow" />
             </Helmet>
 
-            {(itemsSelecionados.length > 0 || (researcher == 'false')) && (
-                <div ref={stickyHeaderRef} className="top-[68px] h-fit sticky z-[2] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
+            <div className="flex w-full">
+                <div ref={filtersSlotRef} className="hidden lg:block shrink-0" />
+
+                <div className="flex-1 min-w-0">
+                    {(itemsSelecionados.length > 0 || (researcher == 'false')) && (
+                        <div ref={stickyHeaderRef} className="top-[68px] h-fit sticky z-[2] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
                     <div className={`w-full px-8 border-b border-b-neutral-200 dark:border-b-neutral-800`}>
                         {isOn && (
                             <div className="w-full pt-4  flex justify-between items-center">
@@ -252,40 +263,40 @@ export function ResultHome() {
                                 <ScrollArea>
                                     <div className="w-full flex  items-center gap-2">
                                         {!((researcher == 'false' && itemsSelecionados.length == 0) && itemsSelecionados.length == 0) && (
-                                            <div className={`pb-2 border-b-2 transition-all ${typeResult == 'researchers-home' ? ('border-b-[#719CB8]') : (' border-b-transparent ')}`}>
-                                                <Button variant={typeResult == 'researchers-home' ? ('ghost') : ('ghost')} className={`${typeResult}`} onClick={() => onOpen('researchers-home')}>
+                                            <div className={`transition-all`}>
+                                                <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult == 'researchers-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('researchers-home')}>
                                                     <Users className="h-4 w-4" />
                                                     Pesquisadores
                                                 </Button>
                                             </div>
                                         )}
                                         {searchType === 'article' && (
-                                            <div className={`pb-2 border-b-2  transition-all ${typeResult == 'articles-home' ? ('border-b-[#719CB8]') : (' border-b-transparent ')}`}>
-                                                <Button variant={typeResult == 'articles-home' ? ('ghost') : ('ghost')} className="m-0" onClick={() => onOpen('articles-home')}>
+                                            <div className={`transition-all`}>
+                                                <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult == 'articles-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('articles-home')}>
                                                     <File className="h-4 w-4" />
                                                     Artigos
                                                 </Button>
                                             </div>
                                         )}
                                         {searchType === 'book' && (
-                                            <div className={`pb-2 border-b-2  transition-all ${typeResult == 'book-home' ? ('border-b-[#719CB8]') : (' border-b-transparent ')}`}>
-                                                <Button variant={typeResult == 'book-home' ? ('ghost') : ('ghost')} className="m-0" onClick={() => onOpen('book-home')}>
+                                            <div className={`transition-all`}>
+                                                <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult == 'book-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('book-home')}>
                                                     <BookOpen className="h-4 w-4" />
                                                     Livros e capítulos
                                                 </Button>
                                             </div>
                                         )}
                                         {searchType === 'patent' && (
-                                            <div className={`pb-2 border-b-2  transition-all ${typeResult == 'patent-home' ? ('border-b-[#719CB8]') : (' border-b-transparent ')}`}>
-                                                <Button variant={typeResult == 'patent-home' ? ('ghost') : ('ghost')} className="m-0" onClick={() => onOpen('patent-home')}>
+                                            <div className={`transition-all`}>
+                                                <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult == 'patent-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('patent-home')}>
                                                     <Copyright className="h-4 w-4" />
                                                     Patentes
                                                 </Button>
                                             </div>
                                         )}
                                         {searchType === 'speaker' && (
-                                            <div className={`pb-2 border-b-2  transition-all ${typeResult == 'speaker-home' ? ('border-b-[#719CB8]') : (' border-b-transparent ')}`}>
-                                                <Button variant={typeResult == 'speaker-home' ? ('ghost') : ('ghost')} className="m-0" onClick={() => onOpen('speaker-home')}>
+                                            <div className={`transition-all`}>
+                                                <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult == 'speaker-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('speaker-home')}>
                                                     <Ticket className="h-4 w-4" />
                                                     Participação em eventos
                                                 </Button>
@@ -293,8 +304,8 @@ export function ResultHome() {
                                         )}
                                         {!((simcc && researcher == 'false' && itemsSelecionados.length == 0) && itemsSelecionados.length == 0) && (
                                             searchType != 'name' && (
-                                                <div className={`pb-2 border-b-2 transition-all ${typeResult == 'institutions-home' ? ('border-b-[#719CB8]') : (' border-b-transparent ')}`}>
-                                                    <Button variant={typeResult == 'institutions-home' ? ('ghost') : ('ghost')} className={`${typeResult}`} onClick={() => onOpen('institutions-home')}>
+                                                <div className={`transition-all`}>
+                                                    <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult == 'institutions-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('institutions-home')}>
                                                         <Building2 className="h-4 w-4" />
                                                         Instituições
                                                     </Button>
@@ -353,7 +364,7 @@ export function ResultHome() {
 
                                         </DropdownMenuItem >
 
-                                        {typeResult == 'researchers-home' && (
+                                        {(typeResult == 'researchers-home' || typeResult == 'articles-home') && (
                                             <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2 lg:hidden">
 
                                                 <SlidersHorizontal size={16} className="" />
@@ -389,7 +400,10 @@ export function ResultHome() {
                 )}
 
             </div>
+            </div>
+            </div>
         </div>
+        </ResultFiltersSlotContext.Provider>
 
     );
 }

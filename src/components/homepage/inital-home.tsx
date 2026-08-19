@@ -582,12 +582,12 @@ export function InitialHome() {
                     <Link to={'/informacoes'} className="inline-flex z-[2] items-center rounded-lg  bg-neutral-100 dark:bg-neutral-700  gap-2 mb-3 px-3 py-1 text-sm font-medium"><Info size={12} /><div className="h-full w-[1px] bg-neutral-200 dark:bg-neutral-800"></div>Saiba como utilizar a plataforma<ArrowRight size={12} /></Link>
 
                     <h1 className="z-[2] text-center max-w-[980px] text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]  md:block mb-4 ">
-                        Experimente{" "}
+                        Descubra talentos científicos e{" "}
                         <strong className="bg-eng-blue  rounded-md px-3 pb-2 text-white font-medium">
                             {" "}
-                            pesquisar um tema
+                            competências
                         </strong>{" "}
-                        e veja o que a plataforma pode filtrar para você.
+                        na Bahia.
                     </h1>
                     <p className="max-w-[750px] text-center text-lg font-light text-foreground"></p>
 

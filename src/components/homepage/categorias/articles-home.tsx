@@ -1,4 +1,5 @@
 import { useContext, useMemo, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from 'react-router-dom'
 import { useModalResult } from "../../hooks/use-modal-result";
 import { UserContext } from "../../../context/context";
@@ -14,9 +15,10 @@ import { Button } from "../../ui/button";
 import { TableReseracherArticleshome } from "./articles-home/table-articles";
 import { Alert } from "../../ui/alert";
 import { CardContent, CardHeader, CardTitle } from "../../ui/card";
-import { FilterArticle } from "./articles-home/filters-articles";
 import { GraficoCitationsArticleHome } from "./articles-home/grafico-citacoes";
 import { File } from "lucide-react";
+import { ResultFiltersSlotContext } from "../result-filters-slot-context";
+import { useArticleFilters } from "./articles-home/use-article-filters";
 
 export type Publicacao = {
     abstract: string,
@@ -199,6 +201,7 @@ function ArticlesListAccordion({ loading, publicacoes, typeVisu, setTypeVisu, di
 }
 export function ArticlesHome() {
     const { urlGeral, searchType, valoresSelecionadosExport } = useContext(UserContext);
+    const filtersSlot = useContext(ResultFiltersSlotContext);
     const queryUrl = useQuery();
     const institutionId = queryUrl.get('institution_id');
 
@@ -220,15 +223,17 @@ export function ArticlesHome() {
         return chartData.reduce((acc, item) => acc + item.among, 0);
     }, [chartData]);
 
-    const percentage = useMemo(() => {
-        const totalDoi = chartData.reduce((acc, item) => acc + item.count_doi, 0);
-        return publicacoesLength > 0 ? (totalDoi / publicacoesLength) * 100 : 0;
-    }, [chartData, publicacoesLength]);
-
     const handleResearcherUpdate = (newResearcherData: Filter[]) => {
         setFilters(newResearcherData);
         setPage(1);
     };
+
+    const { sidebar, component } = useArticleFilters({ filteredCount: publicacoesLength, filters, onFilterUpdate: handleResearcherUpdate });
+
+    const percentage = useMemo(() => {
+        const totalDoi = chartData.reduce((acc, item) => acc + item.count_doi, 0);
+        return publicacoesLength > 0 ? (totalDoi / publicacoesLength) * 100 : 0;
+    }, [chartData, publicacoesLength]);
 
     const urlTermPublicacoes = useMemo(() => {
         const yearString = filters.length > 0 ? filters[0].year.join(';') : [2020];
@@ -327,32 +332,36 @@ export function ArticlesHome() {
     }, [urlTermCharts]);
 
     return (
-        <div className="grid grid-cols-1 gap-4 pb-16">
-            <div className="mt-6">
-                <FilterArticle onFilterUpdate={handleResearcherUpdate} />
+        <div className="w-full h-full">
+            <div className="w-full flex gap-4 justify-center items-start">
+                {filtersSlot && createPortal(sidebar, filtersSlot)}
+                <div className="flex-1 gap-4 flex flex-col">
+                    <div className="grid grid-cols-1 gap-4 pb-16">
+                        <ArticlesSummaryCard
+                            publicacoesLength={publicacoesLength}
+                            percentage={percentage}
+                            distinct={distinct}
+                            setDistinct={setDistinct}
+                        />
+
+                        <ArticlesChartsAccordion
+                            loading={loading}
+                            publicacoes={publicacoes}
+                        />
+
+                        <ArticlesListAccordion
+                            loading={loading}
+                            publicacoes={publicacoes}
+                            typeVisu={typeVisu}
+                            setTypeVisu={setTypeVisu}
+                            distinct={distinct}
+                            onLoadMore={() => setPage(prev => prev + 1)}
+                            hasMore={hasMore}
+                        />
+                    </div>
+                </div>
+                {component}
             </div>
-
-            <ArticlesSummaryCard
-                publicacoesLength={publicacoesLength}
-                percentage={percentage}
-                distinct={distinct}
-                setDistinct={setDistinct}
-            />
-
-            <ArticlesChartsAccordion
-                loading={loading}
-                publicacoes={publicacoes}
-            />
-
-            <ArticlesListAccordion
-                loading={loading}
-                publicacoes={publicacoes}
-                typeVisu={typeVisu}
-                setTypeVisu={setTypeVisu}
-                distinct={distinct}
-                onLoadMore={() => setPage(prev => prev + 1)}
-                hasMore={hasMore}
-            />
         </div>
     )
 }

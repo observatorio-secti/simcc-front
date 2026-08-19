@@ -10,13 +10,20 @@ import { useLocation, useParams } from "react-router-dom";
 
 export function Home() {
     const { onOpen } = useModalHomepage();
-    const { navCollapsedSize, defaultLayout, isCollapsed, idGraduateProgram, setValoresSelecionadosExport } = useContext(UserContext)
+    const { navCollapsedSize, defaultLayout, isCollapsed, setIsCollapsed, idGraduateProgram, setValoresSelecionadosExport } = useContext(UserContext)
     const location = useLocation();
     const { searchId } = useParams<{ searchId: string; institution_id?: string }>();
 
     useEffect(() => {
         if (searchId) setValoresSelecionadosExport(searchId);
     }, [searchId]);
+
+    useEffect(() => {
+        // Ao cair na página de resultados, carrega com a barra lateral principal colapsada
+        if (location.pathname == '/resultados') {
+            setIsCollapsed(false);
+        }
+    }, [location.pathname]);
 
     useEffect(() => {
         if (location.pathname == '/') {
