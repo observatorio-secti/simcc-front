@@ -4,10 +4,10 @@ import { UserContext } from '../../../../context/context';
 import { useModal } from '../../../hooks/use-modal-store';
 
 interface Props {
-  id: string;
-  frequency: string;
+  id: string | number;
+  frequency?: string | number;
   name: string;
-  among: string;
+  among: string | number;
   fontSize: number;
 }
 
@@ -18,7 +18,7 @@ export function CloudWordItemResearcher(props: Props) {
   return (
     <li
       key={props.id}
-      className="list-none list-item w-min group"
+      className="list-none list-item w-min group cursor-pointer"
       onClick={() => onOpen('researcher-modal', { name: props.name })}
     >
       <div>
