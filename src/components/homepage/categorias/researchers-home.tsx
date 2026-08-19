@@ -445,34 +445,34 @@ function useResearcherFilters({
 
   const filteredTotal = Array.isArray(uniqueGraduatePrograms)
     ? uniqueGraduatePrograms.filter((item) => {
-        // Normaliza a string do item e da busca para comparação
-        const normalizeString = (str: any) =>
-          str
-            .normalize('NFD') // Decompõe os caracteres acentuados
-            .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
-            .toLowerCase(); // Converte para minúsculas
+      // Normaliza a string do item e da busca para comparação
+      const normalizeString = (str: any) =>
+        str
+          .normalize('NFD') // Decompõe os caracteres acentuados
+          .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
+          .toLowerCase(); // Converte para minúsculas
 
-        const searchString = normalizeString(item);
-        const normalizedSearch = normalizeString(search);
+      const searchString = normalizeString(item);
+      const normalizedSearch = normalizeString(search);
 
-        return searchString.includes(normalizedSearch);
-      })
+      return searchString.includes(normalizedSearch);
+    })
     : [];
 
   const filteredTotal2 = Array.isArray(uniqueCities)
     ? uniqueCities.filter((item) => {
-        // Normaliza a string do item e da busca para comparação
-        const normalizeString = (str: any) =>
-          str
-            .normalize('NFD') // Decompõe os caracteres acentuados
-            .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
-            .toLowerCase(); // Converte para minúsculas
+      // Normaliza a string do item e da busca para comparação
+      const normalizeString = (str: any) =>
+        str
+          .normalize('NFD') // Decompõe os caracteres acentuados
+          .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
+          .toLowerCase(); // Converte para minúsculas
 
-        const searchString = normalizeString(item);
-        const normalizedSearch = normalizeString(search2);
+      const searchString = normalizeString(item);
+      const normalizedSearch = normalizeString(search2);
 
-        return searchString.includes(normalizedSearch);
-      })
+      return searchString.includes(normalizedSearch);
+    })
     : [];
 
   const filters = {
@@ -639,8 +639,7 @@ function FilterSections({ filters }: { filters: FiltersData }) {
                   className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left gap-2 flex"
                 >
                   <Alert
-                    className={` w-4 rounded-md border-0 h-4 p-0 ${
-                      area.includes('CIENCIAS AGRARIAS')
+                    className={` w-4 rounded-md border-0 h-4 p-0 ${area.includes('CIENCIAS AGRARIAS')
                         ? 'bg-red-400'
                         : area.includes('CIENCIAS EXATAS E DA TERRA')
                           ? 'bg-green-400'
@@ -655,13 +654,13 @@ function FilterSections({ filters }: { filters: FiltersData }) {
                                   : area.includes('CIENCIAS SOCIAIS APLICADAS')
                                     ? 'bg-[#009245]'
                                     : area.includes(
-                                          'LINGUISTICA LETRAS E ARTES',
-                                        )
+                                      'LINGUISTICA LETRAS E ARTES',
+                                    )
                                       ? 'bg-[#A67C52]'
                                       : area.includes('OUTROS')
                                         ? 'bg-[#1B1464]'
                                         : 'bg-[#000]'
-                    }`}
+                      }`}
                   />{' '}
                   {area}
                 </ToggleGroupItem>
@@ -1321,8 +1320,7 @@ export function ResearchersHome() {
               <p className="text-sm font-medium">Filtros aplicados:</p>
               {selectedAreas.map((item) => (
                 <Badge
-                  className={` gap-2 items-center flex font-normal  rounded-md  dark:text-white py-2 px-3 ${
-                    item.includes('CIENCIAS AGRARIAS')
+                  className={` gap-2 items-center flex font-normal  rounded-md  dark:text-white py-2 px-3 ${item.includes('CIENCIAS AGRARIAS')
                       ? 'bg-red-400'
                       : item.includes('CIENCIAS EXATAS E DA TERRA')
                         ? 'bg-green-400'
@@ -1341,7 +1339,7 @@ export function ResearchersHome() {
                                     : item.includes('OUTROS')
                                       ? 'bg-[#1B1464]'
                                       : 'bg-[#000]'
-                  }`}
+                    }`}
                 >
                   {item}
                   <div

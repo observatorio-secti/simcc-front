@@ -13,7 +13,6 @@ interface Props {
 
 export function CloudWordItemResearcher(props: Props) {
   const { searchType } = useContext(UserContext);
-
   const { onOpen } = useModal();
 
   return (
@@ -24,10 +23,9 @@ export function CloudWordItemResearcher(props: Props) {
     >
       <div>
         <Alert
-          className={`flex gap-2 font-semibold   text-white items-center
+          className={`flex gap-2 font-semibold text-white items-center whitespace-nowrap
            ${(searchType === 'article' && 'bg-blue-500 dark:bg-blue-500 ') ||
-            (searchType === 'abstract' &&
-              'bg-yellow-500 dark:bg-yellow-500 ') ||
+            (searchType === 'abstract' && 'bg-yellow-500 dark:bg-yellow-500 ') ||
             (searchType === 'speaker' && 'bg-orange-500 dark:bg-orange-500') ||
             (searchType === 'book' && 'bg-pink-500 dark:bg-pink-500 ') ||
             (searchType === 'patent' && 'bg-cyan-500 dark:bg-cyan-500 ') ||
