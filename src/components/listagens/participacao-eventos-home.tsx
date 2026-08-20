@@ -1,20 +1,25 @@
-import { useContext, useEffect, useState } from "react"
-import { UserContext } from "../../context/context"
-import { Skeleton } from "../ui/skeleton"
-import { HeaderResult } from "../homepage/header-results"
-import { Alert } from "../ui/alert"
-import { CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Briefcase, Code } from "lucide-react"
-import { FilterYearPopUp } from "../popup/filters-year-popup"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion"
-import { HeaderResultTypeHome } from "../homepage/categorias/header-result-type-home"
-import { ChartBar, Rows, SquaresFour, StripeLogo } from "phosphor-react"
-import { Switch } from "../ui/switch"
-import { Button } from "../ui/button"
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
-import { BlockItemGeral } from "../homepage/categorias/book-home/block-item-geral"
-import { TableReseracherMarcasPopup } from "../popup/columns/producoes-tecnicas/table-marcas-popup"
-import { GraficoTrabalhoEvento } from "../popup/graficos/grafico-trabalho-evento"
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../../context/context';
+import { Skeleton } from '../ui/skeleton';
+import { HeaderResult } from '../homepage/header-results';
+import { Alert } from '../ui/alert';
+import { CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Briefcase } from 'lucide-react';
+import { FilterYearPopUp } from '../popup/filters-year-popup';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../ui/accordion';
+import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-home';
+import { ChartBar, Rows, SquaresFour } from 'phosphor-react';
+import { Switch } from '../ui/switch';
+import { Button } from '../ui/button';
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+import { BlockItemGeral } from '../homepage/categorias/book-home/block-item-geral';
+import { TableReseracherMarcasPopup } from '../popup/columns/producoes-tecnicas/table-marcas-popup';
+import { GraficoTrabalhoEvento } from '../popup/graficos/grafico-trabalho-evento';
 
 type Patente = {
   authors: string;
@@ -27,17 +32,17 @@ type Patente = {
   title: string;
   title_en: string;
   year_: string;
-}
+};
 
 type Filter = {
-  year: number[]
-  qualis: string[]
-}
+  year: number[];
+  qualis: string[];
+};
 
 export function ParticipacaoEventosHome() {
   const [publicacoes, setPublicacoes] = useState<Patente[]>([]);
-  const [typeVisu, setTypeVisu] = useState('block')
-  const [loading, isLoading] = useState(false)
+  const [typeVisu, setTypeVisu] = useState('block');
+  const [loading, isLoading] = useState(false);
 
   const [filters, setFilters] = useState<Filter[]>([]);
 
@@ -46,14 +51,14 @@ export function ParticipacaoEventosHome() {
 
   const handleResearcherUpdate = (newResearcherData: Filter[]) => {
     setFilters(newResearcherData);
-  }
+  };
 
   const yearString = filters.length > 0 ? filters[0].year.join(';') : '';
 
-  const { urlGeral, valoresSelecionadosExport } = useContext(UserContext)
-  const [distinct, setDistinct] = useState(false)
+  const { urlGeral, valoresSelecionadosExport } = useContext(UserContext);
+  const [distinct, setDistinct] = useState(false);
 
-  let urlTermPublicacoes = `${urlGeral}researcher_production/events?researcher_id=&year=${yearString}&distinct=${distinct ? '1' : '0'}&page=${page}&length=12`;
+  const urlTermPublicacoes = `${urlGeral}researcher_production/events?researcher_id=&year=${yearString}&distinct=${distinct ? '1' : '0'}&page=${page}&length=12`;
 
   useEffect(() => {
     setPage(1);
@@ -66,13 +71,13 @@ export function ParticipacaoEventosHome() {
       try {
         if (page === 1) isLoading(true);
         const response = await fetch(urlTermPublicacoes, {
-          mode: "cors",
+          mode: 'cors',
           headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-            "Content-Type": "text/plain",
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600',
+            'Content-Type': 'text/plain',
           },
         });
         const data = await response.json();
@@ -81,7 +86,7 @@ export function ParticipacaoEventosHome() {
           if (page === 1) {
             setPublicacoes(data);
           } else {
-            setPublicacoes(prev => [...prev, ...data]);
+            setPublicacoes((prev) => [...prev, ...data]);
           }
 
           if (data.length < 12) {
@@ -110,7 +115,7 @@ export function ParticipacaoEventosHome() {
     <div className="grid grid-cols-1 gap-4 pb-16 ">
       <HeaderResult />
       <div className="mt-4 ">
-        <Alert className={`p-0 bg-cover bg-no-repeat bg-center `}  >
+        <Alert className={`p-0 bg-cover bg-no-repeat bg-center `}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total de trabalhos em eventos
@@ -127,17 +132,17 @@ export function ParticipacaoEventosHome() {
       </div>
 
       <div className="mt-6">
-        <FilterYearPopUp
-          onFilterUpdate={handleResearcherUpdate} />
+        <FilterYearPopUp onFilterUpdate={handleResearcherUpdate} />
       </div>
 
       <Accordion type="single" collapsible defaultValue="item-1">
-        <AccordionItem value="item-1" >
+        <AccordionItem value="item-1">
           <div className="flex ">
-            <HeaderResultTypeHome title="Gráfico de quantidade total de trabalhos em eventos" icon={<ChartBar size={24} className="text-gray-400" />}>
-            </HeaderResultTypeHome>
-            <AccordionTrigger>
-            </AccordionTrigger>
+            <HeaderResultTypeHome
+              title="Gráfico de quantidade total de trabalhos em eventos"
+              icon={<ChartBar size={24} className="text-gray-400" />}
+            ></HeaderResultTypeHome>
+            <AccordionTrigger></AccordionTrigger>
           </div>
           <AccordionContent className="p-0">
             {loading && page === 1 ? (
@@ -149,8 +154,8 @@ export function ParticipacaoEventosHome() {
         </AccordionItem>
       </Accordion>
 
-      <Accordion defaultValue="item-1" type="single" collapsible >
-        <AccordionItem value="item-1" >
+      <Accordion defaultValue="item-1" type="single" collapsible>
+        <AccordionItem value="item-1">
           <div className="flex ">
             <div className="flex gap-4 w-full justify-between items-center ">
               <div className="flex gap-4 items-center">
@@ -169,19 +174,26 @@ export function ParticipacaoEventosHome() {
                   Distintas
                 </div>
 
-                <Button onClick={() => setTypeVisu('rows')} variant={typeVisu == 'block' ? 'ghost' : 'outline'} size={'icon'}>
+                <Button
+                  onClick={() => setTypeVisu('rows')}
+                  variant={typeVisu == 'block' ? 'ghost' : 'outline'}
+                  size={'icon'}
+                >
                   <Rows size={16} className=" whitespace-nowrap" />
                 </Button>
 
-                <Button onClick={() => setTypeVisu('block')} variant={typeVisu == 'block' ? 'outline' : 'ghost'} size={'icon'}>
+                <Button
+                  onClick={() => setTypeVisu('block')}
+                  variant={typeVisu == 'block' ? 'outline' : 'ghost'}
+                  size={'icon'}
+                >
                   <SquaresFour size={16} className=" whitespace-nowrap" />
                 </Button>
               </div>
             </div>
-            <AccordionTrigger>
-            </AccordionTrigger>
+            <AccordionTrigger></AccordionTrigger>
           </div>
-          <AccordionContent >
+          <AccordionContent>
             {typeVisu == 'block' ? (
               loading && page === 1 ? (
                 <ResponsiveMasonry
@@ -189,40 +201,38 @@ export function ParticipacaoEventosHome() {
                     350: 1,
                     750: 2,
                     900: 3,
-                    1200: 4
+                    1200: 4,
                   }}
                 >
                   <Masonry gutter="16px">
                     {items.map((item, index) => (
-                      <div className="w-full" key={index}>{item}</div>
+                      <div className="w-full" key={index}>
+                        {item}
+                      </div>
                     ))}
                   </Masonry>
                 </ResponsiveMasonry>
+              ) : publicacoes.length == 0 ? (
+                <div className="items-center justify-center w-full flex text-center pt-6">
+                  Sem resultados para essa pesquisa
+                </div>
               ) : (
-                publicacoes.length == 0 ? (
-                  <div className="items-center justify-center w-full flex text-center pt-6">Sem resultados para essa pesquisa</div>
-                ) : (
-                  <BlockItemGeral
-                    articles={publicacoes}
-                    distinct={distinct}
-                    type={'work-event'}
-                    hasMore={hasMore}
-                    onLoadMore={() => setPage(prev => prev + 1)}
-                  />
-                )
-              )
-            ) : (
-              loading && page === 1 ? (
-                <Skeleton className="w-full rounded-md h-[400px]" />
-              ) : (
-                <TableReseracherMarcasPopup
-                  livros={publicacoes}
+                <BlockItemGeral
+                  articles={publicacoes}
+                  distinct={distinct}
+                  type={'work-event'}
+                  hasMore={hasMore}
+                  onLoadMore={() => setPage((prev) => prev + 1)}
                 />
               )
+            ) : loading && page === 1 ? (
+              <Skeleton className="w-full rounded-md h-[400px]" />
+            ) : (
+              <TableReseracherMarcasPopup livros={publicacoes} />
             )}
           </AccordionContent>
         </AccordionItem>
       </Accordion>
     </div>
-  )
+  );
 }

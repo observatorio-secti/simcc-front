@@ -478,7 +478,7 @@ type FiltersData = {
 };
 
 function FilterSections({ filters }: { filters: FiltersData }) {
-    const { version } = useContext(UserContext);
+    const version = false;
 
     return (
         <Accordion type="single" collapsible className="w-full">
@@ -796,7 +796,8 @@ export function ResearchersHome() {
     const [typeVisu, setTypeVisu] = useState('block');
     const [visibleResearchersCount, setVisibleResearchersCount] = useState(36);
     const { itemsSelecionados, urlGeral, searchType, simcc } = useContext(UserContext);
-    const { version, pesquisadoresSelecionados, idGraduateProgram } = useContext(UserContext);
+    const { pesquisadoresSelecionados, idGraduateProgram } = useContext(UserContext);
+    const version = false;
     const filtersSlot = useContext(ResultFiltersSlotContext);
 
     useEffect(() => {

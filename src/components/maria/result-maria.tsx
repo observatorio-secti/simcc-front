@@ -1,7 +1,3 @@
 export function ResultMaria() {
-    return(
-        <div>
-
-        </div>
-    )
+  return <div></div>;
 }

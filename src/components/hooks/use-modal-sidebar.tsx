@@ -1,8 +1,6 @@
+import { create } from 'zustand';
 
-import { create } from "zustand";
-
-export type ModalType = "filter" | "info"
-
+export type ModalType = 'filter' | 'info';
 
 interface ModalStore {
   type: ModalType | null;
@@ -11,10 +9,10 @@ interface ModalStore {
   onClose: () => void;
 }
 
-export const useModalSidebar = create<ModalStore>((set:any) => ({
+export const useModalSidebar = create<ModalStore>((set: any) => ({
   type: null,
   data: {},
   isOpen: false,
-  onOpen: (type: any) => set({ isOpen: true, type}),
-  onClose: () => set({ type: null, isOpen: false })
+  onOpen: (type: any) => set({ isOpen: true, type }),
+  onClose: () => set({ type: null, isOpen: false }),
 }));

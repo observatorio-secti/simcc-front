@@ -201,7 +201,7 @@ export function ResultHome() {
         }
     };
 
-    const { version } = useContext(UserContext)
+    const version = false
     const rootRef = useRef<HTMLDivElement>(null);
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
 

@@ -1,7 +1,22 @@
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, LabelList, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../../components/ui/chart";
-import { Alert } from "../../../ui/alert";
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../../../components/ui/chart';
+import { Alert } from '../../../ui/alert';
 
 type Patente = {
   id: string;
@@ -14,13 +29,15 @@ type Patente = {
 
 const chartConfig = {
   publicacoes: {
-    label: "Patentes",
-    color: "#66B4D0",
+    label: 'Patentes',
+    color: '#66B4D0',
   },
 } satisfies ChartConfig;
 
 export function GraficoPatente({ publicacoes }: { publicacoes: Patente[] }) {
-  const [chartData, setChartData] = useState<{ year: string; publicacoes: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { year: string; publicacoes: number }[]
+  >([]);
 
   useEffect(() => {
     const counts: { [year: string]: number } = {};
@@ -30,7 +47,10 @@ export function GraficoPatente({ publicacoes }: { publicacoes: Patente[] }) {
       counts[year] = (counts[year] || 0) + 1;
     });
 
-    const data = Object.entries(counts).map(([year, count]) => ({ year, publicacoes: count }));
+    const data = Object.entries(counts).map(([year, count]) => ({
+      year,
+      publicacoes: count,
+    }));
     setChartData(data);
   }, [publicacoes]);
 
@@ -38,20 +58,36 @@ export function GraficoPatente({ publicacoes }: { publicacoes: Patente[] }) {
     <Alert className="pt-12">
       <ChartContainer config={chartConfig} className="h-[250px] w-full">
         <ResponsiveContainer>
-          <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-            <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+          >
+            <XAxis
+              dataKey="year"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
             <CartesianGrid vertical={false} horizontal={false} />
             <ChartLegend content={<ChartLegendContent />} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="dashed" />}
+            />
             <Bar
               dataKey="publicacoes"
               fill={chartConfig.publicacoes.color}
               stackId="a"
               radius={4}
             >
-              <LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
               {chartData.map((entry, index) =>
-                entry.publicacoes > 0 ? <Cell key={`cell-${index}`} /> : null
+                entry.publicacoes > 0 ? <Cell key={`cell-${index}`} /> : null,
               )}
             </Bar>
           </BarChart>

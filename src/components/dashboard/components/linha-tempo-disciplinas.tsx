@@ -1,6 +1,6 @@
-import { Check, X } from "lucide-react";
-import { ScrollArea, ScrollBar } from "../../ui/scroll-area";
-import { useModal } from "../../hooks/use-modal-store";
+import { Check, X } from 'lucide-react';
+import { ScrollArea, ScrollBar } from '../../ui/scroll-area';
+import { useModal } from '../../hooks/use-modal-store';
 
 interface YearSemester {
   year: string;
@@ -25,16 +25,19 @@ export function LinhaTempoDisciplinas({ items, depId }: Props) {
       <div className="flex items-center">
         {items.map((item, index) => (
           <div>
-            <div key={index} className="flex w-20 flex-col items-center gap-3 z-[1]">
+            <div
+              key={index}
+              className="flex w-20 flex-col items-center gap-3 z-[1]"
+            >
               <div className="flex items-center w-full">
                 <div className="border-b w-full  flex flex-1  "></div>
 
                 <div
-                  onClick={() => onOpen("import-disciplina", { dep_id: depId })}
+                  onClick={() => onOpen('import-disciplina', { dep_id: depId })}
                   className={`w-8 h-8 cursor-pointer rounded-full border ${
                     item.selected
-                      ? "bg-eng-dark-blue dark:bg-eng-dark-blue text-white"
-                      : "bg-neutral-50 dark:bg-neutral-900"
+                      ? 'bg-eng-dark-blue dark:bg-eng-dark-blue text-white'
+                      : 'bg-neutral-50 dark:bg-neutral-900'
                   } whitespace-nowrap flex items-center justify-center text-xl font-bold`}
                 >
                   {item.selected ? <Check size={12} /> : <X size={12} />}

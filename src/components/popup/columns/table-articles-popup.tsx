@@ -1,6 +1,5 @@
-
-import { columns } from "./columns-articles";
-import { DataTable } from "./popup-data-table";
+import { columns } from './columns-articles';
+import { DataTable } from './popup-data-table';
 
 type Articles = {
   articles: any[];

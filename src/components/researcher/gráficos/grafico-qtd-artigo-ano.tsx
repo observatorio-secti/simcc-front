@@ -1,6 +1,21 @@
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid, Tooltip, ResponsiveContainer, Label } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../ui/chart";
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../ui/chart';
 
 type Dados = {
   count_article?: number;
@@ -37,16 +52,16 @@ type ChartDataItem = {
 };
 
 const chartConfig: ChartConfig = {
-  A1: { label: "Qualis A1", color: "#006837" },
-  A2: { label: "Qualis A2", color: "#8FC53E" },
-  A3: { label: "Qualis A3", color: "#ACC483" },
-  A4: { label: "Qualis A4", color: "#BDC4B1" },
-  B1: { label: "Qualis B1", color: "#F15A24" },
-  B2: { label: "Qualis B2", color: "#F5831F" },
-  B3: { label: "Qualis B3", color: "#F4AD78" },
-  B4: { label: "Qualis B4", color: "#F4A992" },
-  C: { label: "Qualis C", color: "#EC1C22" },
-  SQ: { label: "Sem qualis", color: "#560B11" },
+  A1: { label: 'Qualis A1', color: '#006837' },
+  A2: { label: 'Qualis A2', color: '#8FC53E' },
+  A3: { label: 'Qualis A3', color: '#ACC483' },
+  A4: { label: 'Qualis A4', color: '#BDC4B1' },
+  B1: { label: 'Qualis B1', color: '#F15A24' },
+  B2: { label: 'Qualis B2', color: '#F5831F' },
+  B3: { label: 'Qualis B3', color: '#F4AD78' },
+  B4: { label: 'Qualis B4', color: '#F4A992' },
+  C: { label: 'Qualis C', color: '#EC1C22' },
+  SQ: { label: 'Sem qualis', color: '#560B11' },
 };
 
 export function GraficoQtdArtigoAno(props: { articles: Dados[] }) {
@@ -57,7 +72,7 @@ export function GraficoQtdArtigoAno(props: { articles: Dados[] }) {
       const counts: { [year: string]: { [qualis: string]: number } } = {};
 
       props.articles.forEach((publicacao) => {
-        const year = publicacao.year?.toString() || "Unknown";
+        const year = publicacao.year?.toString() || 'Unknown';
         const {
           A1 = 0,
           A2 = 0,
@@ -99,27 +114,48 @@ export function GraficoQtdArtigoAno(props: { articles: Dados[] }) {
   return (
     <ChartContainer config={chartConfig} className="h-[260px] w-full">
       <ResponsiveContainer>
-        <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-          <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+        >
+          <XAxis
+            dataKey="year"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+          />
           <YAxis tickLine={false} tickMargin={10} axisLine={false} />
           <CartesianGrid vertical={false} horizontal={false} />
-          <ChartLegend className="flex flex-wrap" content={<ChartLegendContent />} />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+          <ChartLegend
+            className="flex flex-wrap"
+            content={<ChartLegendContent />}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
           {availableQualis.map((key) => {
-            const hasData = chartData.some((d) => typeof d[key] === "number" && d[key] > 0);
+            const hasData = chartData.some(
+              (d) => typeof d[key] === 'number' && d[key] > 0,
+            );
 
             if (!hasData) return null;
 
             return (
-              <Bar key={key} dataKey={key} fill={chartConfig[key].color} stackId="a" radius={[2, 2, 2, 2]} >
-
+              <Bar
+                key={key}
+                dataKey={key}
+                fill={chartConfig[key].color}
+                stackId="a"
+                radius={[2, 2, 2, 2]}
+              >
                 {/* Colocando o total acima de todas as barras empilhadas */}
                 <LabelList
                   dataKey="total"
                   position="top" // Posicionando o total no topo de todas as barras empilhadas
                   className="fill-foreground"
                   fontSize={12}
-                  formatter={(value) => (value ? value.toFixed(0) : "")}
+                  formatter={(value) => (value ? value.toFixed(0) : '')}
                 />
               </Bar>
             );

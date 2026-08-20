@@ -1,5 +1,5 @@
-import { columns } from "./columns-books";
-import { DataTable } from "./popup-data-table";
+import { columns } from './columns-books';
+import { DataTable } from './popup-data-table';
 
 type Livros = {
   books: any[];

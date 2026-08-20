@@ -1,26 +1,58 @@
-import { ChevronDown, ChevronUp, Download, MapIcon, Plus, SlidersHorizontal, Trash, User, X } from "lucide-react";
-import { ChartBar, MagnifyingGlass, Rows, SquaresFour, UserList } from "phosphor-react";
-import { Button } from "../ui/button";
-import { useLocation, useNavigate } from "react-router-dom";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
-import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../context/context";
-import { Skeleton } from "../ui/skeleton";
-import { Alert } from "../ui/alert";
-import { Input } from "../ui/input";
-import { CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
-import { HeaderResultTypeHome } from "../homepage/categorias/header-result-type-home";
-import { Badge } from "../ui/badge";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { ScrollArea } from "../ui/scroll-area";
-import { ResearchItem } from "../homepage/categorias/researchers-home/researcher-item";
-import { columns } from "../homepage/categorias/researchers-home/columns";
-import { DataTable } from "../homepage/categorias/researchers-home/data-table";
-import { GraficoBolsistasPQ, CategoryMetric } from "../dashboard/graficos/grafico-bolsista-produtividade";
-import { GraficoBolsistasDT } from "../dashboard/graficos/grafico-bolsista-tecnologico";
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  MapIcon,
+  Plus,
+  SlidersHorizontal,
+  Trash,
+  User,
+  X,
+} from 'lucide-react';
+import {
+  ChartBar,
+  MagnifyingGlass,
+  Rows,
+  SquaresFour,
+  UserList,
+} from 'phosphor-react';
+import { Button } from '../ui/button';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../../context/context';
+import { useInstitutionBolsistas } from './hooks/use-institution-queries';
+import { Skeleton } from '../ui/skeleton';
+import { Alert } from '../ui/alert';
+import { Input } from '../ui/input';
+import { CardContent, CardHeader, CardTitle } from '../ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../ui/accordion';
+import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-home';
+import { Badge } from '../ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import { ScrollArea } from '../ui/scroll-area';
+import { ResearchItem } from '../homepage/categorias/researchers-home/researcher-item';
+import { columns } from '../homepage/categorias/researchers-home/columns';
+import { DataTable } from '../homepage/categorias/researchers-home/data-table';
+import {
+  GraficoBolsistasPQ,
+  CategoryMetric,
+} from '../dashboard/graficos/grafico-bolsista-produtividade';
+import { GraficoBolsistasDT } from '../dashboard/graficos/grafico-bolsista-tecnologico';
 import municipios from '../homepage/categorias/researchers-home/municipios.json';
-import MapaResearcher from "../homepage/categorias/researchers-home/mapa-researcher";
+import MapaResearcher from '../homepage/categorias/researchers-home/mapa-researcher';
 
 type CityData = {
   nome: string;
@@ -97,16 +129,19 @@ interface BolsistasInstitutionProps {
   institutionName?: string;
 }
 
-export function BolsistasInstitution({ institutionId, institutionName }: BolsistasInstitutionProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [total, setTotal] = useState<Research[]>([]);
-  const { urlGeral } = useContext(UserContext);
+export function BolsistasInstitution({
+  institutionId,
+  institutionName,
+}: BolsistasInstitutionProps) {
+  const { data: rawBolsistas = [], isLoading } = useInstitutionBolsistas();
+  const total = rawBolsistas as Research[];
+
   const [count, setCount] = useState(24);
   const [search, setSearch] = useState('');
   const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
   const [typeVisu, setTypeVisu] = useState('block');
   const [isOn, setIsOn] = useState(true);
-  const [jsonData, setJsonData] = useState<any[]>([]);
+  const jsonData = total;
   const [open, setOpen] = useState(false);
   const [search2, setSearch2] = useState('');
   const [cityData, setCityData] = useState<CityData[]>([]);
@@ -114,83 +149,72 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
   const location = useLocation();
   const navigate = useNavigate();
 
-  const urlBolsistas = `${urlGeral}researcher/foment`;
-
-  useEffect(() => {
-    setIsLoading(true);
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlBolsistas, {
-          mode: "cors",
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-            "Content-Type": "text/plain",
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setTotal(data);
-          setIsLoading(false);
-          setJsonData(data);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [urlBolsistas]);
-
   // Filtrar bolsistas por instituição
-  const filteredByInstitution = Array.isArray(total) ? total.filter(item => {
-    const normalizeString = (str: string) => str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .trim();
+  const filteredByInstitution = Array.isArray(total)
+    ? total.filter((item) => {
+        const normalizeString = (str: string) =>
+          str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
 
-    const itemUniversity = normalizeString(item.university);
-    const targetInstitution = normalizeString(institutionName || '');
-    const targetId = normalizeString(institutionId);
+        const itemUniversity = normalizeString(item.university);
+        const targetInstitution = normalizeString(institutionName || '');
+        const targetId = normalizeString(institutionId);
 
-    return itemUniversity.includes(targetInstitution) ||
-      itemUniversity.includes(targetId) ||
-      targetInstitution.includes(itemUniversity);
-  }) : [];
+        return (
+          itemUniversity.includes(targetInstitution) ||
+          itemUniversity.includes(targetId) ||
+          targetInstitution.includes(itemUniversity)
+        );
+      })
+    : [];
 
   // Extrair modalidades únicas dos bolsistas filtrados
   const modalities = Array.isArray(filteredByInstitution)
-    ? [...new Set(
-      filteredByInstitution.flatMap(item =>
-        Array.isArray(item.subsidy) ? item.subsidy.map(s => s.modality_name) : []
-      )
-    )].filter(Boolean)
+    ? [
+        ...new Set(
+          filteredByInstitution.flatMap((item) =>
+            Array.isArray(item.subsidy)
+              ? item.subsidy.map((s) => s.modality_name)
+              : [],
+          ),
+        ),
+      ].filter(Boolean)
     : [];
 
-  const filteredTotal = filteredByInstitution.filter(item => {
-    const normalizeString = (str: string) => str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+  const filteredTotal = filteredByInstitution.filter((item) => {
+    const normalizeString = (str: string) =>
+      str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
 
     const searchString = normalizeString(item.name);
     const normalizedSearch = normalizeString(search);
 
-    const hasSelectedModality = selectedModalities.length === 0 || (
-      item.subsidy && item.subsidy.some(sub => selectedModalities.includes(sub.modality_name))
-    );
+    const hasSelectedModality =
+      selectedModalities.length === 0 ||
+      (item.subsidy &&
+        item.subsidy.some((sub) =>
+          selectedModalities.includes(sub.modality_name),
+        ));
 
     return searchString.includes(normalizedSearch) && hasSelectedModality;
   });
 
-  const getMetricsFromResearchers = (researchersList: Research[]): CategoryMetric[] => {
-    const countsMap = new Map<string, { modality_code: string; category_level_code: string; count: number }>();
+  const getMetricsFromResearchers = (
+    researchersList: Research[],
+  ): CategoryMetric[] => {
+    const countsMap = new Map<
+      string,
+      { modality_code: string; category_level_code: string; count: number }
+    >();
 
-    researchersList.forEach(r => {
+    researchersList.forEach((r) => {
       if (Array.isArray(r.subsidy)) {
-        r.subsidy.forEach(sub => {
+        r.subsidy.forEach((sub) => {
           const mod = sub.modality_code;
           const level = sub.category_level_code;
           if (mod && level) {
@@ -202,7 +226,7 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
               countsMap.set(key, {
                 modality_code: mod,
                 category_level_code: level,
-                count: 1
+                count: 1,
               });
             }
           }
@@ -217,7 +241,7 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
 
   const handleModalityChange = (value: string) => {
     setSelectedModalities((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value],
     );
   };
 
@@ -233,8 +257,10 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
     const csv = [
       '\uFEFF' + header.join(';'),
       ...items.map((item) =>
-        header.map((fieldName) => JSON.stringify(item[fieldName], replacer)).join(';')
-      )
+        header
+          .map((fieldName) => JSON.stringify(item[fieldName], replacer))
+          .join(';'),
+      ),
     ].join('\r\n');
 
     return csv;
@@ -243,7 +269,9 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
   const handleDownloadJson = async () => {
     try {
       const csvData = convertJsonToCsv(filteredByInstitution);
-      const blob = new Blob([csvData], { type: 'text/csv;charset=windows-1252;' });
+      const blob = new Blob([csvData], {
+        type: 'text/csv;charset=windows-1252;',
+      });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.download = `bolsistas-produtividade-${institutionName}.csv`;
@@ -254,23 +282,26 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
     }
   };
 
-  const filteredTotal2 = Array.isArray(modalities) ? modalities.filter(item => {
-    const normalizeString = (str: any) => str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
+  const filteredTotal2 = Array.isArray(modalities)
+    ? modalities.filter((item) => {
+        const normalizeString = (str: any) =>
+          str
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
 
-    const searchString = normalizeString(item);
-    const normalizedSearch = normalizeString(search2);
+        const searchString = normalizeString(item);
+        const normalizedSearch = normalizeString(search2);
 
-    return searchString.includes(normalizedSearch);
-  }) : [];
+        return searchString.includes(normalizedSearch);
+      })
+    : [];
 
   // Função para normalizar nomes de cidade
   const normalizeCityName = (cityName: string) => {
     return cityName
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase();
   };
 
@@ -280,7 +311,7 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
       const cityMap = new Map<string, CityData>();
 
       const municipioMap = new Map(
-        municipios.map((m) => [normalizeCityName(m.nome), m])
+        municipios.map((m) => [normalizeCityName(m.nome), m]),
       );
 
       filteredByInstitution.forEach((r) => {
@@ -319,14 +350,24 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
   return (
     <main className="flex flex-1 flex-col">
       <div className="top-[68px] sticky z-[9] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
-        <div className={`w-full px-8 border-b border-b-neutral-200 dark:border-b-neutral-800`}>
+        <div
+          className={`w-full px-8 border-b border-b-neutral-200 dark:border-b-neutral-800`}
+        >
           {isOn && (
             <div className="w-full flex justify-between items-center">
               <div className="w-full pt-4 flex justify-between items-center">
                 <Alert className="h-14 mt-4 mb-2 p-2 flex items-center justify-between w-full">
                   <div className="flex items-center gap-2 w-full flex-1">
-                    <MagnifyingGlass size={16} className="whitespace-nowrap w-10" />
-                    <Input onChange={(e) => setSearch(e.target.value)} value={search} type="text" className="border-0 w-full" />
+                    <MagnifyingGlass
+                      size={16}
+                      className="whitespace-nowrap w-10"
+                    />
+                    <Input
+                      onChange={(e) => setSearch(e.target.value)}
+                      value={search}
+                      type="text"
+                      className="border-0 w-full"
+                    />
                   </div>
                 </Alert>
               </div>
@@ -338,7 +379,11 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
 
             <div className="hidden xl:flex xl:flex-nowrap gap-2">
               <div className="md:flex md:flex-nowrap gap-2">
-                <Button onClick={() => handleDownloadJson()} variant="ghost" className="">
+                <Button
+                  onClick={() => handleDownloadJson()}
+                  variant="ghost"
+                  className=""
+                >
                   <Download size={16} className="" />
                   Baixar resultado
                 </Button>
@@ -351,7 +396,9 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56">
-                    <DropdownMenuLabel>Filtrar por modalidade</DropdownMenuLabel>
+                    <DropdownMenuLabel>
+                      Filtrar por modalidade
+                    </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <ScrollArea className="h-72">
                       {filteredTotal2.map((modality) => (
@@ -369,8 +416,16 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
               </div>
 
               <div></div>
-              <Button variant="ghost" size="icon" onClick={() => setIsOn(!isOn)}>
-                {isOn ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOn(!isOn)}
+              >
+                {isOn ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -378,7 +433,9 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
       </div>
 
       <div className="p-4 md:p-8">
-        <div className={`${selectedModalities.length > 0 ? ('flex') : ('hidden')} flex flex-wrap gap-3 mb-6 items-center`}>
+        <div
+          className={`${selectedModalities.length > 0 ? 'flex' : 'hidden'} flex flex-wrap gap-3 mb-6 items-center`}
+        >
           <p className="text-sm font-medium">Filtros aplicados:</p>
           {selectedModalities.map((item) => (
             <Badge
@@ -395,8 +452,13 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
             </Badge>
           ))}
 
-          <Badge variant={'secondary'} onClick={() => clearFilters()} className="rounded-md cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-900 border-0 py-2 px-3 font-normal flex items-center justify-center gap-2">
-            <Trash size={12} />Limpar filtros
+          <Badge
+            variant={'secondary'}
+            onClick={() => clearFilters()}
+            className="rounded-md cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-900 border-0 py-2 px-3 font-normal flex items-center justify-center gap-2"
+          >
+            <Trash size={12} />
+            Limpar filtros
           </Badge>
         </div>
 
@@ -415,11 +477,18 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
           </CardContent>
         </Alert>
 
-        <Accordion defaultValue="item-1" type="single" collapsible className="mb-6 hidden md:flex">
+        <Accordion
+          defaultValue="item-1"
+          type="single"
+          collapsible
+          className="mb-6 hidden md:flex"
+        >
           <AccordionItem value="item-1" className="w-full">
             <div className="flex mb-2">
-              <HeaderResultTypeHome title="Bolsistas no mapa" icon={<MapIcon size={24} className="text-gray-400" />}>
-              </HeaderResultTypeHome>
+              <HeaderResultTypeHome
+                title="Bolsistas no mapa"
+                icon={<MapIcon size={24} className="text-gray-400" />}
+              ></HeaderResultTypeHome>
               <AccordionTrigger></AccordionTrigger>
             </div>
             <AccordionContent className="p-0">
@@ -432,11 +501,18 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
           </AccordionItem>
         </Accordion>
 
-        <Accordion defaultValue="item-1" type="single" collapsible className="mb-6 hidden md:flex">
+        <Accordion
+          defaultValue="item-1"
+          type="single"
+          collapsible
+          className="mb-6 hidden md:flex"
+        >
           <AccordionItem value="item-1" className="w-full">
             <div className="flex mb-2">
-              <HeaderResultTypeHome title="Gráficos dos bolsistas CNPq" icon={<ChartBar size={24} className="text-gray-400" />}>
-              </HeaderResultTypeHome>
+              <HeaderResultTypeHome
+                title="Gráficos dos bolsistas CNPq"
+                icon={<ChartBar size={24} className="text-gray-400" />}
+              ></HeaderResultTypeHome>
               <AccordionTrigger></AccordionTrigger>
             </div>
             <AccordionContent className="p-0">
@@ -455,12 +531,23 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
         <Accordion defaultValue="item-1" type="single" collapsible>
           <AccordionItem value="item-1">
             <div className="flex mb-2 mt-4">
-              <HeaderResultTypeHome title="Bolsistas de produtividade" icon={<UserList size={24} className="text-gray-400" />}>
+              <HeaderResultTypeHome
+                title="Bolsistas de produtividade"
+                icon={<UserList size={24} className="text-gray-400" />}
+              >
                 <div className="hidden md:flex gap-3 mr-3">
-                  <Button onClick={() => setTypeVisu('rows')} variant={typeVisu === 'block' ? 'ghost' : 'outline'} size={'icon'}>
+                  <Button
+                    onClick={() => setTypeVisu('rows')}
+                    variant={typeVisu === 'block' ? 'ghost' : 'outline'}
+                    size={'icon'}
+                  >
                     <Rows size={16} className="whitespace-nowrap" />
                   </Button>
-                  <Button onClick={() => setTypeVisu('block')} variant={typeVisu === 'block' ? 'outline' : 'ghost'} size={'icon'}>
+                  <Button
+                    onClick={() => setTypeVisu('block')}
+                    variant={typeVisu === 'block' ? 'outline' : 'ghost'}
+                    size={'icon'}
+                  >
                     <SquaresFour size={16} className="whitespace-nowrap" />
                   </Button>
                 </div>
@@ -478,7 +565,7 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
                       900: 4,
                       1200: 6,
                       1500: 6,
-                      1700: 7
+                      1700: 7,
                     }}
                   >
                     <Masonry gutter="16px" className="pb-4 md:pb-8">
@@ -499,12 +586,18 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
                         900: 4,
                         1200: 6,
                         1500: 6,
-                        1700: 7
+                        1700: 7,
                       }}
                     >
-                      <Masonry gutter="16px" className="pb-4 md:pb-8 z-[1] w-full">
+                      <Masonry
+                        gutter="16px"
+                        className="pb-4 md:pb-8 z-[1] w-full"
+                      >
                         {filteredTotal.slice(0, count).map((props, index) => {
-                          const matchingSubsidy = props.subsidy && props.subsidy.length > 0 ? props.subsidy[0] : null;
+                          const matchingSubsidy =
+                            props.subsidy && props.subsidy.length > 0
+                              ? props.subsidy[0]
+                              : null;
 
                           return (
                             <ResearchItem
@@ -542,7 +635,10 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
 
                     {filteredTotal.length > count && (
                       <div className="w-full flex justify-center pb-8">
-                        <Button className="w-fit" onClick={() => setCount(count + 24)}>
+                        <Button
+                          className="w-fit"
+                          onClick={() => setCount(count + 24)}
+                        >
                           <Plus size={16} />
                           Mostrar mais
                         </Button>
@@ -550,12 +646,10 @@ export function BolsistasInstitution({ institutionId, institutionName }: Bolsist
                     )}
                   </div>
                 )
+              ) : isLoading ? (
+                <Skeleton className="w-full rounded-md h-[400px]" />
               ) : (
-                isLoading ? (
-                  <Skeleton className="w-full rounded-md h-[400px]" />
-                ) : (
-                  <DataTable columns={columns} data={filteredTotal} />
-                )
+                <DataTable columns={columns} data={filteredTotal} />
               )}
             </AccordionContent>
           </AccordionItem>

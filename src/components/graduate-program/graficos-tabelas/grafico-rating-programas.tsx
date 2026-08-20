@@ -1,35 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import {
   BarChart,
   Bar,
   XAxis,
-  YAxis,
   CartesianGrid,
   ResponsiveContainer,
   LabelList,
   Cell,
-} from "recharts";
+} from 'recharts';
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "../../../components/ui/chart";
+} from '../../../components/ui/chart';
 import {
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../ui/card";
+} from '../../ui/card';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../ui/tooltip";
-import { Info } from "lucide-react";
-import { Alert } from "../../ui/alert";
-import { GraduateProgram } from "../graduate-program";
+} from '../../ui/tooltip';
+import { Info } from 'lucide-react';
+import { Alert } from '../../ui/alert';
+import { GraduateProgram } from '../graduate-program';
 
 type ResearchData = {
   group: GraduateProgram[];
@@ -37,8 +36,8 @@ type ResearchData = {
 
 const chartConfig = {
   institution: {
-    label: "Instituição",
-    color: "#004A75",
+    label: 'Instituição',
+    color: '#004A75',
   },
 } satisfies ChartConfig;
 
@@ -61,7 +60,7 @@ export function GraficoRatingProgramas(props: ResearchData) {
         counts[rating] += 1;
       });
 
-      const customOrder = ["A", "3", "4", "5", "6", "7"];
+      const customOrder = ['A', '3', '4', '5', '6', '7'];
 
       const data = Object.entries(counts)
         .map(([institution, count]) => ({
@@ -82,7 +81,7 @@ export function GraficoRatingProgramas(props: ResearchData) {
           } else if (hasIndexB) {
             return 1;
           } else {
-            return a.institution.localeCompare(b.institution, "pt-BR", {
+            return a.institution.localeCompare(b.institution, 'pt-BR', {
               numeric: true,
             });
           }
@@ -137,20 +136,20 @@ export function GraficoRatingProgramas(props: ResearchData) {
               <Bar dataKey="count" radius={4}>
                 {chartData.map((entry, index) => {
                   const rating = entry.institution;
-                  let fill = "#60A5FA"; // azul padrão
+                  let fill = '#60A5FA'; // azul padrão
 
                   const numericRating = Number(rating);
 
                   if (!isNaN(numericRating)) {
                     if (numericRating <= 2) {
-                      fill = "#6B7280"; // cinza
+                      fill = '#6B7280'; // cinza
                     } else if (numericRating <= 4) {
-                      fill = "#F59E0B"; // amarelo
+                      fill = '#F59E0B'; // amarelo
                     } else {
-                      fill = "#10B981"; // verde
+                      fill = '#10B981'; // verde
                     }
-                  } else if (rating === "A") {
-                    fill = "#6366F1"; // roxo para "A"
+                  } else if (rating === 'A') {
+                    fill = '#6366F1'; // roxo para "A"
                   }
 
                   return <Cell key={`cell-${index}`} fill={fill} />;

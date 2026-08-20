@@ -1,8 +1,5 @@
-import { Calendar } from "./ui/calendar"
-import {
-  SidebarGroup,
-  SidebarGroupContent,
-} from "./ui/sidebar"
+import { Calendar } from './ui/calendar';
+import { SidebarGroup, SidebarGroupContent } from './ui/sidebar';
 
 export function DatePicker() {
   return (
@@ -11,5 +8,5 @@ export function DatePicker() {
         <Calendar className="[&_[role=gridcell].bg-accent]:bg-sidebar-primary [&_[role=gridcell].bg-accent]:text-sidebar-primary-foreground [&_[role=gridcell]]:w-[33px]" />
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

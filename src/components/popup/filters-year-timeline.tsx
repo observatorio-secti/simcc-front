@@ -1,38 +1,30 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
-import { Slider } from "../ui/slider";
-import debounce from "lodash.debounce"; // Importing debounce
+import { Slider } from '../ui/slider';
+import debounce from 'lodash.debounce'; // Importing debounce
 interface Props {
-    onFilterUpdate: (newResearcher: Filter[]) => void;
+  onFilterUpdate: (newResearcher: Filter[]) => void;
 }
 
 type Filter = {
-    year: number[]
-    qualis: string[]
-}
+  year: number[];
+  qualis: string[];
+};
 
+export function FilterYearTimeLine(props: Props) {
+  const [itensSelecionados] = useState<string[]>([]);
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const [filterYear, setFilterYear] = useState([1990]);
 
+  //ano atual
 
-export function FilterYearTimeLine(props:Props) {
- 
-
-
-    const [itensSelecionados] = useState<string[]>([]);
-    const currentDate = new Date();
-    const year = currentDate.getFullYear()
-    const [filterYear, setFilterYear] = useState([1990])
-  
-    
-  
- 
-    //ano atual
-   
   // Função para debounced update
   const updateResearcher = useCallback(
     debounce((newResearcher: Filter[]) => {
       props.onFilterUpdate(newResearcher);
     }, 500), // 500ms debounce
-    []
+    [],
   );
 
   // Atualizando filtros quando filterYear ou itensSelecionados mudarem
@@ -44,29 +36,22 @@ export function FilterYearTimeLine(props:Props) {
     updateResearcher([filtros]); // Chamando a função de update
   }, [filterYear, itensSelecionados, updateResearcher]);
 
-    
-
-    return(
-       <div className="mb-6 flex gap-6">
-    
-
-        <div className="w-full flex flex-1 flex-col">
-        
+  return (
+    <div className="mb-6 flex gap-6">
+      <div className="w-full flex flex-1 flex-col">
         <div className="flex items-center gap-3 pt-4">
-<Slider
-defaultValue={filterYear}
-onValueChange={(value) => setFilterYear(value)}
-max={year}
-min={1990}
-step={1}
-className="color-blue-700"
+          <Slider
+            defaultValue={filterYear}
+            onValueChange={(value) => setFilterYear(value)}
+            max={year}
+            min={1990}
+            step={1}
+            className="color-blue-700"
+          ></Slider>
 
-></Slider>
-
-<p className="text-sm font-bold">{filterYear}</p>
-
-</div>
+          <p className="text-sm font-bold">{filterYear}</p>
         </div>
-       </div>
-    )
+      </div>
+    </div>
+  );
 }

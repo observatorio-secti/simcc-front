@@ -1,6 +1,5 @@
-"use client"
+'use client';
 
-import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip } from "recharts"
 import {
   Card,
   CardContent,
@@ -8,40 +7,40 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "../../components/ui/chart"
-
-
+} from '../../components/ui/card';
 
 interface Props {
-    combinedData:any[]
+  combinedData: any[];
 }
 
 const intersticio_tabela = {
   1: { 1: 30, 2: 40 },
   2: { 1: 20, 2: 50 },
   // Preencha conforme necessário
-}
+};
 
-
-export function TempoGrafico(props:Props) {
-    
-const chartData = props.combinedData.map((item, index) => {
-    const inicioDate = new Date(item.inicio)
+export function TempoGrafico(props: Props) {
+  const chartData = props.combinedData.map((item, index) => {
+    const inicioDate = new Date(item.inicio);
     const fimDate =
       index === props.combinedData.length - 1 && !item.fim
-        ? new Date(inicioDate.getTime() + (intersticio_tabela[item.classe]?.[item.nivel] ?? 0) * 24 * 60 * 60 * 1000)
-        : new Date(item.fim)
-  
-    let fimCorreto: string | null = null
+        ? new Date(
+            inicioDate.getTime() +
+              (intersticio_tabela[item.classe]?.[item.nivel] ?? 0) *
+                24 *
+                60 *
+                60 *
+                1000,
+          )
+        : new Date(item.fim);
+
+    let fimCorreto: string | null = null;
     if (item.tempo_acumulado > 0 && item.tempo_nivel != null) {
-      fimCorreto = new Date(inicioDate.getTime() + item.tempo_acumulado * 24 * 60 * 60 * 1000).toISOString()
+      fimCorreto = new Date(
+        inicioDate.getTime() + item.tempo_acumulado * 24 * 60 * 60 * 1000,
+      ).toISOString();
     }
-  
+
     return {
       nome: item.nome,
       cpf: item.cpf,
@@ -49,18 +48,18 @@ const chartData = props.combinedData.map((item, index) => {
       fim: fimCorreto,
       tempo_acumulado: item.tempo_acumulado,
       tempo_nivel: item.tempo_nivel,
-    }
-  })
-  
+    };
+  });
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Gráfico de Tempo Acumulado</CardTitle>
-        <CardDescription>Evolução do tempo acumulado dos docentes</CardDescription>
+        <CardDescription>
+          Evolução do tempo acumulado dos docentes
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        
-      </CardContent>
+      <CardContent></CardContent>
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
@@ -74,5 +73,5 @@ const chartData = props.combinedData.map((item, index) => {
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

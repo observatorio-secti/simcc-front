@@ -9,7 +9,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 
 import {
   Table,
@@ -18,22 +18,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../components/ui/table";
+} from '../../components/ui/table';
 
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from '../../components/ui/dropdown-menu';
 
-import { Button } from "../../components/ui/button";
+import { Button } from '../../components/ui/button';
 
-
-import { useState } from "react";
-import { Columns } from "phosphor-react";
-import { Plus } from "lucide-react";
-import { useModal } from "../hooks/use-modal-store";
+import { useState } from 'react';
+import { Columns } from 'phosphor-react';
+import { Plus } from 'lucide-react';
+import { useModal } from '../hooks/use-modal-store';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -65,57 +64,57 @@ export function DataTableModal<TData, TValue>({
     },
   });
 
-  const {onOpen, type} = useModal()
-
+  const { onOpen, type } = useModal();
 
   return (
     <div>
       <div className="flex items-center py-4 gap-3">
-     
+        <div className="flex gap-3 ml-auto">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                <Columns size={16} />
+                Colunas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-<div className="flex gap-3 ml-auto">
-
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            
-            <Button variant="outline" className="ml-auto">
-            <Columns size={16} />
-              Colunas
+          {type == 'list-student-program' && (
+            <Button onClick={() => onOpen('add-student-graduation')}>
+              <Plus size={16} className="" />
+              Adicionar
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
 
-        {type == 'list-student-program' && (
-  <Button onClick={() => onOpen('add-student-graduation')}  ><Plus size={16} className="" />Adicionar</Button>
-)}
-
-{type == 'add-researcher-graduation' && (
-  <Button onClick={() => onOpen('add-researcher-graduation-two')}  ><Plus size={16} className="" />Adicionar</Button>
-)}
-</div>
+          {type == 'add-researcher-graduation' && (
+            <Button onClick={() => onOpen('add-researcher-graduation-two')}>
+              <Plus size={16} className="" />
+              Adicionar
+            </Button>
+          )}
+        </div>
       </div>
       <div className="rounded-md border dark:border-none">
-        <Table >
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -126,7 +125,7 @@ export function DataTableModal<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -139,13 +138,13 @@ export function DataTableModal<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

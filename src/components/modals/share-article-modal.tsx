@@ -1,30 +1,35 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { useModalSecundary } from "../hooks/use-modal-store-secundary";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { toast } from "sonner";
-import { FacebookLogo, LinkedinLogo, WhatsappLogo, EnvelopeSimple } from "phosphor-react";
-import { XLogoIcon } from "@phosphor-icons/react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useModalSecundary } from '../hooks/use-modal-store-secundary';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { toast } from 'sonner';
+import {
+  FacebookLogo,
+  LinkedinLogo,
+  WhatsappLogo,
+  EnvelopeSimple,
+} from 'phosphor-react';
+import { XLogoIcon } from '@phosphor-icons/react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 const stripHtml = (value?: string) => {
-  if (!value) return "";
+  if (!value) return '';
 
-  const div = document.createElement("div");
+  const div = document.createElement('div');
   div.innerHTML = value;
-  const text = div.textContent || div.innerText || "";
+  const text = div.textContent || div.innerText || '';
 
-  return text.replace(/\s+/g, " ").trim();
+  return text.replace(/\s+/g, ' ').trim();
 };
 
 const normalizeText = (value?: string) => {
   const text = stripHtml(value);
   return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, " ")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
     .trim();
 };
 
@@ -35,31 +40,38 @@ const truncateWithEllipsis = (value: string, maxLength: number) => {
 
 export function ShareArticleModal() {
   const { isOpen, type, onClose, data } = useModalSecundary();
-  const isModalOpen = isOpen && type === "share-article";
+  const isModalOpen = isOpen && type === 'share-article';
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hasOverflow, setHasOverflow] = useState(false);
 
   const shareTarget = useMemo(() => {
-    if (data.doi && data.doi.trim() !== "" && data.doi !== "None") {
-      const normalizedDoi = data.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+    if (data.doi && data.doi.trim() !== '' && data.doi !== 'None') {
+      const normalizedDoi = data.doi.replace(
+        /^https?:\/\/(dx\.)?doi\.org\//i,
+        '',
+      );
       return `https://doi.org/${normalizedDoi}`;
     }
 
-    if (data.landing_page_url && data.landing_page_url.trim() !== "" && data.landing_page_url !== "None") {
+    if (
+      data.landing_page_url &&
+      data.landing_page_url.trim() !== '' &&
+      data.landing_page_url !== 'None'
+    ) {
       return data.landing_page_url;
     }
 
-    const title = data.title || "";
+    const title = data.title || '';
     return `${window.location.origin}/resultados?type_search=article&terms=${encodeURIComponent(title)}&tab=articles-home`;
   }, [data.doi, data.landing_page_url, data.title]);
 
   const shareMessage = useMemo(() => {
-    const title = normalizeText(data.title) || "Artigo";
-    const revista = normalizeText(data.magazine) || "Revista não informada";
-    const year = data.year || "";
-    const qualis = data.qualis && data.qualis !== "None" ? data.qualis : "";
-    const quadrennial = data.quadrennial || "";
-    const researcher = normalizeText(data.researcher) || "";
+    const title = normalizeText(data.title) || 'Artigo';
+    const revista = normalizeText(data.magazine) || 'Revista não informada';
+    const year = data.year || '';
+    const qualis = data.qualis && data.qualis !== 'None' ? data.qualis : '';
+    const quadrennial = data.quadrennial || '';
+    const researcher = normalizeText(data.researcher) || '';
 
     const lines = [`Título: ${title}`, `Revista: ${revista}`];
 
@@ -68,20 +80,28 @@ export function ShareArticleModal() {
     }
 
     if (qualis) {
-      lines.push(`Qualis: ${qualis}${quadrennial ? ` (${quadrennial})` : ""}`);
+      lines.push(`Qualis: ${qualis}${quadrennial ? ` (${quadrennial})` : ''}`);
     }
 
     if (researcher) {
       lines.push(`Pesquisador: ${researcher}`);
     }
 
-    return lines.join("\n");
-  }, [data.magazine, data.qualis, data.quadrennial, data.researcher, data.title, data.year, shareTarget]);
+    return lines.join('\n');
+  }, [
+    data.magazine,
+    data.qualis,
+    data.quadrennial,
+    data.researcher,
+    data.title,
+    data.year,
+    shareTarget,
+  ]);
 
   const twitterMessage = useMemo(() => {
     const totalLimit = 280;
     const urlLength = 24;
-    const separator = "\n\n";
+    const separator = '\n\n';
     const sharedUrl = shareTarget;
 
     const full = `${shareMessage}${separator}${sharedUrl}`;
@@ -89,19 +109,21 @@ export function ShareArticleModal() {
 
     const textBudget = totalLimit - urlLength - separator.length;
 
-    const lines = shareMessage.split("\n");
+    const lines = shareMessage.split('\n');
     const restLines = lines.slice(1);
-    const restText = restLines.join("\n");
+    const restText = restLines.join('\n');
 
     const maxTitleLength = Math.max(
       0,
-      textBudget - (restLines.length > 0 ? restText.length + 1 : 0)
+      textBudget - (restLines.length > 0 ? restText.length + 1 : 0),
     );
 
-    const titleLine = truncateWithEllipsis(lines[0] || "Título", maxTitleLength);
-    const truncatedText = restLines.length > 0
-      ? `${titleLine}\n${restText}`
-      : titleLine;
+    const titleLine = truncateWithEllipsis(
+      lines[0] || 'Título',
+      maxTitleLength,
+    );
+    const truncatedText =
+      restLines.length > 0 ? `${titleLine}\n${restText}` : titleLine;
 
     return `${truncatedText}${separator}${sharedUrl}`;
   }, [shareMessage, shareTarget]);
@@ -109,7 +131,9 @@ export function ShareArticleModal() {
   const shareLinks = useMemo(() => {
     const encodedUrl = encodeURIComponent(shareTarget);
     const encodedMessage = encodeURIComponent(shareMessage);
-    const encodedTitle = encodeURIComponent(normalizeText(data.title) || "Artigo");
+    const encodedTitle = encodeURIComponent(
+      normalizeText(data.title) || 'Artigo',
+    );
     const encodedTwitterMessage = encodeURIComponent(twitterMessage);
 
     return {
@@ -117,7 +141,7 @@ export function ShareArticleModal() {
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}&title=${encodedTitle}&summary=${encodedMessage}`,
       twitter: `https://twitter.com/intent/tweet?text=${encodedTwitterMessage}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedMessage}`,
-      email: `mailto:?subject=${encodeURIComponent(`Artigo: ${data.title || "Compartilhamento"}`)}&body=${encodeURIComponent(`${shareMessage}\n\n${shareTarget}`)}`,
+      email: `mailto:?subject=${encodeURIComponent(`Artigo: ${data.title || 'Compartilhamento'}`)}&body=${encodeURIComponent(`${shareMessage}\n\n${shareTarget}`)}`,
     };
   }, [data.title, shareMessage, shareTarget, twitterMessage]);
 
@@ -129,35 +153,36 @@ export function ShareArticleModal() {
     };
 
     checkOverflow();
-    window.addEventListener("resize", checkOverflow);
+    window.addEventListener('resize', checkOverflow);
 
-    return () => window.removeEventListener("resize", checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
   }, [isModalOpen]);
 
   const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -200, behavior: "smooth" });
+    scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' });
   };
 
   const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 200, behavior: "smooth" });
+    scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
   };
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareTarget);
-      toast("Link copiado com sucesso", {
-        description: "O link do artigo foi copiado para a área de transferência.",
+      toast('Link copiado com sucesso', {
+        description:
+          'O link do artigo foi copiado para a área de transferência.',
         action: {
-          label: "Fechar",
+          label: 'Fechar',
           onClick: () => {},
         },
       });
     } catch (error) {
       console.error(error);
-      toast("Não foi possível copiar o link", {
-        description: "Tente novamente em instantes.",
+      toast('Não foi possível copiar o link', {
+        description: 'Tente novamente em instantes.',
         action: {
-          label: "Fechar",
+          label: 'Fechar',
           onClick: () => {},
         },
       });
@@ -220,7 +245,9 @@ export function ShareArticleModal() {
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500/10 text-green-600 dark:bg-green-500/15">
                   <WhatsappLogo size={24} />
                 </span>
-                <span className="text-xs text-center text-muted-foreground">WhatsApp</span>
+                <span className="text-xs text-center text-muted-foreground">
+                  WhatsApp
+                </span>
               </a>
 
               <a
@@ -232,7 +259,9 @@ export function ShareArticleModal() {
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-sky-500/10 text-sky-600 dark:bg-sky-500/15">
                   <LinkedinLogo size={24} />
                 </span>
-                <span className="text-xs text-center text-muted-foreground">LinkedIn</span>
+                <span className="text-xs text-center text-muted-foreground">
+                  LinkedIn
+                </span>
               </a>
 
               <a
@@ -244,7 +273,9 @@ export function ShareArticleModal() {
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-100">
                   <XLogoIcon size={22} weight="bold" />
                 </span>
-                <span className="text-xs text-center text-muted-foreground">X</span>
+                <span className="text-xs text-center text-muted-foreground">
+                  X
+                </span>
               </a>
 
               <a
@@ -256,7 +287,9 @@ export function ShareArticleModal() {
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-600/10 text-blue-700 dark:bg-blue-500/15">
                   <FacebookLogo size={24} />
                 </span>
-                <span className="text-xs text-center text-muted-foreground">Facebook</span>
+                <span className="text-xs text-center text-muted-foreground">
+                  Facebook
+                </span>
               </a>
 
               <a
@@ -266,7 +299,9 @@ export function ShareArticleModal() {
                 <span className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:bg-amber-500/15">
                   <EnvelopeSimple size={24} />
                 </span>
-                <span className="text-xs text-center text-muted-foreground">E-mail</span>
+                <span className="text-xs text-center text-muted-foreground">
+                  E-mail
+                </span>
               </a>
             </div>
           </div>

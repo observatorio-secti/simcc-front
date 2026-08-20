@@ -1,6 +1,21 @@
-import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, LabelList, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../components/ui/chart";
+import { useEffect, useState } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../../components/ui/chart';
 
 type Dados = {
   count_software: number;
@@ -32,7 +47,6 @@ type PesosProducao = {
   patent_granted: string;
   patent_not_granted: string;
   report: string;
-
 };
 
 type ProdTecProps = {
@@ -41,14 +55,22 @@ type ProdTecProps = {
 };
 
 const chartConfig = {
-  software: { label: "Software", color: "#096670" },
-  patente_concedida: { label: "Patente Conc", color: "#6BC26B" },
-  patente_nao_concedida: { label: "Patente Não Conc", color: "#CE3830" },
-  rel_tec: { label: "Rel Técnico", color: "#662D91" },
+  software: { label: 'Software', color: '#096670' },
+  patente_concedida: { label: 'Patente Conc', color: '#6BC26B' },
+  patente_nao_concedida: { label: 'Patente Não Conc', color: '#CE3830' },
+  rel_tec: { label: 'Rel Técnico', color: '#662D91' },
 } satisfies ChartConfig;
 
 export function GraficoIndiceProdTec(props: ProdTecProps) {
-  const [chartData, setChartData] = useState<{ year: string; software: number; patente_concedida: number; patente_nao_concedida: number; rel_tec: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    {
+      year: string;
+      software: number;
+      patente_concedida: number;
+      patente_nao_concedida: number;
+      rel_tec: number;
+    }[]
+  >([]);
 
   // Mapeamento dos valores de peso de produção
   const pesosMap: { [key: string]: number } = {
@@ -79,21 +101,45 @@ export function GraficoIndiceProdTec(props: ProdTecProps) {
       };
 
       // Calcular somas ponderadas
-      const counts: { [year: string]: { software: number; patente_concedida: number; patente_nao_concedida: number; rel_tec: number } } = {};
+      const counts: {
+        [year: string]: {
+          software: number;
+          patente_concedida: number;
+          patente_nao_concedida: number;
+          rel_tec: number;
+        };
+      } = {};
 
       props.articles.forEach((publicacao) => {
         const year = publicacao.year.toString();
-        const { count_software, count_patent_granted, count_patent_not_granted, count_report } = publicacao;
+        const {
+          count_software,
+          count_patent_granted,
+          count_patent_not_granted,
+          count_report,
+        } = publicacao;
 
-        if (count_software > 0 || count_patent_granted > 0 || count_patent_not_granted > 0 || count_report > 0) {
+        if (
+          count_software > 0 ||
+          count_patent_granted > 0 ||
+          count_patent_not_granted > 0 ||
+          count_report > 0
+        ) {
           if (!counts[year]) {
-            counts[year] = { software: 0, patente_concedida: 0, patente_nao_concedida: 0, rel_tec: 0 };
+            counts[year] = {
+              software: 0,
+              patente_concedida: 0,
+              patente_nao_concedida: 0,
+              rel_tec: 0,
+            };
           }
 
           // Atualizar valores ponderados
           counts[year].software += count_software * pesosNumericos.software;
-          counts[year].patente_concedida += count_patent_granted * pesosNumericos.patent_granted;
-          counts[year].patente_nao_concedida += count_patent_not_granted * pesosNumericos.patent_not_granted;
+          counts[year].patente_concedida +=
+            count_patent_granted * pesosNumericos.patent_granted;
+          counts[year].patente_nao_concedida +=
+            count_patent_not_granted * pesosNumericos.patent_not_granted;
           counts[year].rel_tec += count_report * pesosNumericos.report;
         }
       });
@@ -114,40 +160,74 @@ export function GraficoIndiceProdTec(props: ProdTecProps) {
   return (
     <ChartContainer config={chartConfig} className="h-[260px] w-full">
       <ResponsiveContainer>
-        <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-          <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+        <BarChart
+          data={chartData}
+          margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+        >
+          <XAxis
+            dataKey="year"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+          />
           <YAxis tickLine={false} tickMargin={10} axisLine={false} />
           <CartesianGrid vertical={false} horizontal={false} />
-          <ChartLegend className="flex flex-wrap" content={<ChartLegendContent />} />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-          <Bar dataKey="software" radius={4} fill={chartConfig['software'].color} stackId="a">
+          <ChartLegend
+            className="flex flex-wrap"
+            content={<ChartLegendContent />}
+          />
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent indicator="dashed" />}
+          />
+          <Bar
+            dataKey="software"
+            radius={4}
+            fill={chartConfig['software'].color}
+            stackId="a"
+          >
             <LabelList
               position="top"
-              formatter={(value) => value > 0 ? value.toFixed(2) : '0'}
+              formatter={(value) => (value > 0 ? value.toFixed(2) : '0')}
               fontSize={12}
               className="fill-foreground"
             />
           </Bar>
-          <Bar dataKey="patente_concedida" radius={4} fill={chartConfig['patente_concedida'].color} stackId="a">
+          <Bar
+            dataKey="patente_concedida"
+            radius={4}
+            fill={chartConfig['patente_concedida'].color}
+            stackId="a"
+          >
             <LabelList
               position="top"
-              formatter={(value) => value > 0 ? value.toFixed(2) : '0'}
+              formatter={(value) => (value > 0 ? value.toFixed(2) : '0')}
               fontSize={12}
               className="fill-foreground"
             />
           </Bar>
-          <Bar dataKey="patente_nao_concedida" radius={4} fill={chartConfig['patente_nao_concedida'].color} stackId="a">
+          <Bar
+            dataKey="patente_nao_concedida"
+            radius={4}
+            fill={chartConfig['patente_nao_concedida'].color}
+            stackId="a"
+          >
             <LabelList
               position="top"
-              formatter={(value) => value > 0 ? value.toFixed(2) : '0'}
+              formatter={(value) => (value > 0 ? value.toFixed(2) : '0')}
               fontSize={12}
               className="fill-foreground"
             />
           </Bar>
-          <Bar dataKey="rel_tec" radius={4} fill={chartConfig['rel_tec'].color} stackId="a">
+          <Bar
+            dataKey="rel_tec"
+            radius={4}
+            fill={chartConfig['rel_tec'].color}
+            stackId="a"
+          >
             <LabelList
               position="top"
-              formatter={(value) => value > 0 ? value.toFixed(2) : '0'}
+              formatter={(value) => (value > 0 ? value.toFixed(2) : '0')}
               fontSize={12}
               className="fill-foreground"
             />

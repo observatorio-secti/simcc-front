@@ -1,5 +1,5 @@
-import { columns } from "./columns-orientacoes";
-import { DataTable } from "./popup-data-table";
+import { columns } from './columns-orientacoes';
+import { DataTable } from './popup-data-table';
 
 type Orientacoes = {
   orientacoes: any[];

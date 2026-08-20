@@ -1,59 +1,75 @@
-import { useEffect, useState, useContext } from "react";
-import { UserContext } from "../../../../context/context";
-import { Alert } from "../../../ui/alert";
-import { BarChart, Bar, XAxis, LabelList, CartesianGrid, ResponsiveContainer } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../../components/ui/chart";
+import { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../../../../context/context';
+import { Alert } from '../../../ui/alert';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../../../components/ui/chart';
 
 const chartConfig = {
   views: {
-    label: "Page Views",
+    label: 'Page Views',
   },
   A1: {
-    label: "Qualis A1",
-    color: "#006837",
+    label: 'Qualis A1',
+    color: '#006837',
   },
   A2: {
-    label: "Qualis A2",
-    color: "#8FC53E",
+    label: 'Qualis A2',
+    color: '#8FC53E',
   },
   A3: {
-    label: "Qualis A3",
-    color: "#ACC483",
+    label: 'Qualis A3',
+    color: '#ACC483',
   },
   A4: {
-    label: "Qualis A4",
-    color: "#BDC4B1",
+    label: 'Qualis A4',
+    color: '#BDC4B1',
   },
   B1: {
-    label: "Qualis B1",
-    color: "#F15A24",
+    label: 'Qualis B1',
+    color: '#F15A24',
   },
   B2: {
-    label: "Qualis B2",
-    color: "#F5831F",
+    label: 'Qualis B2',
+    color: '#F5831F',
   },
   B3: {
-    label: "Qualis B3",
-    color: "#F4AD78",
+    label: 'Qualis B3',
+    color: '#F4AD78',
   },
   B4: {
-    label: "Qualis B4",
-    color: "#F4A992",
+    label: 'Qualis B4',
+    color: '#F4A992',
   },
   C: {
-    label: "Qualis C",
-    color: "#EC1C22",
+    label: 'Qualis C',
+    color: '#EC1C22',
   },
   SQ: {
-    label: "Sem qualis",
-    color: "#560B11",
+    label: 'Sem qualis',
+    color: '#560B11',
   },
 } satisfies ChartConfig;
 
 export function GraficoArticleHome({ researcher_id }) {
-  console.log('ID TA AQUI', researcher_id)
+  console.log('ID TA AQUI', researcher_id);
   const { urlGeral } = useContext(UserContext);
-  const [chartData, setChartData] = useState<{ year: number;[qualis: string]: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { year: number; [qualis: string]: number }[]
+  >([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,14 +101,31 @@ export function GraficoArticleHome({ researcher_id }) {
     <Alert className="pt-12">
       <ChartContainer config={chartConfig} className="h-[250px] w-full">
         <ResponsiveContainer>
-          <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-            <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+          >
+            <XAxis
+              dataKey="year"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
             <CartesianGrid vertical={false} horizontal={false} />
-            <ChartLegend className="flex flex-wrap text-[0.6rem] md:text-[0.8rem]" content={<ChartLegendContent />} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+            <ChartLegend
+              className="flex flex-wrap text-[0.6rem] md:text-[0.8rem]"
+              content={<ChartLegendContent />}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="dashed" />}
+            />
             {Object.keys(chartConfig).map((key, index) => {
-              if (key !== "views") {
-                const configKey = key as Exclude<keyof typeof chartConfig, "views">;
+              if (key !== 'views') {
+                const configKey = key as Exclude<
+                  keyof typeof chartConfig,
+                  'views'
+                >;
                 return (
                   <Bar
                     key={configKey}
@@ -102,7 +135,12 @@ export function GraficoArticleHome({ researcher_id }) {
                     radius={4}
                   >
                     {index === Object.keys(chartConfig).length - 1 && (
-                      <LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
+                      <LabelList
+                        position="top"
+                        offset={12}
+                        className="fill-foreground"
+                        fontSize={12}
+                      />
                     )}
                   </Bar>
                 );

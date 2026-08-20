@@ -1,55 +1,56 @@
-import { Plus, X } from "lucide-react";
-import { Button } from "../ui/button";
-import { DialogHeader } from "../ui/dialog";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import { Sheet, SheetContent } from "../ui/sheet";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
-import { useModalSecundary } from "../hooks/use-modal-store-secundary";
-import { useContext, useEffect, useRef, useState } from "react";
-import { UserContext } from "../../context/context";
-import { Alert } from "../ui/alert";
+import { X } from 'lucide-react';
+import { Button } from '../ui/button';
+import { DialogHeader } from '../ui/dialog';
+import { ScrollArea } from '../ui/scroll-area';
+import { Sheet, SheetContent } from '../ui/sheet';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../ui/tooltip';
+import { useModalSecundary } from '../hooks/use-modal-store-secundary';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { UserContext } from '../../context/context';
+import { Alert } from '../ui/alert';
 
 interface Coautor {
-  id: string
-  name: string
-  among: number
-  type: string
+  id: string;
+  name: string;
+  among: number;
+  type: string;
 }
-
 
 export function CoautoresModal() {
   const { onClose, isOpen, type: typeModal, data } = useModalSecundary();
-  const isModalOpen = (isOpen && typeModal === "coautores")
+  const isModalOpen = isOpen && typeModal === 'coautores';
 
-  const [count, setCount] = useState(20)
+  const [count, setCount] = useState(20);
   const [researcher, setResearcher] = useState<Coautor[]>([]);
-  const [, isLoading] = useState(false)
+  const [, isLoading] = useState(false);
   const { urlGeral } = useContext(UserContext);
-  let urlTermPesquisadores = urlGeral + `researcher/co-authorship/${data.id}`;
-  console.log(urlTermPesquisadores)
+  const urlTermPesquisadores = urlGeral + `researcher/co-authorship/${data.id}`;
+  console.log(urlTermPesquisadores);
 
   useEffect(() => {
     const fetchData = async () => {
-
       try {
-        isLoading(true)
+        isLoading(true);
         const response = await fetch(urlTermPesquisadores, {
-          mode: "cors",
+          mode: 'cors',
           headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-            "Content-Type": "text/plain",
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600',
+            'Content-Type': 'text/plain',
           },
         });
 
         const data = await response.json();
         if (data) {
           setResearcher(data);
-
         }
-
       } catch (err) {
         console.log(err);
       } finally {
@@ -75,7 +76,6 @@ export function CoautoresModal() {
 
   return (
     <Sheet open={isModalOpen} onOpenChange={onClose}>
-
       <SheetContent
         className={`p-0 dark:bg-neutral-900 dark:border-gray-600 min-w-[50vw]`}
       >
@@ -86,9 +86,9 @@ export function CoautoresModal() {
                 <TooltipTrigger asChild>
                   <Button
                     className="h-8 w-8"
-                    variant={"outline"}
+                    variant={'outline'}
                     onClick={() => onClose()}
-                    size={"icon"}
+                    size={'icon'}
                   >
                     <X size={16} />
                   </Button>
@@ -105,7 +105,7 @@ export function CoautoresModal() {
 
         <ScrollArea className="relative pb-4 whitespace-nowrap h-[calc(100vh-50px)] p-8 ">
           <div className="mb-8 flex justify-between items-center">
-            <div >
+            <div>
               <p className="max-w-[750px] mb-2 text-lg font-light text-foreground">
                 Coautores de
               </p>
@@ -115,9 +115,7 @@ export function CoautoresModal() {
               </h1>
             </div>
 
-            <div>
-
-            </div>
+            <div></div>
           </div>
 
           <div className="flex flex-wrap gap-4">
@@ -143,45 +141,50 @@ export function CoautoresModal() {
                 const maxFontSize = 250;
                 const minFontSize = 70;
 
-                const distinctAmongValues = [...new Set(sortedResearchers.map((item: any) => item.among))];
+                const distinctAmongValues = [
+                  ...new Set(sortedResearchers.map((item: any) => item.among)),
+                ];
                 const distinctAmongCount = distinctAmongValues.length;
                 const fontSize =
                   maxFontSize -
                   ((maxFontSize - minFontSize) / (distinctAmongCount - 1)) *
-                  distinctAmongValues.indexOf(item.among);
+                    distinctAmongValues.indexOf(item.among);
 
                 return (
                   <li key={item.id} className="list-none">
                     <div className="">
                       <Alert
                         className={`flex items-start justify-start text-left w-fit gap-4 font-semibold text-white  p-2 truncate 
-               ${(item.type === 'internal' && 'bg-yellow-500 dark:bg-yellow-500') ||
-                          (item.type === 'external' && 'bg-orange-400 dark:bg-orange-400') ||
-                          (item.type === 'speaker' && 'bg-red-400 dark:bg-red-400') || ''
-                          }
+               ${
+                 (item.type === 'internal' &&
+                   'bg-yellow-500 dark:bg-yellow-500') ||
+                 (item.type === 'external' &&
+                   'bg-orange-400 dark:bg-orange-400') ||
+                 (item.type === 'speaker' && 'bg-red-400 dark:bg-red-400') ||
+                 ''
+               }
             `}
                         style={{
                           fontSize: `${fontSize}%`,
                           maxWidth: '100%',
                           whiteSpace: 'normal',
                           wordBreak: 'break-word',
-                          textAlign: 'center'
+                          textAlign: 'center',
                         }}
                       >
-                        <p className="text-left">{item.name} <strong className="font-normal">{item.among}</strong></p>
+                        <p className="text-left">
+                          {item.name}{' '}
+                          <strong className="font-normal">{item.among}</strong>
+                        </p>
                       </Alert>
                     </div>
                   </li>
                 );
               })}
             </div>
-
-
-
-            
           </div>
         </ScrollArea>
       </SheetContent>
     </Sheet>
-  )
+  );
 }

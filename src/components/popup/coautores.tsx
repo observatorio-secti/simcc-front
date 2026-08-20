@@ -1,59 +1,54 @@
-import { Maximize2, Plus } from "lucide-react"
-import { Button } from "../ui/button"
-import { useModalSecundary } from "../hooks/use-modal-store-secundary"
-import { useContext, useEffect, useRef, useState } from "react"
-import { UserContext } from "../../context/context"
-import { CloudWordItemResearcherCoautores } from "../homepage/categorias/researchers-home/cloud-word-item-researcher-coautores"
-import { Alert } from "../ui/alert"
-import { useModal } from "../hooks/use-modal-store"
-import { Skeleton } from "../ui/skeleton"
+import { Maximize2, Plus } from 'lucide-react';
+import { Button } from '../ui/button';
+import { useModalSecundary } from '../hooks/use-modal-store-secundary';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { UserContext } from '../../context/context';
+import { Alert } from '../ui/alert';
+import { useModal } from '../hooks/use-modal-store';
+import { Skeleton } from '../ui/skeleton';
 
 interface Props {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 interface Coautor {
-  id: string
-  name: string
-  among: number
-  type: string
+  id: string;
+  name: string;
+  among: number;
+  type: string;
 }
 
-
 export function Coautores(props: Props) {
-
-  const { onOpen } = useModalSecundary()
-  const { onOpen: onOpenOne, onClose } = useModal()
-  const [count, setCount] = useState(5)
+  const { onOpen } = useModalSecundary();
+  const { onOpen: onOpenOne, onClose } = useModal();
+  const [count, setCount] = useState(5);
   const [researcher, setResearcher] = useState<Coautor[]>([]);
-  const [loading, isLoading] = useState(false)
+  const [loading, isLoading] = useState(false);
   const { urlGeral } = useContext(UserContext);
-  let urlTermPesquisadores = urlGeral + `researcher/co-authorship/${props.id}`;
-  console.log(urlTermPesquisadores)
+  const urlTermPesquisadores =
+    urlGeral + `researcher/co-authorship/${props.id}`;
+  console.log(urlTermPesquisadores);
 
   useEffect(() => {
     const fetchData = async () => {
-
       try {
-        isLoading(true)
+        isLoading(true);
         const response = await fetch(urlTermPesquisadores, {
-          mode: "cors",
+          mode: 'cors',
           headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Max-Age": "3600",
-            "Content-Type": "text/plain",
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600',
+            'Content-Type': 'text/plain',
           },
         });
 
         const data = await response.json();
         if (data) {
           setResearcher(data);
-
         }
-
       } catch (err) {
         console.log(err);
       } finally {
@@ -85,7 +80,14 @@ export function Coautores(props: Props) {
       <div className="flex mb-6 items-center justify-between">
         <div className="text-left  font-medium text-2xl">Coautores</div>
 
-        <Button onClick={() => onOpen('coautores', { id: props.id, name: props.name })} className="w-8 h-8" size={'icon'} variant={'outline'}>
+        <Button
+          onClick={() =>
+            onOpen('coautores', { id: props.id, name: props.name })
+          }
+          className="w-8 h-8"
+          size={'icon'}
+          variant={'outline'}
+        >
           <Maximize2 size={16} />
         </Button>
       </div>
@@ -119,32 +121,42 @@ export function Coautores(props: Props) {
             const maxFontSize = 130;
             const minFontSize = 70;
 
-            const distinctAmongValues = [...new Set(sortedResearchers.map((item: any) => item.among))];
+            const distinctAmongValues = [
+              ...new Set(sortedResearchers.map((item: any) => item.among)),
+            ];
             const distinctAmongCount = distinctAmongValues.length;
             const fontSize =
               maxFontSize -
               ((maxFontSize - minFontSize) / (distinctAmongCount - 1)) *
-              distinctAmongValues.indexOf(item.among);
+                distinctAmongValues.indexOf(item.among);
 
             return (
               <li key={item.id} className="list-none">
                 <div className="text-left">
                   <Alert
                     className={`flex items-start justify-start text-left w-fit gap-2 font-semibold text-white  p-2 
-                    ${(item.type === 'internal' && 'bg-yellow-500 dark:bg-yellow-500') ||
-                      (item.type === 'external' && 'bg-orange-400 dark:bg-orange-400') ||
-                      (item.type === 'speaker' && 'bg-red-400 dark:bg-red-400') || ''
-                      }
+                    ${
+                      (item.type === 'internal' &&
+                        'bg-yellow-500 dark:bg-yellow-500') ||
+                      (item.type === 'external' &&
+                        'bg-orange-400 dark:bg-orange-400') ||
+                      (item.type === 'speaker' &&
+                        'bg-red-400 dark:bg-red-400') ||
+                      ''
+                    }
                   `}
                     style={{
                       fontSize: `${fontSize}%`,
                       maxWidth: '100%',
                       whiteSpace: 'normal',
                       wordBreak: 'break-word',
-                      textAlign: 'center'
+                      textAlign: 'center',
                     }}
                   >
-                    <p className="text-left">{item.name} <strong className="font-normal">{item.among}</strong></p>
+                    <p className="text-left">
+                      {item.name}{' '}
+                      <strong className="font-normal">{item.among}</strong>
+                    </p>
                   </Alert>
                 </div>
               </li>
@@ -153,16 +165,17 @@ export function Coautores(props: Props) {
         </div>
       )}
 
-
-
       {sortedResearchers.length > count && (
         <div className="w-full mb-6 items-center flex justify-center">
-          <Button onClick={() => setCount(count + 5)} variant={'outline'} size={'sm'}>
-            <Plus size={16} />  Mostrar mais
+          <Button
+            onClick={() => setCount(count + 5)}
+            variant={'outline'}
+            size={'sm'}
+          >
+            <Plus size={16} /> Mostrar mais
           </Button>
         </div>
       )}
-
     </div>
-  )
+  );
 }

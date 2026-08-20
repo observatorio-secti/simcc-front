@@ -1,7 +1,5 @@
-
-import { columnsParcicipacaoEvento } from "../../../popup/columns/columns-participacao-eventos";
-import { columns } from "../../../popup/columns/columns-articles";
-import { DataTable } from "../../../popup/columns/popup-data-table";
+import { columns } from '../../../popup/columns/columns-articles';
+import { DataTable } from '../../../popup/columns/popup-data-table';
 
 type Articles = {
   articles: any[];

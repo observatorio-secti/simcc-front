@@ -1,11 +1,21 @@
-import { useEffect, useState } from "react";
-import { Alert } from "../../../ui/alert";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid,  ResponsiveContainer, LabelList } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../../../components/ui/chart";
-
-import {  CardContent, CardDescription, CardHeader, CardTitle } from "../../../ui/card";
-import { Tooltip ,TooltipContent, TooltipProvider, TooltipTrigger } from "../../../ui/tooltip";
-import { Info } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { Alert } from '../../../ui/alert';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  LabelList,
+} from 'recharts';
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '../../../../components/ui/chart';
 
 type Articles = {
   articles: any[];
@@ -13,16 +23,18 @@ type Articles = {
 
 const chartConfig = {
   views: {
-    label: "Page Views",
+    label: 'Page Views',
   },
   citations: {
-    label: "Citações",
-    color: "#2BC8DC",
+    label: 'Citações',
+    color: '#2BC8DC',
   },
 } satisfies ChartConfig;
 
 export function GraficoCitationsArticleHome(props: Articles) {
-  const [chartData, setChartData] = useState<{ year: number; citations: number }[]>([]);
+  const [chartData, setChartData] = useState<
+    { year: number; citations: number }[]
+  >([]);
 
   useEffect(() => {
     if (props.articles) {
@@ -50,15 +62,28 @@ export function GraficoCitationsArticleHome(props: Articles) {
 
   return (
     <Alert className="pt-12">
-     
-     <ChartContainer config={chartConfig} className="h-[250px] w-full">
+      <ChartContainer config={chartConfig} className="h-[250px] w-full">
         <ResponsiveContainer>
-          <LineChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 0 }}>
-            <XAxis dataKey="year" tickLine={false} tickMargin={10} axisLine={false} />
-          
+          <LineChart
+            data={chartData}
+            margin={{ top: 20, right: 20, left: 20, bottom: 0 }}
+          >
+            <XAxis
+              dataKey="year"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
+
             <CartesianGrid vertical={false} horizontal={false} />
-            <ChartLegend className="flex flex-wrap text-[0.6rem] md:text-[0.8rem]" content={<ChartLegendContent />} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+            <ChartLegend
+              className="flex flex-wrap text-[0.6rem] md:text-[0.8rem]"
+              content={<ChartLegendContent />}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="dashed" />}
+            />
             <Line
               type="monotone"
               dataKey="citations"
@@ -67,12 +92,17 @@ export function GraficoCitationsArticleHome(props: Articles) {
               dot={{ r: 4 }}
               activeDot={{ r: 6 }}
             >
-              <LabelList dataKey="citations" position="top" offset={12} className="fill-foreground" fontSize={12} />
+              <LabelList
+                dataKey="citations"
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
             </Line>
           </LineChart>
         </ResponsiveContainer>
       </ChartContainer>
-  
     </Alert>
   );
 }
