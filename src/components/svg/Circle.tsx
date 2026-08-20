@@ -2,7 +2,7 @@ export function Circle() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      height="full"
+      height="100%"
       fill="none"
       viewBox="0 0 817 670"
     >

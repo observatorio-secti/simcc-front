@@ -114,8 +114,10 @@ export function InitialHome() {
     years.push(i);
   }
 
-  const { data: dados = [] } = useResearcherDadosGerais(new Date().getFullYear() - 4);
-  const { data: words = [] } = useWordsResearcher();
+  const { data: dadosData = [] } = useResearcherDadosGerais(new Date().getFullYear() - 4);
+  const dados = Array.isArray(dadosData) ? dadosData : [];
+  const { data: wordsData = [] } = useWordsResearcher();
+  const words = Array.isArray(wordsData) ? wordsData : [];
 
   const { theme } = useTheme();
 

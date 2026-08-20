@@ -1,7 +1,7 @@
 export function SymbolEEWhite() {
   return (
     <svg
-      height="full"
+      height="100%"
       viewBox="0 0 947 1532"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
