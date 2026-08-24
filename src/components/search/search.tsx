@@ -231,25 +231,11 @@ export function Search() {
   };
 
   const handleRemoveItem = (index: number) => {
-    if (itemsSelecionados.length == 1) {
-      if (posGrad) {
-        queryUrl.set('terms', '');
-        navigate({
-          pathname: '/pos-graduacao',
-          search: queryUrl.toString(),
-        });
-      } else if (resultados) {
-        queryUrl.set('terms', '');
-        navigate({
-          pathname: '/resultados',
-          search: queryUrl.toString(),
-        });
-      }
-      setItensSelecionados([]);
-    } else {
-      const newItems = [...itemsSelecionados];
-      newItems.splice(index, 1);
-      setItensSelecionados(newItems);
+    const newItems = itemsSelecionados.filter((_, itemIndex) => itemIndex !== index);
+    setItensSelecionados(newItems);
+
+    if (newItems.length === 0) {
+      navigate('/');
     }
   };
 
