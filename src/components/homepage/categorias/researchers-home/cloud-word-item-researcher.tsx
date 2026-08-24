@@ -4,10 +4,10 @@ import { UserContext } from '../../../../context/context';
 import { useModal } from '../../../hooks/use-modal-store';
 
 interface Props {
-  id: string;
-  frequency: string;
+  id: string | number;
+  frequency?: string | number;
   name: string;
-  among: string;
+  among: string | number;
   fontSize: number;
 }
 
@@ -18,12 +18,12 @@ export function CloudWordItemResearcher(props: Props) {
   return (
     <li
       key={props.id}
-      className="list-none list-item w-min group"
+      className="list-none list-item w-fit group cursor-pointer"
       onClick={() => onOpen('researcher-modal', { name: props.name })}
     >
       <div>
         <Alert
-          className={`flex gap-2 font-semibold text-white items-center whitespace-nowrap
+          className={`flex font-semibold text-white items-center whitespace-nowrap border-0 transition-all
            ${(searchType === 'article' && 'bg-blue-500 dark:bg-blue-500 ') ||
             (searchType === 'abstract' && 'bg-yellow-500 dark:bg-yellow-500 ') ||
             (searchType === 'speaker' && 'bg-orange-500 dark:bg-orange-500') ||
@@ -34,7 +34,12 @@ export function CloudWordItemResearcher(props: Props) {
             ''
             }
         `}
-          style={{ fontSize: `${props.fontSize}%` }}
+          style={{
+            fontSize: `${props.fontSize}%`,
+            padding: '0.65em 1.1em',
+            gap: '0.45em',
+            borderRadius: '0.5em',
+          }}
         >
           {props.name}
           <div className="font-normal">{props.among}</div>
