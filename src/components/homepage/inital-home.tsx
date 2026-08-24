@@ -114,8 +114,10 @@ export function InitialHome() {
     years.push(i);
   }
 
-  const { data: dados = [] } = useResearcherDadosGerais(new Date().getFullYear() - 4);
-  const { data: words = [] } = useWordsResearcher();
+  const { data: dadosData = [] } = useResearcherDadosGerais(new Date().getFullYear() - 4);
+  const dados = Array.isArray(dadosData) ? dadosData : [];
+  const { data: wordsData = [] } = useWordsResearcher();
+  const words = Array.isArray(wordsData) ? wordsData : [];
 
   const { theme } = useTheme();
 
@@ -232,15 +234,15 @@ export function InitialHome() {
             <ArrowRight size={12} />
           </Link>
 
-          <h1 className="z-[2] text-center max-w-[980px] text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]  md:block mb-4 ">
-            Experimente{' '}
-            <strong className="bg-eng-blue  rounded-md px-3 pb-2 text-white font-medium">
-              {' '}
-              pesquisar um tema
-            </strong>{' '}
-            e veja o que a plataforma pode filtrar para você.
-          </h1>
-          <p className="max-w-[750px] text-center text-lg font-light text-foreground"></p>
+                    <h1 className="z-[2] text-center max-w-[980px] text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]  md:block mb-4 ">
+                        Descubra talentos científicos e{" "}
+                        <strong className="bg-eng-blue  rounded-md px-3 pb-2 text-white font-medium">
+                            {" "}
+                            competências
+                        </strong>{" "}
+                        na Bahia.
+                    </h1>
+                    <p className="max-w-[750px] text-center text-lg font-light text-foreground"></p>
 
           <div className="lg:max-w-[60vw] lg:w-[60vw] w-full">
             <Search />

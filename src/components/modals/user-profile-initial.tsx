@@ -245,8 +245,6 @@ export function UserProfileInitialModal() {
   const [perfil, setPerfil] = useState('');
   const [status, setStatus] = useState('');
 
-  console.log(perfil);
-
   const content = () => {
     return (
       <div className="flex flex-col gap-4">

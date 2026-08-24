@@ -19,7 +19,11 @@ export const getResearcherDadosGerais = async (year: number) => {
   const { data } = await api.get('ResearcherData/DadosGerais', {
     params: { year },
   });
-  return data;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data?.results)) return data.results;
+  if (Array.isArray(data?.items)) return data.items;
+  return [];
 };
 
 export const getMetricsResearcherScholarship = async () => {
@@ -34,7 +38,11 @@ export const getWordsResearcher = async () => {
       researcher_id: '',
     },
   });
-  return data;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  if (Array.isArray(data?.results)) return data.results;
+  if (Array.isArray(data?.items)) return data.items;
+  return [];
 };
 
 export const getFoment = async () => {

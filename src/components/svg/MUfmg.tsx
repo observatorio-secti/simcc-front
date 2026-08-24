@@ -5,7 +5,7 @@ export function MUfmg() {
 
   return (
     <svg
-      height="full"
+      height="100%"
       viewBox="0 0 1850 1420"
       fill={theme == 'dark' ? '#ffffff' : '#000000'}
       xmlns="http://www.w3.org/2000/svg"
