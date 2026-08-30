@@ -46,7 +46,6 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { AreaChart, Area, LineChart, Line } from 'recharts';
 
-
 import { ChartConfig, ChartContainer } from '../../components/ui/chart';
 
 import Highcharts from 'highcharts';
@@ -61,9 +60,6 @@ import {
   useResearcherDadosGerais,
   useWordsResearcher,
 } from './hooks/use-home-queries';
-
-
-
 
 HC_wordcloud(Highcharts);
 
@@ -234,15 +230,19 @@ export function InitialHome() {
             <ArrowRight size={12} />
           </Link>
 
-                    <h1 className="z-[2] text-center max-w-[980px] text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]  md:block mb-4 ">
-                        Descubra talentos científicos e{" "}
-                        <strong className="bg-eng-blue  rounded-md px-3 pb-2 text-white font-medium">
-                            {" "}
-                            competências
-                        </strong>{" "}
-                        na Bahia.
-                    </h1>
-                    <p className="max-w-[750px] text-center text-lg font-light text-foreground"></p>
+          <h1 className="z-[2] text-center text-3xl font-medium text-slate-800 leading-snug tracking-tight md:text-[2.6rem] lg:leading-[1.5] mb-8 mt-4">
+              Experimente{' '}
+              <span className="text-[#00757a] font-semibold border-b-[2px] border-[#00757a] pb-[4px]">
+                  pesquisar um tema
+              </span>
+              <br className="hidden md:block" />
+              e veja o que a plataforma pode
+              <br className="hidden md:block" />
+              filtrar para{' '}
+              <span className="text-[#9c1f2e] font-semibold">
+                  você.
+              </span>
+          </h1>
 
           <div className="lg:max-w-[60vw] lg:w-[60vw] w-full">
             <Search />
