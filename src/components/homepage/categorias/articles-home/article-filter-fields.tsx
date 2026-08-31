@@ -1,6 +1,50 @@
+import { useEffect, useState } from "react";
 import { Alert } from "../../../ui/alert";
+import { Input } from "../../../ui/input";
 import { CalendarBlank, CheckSquare } from "phosphor-react";
 import { Slider } from "../../../ui/slider";
+
+export const ABSOLUTE_YEAR_MIN = 1990;
+
+export function getYearBounds() {
+    const max = new Date().getFullYear();
+    return { min: ABSOLUTE_YEAR_MIN, max, defaultMin: max - 10, defaultMax: max };
+}
+
+export function getDefaultYearRange(): [number, number] {
+    const { defaultMin, defaultMax } = getYearBounds();
+    return [defaultMin, defaultMax];
+}
+
+export function normalizeYearRange(value: number[] | undefined): [number, number] {
+    const { min: YEAR_MIN, max: YEAR_MAX } = getYearBounds();
+    if (!value || value.length === 0) return getDefaultYearRange();
+    if (value.length === 1) {
+        const clamped = Math.min(Math.max(value[0], YEAR_MIN), YEAR_MAX);
+        return [clamped, YEAR_MAX];
+    }
+    const a = Math.min(Math.max(value[0], YEAR_MIN), YEAR_MAX);
+    const b = Math.min(Math.max(value[1], YEAR_MIN), YEAR_MAX);
+    return a <= b ? [a, b] : [b, b];
+}
+
+export function yearRangeToString(range: number[] | undefined): string {
+    const [min] = normalizeYearRange(range);
+    return String(min);
+}
+
+export function yearRangeToStringExpanded(range: number[] | undefined): string {
+    const [min, max] = normalizeYearRange(range);
+    const years: number[] = [];
+    for (let y = min; y <= max; y++) years.push(y);
+    return years.join(";");
+}
+
+export function yearRangeToStringInterval(range: number[] | undefined): string {
+    const [min, max] = normalizeYearRange(range);
+    if (min === max) return String(min);
+    return `${min};${max}`;
+}
 
 export const qualisColor: { [key: string]: string } = {
     A1: "bg-[#006837]",
@@ -62,20 +106,107 @@ export function ArticleQualisSelector({ selected, onToggle }: { selected: string
 }
 
 export function ArticleYearSlider({ value, onChange }: { value: number[]; onChange: (value: number[]) => void }) {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
+    const { min: YEAR_MIN, max: YEAR_MAX } = getYearBounds();
+    const normalized = normalizeYearRange(value);
+    const [minStr, setMinStr] = useState(String(normalized[0]));
+    const [maxStr, setMaxStr] = useState(String(normalized[1]));
+
+    useEffect(() => {
+        setMinStr(String(normalized[0]));
+        setMaxStr(String(normalized[1]));
+    }, [normalized[0], normalized[1]]);
+
+    const commitMin = (raw: string) => {
+        const parsed = parseInt(raw, 10);
+        if (Number.isNaN(parsed)) {
+            setMinStr(String(normalized[0]));
+            return;
+        }
+        let clamped = Math.min(Math.max(parsed, YEAR_MIN), YEAR_MAX);
+        if (clamped > normalized[1]) clamped = normalized[1];
+        onChange([clamped, normalized[1]]);
+    };
+
+    const commitMax = (raw: string) => {
+        const parsed = parseInt(raw, 10);
+        if (Number.isNaN(parsed)) {
+            setMaxStr(String(normalized[1]));
+            return;
+        }
+        let clamped = Math.min(Math.max(parsed, YEAR_MIN), YEAR_MAX);
+        if (clamped < normalized[0]) clamped = normalized[0];
+        onChange([normalized[0], clamped]);
+    };
+
+    const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value;
+        setMinStr(raw);
+        if (raw === "" || raw === "-") return;
+        const parsed = parseInt(raw, 10);
+        if (Number.isNaN(parsed)) return;
+        if (parsed < YEAR_MIN || parsed > YEAR_MAX) return;
+        if (parsed > normalized[1]) return;
+        onChange([parsed, normalized[1]]);
+    };
+
+    const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value;
+        setMaxStr(raw);
+        if (raw === "" || raw === "-") return;
+        const parsed = parseInt(raw, 10);
+        if (Number.isNaN(parsed)) return;
+        if (parsed < YEAR_MIN || parsed > YEAR_MAX) return;
+        if (parsed < normalized[0]) return;
+        onChange([normalized[0], parsed]);
+    };
 
     return (
-        <Alert className="w-full flex items-center gap-2 h-full">
+        <Alert className="w-full flex flex-col gap-3">
             <Slider
-                value={value}
-                onValueChange={onChange}
-                max={year}
-                min={1990}
+                value={normalized}
+                onValueChange={(v) => {
+                    const [a, b] = v as [number, number];
+                    const clampedA = Math.min(Math.max(a, YEAR_MIN), YEAR_MAX);
+                    const clampedB = Math.min(Math.max(b, YEAR_MIN), YEAR_MAX);
+                    onChange(clampedA <= clampedB ? [clampedA, clampedB] : [clampedB, clampedB]);
+                }}
+                max={YEAR_MAX}
+                min={YEAR_MIN}
                 step={1}
                 className="color-blue-700"
-            ></Slider>
-            <p className="text-sm font-bold">{value}</p>
+            />
+            <div className="flex items-center gap-2">
+                <Input
+                    type="number"
+                    inputMode="numeric"
+                    aria-label="Ano mínimo"
+                    value={minStr}
+                    min={YEAR_MIN}
+                    max={YEAR_MAX}
+                    onChange={handleMinChange}
+                    onBlur={() => commitMin(minStr)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                    }}
+                    className="h-9 text-center"
+                />
+                <span className="text-sm text-muted-foreground shrink-0">—</span>
+                <Input
+                    type="number"
+                    inputMode="numeric"
+                    aria-label="Ano máximo"
+                    value={maxStr}
+                    min={YEAR_MIN}
+                    max={YEAR_MAX}
+                    onChange={handleMaxChange}
+                    onBlur={() => commitMax(maxStr)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                    }}
+                    className="h-9 text-center"
+                />
+            </div>
+            <p className="text-sm font-bold text-center">{normalized[0]} — {normalized[1]}</p>
         </Alert>
     );
 }

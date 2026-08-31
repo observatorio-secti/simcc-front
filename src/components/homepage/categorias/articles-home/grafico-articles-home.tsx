@@ -64,21 +64,48 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function GraficoArticleHome({ researcher_id }) {
-  console.log('ID TA AQUI', researcher_id);
+type GraficoArticleHomeProps = {
+  researcher_id?: string | null;
+  url?: string;
+  articles?: { year: string | number; qualis?: string | null }[];
+};
+
+export function GraficoArticleHome({ researcher_id, url: chartUrl, articles }: GraficoArticleHomeProps) {
   const { urlGeral } = useContext(UserContext);
   const [chartData, setChartData] = useState<
     { year: number; [qualis: string]: number }[]
   >([]);
 
   useEffect(() => {
+    if (articles) {
+      const groupedArticles = articles.reduce<Record<number, Record<string, number>>>((groups, article) => {
+        const year = Number(article.year);
+        const qualis = article.qualis ?? 'SQ';
+
+        if (!groups[year]) {
+          groups[year] = {};
+        }
+
+        groups[year][qualis] = (groups[year][qualis] ?? 0) + 1;
+        return groups;
+      }, {});
+
+      setChartData(Object.entries(groupedArticles).map(([year, qualis]) => ({
+        year: Number(year),
+        ...qualis,
+      })));
+      return;
+    }
+
     const fetchData = async () => {
       try {
-        const url = new URL(`${urlGeral}metrics/article/chart`);
+        const url = chartUrl ?? `${urlGeral}metrics/article/chart`;
+        const searchParams = new URLSearchParams();
         if (researcher_id != null && researcher_id !== '') {
-          url.searchParams.append('researcher_id', researcher_id);
+          searchParams.append('researcher_id', researcher_id);
         }
-        const response = await fetch(url.toString());
+        const query = searchParams.toString();
+        const response = await fetch(query ? `${url}?${query}` : url);
         const data = await response.json();
 
         const formattedData = data.map((item: any) => ({
@@ -95,7 +122,7 @@ export function GraficoArticleHome({ researcher_id }) {
     if (urlGeral) {
       fetchData();
     }
-  }, [urlGeral]);
+  }, [urlGeral, researcher_id, chartUrl, articles]);
 
   return (
     <Alert className="pt-12">

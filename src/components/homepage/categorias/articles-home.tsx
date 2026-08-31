@@ -19,6 +19,7 @@ import { GraficoCitationsArticleHome } from "./articles-home/grafico-citacoes";
 import { File } from "lucide-react";
 import { ResultFiltersSlotContext } from "../result-filters-slot-context";
 import { useArticleFilters } from "./articles-home/use-article-filters";
+import { getDefaultYearRange, normalizeYearRange, yearRangeToString } from "./articles-home/article-filter-fields";
 
 export type Publicacao = {
     abstract: string,
@@ -130,7 +131,7 @@ function ArticlesChartsAccordion({ loading, publicacoes }: { loading: boolean, p
                         </div>
                     ) : (
                         <div className="grid gap-8">
-                            <GraficoArticleHome researcher_id={null} />
+                            <GraficoArticleHome researcher_id={null} articles={publicacoes} />
                             <GraficoCitationsArticleHome articles={publicacoes} />
                         </div>
                     )}
@@ -201,13 +202,12 @@ function ArticlesListAccordion({ loading, publicacoes, typeVisu, setTypeVisu, di
 }
 export function ArticlesHome() {
     const { urlGeral, searchType, valoresSelecionadosExport } = useContext(UserContext);
-    const filtersSlot = useContext(ResultFiltersSlotContext);
+    const { slot: filtersSlot, articleDistinct, setArticleDistinct } = useContext(ResultFiltersSlotContext);
     const queryUrl = useQuery();
     const institutionId = queryUrl.get('institution_id');
 
     const [loading, isLoading] = useState(false);
     const [, setLoadingCharts] = useState(false);
-    const [distinct, setDistinct] = useState(false);
     const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
     const [chartData, setChartData] = useState<ChartMetric[]>([]);
     const [typeVisu, setTypeVisu] = useState('block');
@@ -219,13 +219,46 @@ export function ArticlesHome() {
     const institutionParam = institutionId ? `&institution_id=${institutionId}` : '';
     const selectedTerms = institutionId ? '' : valoresSelecionadosExport;
 
-    const publicacoesLength = useMemo(() => {
+    const chartTotal = useMemo(() => {
         return chartData.reduce((acc, item) => acc + item.among, 0);
     }, [chartData]);
+
+    const hasActiveFilters = useMemo(() => {
+        if (filters.length === 0) return false;
+
+        const currentFilter = filters[0];
+        const hasQualis = (currentFilter.qualis ?? []).length > 0;
+        const [defaultMin, defaultMax] = getDefaultYearRange();
+        const year = currentFilter.year ?? [];
+        const hasYearFilter = year.length !== 2 || year[0] !== defaultMin || year[1] !== defaultMax;
+
+        return hasQualis || hasYearFilter;
+    }, [filters]);
+
+    const publicacoesLength = useMemo(() => {
+        if (hasActiveFilters) {
+            if (publicacoes.length > 0) {
+                return publicacoes.length;
+            }
+
+            if (loading && chartTotal > 0) {
+                return chartTotal;
+            }
+
+            return 0;
+        }
+
+        if (chartTotal > 0) {
+            return chartTotal;
+        }
+
+        return publicacoes.length;
+    }, [hasActiveFilters, publicacoes.length, loading, chartTotal]);
 
     const handleResearcherUpdate = (newResearcherData: Filter[]) => {
         setFilters(newResearcherData);
         setPage(1);
+        setHasMore(true);
     };
 
     const { sidebar, component } = useArticleFilters({ filteredCount: publicacoesLength, filters, onFilterUpdate: handleResearcherUpdate });
@@ -236,44 +269,44 @@ export function ArticlesHome() {
     }, [chartData, publicacoesLength]);
 
     const urlTermPublicacoes = useMemo(() => {
-        const yearString = filters.length > 0 ? filters[0].year.join(';') : [2020];
+        const yearString = filters.length > 0 ? yearRangeToString(filters[0].year) : yearRangeToString(getDefaultYearRange());
         const qualisString = filters.length > 0 ? filters[0].qualis.join(';') : '';
         const paginationParams = `&page=${page}&lenght=${limit}&sort_by=year&sort_order=desc`;
 
-        let url = `${urlGeral}bibliographic_production_article?terms=&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}${paginationParams}`;
+        let url = `${urlGeral}bibliographic_production_article?terms=&year=${yearString}&qualis=${qualisString}&university=&distinct=${articleDistinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}${paginationParams}`;
 
         if (selectedTerms !== '') {
             if (searchType === 'name') {
                 url = `${urlGeral}bibliographic_production_researcher?terms=${selectedTerms}&researcher_id=&type=ARTICLE&qualis=${qualisString}&year=${yearString}${institutionParam}${paginationParams}`;
             } else if (searchType === 'article') {
-                url = `${urlGeral}bibliographic_production_article?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}${paginationParams}`;
+                url = `${urlGeral}bibliographic_production_article?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${articleDistinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}${paginationParams}`;
             } else if (searchType === 'area') {
                 url = `${urlGeral}bibliographic_production_article_area?area_specialty=${selectedTerms.replace(/;/g, ' ')}&great_area=&year=${yearString}&qualis=${qualisString}${institutionParam}${paginationParams}`;
             } else if (searchType === 'abstract') {
-                url = `${urlGeral}bibliographic_production_article?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}${institutionParam}${paginationParams}`;
+                url = `${urlGeral}bibliographic_production_article?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${articleDistinct ? '1' : '0'}${institutionParam}${paginationParams}`;
             }
         }
         return url;
-    }, [filters, searchType, selectedTerms, distinct, idGraduateProgram, institutionParam, urlGeral, page]);
+    }, [filters, searchType, selectedTerms, articleDistinct, idGraduateProgram, institutionParam, urlGeral, page]);
     const urlTermCharts = useMemo(() => {
-        const yearString = filters.length > 0 ? filters[0].year.join(';') : [2020];
+        const yearString = filters.length > 0 ? yearRangeToString(filters[0].year) : yearRangeToString(getDefaultYearRange());
         const qualisString = filters.length > 0 ? filters[0].qualis.join(';') : '';
 
-        let url = `${urlGeral}metrics/article/chart?terms=&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}`;
+        let url = `${urlGeral}metrics/article/chart?terms=&year=${yearString}&qualis=${qualisString}&university=&distinct=${articleDistinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}`;
 
         if (selectedTerms !== '') {
             if (searchType === 'name') {
                 url = `${urlGeral}metrics/article/chart?terms=${selectedTerms}&researcher_id=&type=ARTICLE&qualis=${qualisString}&year=${yearString}${institutionParam}`;
             } else if (searchType === 'article') {
-                url = `${urlGeral}metrics/article/chart?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}`;
+                url = `${urlGeral}metrics/article/chart?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${articleDistinct ? '1' : '0'}&graduate_program_id=${String(idGraduateProgram) === "0" ? "" : idGraduateProgram}${institutionParam}`;
             } else if (searchType === 'area') {
                 url = `${urlGeral}metrics/article/chart?area_specialty=${selectedTerms.replace(/;/g, ' ')}&great_area=&year=${yearString}&qualis=${qualisString}${institutionParam}`;
             } else if (searchType === 'abstract') {
-                url = `${urlGeral}metrics/article/chart?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${distinct ? '1' : '0'}${institutionParam}`;
+                url = `${urlGeral}metrics/article/chart?terms=${selectedTerms}&year=${yearString}&qualis=${qualisString}&university=&distinct=${articleDistinct ? '1' : '0'}${institutionParam}`;
             }
         }
         return url;
-    }, [filters, searchType, selectedTerms, distinct, idGraduateProgram, institutionParam, urlGeral]);
+    }, [filters, searchType, selectedTerms, articleDistinct, idGraduateProgram, institutionParam, urlGeral]);
     useEffect(() => {
         const fetchData = async () => {
             if (page === 1) isLoading(true);
@@ -288,14 +321,35 @@ export function ArticlesHome() {
                         "Content-Type": "text/plain",
                     },
                 });
+                if (!response.ok) {
+                    await response.text();
+                    isLoading(false);
+                    return;
+                }
+                const contentType = response.headers.get("content-type") || "";
+                if (!contentType.includes("application/json")) {
+                    await response.text();
+                    isLoading(false);
+                    return;
+                }
                 const data = await response.json();
                 if (data) {
+                    const interval = filters.length > 0 ? normalizeYearRange(filters[0].year) : getDefaultYearRange();
+                    const [minY, maxY] = interval;
+                    const filtered = Array.isArray(data)
+                        ? data.filter((item: Publicacao) => {
+                              const y = parseInt(String((item as Publicacao).year), 10);
+                              return !Number.isNaN(y) ? y >= minY && y <= maxY : true;
+                          })
+                        : data;
                     if (page === 1) {
-                        setPublicacoes(data);
+                        setPublicacoes(filtered);
                     } else {
-                        setPublicacoes(prev => [...prev, ...data]);
+                        setPublicacoes(prev => [...prev, ...filtered]);
                     }
-                    setHasMore(data.length === limit);
+                    setHasMore(Array.isArray(data) ? data.length === limit : false);
+                    isLoading(false);
+                } else {
                     isLoading(false);
                 }
             } catch (err) {
@@ -319,11 +373,27 @@ export function ArticlesHome() {
                         "Content-Type": "text/plain",
                     },
                 });
+                if (!response.ok) {
+                    await response.text();
+                    setLoadingCharts(false);
+                    return;
+                }
+                const contentType = response.headers.get("content-type") || "";
+                if (!contentType.includes("application/json")) {
+                    await response.text();
+                    setLoadingCharts(false);
+                    return;
+                }
                 const data = await response.json();
                 if (data) {
-                    setChartData(data);
-                    setLoadingCharts(false);
+                    const interval = filters.length > 0 ? normalizeYearRange(filters[0].year) : getDefaultYearRange();
+                    const [minY, maxY] = interval;
+                    const filtered = Array.isArray(data)
+                        ? (data as ChartMetric[]).filter((item) => item.year >= minY && item.year <= maxY)
+                        : data;
+                    setChartData(filtered);
                 }
+                setLoadingCharts(false);
             } catch (err) {
                 setLoadingCharts(false);
             }
@@ -340,8 +410,8 @@ export function ArticlesHome() {
                         <ArticlesSummaryCard
                             publicacoesLength={publicacoesLength}
                             percentage={percentage}
-                            distinct={distinct}
-                            setDistinct={setDistinct}
+                            distinct={articleDistinct}
+                            setDistinct={setArticleDistinct}
                         />
 
                         <ArticlesChartsAccordion
@@ -354,7 +424,7 @@ export function ArticlesHome() {
                             publicacoes={publicacoes}
                             typeVisu={typeVisu}
                             setTypeVisu={setTypeVisu}
-                            distinct={distinct}
+                            distinct={articleDistinct}
                             onLoadMore={() => setPage(prev => prev + 1)}
                             hasMore={hasMore}
                         />

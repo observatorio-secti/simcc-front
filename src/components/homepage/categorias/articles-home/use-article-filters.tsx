@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ResultFiltersSidebar, ResultFiltersSheet } from "../../result-filters-shell";
-import { ArticleFilterSections } from "./article-filter-fields";
+import { ArticleFilterSections, getDefaultYearRange, normalizeYearRange } from "./article-filter-fields";
 import debounce from "lodash.debounce";
 
 type Filter = {
@@ -14,14 +14,16 @@ type UseArticleFiltersProps = {
     onFilterUpdate: (filters: Filter[]) => void;
 };
 
-const DEFAULT_FILTERS: Filter = {
-    year: [1990],
+const getDefaultFilters = (): Filter => ({
+    year: [...getDefaultYearRange()],
     qualis: [],
-};
+});
+
+const DEFAULT_FILTERS: Filter = getDefaultFilters();
 
 export function useArticleFilters({ filteredCount, filters, onFilterUpdate }: UseArticleFiltersProps) {
-    const [qualis, setQualis] = useState<string[]>(filters[0]?.qualis ?? DEFAULT_FILTERS.qualis);
-    const [year, setYear] = useState<number[]>(filters[0]?.year ?? DEFAULT_FILTERS.year);
+    const [qualis, setQualis] = useState<string[]>(filters[0]?.qualis ?? getDefaultFilters().qualis);
+    const [year, setYear] = useState<number[]>(normalizeYearRange(filters[0]?.year ?? getDefaultFilters().year));
     const isFirstRender = useRef(true);
     const onFilterUpdateRef = useRef(onFilterUpdate);
     onFilterUpdateRef.current = onFilterUpdate;
@@ -32,8 +34,8 @@ export function useArticleFilters({ filteredCount, filters, onFilterUpdate }: Us
         debouncedUpdate([{ year: nextYear, qualis: nextQualis }]);
     }, [debouncedUpdate]);
 
-    const handleQualisChange = useCallback((nextQualis: string[]) => {
-        setQualis(nextQualis);
+    const handleQualisChange = useCallback((nextQualis: string[] | ((prev: string[]) => string[])) => {
+        setQualis((prev) => (typeof nextQualis === 'function' ? (nextQualis as (p: string[]) => string[])(prev) : nextQualis));
     }, []);
 
     const handleYearChange = useCallback((nextYear: number[]) => {
@@ -41,14 +43,17 @@ export function useArticleFilters({ filteredCount, filters, onFilterUpdate }: Us
     }, []);
 
     const clearFilters = useCallback(() => {
+        debouncedUpdate.cancel();
+        const defaults = getDefaultFilters();
         setQualis([]);
-        setYear(DEFAULT_FILTERS.year);
-        onFilterUpdate([{ ...DEFAULT_FILTERS }]);
-    }, [onFilterUpdate]);
+        setYear(defaults.year);
+        onFilterUpdate([{ ...defaults }]);
+    }, [onFilterUpdate, debouncedUpdate]);
 
     const applyFilters = useCallback(() => {
+        debouncedUpdate.cancel();
         onFilterUpdate([{ year, qualis }]);
-    }, [year, qualis, onFilterUpdate]);
+    }, [year, qualis, onFilterUpdate, debouncedUpdate]);
 
     useEffect(() => {
         if (isFirstRender.current) {
@@ -58,18 +63,14 @@ export function useArticleFilters({ filteredCount, filters, onFilterUpdate }: Us
         emitFilters(qualis, year);
     }, [qualis, year]);
 
-    const sections = (
-        <ArticleFilterSections
-            qualis={qualis}
-            year={year}
-            onQualisChange={handleQualisChange}
-            onYearChange={handleYearChange}
-        />
-    );
-
     const sidebar = (
         <ResultFiltersSidebar onClear={clearFilters}>
-            {sections}
+            <ArticleFilterSections
+                qualis={qualis}
+                year={year}
+                onQualisChange={handleQualisChange}
+                onYearChange={handleYearChange}
+            />
         </ResultFiltersSidebar>
     );
 
@@ -79,7 +80,12 @@ export function useArticleFilters({ filteredCount, filters, onFilterUpdate }: Us
             onApply={applyFilters}
             filteredCount={filteredCount}
         >
-            {sections}
+            <ArticleFilterSections
+                qualis={qualis}
+                year={year}
+                onQualisChange={handleQualisChange}
+                onYearChange={handleYearChange}
+            />
         </ResultFiltersSheet>
     );
 

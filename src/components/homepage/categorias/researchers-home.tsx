@@ -798,7 +798,7 @@ export function ResearchersHome() {
     const { itemsSelecionados, urlGeral, searchType, simcc } = useContext(UserContext);
     const { pesquisadoresSelecionados, idGraduateProgram } = useContext(UserContext);
     const version = false;
-    const filtersSlot = useContext(ResultFiltersSlotContext);
+    const { slot: filtersSlot } = useContext(ResultFiltersSlotContext);
 
     useEffect(() => {
         localStorage.setItem('pesquisadoresSelecionados', JSON.stringify(pesquisadoresSelecionados));
