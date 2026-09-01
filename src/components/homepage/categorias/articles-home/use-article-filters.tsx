@@ -19,8 +19,6 @@ const getDefaultFilters = (): Filter => ({
     qualis: [],
 });
 
-const DEFAULT_FILTERS: Filter = getDefaultFilters();
-
 export function useArticleFilters({ filteredCount, filters, onFilterUpdate }: UseArticleFiltersProps) {
     const [qualis, setQualis] = useState<string[]>(filters[0]?.qualis ?? getDefaultFilters().qualis);
     const [year, setYear] = useState<number[]>(normalizeYearRange(filters[0]?.year ?? getDefaultFilters().year));

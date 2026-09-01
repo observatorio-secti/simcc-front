@@ -168,7 +168,8 @@ export function ArticleYearSlider({ value, onChange }: { value: number[]; onChan
                     const [a, b] = v as [number, number];
                     const clampedA = Math.min(Math.max(a, YEAR_MIN), YEAR_MAX);
                     const clampedB = Math.min(Math.max(b, YEAR_MIN), YEAR_MAX);
-                    onChange(clampedA <= clampedB ? [clampedA, clampedB] : [clampedB, clampedB]);
+                    const next = clampedA <= clampedB ? [clampedA, clampedB] : [clampedB, clampedB];
+                    onChange(next as [number, number]);
                 }}
                 max={YEAR_MAX}
                 min={YEAR_MIN}

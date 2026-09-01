@@ -18,7 +18,8 @@ import {
 } from '../../../../components/ui/chart';
 
 type Articles = {
-  articles: any[];
+  articles?: any[];
+  metrics?: { year: number; citations: number }[];
 };
 
 const chartConfig = {
@@ -37,6 +38,10 @@ export function GraficoCitationsArticleHome(props: Articles) {
   >([]);
 
   useEffect(() => {
+    if (props.metrics) {
+      setChartData(props.metrics.map(m => ({ year: m.year, citations: m.citations })));
+      return;
+    }
     if (props.articles) {
       const counts: { [year: number]: number } = {};
 
@@ -58,7 +63,7 @@ export function GraficoCitationsArticleHome(props: Articles) {
 
       setChartData(data);
     }
-  }, [props.articles]);
+  }, [props.articles, props.metrics]);
 
   return (
     <Alert className="pt-12">

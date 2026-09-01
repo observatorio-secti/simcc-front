@@ -68,15 +68,20 @@ type GraficoArticleHomeProps = {
   researcher_id?: string | null;
   url?: string;
   articles?: { year: string | number; qualis?: string | null }[];
+  metrics?: { year: number; qualis: Record<string, number> }[];
 };
 
-export function GraficoArticleHome({ researcher_id, url: chartUrl, articles }: GraficoArticleHomeProps) {
+export function GraficoArticleHome({ researcher_id, url: chartUrl, articles, metrics }: GraficoArticleHomeProps) {
   const { urlGeral } = useContext(UserContext);
   const [chartData, setChartData] = useState<
     { year: number; [qualis: string]: number }[]
   >([]);
 
   useEffect(() => {
+    if (metrics) {
+      setChartData(metrics.map(m => ({ year: m.year, ...m.qualis })));
+      return;
+    }
     if (articles) {
       const groupedArticles = articles.reduce<Record<number, Record<string, number>>>((groups, article) => {
         const year = Number(article.year);
@@ -122,7 +127,7 @@ export function GraficoArticleHome({ researcher_id, url: chartUrl, articles }: G
     if (urlGeral) {
       fetchData();
     }
-  }, [urlGeral, researcher_id, chartUrl, articles]);
+  }, [urlGeral, researcher_id, chartUrl, articles, metrics]);
 
   return (
     <Alert className="pt-12">
