@@ -37,6 +37,7 @@ import { Keepo } from '../dashboard/builder-page/builder-page';
 import { useParams } from 'react-router-dom';
 import { useInstitution } from './hooks/use-institution-queries';
 import { Institution as InstitutionType } from '../../services/institution';
+import { getFallbackInstitutionCover, getFallbackInstitutionLogo } from './fallback-logos';
 
 export type GraduateProgram = InstitutionType;
 HC_wordcloud(Highcharts);
@@ -77,6 +78,37 @@ export function VisualizacaoInstituicao({
 
   const { data: graduatePrograms, isLoading: loading } =
     useInstitution(effectiveIdentifier);
+
+  // Fallback pequeno para logo principal e capa (removível quando back retornar)
+  const fallbackLogoDetail = getFallbackInstitutionLogo({
+    id: graduatePrograms?.id,
+    acronym: (graduatePrograms as any)?.acronym || effectiveIdentifier,
+    name: graduatePrograms?.name,
+  });
+  const fallbackCoverDetail = getFallbackInstitutionCover({
+    id: graduatePrograms?.id,
+    acronym: (graduatePrograms as any)?.acronym || effectiveIdentifier,
+    name: graduatePrograms?.name,
+  });
+  const admIconSrc = graduatePrograms?.id ? `${urlGeralAdm}institution/upload/${graduatePrograms.id}/icon` : '';
+  const [detailIconSrc, setDetailIconSrc] = useState(admIconSrc || fallbackLogoDetail || '');
+  useEffect(() => {
+    setDetailIconSrc(admIconSrc || fallbackLogoDetail || '');
+  }, [admIconSrc, fallbackLogoDetail]);
+
+  const admCoverSrc = graduatePrograms?.id ? `${urlGeralAdm}institution/upload/${graduatePrograms.id}/cover` : '';
+  const [detailCoverSrc, setDetailCoverSrc] = useState(admCoverSrc || fallbackCoverDetail || '');
+  useEffect(() => {
+    setDetailCoverSrc(admCoverSrc || fallbackCoverDetail || '');
+  }, [admCoverSrc, fallbackCoverDetail]);
+  useEffect(() => {
+    if (!detailCoverSrc || detailCoverSrc === fallbackCoverDetail) return;
+    const img = new Image();
+    img.onerror = () => {
+      if (fallbackCoverDetail) setDetailCoverSrc(fallbackCoverDetail);
+    };
+    img.src = detailCoverSrc;
+  }, [detailCoverSrc, fallbackCoverDetail]);
 
   // Mapeamento de links das instituições
   const institutionLinks: { [key: string]: string } = {
@@ -328,7 +360,11 @@ export function VisualizacaoInstituicao({
           <div className="md:p-8 p-4 pb-0">
             <div
               style={{
-                backgroundImage: `url(${urlGeralAdm}institution/upload/${graduatePrograms.id}/cover)`,
+                backgroundImage: detailCoverSrc
+                  ? `url(${detailCoverSrc})`
+                  : fallbackCoverDetail
+                    ? `url(${fallbackCoverDetail})`
+                    : undefined,
               }}
               className="bg-eng-blue bg-no-repeat bg-center bg-cover border dark:border-neutral-800 w-full rounded-md h-[300px]"
             >
@@ -406,7 +442,8 @@ lg:flex-row
                     <div className="absolute">
                       <Avatar
                         onClick={handleLogoClick}
-                        className={`rounded-lg h-24 w-24 relative -top-12 xl:top-0 ${getInstitutionLink() ? 'cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out ring-2 ring-transparent hover:ring-white/50' : ''}`}
+                        style={{ backgroundColor: 'white' }}
+                        className={`rounded-lg h-24 w-24 relative -top-12 xl:top-0 bg-white dark:bg-white ${getInstitutionLink() ? 'cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out ring-2 ring-transparent hover:ring-white/50' : ''}`}
                         title={
                           getInstitutionLink()
                             ? `Visitar site da ${graduatePrograms.name}`
@@ -414,11 +451,27 @@ lg:flex-row
                         }
                       >
                         <AvatarImage
-                          className={'rounded-md h-24 w-24'}
-                          src={`${urlGeralAdm}institution/upload/${graduatePrograms.id}/icon`}
+                          style={{ backgroundColor: 'white' }}
+                          className={'rounded-md h-24 w-24 object-contain bg-white dark:bg-white p-1'}
+                          src={detailIconSrc || fallbackLogoDetail || ''}
+                          onError={() => {
+                            if (fallbackLogoDetail && detailIconSrc !== fallbackLogoDetail) setDetailIconSrc(fallbackLogoDetail);
+                          }}
                         />
-                        <AvatarFallback className="flex items-center justify-center">
-                          <Building size={24} />
+                        <AvatarFallback
+                          style={{ backgroundColor: 'white' }}
+                          className="flex items-center justify-center bg-white dark:bg-white"
+                        >
+                          {fallbackLogoDetail ? (
+                            <img
+                              src={fallbackLogoDetail}
+                              alt={graduatePrograms.acronym || graduatePrograms.name}
+                              className="h-full w-full object-contain p-1 bg-white"
+                              style={{ backgroundColor: 'white' }}
+                            />
+                          ) : (
+                            <Building size={24} />
+                          )}
                         </AvatarFallback>
                       </Avatar>
                     </div>
