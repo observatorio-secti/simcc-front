@@ -4,12 +4,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Alert } from '../ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useModal } from '../hooks/use-modal-store';
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { UserContext } from '../../context/context';
 
 interface GraduateProgram {
   id: string;
-  avatar: string;
+  avatar?: string;
+  image?: string | null;
+  cover?: string | null;
   name: string;
   count_r: string;
   count_gp: string;
@@ -133,9 +135,19 @@ export function InstitutionItem(props: GraduateProgram) {
   };
 
   const { onOpen } = useModal();
-  const { urlGeral, urlGeralAdm, simcc } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const buildAssetUrl = (path?: string | null) => {
+    if (!path) return null;
+    if (/^https?:\/\//.test(path)) return path;
+    const base = (urlGeral || '').replace(/\/$/, '');
+    return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
+
+  const rawLogo = (props as any).image ?? props.avatar ?? null;
+  const rawCover = (props as any).cover ?? null;
+  const logoUrl = buildAssetUrl(rawLogo);
+  const coverUrl = buildAssetUrl(rawCover);
 
   return (
     <div
@@ -146,12 +158,22 @@ export function InstitutionItem(props: GraduateProgram) {
       <Alert
         className="flex flex-col items-center bg-no-repeat bg-center bg-cover"
         style={{
-          backgroundImage: `url(${urlGeralAdm}institution/upload/${props.id}/cover)`,
+          backgroundImage: coverUrl ? `url(${coverUrl})` : undefined,
         }}
       >
-        <Avatar className="cursor-pointer z-[1] top-12 rounded-md relative border dark:border-neutral-800 h-20 w-20 flex-shrink-0">
-          <AvatarImage className="rounded-md" src={props.avatar} />
-          <AvatarFallback className="flex items-center justify-center">
+        <Avatar
+          style={{ backgroundColor: 'white' }}
+          className="cursor-pointer z-[1] top-12 rounded-md relative border dark:border-neutral-800 h-20 w-20 flex-shrink-0 bg-white dark:bg-white"
+        >
+          <AvatarImage
+            style={{ backgroundColor: 'white' }}
+            className="rounded-md object-contain bg-white dark:bg-white p-1"
+            src={logoUrl || undefined}
+          />
+          <AvatarFallback
+            style={{ backgroundColor: 'white' }}
+            className="flex items-center justify-center bg-white dark:bg-white"
+          >
             <Landmark size={16} />
           </AvatarFallback>
         </Avatar>

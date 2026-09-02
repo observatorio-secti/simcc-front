@@ -11,6 +11,8 @@ export interface Institution {
   count_t: string;
   acronym: string;
   researchers: string[];
+  image: string | null;
+  cover: string | null;
 }
 
 export interface TotalDocentesMetrics {

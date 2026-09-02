@@ -51,7 +51,7 @@ interface VisualizacaoInstituicaoProps {
 export function VisualizacaoInstituicao({
   identifier: propIdentifier,
 }: VisualizacaoInstituicaoProps = {}) {
-  const { urlGeral, urlGeralAdm } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams<{
@@ -77,6 +77,16 @@ export function VisualizacaoInstituicao({
 
   const { data: graduatePrograms, isLoading: loading } =
     useInstitution(effectiveIdentifier);
+
+  const buildAssetUrl = (path?: string | null) => {
+    if (!path) return null;
+    if (/^https?:\/\//.test(path)) return path;
+    const base = (urlGeral || '').replace(/\/$/, '');
+    return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
+
+  const logoUrl = buildAssetUrl((graduatePrograms as any)?.image);
+  const coverUrl = buildAssetUrl((graduatePrograms as any)?.cover);
 
   // Mapeamento de links das instituições
   const institutionLinks: { [key: string]: string } = {
@@ -328,7 +338,7 @@ export function VisualizacaoInstituicao({
           <div className="md:p-8 p-4 pb-0">
             <div
               style={{
-                backgroundImage: `url(${urlGeralAdm}institution/upload/${graduatePrograms.id}/cover)`,
+                backgroundImage: coverUrl ? `url(${coverUrl})` : undefined,
               }}
               className="bg-eng-blue bg-no-repeat bg-center bg-cover border dark:border-neutral-800 w-full rounded-md h-[300px]"
             >
@@ -406,7 +416,8 @@ lg:flex-row
                     <div className="absolute">
                       <Avatar
                         onClick={handleLogoClick}
-                        className={`rounded-lg h-24 w-24 relative -top-12 xl:top-0 ${getInstitutionLink() ? 'cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out ring-2 ring-transparent hover:ring-white/50' : ''}`}
+                        style={{ backgroundColor: 'white' }}
+                        className={`rounded-lg h-24 w-24 relative -top-12 xl:top-0 bg-white dark:bg-white ${getInstitutionLink() ? 'cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out ring-2 ring-transparent hover:ring-white/50' : ''}`}
                         title={
                           getInstitutionLink()
                             ? `Visitar site da ${graduatePrograms.name}`
@@ -414,10 +425,14 @@ lg:flex-row
                         }
                       >
                         <AvatarImage
-                          className={'rounded-md h-24 w-24'}
-                          src={`${urlGeralAdm}institution/upload/${graduatePrograms.id}/icon`}
+                          style={{ backgroundColor: 'white' }}
+                          className={'rounded-md h-24 w-24 object-contain bg-white dark:bg-white p-1'}
+                          src={logoUrl || undefined}
                         />
-                        <AvatarFallback className="flex items-center justify-center">
+                        <AvatarFallback
+                          style={{ backgroundColor: 'white' }}
+                          className="flex items-center justify-center bg-white dark:bg-white"
+                        >
                           <Building size={24} />
                         </AvatarFallback>
                       </Avatar>

@@ -115,7 +115,7 @@ function ArticlesSummaryCard({ publicacoesLength, percentage, distinct, setDisti
     )
 }
 
-function ArticlesChartsAccordion({ loading, publicacoes }: { loading: boolean, publicacoes: Publicacao[] }) {
+function ArticlesChartsAccordion({ loading, chartData }: { loading: boolean, chartData: ChartMetric[] }) {
     return (
         <Accordion defaultValue="item-1" type="single" collapsible>
             <AccordionItem value="item-1">
@@ -131,8 +131,8 @@ function ArticlesChartsAccordion({ loading, publicacoes }: { loading: boolean, p
                         </div>
                     ) : (
                         <div className="grid gap-8">
-                            <GraficoArticleHome researcher_id={null} articles={publicacoes} />
-                            <GraficoCitationsArticleHome articles={publicacoes} />
+                            <GraficoArticleHome researcher_id={null} metrics={chartData} />
+                            <GraficoCitationsArticleHome metrics={chartData} />
                         </div>
                     )}
                 </AccordionContent>
@@ -207,17 +207,59 @@ export function ArticlesHome() {
     const institutionId = queryUrl.get('institution_id');
 
     const [loading, isLoading] = useState(false);
-    const [, setLoadingCharts] = useState(false);
-    const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
-    const [chartData, setChartData] = useState<ChartMetric[]>([]);
+    const [chartLoading, setLoadingCharts] = useState(false);
+    const [rawPublicacoes, setRawPublicacoes] = useState<Publicacao[]>([]);
+    const [rawChartData, setRawChartData] = useState<ChartMetric[]>([]);
     const [typeVisu, setTypeVisu] = useState('block');
     const [filters, setFilters] = useState<Filter[]>([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [fetchTrigger, setFetchTrigger] = useState(0);
     const limit = 12;
     const idGraduateProgram = '';
     const institutionParam = institutionId ? `&institution_id=${institutionId}` : '';
     const selectedTerms = institutionId ? '' : valoresSelecionadosExport;
+
+    const yearInterval = useMemo(() => {
+        const interval = filters.length > 0 ? normalizeYearRange(filters[0].year) : getDefaultYearRange();
+        return interval;
+    }, [filters]);
+
+    // Filtragem cliente: backend filtra só piso (year >= min), max aplicado aqui
+    const publicacoes = useMemo(() => {
+        const [minY, maxY] = yearInterval;
+        const filtered = rawPublicacoes.filter((item) => {
+            const y = parseInt(String(item.year), 10);
+            return !Number.isNaN(y) ? y >= minY && y <= maxY : true;
+        });
+        return filtered;
+    }, [rawPublicacoes, yearInterval]);
+
+    const chartData = useMemo(() => {
+        const [minY, maxY] = yearInterval;
+        let filtered = rawChartData.filter((item) => item.year >= minY && item.year <= maxY);
+        const activeQualis = filters.length > 0 ? filters[0].qualis : [];
+        if (activeQualis.length > 0) {
+            filtered = filtered.map(item => {
+                const newQualis: Record<string, number> = {};
+                let sumSelected = 0;
+                for (const k of Object.keys(item.qualis)) {
+                    const val = (item.qualis as any)[k] as number;
+                    const keep = activeQualis.includes(k) ? val : 0;
+                    newQualis[k] = keep;
+                    if (activeQualis.includes(k)) sumSelected += val;
+                }
+                const originalAmong = item.among;
+                const newAmong = sumSelected;
+                const ratio = originalAmong > 0 ? newAmong / originalAmong : 0;
+                const newCitations = Math.round(item.citations * ratio);
+                const newCountDoi = Math.round(item.count_doi * ratio);
+                return { ...item, qualis: newQualis as any, among: newAmong, citations: newCitations, count_doi: newCountDoi } as any;
+            });
+        }
+        filtered = filtered.filter(item => item.among > 0);
+        return filtered;
+    }, [rawChartData, yearInterval, filters]);
 
     const chartTotal = useMemo(() => {
         return chartData.reduce((acc, item) => acc + item.among, 0);
@@ -235,38 +277,50 @@ export function ArticlesHome() {
         return hasQualis || hasYearFilter;
     }, [filters]);
 
+    // Total desacoplado da paginação: usa chartData agregado
     const publicacoesLength = useMemo(() => {
-        if (hasActiveFilters) {
-            if (publicacoes.length > 0) {
-                return publicacoes.length;
-            }
-
-            if (loading && chartTotal > 0) {
-                return chartTotal;
-            }
-
-            return 0;
-        }
-
-        if (chartTotal > 0) {
-            return chartTotal;
-        }
-
-        return publicacoes.length;
-    }, [hasActiveFilters, publicacoes.length, loading, chartTotal]);
+        if (chartLoading) return 0;
+        return chartTotal;
+    }, [chartTotal, chartLoading, hasActiveFilters, publicacoes.length]);
 
     const handleResearcherUpdate = (newResearcherData: Filter[]) => {
+        const newInterval = newResearcherData[0] ? normalizeYearRange(newResearcherData[0].year) : getDefaultYearRange();
+        const prevInterval = filters.length > 0 ? normalizeYearRange(filters[0].year) : getDefaultYearRange();
+        const prevMin = prevInterval[0];
+        const newMin = newInterval[0];
+        const isMinChanged = prevMin !== newMin;
+        const prevQualis = filters.length > 0 ? (filters[0].qualis ?? []) : [];
+        const newQualis = newResearcherData[0]?.qualis ?? [];
+        const isQualisChanged = prevQualis.length !== newQualis.length || prevQualis.some((q,i) => q !== newQualis[i]) || newQualis.some((q,i) => q !== prevQualis[i]);
         setFilters(newResearcherData);
-        setPage(1);
-        setHasMore(true);
+        // Qualis precisa de fetch novo (backend filtra qualis corretamente), max sozinho pode ser só cliente
+        if (isMinChanged || isQualisChanged) {
+            setRawPublicacoes([]);
+            setRawChartData([]);
+            setPage(1);
+            setHasMore(true);
+            setFetchTrigger(t => t + 1);
+        } else {
+            if (rawPublicacoes.length === 0) {
+                setFetchTrigger(t => t + 1);
+                setPage(1);
+                setHasMore(true);
+            } else {
+                if (page !== 1) {
+                    setPage(1);
+                    setHasMore(true);
+                }
+            }
+        }
     };
 
     const { sidebar, component } = useArticleFilters({ filteredCount: publicacoesLength, filters, onFilterUpdate: handleResearcherUpdate });
 
     const percentage = useMemo(() => {
         const totalDoi = chartData.reduce((acc, item) => acc + item.count_doi, 0);
-        return publicacoesLength > 0 ? (totalDoi / publicacoesLength) * 100 : 0;
-    }, [chartData, publicacoesLength]);
+        const total = chartData.reduce((acc, item) => acc + item.among, 0);
+        return total > 0 ? (totalDoi / total) * 100 : 0;
+    }, [chartData]);
 
     const urlTermPublicacoes = useMemo(() => {
         const yearString = filters.length > 0 ? yearRangeToString(filters[0].year) : yearRangeToString(getDefaultYearRange());
@@ -322,30 +376,22 @@ export function ArticlesHome() {
                     },
                 });
                 if (!response.ok) {
-                    await response.text();
+                    const text = await response.text();
                     isLoading(false);
                     return;
                 }
                 const contentType = response.headers.get("content-type") || "";
                 if (!contentType.includes("application/json")) {
-                    await response.text();
+                    const text = await response.text();
                     isLoading(false);
                     return;
                 }
                 const data = await response.json();
                 if (data) {
-                    const interval = filters.length > 0 ? normalizeYearRange(filters[0].year) : getDefaultYearRange();
-                    const [minY, maxY] = interval;
-                    const filtered = Array.isArray(data)
-                        ? data.filter((item: Publicacao) => {
-                              const y = parseInt(String((item as Publicacao).year), 10);
-                              return !Number.isNaN(y) ? y >= minY && y <= maxY : true;
-                          })
-                        : data;
                     if (page === 1) {
-                        setPublicacoes(filtered);
+                        setRawPublicacoes(data);
                     } else {
-                        setPublicacoes(prev => [...prev, ...filtered]);
+                        setRawPublicacoes(prev => [...prev, ...data]);
                     }
                     setHasMore(Array.isArray(data) ? data.length === limit : false);
                     isLoading(false);
@@ -357,7 +403,7 @@ export function ArticlesHome() {
             }
         };
         fetchData();
-    }, [urlTermPublicacoes, page]);
+    }, [urlTermPublicacoes, page, fetchTrigger]);
 
     useEffect(() => {
         const fetchChartData = async () => {
@@ -374,24 +420,19 @@ export function ArticlesHome() {
                     },
                 });
                 if (!response.ok) {
-                    await response.text();
+                    const text = await response.text();
                     setLoadingCharts(false);
                     return;
                 }
                 const contentType = response.headers.get("content-type") || "";
                 if (!contentType.includes("application/json")) {
-                    await response.text();
+                    const text = await response.text();
                     setLoadingCharts(false);
                     return;
                 }
                 const data = await response.json();
                 if (data) {
-                    const interval = filters.length > 0 ? normalizeYearRange(filters[0].year) : getDefaultYearRange();
-                    const [minY, maxY] = interval;
-                    const filtered = Array.isArray(data)
-                        ? (data as ChartMetric[]).filter((item) => item.year >= minY && item.year <= maxY)
-                        : data;
-                    setChartData(filtered);
+                    setRawChartData(data);
                 }
                 setLoadingCharts(false);
             } catch (err) {
@@ -399,7 +440,33 @@ export function ArticlesHome() {
             }
         };
         fetchChartData();
-    }, [urlTermCharts]);
+    }, [urlTermCharts, fetchTrigger]);
+
+    // hasMore para botão "Mostrar mais" deve refletir total filtrado, não só raw
+    const hasMoreFiltered = useMemo(() => {
+        const total = chartTotal;
+        const filteredHasMore = total > 0 ? publicacoes.length < total : hasMore;
+        // Mantém compatibilidade: se backend diz hasMore true, mantém true
+        const combined = hasMore || filteredHasMore;
+        return combined;
+    }, [hasMore, chartTotal, publicacoes.length, page]);
+
+    // Paginação automática: backend só filtra piso, busca próximas páginas até preencher limite
+    useEffect(() => {
+        const autoFill = () => {
+            if (loading) return;
+            if (!hasMore) {
+                return;
+            }
+            if (rawPublicacoes.length === 0) return;
+            const shouldFill = publicacoes.length === 0 || (publicacoes.length > 0 && publicacoes.length < limit && rawPublicacoes.length >= limit);
+            const shouldFillByTotal = chartTotal > 0 && publicacoes.length < chartTotal && publicacoes.length < limit * 2;
+            const finalShouldFill = shouldFill || shouldFillByTotal;
+            if (finalShouldFill && page < 50) setPage(p => p + 1);
+        };
+        const t = setTimeout(autoFill, 500);
+        return () => clearTimeout(t);
+    }, [publicacoes.length, rawPublicacoes.length, hasMore, loading, page, yearInterval, chartTotal]);
 
     return (
         <div className="w-full h-full">
@@ -415,8 +482,8 @@ export function ArticlesHome() {
                         />
 
                         <ArticlesChartsAccordion
-                            loading={loading}
-                            publicacoes={publicacoes}
+                            loading={chartLoading}
+                            chartData={chartData}
                         />
 
                         <ArticlesListAccordion
@@ -426,7 +493,7 @@ export function ArticlesHome() {
                             setTypeVisu={setTypeVisu}
                             distinct={articleDistinct}
                             onLoadMore={() => setPage(prev => prev + 1)}
-                            hasMore={hasMore}
+                            hasMore={hasMoreFiltered}
                         />
                     </div>
                 </div>
