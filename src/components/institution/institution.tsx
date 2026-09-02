@@ -51,7 +51,6 @@ const useQuery = () => {
 };
 
 export function Institution() {
-  const { urlGeralAdm } = useContext(UserContext);
   const queryUrl = useQuery();
   const params = useParams<{
     acronym?: string;
@@ -418,7 +417,6 @@ export function Institution() {
                                         <InstitutionItem
                                           key={index} // Adiciona uma chave para cada item
                                           {...props}
-                                          avatar={`${urlGeralAdm}institution/upload/${props.id}/icon`}
                                           url={'/instituicao'}
                                         />
                                       );

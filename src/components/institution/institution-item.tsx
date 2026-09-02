@@ -4,13 +4,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Alert } from '../ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useModal } from '../hooks/use-modal-store';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { UserContext } from '../../context/context';
-import { getFallbackInstitutionCover, getFallbackInstitutionLogo } from './fallback-logos';
 
 interface GraduateProgram {
   id: string;
-  avatar: string;
+  avatar?: string;
+  image?: string | null;
+  cover?: string | null;
   name: string;
   count_r: string;
   count_gp: string;
@@ -134,39 +135,19 @@ export function InstitutionItem(props: GraduateProgram) {
   };
 
   const { onOpen } = useModal();
-  const { urlGeral, urlGeralAdm, simcc } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const buildAssetUrl = (path?: string | null) => {
+    if (!path) return null;
+    if (/^https?:\/\//.test(path)) return path;
+    const base = (urlGeral || '').replace(/\/$/, '');
+    return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
 
-  // Fallback pequeno para logo principal e capa (removível quando back retornar)
-  const fallbackLogo = getFallbackInstitutionLogo({
-    id: props.id,
-    acronym: props.acronym,
-    name: props.name,
-  });
-  const fallbackCover = getFallbackInstitutionCover({
-    id: props.id,
-    acronym: props.acronym,
-    name: props.name,
-  });
-  const [iconSrc, setIconSrc] = useState(props.avatar || fallbackLogo || '');
-  useEffect(() => {
-    setIconSrc(props.avatar || fallbackLogo || '');
-  }, [props.avatar, fallbackLogo]);
-
-  const admCoverSrc = `${urlGeralAdm}institution/upload/${props.id}/cover`;
-  const [coverSrc, setCoverSrc] = useState(admCoverSrc);
-  useEffect(() => {
-    setCoverSrc(admCoverSrc);
-  }, [admCoverSrc]);
-  useEffect(() => {
-    if (!coverSrc || coverSrc === fallbackCover) return;
-    const img = new Image();
-    img.onerror = () => {
-      if (fallbackCover) setCoverSrc(fallbackCover);
-    };
-    img.src = coverSrc;
-  }, [coverSrc, fallbackCover]);
+  const rawLogo = (props as any).image ?? props.avatar ?? null;
+  const rawCover = (props as any).cover ?? null;
+  const logoUrl = buildAssetUrl(rawLogo);
+  const coverUrl = buildAssetUrl(rawCover);
 
   return (
     <div
@@ -177,7 +158,7 @@ export function InstitutionItem(props: GraduateProgram) {
       <Alert
         className="flex flex-col items-center bg-no-repeat bg-center bg-cover"
         style={{
-          backgroundImage: coverSrc ? `url(${coverSrc})` : fallbackCover ? `url(${fallbackCover})` : undefined,
+          backgroundImage: coverUrl ? `url(${coverUrl})` : undefined,
         }}
       >
         <Avatar
@@ -187,20 +168,13 @@ export function InstitutionItem(props: GraduateProgram) {
           <AvatarImage
             style={{ backgroundColor: 'white' }}
             className="rounded-md object-contain bg-white dark:bg-white p-1"
-            src={iconSrc || fallbackLogo || ''}
-            onError={() => {
-              if (fallbackLogo && iconSrc !== fallbackLogo) setIconSrc(fallbackLogo);
-            }}
+            src={logoUrl || undefined}
           />
           <AvatarFallback
             style={{ backgroundColor: 'white' }}
             className="flex items-center justify-center bg-white dark:bg-white"
           >
-            {fallbackLogo ? (
-              <img src={fallbackLogo} alt={props.acronym || props.name} className="h-full w-full object-contain p-1 bg-white" style={{ backgroundColor: 'white' }} />
-            ) : (
-              <Landmark size={16} />
-            )}
+            <Landmark size={16} />
           </AvatarFallback>
         </Avatar>
 
