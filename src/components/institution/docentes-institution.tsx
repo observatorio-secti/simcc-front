@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 import { UserContext } from '../../context/context';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { Button } from '../ui/button';
-import { ChevronDown, ChevronUp, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Skeleton } from '../ui/skeleton';
 import { Alert } from '../ui/alert';
@@ -159,6 +159,7 @@ export function DocentesInstitution({
   const [typeVisu, setTypeVisu] = useState('block');
   const [search, setSearch] = useState('');
   const [isOn, setIsOn] = useState(true);
+  const [count, setCount] = useState(100);
 
   const items = Array.from({ length: 12 }, (_, index) => (
     <Skeleton key={index} className="w-full rounded-md h-[300px]" />
@@ -166,7 +167,7 @@ export function DocentesInstitution({
 
   const currentDate = new Date().toLocaleDateString();
 
-  // Filtrar pesquisadores pela busca
+  // Filtrar pesquisadores pela busca (sobre todos, antes do slice)
   const filteredResearchers = graduatePrograms.filter((item) => {
     const normalizeString = (str: string) =>
       str
@@ -179,6 +180,15 @@ export function DocentesInstitution({
 
     return searchString.includes(normalizedSearch);
   });
+
+  const visibleResearchers = useMemo(
+    () => filteredResearchers.slice(0, count),
+    [filteredResearchers, count],
+  );
+
+  useEffect(() => {
+    setCount(100);
+  }, [search, institutionId]);
 
   return (
     <main className="flex flex-1 flex-col">
@@ -199,7 +209,7 @@ export function DocentesInstitution({
                       onChange={(e) => setSearch(e.target.value)}
                       value={search}
                       type="text"
-                      placeholder="Pesquisar docente..."
+                      placeholder="Pesquisar"
                       className="border-0 w-full"
                     />
                   </div>
@@ -294,7 +304,21 @@ export function DocentesInstitution({
                       </Masonry>
                     </ResponsiveMasonry>
                   ) : (
-                    <ResearchersBloco researcher={filteredResearchers} />
+                    <>
+                      <ResearchersBloco researcher={visibleResearchers} />
+                      {filteredResearchers.length > count && (
+                        <div className="w-full flex justify-center pb-8">
+                          <Button
+                            className="w-fit"
+                            onClick={() => setCount((c) => c + 100)}
+                            aria-label="Mostrar mais 100 docentes"
+                          >
+                            <Plus size={16} />
+                            Mostrar mais
+                          </Button>
+                        </div>
+                      )}
+                    </>
                   )
                 ) : loading ? (
                   <Skeleton className="w-full rounded-md h-[400px]" />
