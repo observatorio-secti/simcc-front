@@ -1,11 +1,18 @@
-import { Blocks, GraduationCapIcon, Landmark, User, Users } from 'lucide-react';
+import { GraduationCapIcon, Landmark, User, Users } from 'lucide-react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Alert } from '../ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useModal } from '../hooks/use-modal-store';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { UserContext } from '../../context/context';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../ui/tooltip';
+import { useInstitutionResearchers } from './hooks/use-institution-queries';
 
 interface GraduateProgram {
   id: string;
@@ -149,10 +156,56 @@ export function InstitutionItem(props: GraduateProgram) {
   const logoUrl = buildAssetUrl(rawLogo);
   const coverUrl = buildAssetUrl(rawCover);
 
+  // Cada card faz 1 request para buscar fotos reais dos docentes dessa instituição específica
+  const { data: docentesData = [] } = useInstitutionResearchers(props.id);
+  const normalizeName = (str: string) =>
+    (str || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+  // props.researchers são lattes_id (16 dígitos), não nomes - mapeia por lattes_id/id/lattes_10_id/nome
+  const enrichedResearchers = useMemo(() => {
+    const mapById = new Map<string, any>();
+    const mapByLattesId = new Map<string, any>();
+    const mapByLattes10 = new Map<string, any>();
+    const mapByName = new Map<string, any>();
+    (docentesData as any[]).forEach((d: any) => {
+      if (d?.id) mapById.set(String(d.id), d);
+      if (d?.lattes_id) mapByLattesId.set(String(d.lattes_id), d);
+      if (d?.lattes_10_id) mapByLattes10.set(String(d.lattes_10_id), d);
+      if (d?.name) mapByName.set(normalizeName(d.name), d);
+    });
+    return props.researchers.map((raw) => {
+      const str = String(raw).trim();
+      const found = mapByLattesId.get(str) || mapById.get(str) || mapByLattes10.get(str) || mapByName.get(normalizeName(str)) || null;
+      const displayName = found?.name || str;
+      return { raw, name: displayName, data: found };
+    });
+  }, [docentesData, props.researchers]);
+
+  const getResearcherImageUrl = (item: { raw: string; name: string; data: any | null }) => {
+    const img = item.data?.image;
+    if (img && typeof img === 'string' && img.trim() !== '') {
+      if (img.startsWith('data:') || /^https?:\/\//.test(img)) return img;
+      if (img.length > 100 && !img.includes('/')) return `data:image/jpeg;base64,${img}`;
+    }
+    // Se encontrou o docente, usa o nome real (endpoint ?name=) que retorna 200; senão tenta researcher_id com UUID
+    if (item.data?.name) {
+      return `${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item.data.name)}`;
+    }
+    if (item.data?.id) {
+      return `${urlGeral}ResearcherData/Image?researcher_id=${encodeURIComponent(String(item.data.id))}`;
+    }
+    // Fallback: raw é lattes_id numérico - tenta por nome (vai 404) mas evita 422 de researcher_id numérico
+    return `${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item.name)}`;
+  };
+
   return (
     <div
       onClick={() => handlePesquisaFinal()}
-      className="flex w-full cursor-pointer"
+      className="flex w-full cursor-pointer group transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
       key={props.id}
     >
       <Alert
@@ -188,50 +241,59 @@ export function InstitutionItem(props: GraduateProgram) {
                 {props.name} ({props.acronym})
               </div>
 
-              <div className="flex gap-2 flex-wrap mt-1">
-                <div
-                  title="Docentes"
-                  className="text-gray-500 text-sm flex gap-1 items-center"
-                >
-                  <Users size={12} className="flex-shrink-0" />
-                  <span className="truncate">{props.count_r}</span>
-                </div>
+              <TooltipProvider>
+                <div className="flex gap-2 flex-wrap mt-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-gray-500 text-sm flex gap-1 items-center">
+                        <Users size={12} className="flex-shrink-0" />
+                        <span className="truncate">{props.count_r}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Docentes</TooltipContent>
+                  </Tooltip>
 
-                <div
-                  title="Pós-graduações"
-                  className="text-gray-500 text-sm flex gap-1 items-center"
-                >
-                  <GraduationCapIcon size={12} className="flex-shrink-0" />
-                  <span className="truncate">{props.count_gp}</span>
-                </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-gray-500 text-sm flex gap-1 items-center">
+                        <GraduationCapIcon size={12} className="flex-shrink-0" />
+                        <span className="truncate">{props.count_gp}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Pós-graduações</TooltipContent>
+                  </Tooltip>
 
-                <div
-                  title="Grupos de pesquisa"
-                  className="text-gray-500 text-sm flex gap-1 items-center"
-                >
-                  <Blocks size={12} className="flex-shrink-0" />
-                  <span className="truncate">{props.count_gps}</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-gray-500 text-sm flex gap-1 items-center">
+                        <Users size={12} className="flex-shrink-0" />
+                        <span className="truncate">{props.count_gps}</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>Grupos de pesquisa</TooltipContent>
+                  </Tooltip>
                 </div>
-              </div>
+              </TooltipProvider>
             </div>
           </div>
 
-          {props.researchers?.length > 0 && (
+          {enrichedResearchers.length > 0 && (
             <div className="flex  items-center mt-8">
               <div className="flex items-center">
-                {props.researchers.slice(0, 5).map((item, index) => (
+                {enrichedResearchers.slice(0, 5).map((item, index) => (
                   <Avatar
-                    key={item}
+                    key={item.raw}
                     onClick={(event) => {
                       event.stopPropagation();
-                      onOpen('researcher-modal', { name: item });
+                      // Usa nome real quando encontrado, senão o raw (id) - modal resolve por nome
+                      onOpen('researcher-modal', { name: item.name });
                     }}
                     className="cursor-pointer rounded-full relative border dark:border-neutral-800 h-8 w-8 hover:z-10 transition-transform hover:scale-110"
                     style={{ marginLeft: index > 0 ? '-10px' : '0px' }}
                   >
                     <AvatarImage
-                      className="rounded-md h-8 w-8"
-                      src={`${urlGeral}ResearcherData/Image?name=${item}`}
+                      className="rounded-md h-8 w-8 object-cover"
+                      src={getResearcherImageUrl(item)}
                     />
                     <AvatarFallback className="flex items-center justify-center">
                       <User size={16} />
@@ -239,12 +301,20 @@ export function InstitutionItem(props: GraduateProgram) {
                   </Avatar>
                 ))}
 
-                {props.researchers.length > 5 && (
+                {enrichedResearchers.length > 5 && (
                   <div
-                    className="h-8 w-8 flex items-center justify-center text-gray-500 bg-gray-100 dark:bg-neutral-800 rounded-full border dark:border-neutral-700 text-xs font-medium"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      const targetIdentifier = props.acronym?.trim() || props.id;
+                      navigate(
+                        `/instituicao/${encodeURIComponent(targetIdentifier)}?pagina=docentes&institution_id=${encodeURIComponent(props.id)}`,
+                      );
+                    }}
+                    className="h-8 w-8 flex items-center justify-center text-gray-500 bg-gray-100 dark:bg-neutral-800 rounded-full border dark:border-neutral-700 text-xs font-medium cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors"
                     style={{ marginLeft: '-10px' }}
+                    title={`Ver todos os ${enrichedResearchers.length} docentes - clique para abrir página de docentes`}
                   >
-                    +{props.researchers.length - 5}
+                    +{enrichedResearchers.length - 5}
                   </div>
                 )}
               </div>

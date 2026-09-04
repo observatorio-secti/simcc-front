@@ -16,7 +16,7 @@ import {
 import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList } from '../ui/tabs';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { UserContext } from '../../context/context';
 import { useModal } from '../hooks/use-modal-store';
 import Highcharts from 'highcharts';
@@ -35,7 +35,11 @@ import { LinhasPesquisaPrograma } from './linhas-pesquisa-programa';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { Keepo } from '../dashboard/builder-page/builder-page';
 import { useParams } from 'react-router-dom';
-import { useInstitution } from './hooks/use-institution-queries';
+import {
+  useInstitution,
+  useInstitutionBolsistas,
+  useInstitutionResearchGroups,
+} from './hooks/use-institution-queries';
 import { Institution as InstitutionType } from '../../services/institution';
 
 export type GraduateProgram = InstitutionType;
@@ -87,6 +91,45 @@ export function VisualizacaoInstituicao({
 
   const logoUrl = buildAssetUrl((graduatePrograms as any)?.image);
   const coverUrl = buildAssetUrl((graduatePrograms as any)?.cover);
+
+  // Usa o que já existe em grupo de pesquisa e bolsista (mesmo filtro das abas) - sem fallback
+  const { data: rawGroups = [] } = useInstitutionResearchGroups();
+  const { data: rawBolsistas = [] } = useInstitutionBolsistas();
+
+  const normalizeForFilter = (str: string) =>
+    (str || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+  const gruposCount = useMemo(() => {
+    if (!graduatePrograms) return null;
+    return (rawGroups as any[]).filter((item: any) => {
+      const itemInstitution = normalizeForFilter(item.institution);
+      const targetInstitution = normalizeForFilter(graduatePrograms.name || '');
+      const targetId = normalizeForFilter(graduatePrograms.id || '');
+      return (
+        itemInstitution.includes(targetInstitution) ||
+        itemInstitution.includes(targetId) ||
+        targetInstitution.includes(itemInstitution)
+      );
+    }).length;
+  }, [rawGroups, graduatePrograms]);
+
+  const bolsistasCount = useMemo(() => {
+    if (!graduatePrograms) return null;
+    return (rawBolsistas as any[]).filter((item: any) => {
+      const itemUniversity = normalizeForFilter(item.university);
+      const targetInstitution = normalizeForFilter(graduatePrograms.name || '');
+      const targetId = normalizeForFilter(graduatePrograms.id || '');
+      return (
+        itemUniversity.includes(targetInstitution) ||
+        itemUniversity.includes(targetId) ||
+        targetInstitution.includes(itemUniversity)
+      );
+    }).length;
+  }, [rawBolsistas, graduatePrograms]);
 
   // Mapeamento de links das instituições
   const institutionLinks: { [key: string]: string } = {
@@ -444,11 +487,10 @@ lg:flex-row
                           {tabs.map(({ id, label, icon: Icon }) => (
                             <div
                               key={id}
-                              className={`pb-2 border-b-2 text-black dark:text-white transition-all ${
-                                value === id
+                              className={`pb-2 border-b-2 text-black dark:text-white transition-all ${value === id
                                   ? 'border-b-white dark:border-b-neutral-800'
                                   : 'border-b-transparent'
-                              }`}
+                                }`}
                               onClick={() => setValue(id)}
                             >
                               <Button
@@ -477,32 +519,38 @@ lg:flex-row
                   <h1 className="text-2xl mb-2 max-w-[800px] font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] md:block">
                     {graduatePrograms.name}
                   </h1>
-                  <p className="text-lg font-light text-foreground">
-                    <div className="flex flex-wrap gap-4 ">
-                      <div
-                        title="Docentes"
-                        className="text-gray-500 text-sm flex gap-1 items-center"
-                      >
-                        <Users size={12} className="flex-shrink-0" /> Docentes:
-                        <span className="truncate">
-                          {graduatePrograms.count_r}
+                  <div className="flex flex-wrap gap-4 md:gap-6 mt-4">
+                    {[
+                      {
+                        label: 'Docentes',
+                        value: (graduatePrograms as any).count_r,
+                        icon: Users,
+                      },
+                      {
+                        label: 'Pós-graduações',
+                        value: (graduatePrograms as any).count_gp,
+                        icon: GraduationCap,
+                      },
+                      {
+                        label: 'Grupos de Pesquisa',
+                        value: gruposCount,
+                        icon: Users,
+                      },
+                      {
+                        label: 'Bolsistas Produtividade',
+                        value: bolsistasCount,
+                        icon: Award,
+                      },
+                    ].map(({ label, value, icon: Icon }) => (
+                      <div key={label} className="flex items-center gap-2">
+                        <Icon size={16} className="text-muted-foreground shrink-0" aria-hidden />
+                        <span className="text-sm text-muted-foreground">{label}:</span>
+                        <span className="text-xl md:text-2xl font-bold tracking-tight leading-none">
+                          {value != null ? Number(String(value)).toLocaleString('pt-BR') : '—'}
                         </span>
                       </div>
-                      <div
-                        title="Pós-graduações"
-                        className="text-gray-500 text-sm flex gap-1 items-center"
-                      >
-                        <GraduationCapIcon
-                          size={12}
-                          className="flex-shrink-0"
-                        />{' '}
-                        Pós-graduações:
-                        <span className="truncate">
-                          {graduatePrograms.count_gp}
-                        </span>
-                      </div>
-                    </div>
-                  </p>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -515,11 +563,10 @@ lg:flex-row
                         {tabs.map(({ id, label, icon: Icon }) => (
                           <div
                             key={id}
-                            className={`pb-2 border-b-2 text-black dark:text-white transition-all ${
-                              value === id
+                            className={`pb-2 border-b-2 text-black dark:text-white transition-all ${value === id
                                 ? 'border-b-[#719CB8]'
                                 : 'border-b-transparent'
-                            }`}
+                              }`}
                             onClick={() => setValue(id)}
                           >
                             <Button variant="ghost" className="m-0">
