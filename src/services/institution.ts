@@ -9,6 +9,8 @@ export interface Institution {
   count_gps: string;
   count_d: string;
   count_t: string;
+  count_foment: string,
+  count_rg: string,
   acronym: string;
   researchers: string[];
   image: string | null;

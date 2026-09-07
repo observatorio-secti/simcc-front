@@ -1,13 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
-
-import { UserContext } from '../../context/context';
-import { useModalHomepage } from '../hooks/use-modal-homepage';
-
+import { useEffect, useState } from 'react';
 import { areasComCores, InstitutionItem } from './institution-item';
-
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-
 import { Alert } from '../ui/alert';
 import { MagnifyingGlass, Rows, SquaresFour } from 'phosphor-react';
 import { Input } from '../ui/input';
@@ -31,8 +25,6 @@ import {
   AccordionTrigger,
 } from '../ui/accordion';
 import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-home';
-
-import { useModal } from '../hooks/use-modal-store';
 
 import { CardContent, CardHeader, CardTitle } from '../ui/card';
 
@@ -81,17 +73,17 @@ export function Institution() {
 
   const filteredTotal = Array.isArray(graduatePrograms)
     ? graduatePrograms.filter((item) => {
-        const normalizeString = (str: any) =>
-          (str || '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase();
+      const normalizeString = (str: any) =>
+        (str || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
 
-        const searchString = normalizeString(item.name) + ' ' + normalizeString(item.acronym);
-        const normalizedSearch = normalizeString(search);
+      const searchString = normalizeString(item.name) + ' ' + normalizeString(item.acronym);
+      const normalizedSearch = normalizeString(search);
 
-        return searchString.includes(normalizedSearch);
-      })
+      return searchString.includes(normalizedSearch);
+    })
     : [];
 
   const convertJsonToCsv = (json: any[]): string => {
