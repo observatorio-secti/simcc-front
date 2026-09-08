@@ -1219,7 +1219,7 @@ export function ResearchersHome() {
                                         <div>
                                             <div className="grid gap-8 xl:grid-cols-2">
                                                 <GraficoTitulacao />
-                                                <GraficoAreaPesquisares />
+                                                <GraficoAreaPesquisares researchers={researcher} />
                                             </div>
                                         </div>
                                     )}
