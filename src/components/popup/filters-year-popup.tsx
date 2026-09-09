@@ -12,7 +12,7 @@ export function FilterYearPopUp(props: Props) {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   
-  const availableYears = [];
+  const availableYears: number[] = [];
   // Trava o limite da lista visual em 1990 para não criar um menu gigante
   for (let y = currentYear; y >= 1990; y--) {
     availableYears.push(y);
@@ -67,7 +67,7 @@ export function FilterYearPopUp(props: Props) {
               <option value="all">Todos os anos</option>
               {availableYears.map((y) => (
                 <option key={y} value={y}>
-                  {y}
+                  A partir de {y}
                 </option>
               ))}
             </select>
