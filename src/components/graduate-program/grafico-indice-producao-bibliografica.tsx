@@ -82,87 +82,100 @@ export function GraficoIndiceProdBibli(props: Articles) {
   >([]);
 
   useEffect(() => {
-    if (props.articles && props.pesosProducao) {
-      const pesosNumericos: { [key: string]: number } = {
-        A1: parseFloat(props.pesosProducao.a1) || 0,
-        A2: parseFloat(props.pesosProducao.a2) || 0,
-        A3: parseFloat(props.pesosProducao.a3) || 0,
-        A4: parseFloat(props.pesosProducao.a4) || 0,
-        B1: parseFloat(props.pesosProducao.b1) || 0,
-        B2: parseFloat(props.pesosProducao.b2) || 0,
-        B3: parseFloat(props.pesosProducao.b3) || 0,
-        B4: parseFloat(props.pesosProducao.b4) || 0,
-        C: parseFloat(props.pesosProducao.c) || 0,
-        SQ: parseFloat(props.pesosProducao.sq) || 0,
-        livro: parseFloat(props.pesosProducao.book) || 0,
-        cap_livro: parseFloat(props.pesosProducao.book_chapter) || 0,
+    if (!props.articles || !Array.isArray(props.articles) || !props.pesosProducao) {
+      setChartData([]);
+      return;
+    }
+    if (props.articles.length === 0) {
+      setChartData([]);
+      return;
+    }
+    const pesosNumericos: { [key: string]: number } = {
+      A1: parseFloat(props.pesosProducao.a1) || 0,
+      A2: parseFloat(props.pesosProducao.a2) || 0,
+      A3: parseFloat(props.pesosProducao.a3) || 0,
+      A4: parseFloat(props.pesosProducao.a4) || 0,
+      B1: parseFloat(props.pesosProducao.b1) || 0,
+      B2: parseFloat(props.pesosProducao.b2) || 0,
+      B3: parseFloat(props.pesosProducao.b3) || 0,
+      B4: parseFloat(props.pesosProducao.b4) || 0,
+      C: parseFloat(props.pesosProducao.c) || 0,
+      SQ: parseFloat(props.pesosProducao.sq) || 0,
+      livro: parseFloat(props.pesosProducao.book) || 0,
+      cap_livro: parseFloat(props.pesosProducao.book_chapter) || 0,
+    };
+
+    const counts: {
+      [year: string]: {
+        totalArticles: number;
+        totalBooks: number;
+        totalChapters: number;
       };
+    } = {};
 
-      const counts: {
-        [year: string]: {
-          totalArticles: number;
-          totalBooks: number;
-          totalChapters: number;
-        };
-      } = {};
+    props.articles.forEach((publicacao) => {
+      const year = publicacao.year.toString();
+      const {
+        A1,
+        A2,
+        A3,
+        A4,
+        B1,
+        B2,
+        B3,
+        B4,
+        C,
+        SQ,
+        count_book,
+        count_book_chapter,
+      } = publicacao;
+      const qualisData = { A1, A2, A3, A4, B1, B2, B3, B4, C, SQ };
 
-      props.articles.forEach((publicacao) => {
-        const year = publicacao.year.toString();
-        const {
-          A1,
-          A2,
-          A3,
-          A4,
-          B1,
-          B2,
-          B3,
-          B4,
-          C,
-          SQ,
-          count_book,
-          count_book_chapter,
-        } = publicacao;
-        const qualisData = { A1, A2, A3, A4, B1, B2, B3, B4, C, SQ };
+      if (!counts[year]) {
+        counts[year] = { totalArticles: 0, totalBooks: 0, totalChapters: 0 };
+      }
 
-        if (!counts[year]) {
-          counts[year] = { totalArticles: 0, totalBooks: 0, totalChapters: 0 };
-        }
+      let totalArticles = 0;
 
-        // Calcular o  por Qualis
-        let totalArticles = 0;
-
-        Object.keys(qualisData).forEach((qualisKey) => {
-          const weight =
-            pesosNumericos[qualisKey as keyof typeof pesosNumericos];
-          if (!isNaN(weight) && weight > 0) {
-            const value = qualisData[qualisKey as keyof typeof qualisData];
-            if (value !== 0) {
-              totalArticles += value * weight;
-            }
+      Object.keys(qualisData).forEach((qualisKey) => {
+        const weight =
+          pesosNumericos[qualisKey as keyof typeof pesosNumericos];
+        if (!isNaN(weight) && weight > 0) {
+          const value = qualisData[qualisKey as keyof typeof qualisData];
+          if (value !== 0) {
+            totalArticles += value * weight;
           }
-        });
-
-        // Adicionar valores de livros e capítulos de livros separadamente
-        const totalBooks = count_book * pesosNumericos.book;
-        const totalChapters = count_book_chapter * pesosNumericos.book_chapter;
-
-        counts[year].totalArticles += totalArticles;
-        counts[year].totalBooks += totalBooks;
-        counts[year].totalChapters += totalChapters;
+        }
       });
 
-      const data = Object.entries(counts).map(
-        ([year, { totalArticles, totalBooks, totalChapters }]) => ({
-          year,
-          totalArticles,
-          totalBooks,
-          totalChapters,
-        }),
-      );
+      const totalBooks = count_book * pesosNumericos.book;
+      const totalChapters = count_book_chapter * pesosNumericos.book_chapter;
 
-      setChartData(data);
-    }
+      counts[year].totalArticles += totalArticles;
+      counts[year].totalBooks += totalBooks;
+      counts[year].totalChapters += totalChapters;
+    });
+
+    const data = Object.entries(counts).map(
+      ([year, { totalArticles, totalBooks, totalChapters }]) => ({
+        year,
+        totalArticles,
+        totalBooks,
+        totalChapters,
+      }),
+    );
+
+    setChartData(data);
   }, [props.articles, props.pesosProducao]);
+
+  if (chartData.length === 0) {
+    return <p className="text-sm text-muted-foreground p-4 text-center">Sem dados para exibir</p>;
+  }
+
+  const hasAnyPositive = chartData.some((d) => d.totalArticles > 0 || d.totalBooks > 0 || d.totalChapters > 0);
+  if (!hasAnyPositive) {
+    return <p className="text-sm text-muted-foreground p-4 text-center">Sem dados para exibir</p>;
+  }
 
   return (
     <ChartContainer config={chartConfig} className="mr-4 lg:mt-16">
