@@ -12,6 +12,7 @@ import {
   Sparkles,
   SquarePlay,
   UserPlus,
+  Users,
   Wrench,
 } from 'lucide-react';
 
@@ -72,6 +73,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: PanelsTopLeft,
         isActive: true,
         items: [
+          {
+            title: 'Grupos de Pesquisa',
+            url: '/grupos-pesquisa',
+            icon: Users,
+          },
           {
             title: 'Instituições',
             url: '/instituicao',
