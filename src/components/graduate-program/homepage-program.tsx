@@ -447,10 +447,13 @@ export function HomepageProgram(props: Props) {
   const urlDados = `${urlGeral}ResearcherData/DadosGerais?year=${year}&graduate_program_id=${type_search}`;
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchData = async () => {
+      if (!urlGeral || !type_search) return;
       try {
         const response = await fetch(urlDados, {
           mode: 'cors',
+          signal: controller.signal,
           headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET',
@@ -459,15 +462,16 @@ export function HomepageProgram(props: Props) {
             'Content-Type': 'text/plain',
           },
         });
+        if (!response.ok) throw new Error(`DadosGerais ${response.status}`);
         const data = await response.json();
-        if (data) {
-          setDados(data);
-        }
+        if (!Array.isArray(data)) throw new Error('DadosGerais not array');
+        setDados(data);
       } catch (err) {
-        console.log(err);
+        if ((err as Error).name !== 'AbortError') setDados([]);
       }
     };
     fetchData();
+    return () => controller.abort();
   }, [urlDados]);
 
   const [activeChart, setActiveChart] = useState<keyof typeof chartConfig>(
@@ -588,42 +592,46 @@ export function HomepageProgram(props: Props) {
   const [patenteNaoConcedida, setPatenteNaoConcedida] = useState('');
   const [relTec, setRelTec] = useState('');
 
-  const [pesosProducao, setPesosProducao] = useState<PesosProducao>({
-    a1: a1,
-    a2: a2,
-    a3: a3,
-    a4: a4,
-    b1: b1,
-    b2: b2,
-    b3: b3,
-    b4: b4,
-    c: c,
-    sq: sq,
-    f1: t1,
-    f2: t2,
-    f3: t3,
-    f4: t4,
-    f5: t5,
-    livro: livro,
-    cap_livro: capLivro,
-    software: software,
-    patent_granted: patenteCondecida,
-    patent_not_granted: patenteNaoConcedida,
-    report: relTec,
-    book: livro,
-    book_chapter: capLivro,
-  });
+  const FALLBACK_PESOS: PesosProducao = {
+    a1: '1',
+    a2: '0.875',
+    a3: '0.75',
+    a4: '0.625',
+    b1: '0.5',
+    b2: '0.375',
+    b3: '0.25',
+    b4: '0.125',
+    c: '0',
+    sq: '0',
+    f1: '2',
+    f2: '1.5',
+    f3: '1',
+    f4: '0.5',
+    f5: '0.1',
+    livro: '1',
+    cap_livro: '0.25',
+    software: 't5',
+    patent_granted: 't4',
+    patent_not_granted: 't4',
+    report: 't5',
+    book: '1',
+    book_chapter: '0.25',
+  };
+
+  const [pesosProducao, setPesosProducao] = useState<PesosProducao>(FALLBACK_PESOS);
 
   const urlGet =
     urlGeralAdm +
     `indprod/query?institution_id=083a16f0-cccf-47d2-a676-d10b8931f66b`;
 
-  console.log(urlGet);
   useEffect(() => {
+    const controller = new AbortController();
     const fetchData = async () => {
+      if (!urlGeralAdm) return;
       try {
         const response = await fetch(urlGet, {
           mode: 'cors',
+          signal: controller.signal,
           headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET',
@@ -632,39 +640,40 @@ export function HomepageProgram(props: Props) {
             'Content-Type': 'text/plain',
           },
         });
+        if (!response.ok) throw new Error(`indprod ${response.status}`);
         const data = await response.json();
-        if (data.length != 0) {
-          const newData = data[0]; // Assumindo que data é um array e tem apenas um elemento
-          seta1(newData.a1);
-          seta2(newData.a2);
-          seta3(newData.a3);
-          seta4(newData.a4);
-          setb1(newData.b1);
-          setb2(newData.b2);
-          setb3(newData.b3);
-          setb4(newData.b4);
-          setc(newData.c);
-          setsq(newData.sq);
-          setT1(newData.f1);
-          setT2(newData.f2);
-          setT3(newData.f3);
-          setT4(newData.f4);
-          setT5(newData.f5);
-          setLivro(newData.book);
-          setCapLivro(newData.book_chapter);
-          setSoftware(newData.software);
-          setPatenteConcedida(newData.patent_granted);
-          setPatenteNaoConcedida(newData.patent_not_granted);
-          setRelTec(newData.report);
-
-          setPesosProducao(newData);
-        }
+        if (!Array.isArray(data) || data.length === 0) throw new Error('indprod empty');
+        const newData = data[0];
+        seta1(newData.a1);
+        seta2(newData.a2);
+        seta3(newData.a3);
+        seta4(newData.a4);
+        setb1(newData.b1);
+        setb2(newData.b2);
+        setb3(newData.b3);
+        setb4(newData.b4);
+        setc(newData.c);
+        setsq(newData.sq);
+        setT1(newData.f1);
+        setT2(newData.f2);
+        setT3(newData.f3);
+        setT4(newData.f4);
+        setT5(newData.f5);
+        setLivro(newData.book);
+        setCapLivro(newData.book_chapter);
+        setSoftware(newData.software);
+        setPatenteConcedida(newData.patent_granted);
+        setPatenteNaoConcedida(newData.patent_not_granted);
+        setRelTec(newData.report);
+        setPesosProducao(newData);
       } catch (err) {
-        console.log(err);
+        if ((err as Error).name === 'AbortError') return;
+        setPesosProducao(FALLBACK_PESOS);
       }
     };
     fetchData();
-  }, []);
+    return () => controller.abort();
+  }, [urlGet]);
 
   return (
     <main className="h-full w-full flex flex-col">
