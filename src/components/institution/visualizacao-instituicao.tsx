@@ -514,43 +514,68 @@ lg:flex-row
           </div>
           <div className="grid grid-cols-1 gap-4 md:gap-8  z-[2] pt-8 md:p-0">
             <div className="flex justify-between  md:px-8 items-center ">
-              <div className="flex flex-col  gap-6 mt-8 px-8">
+              <div className="flex flex-col  gap-6 mt-8 px-8 w-full">
                 <div>
                   <h1 className="text-2xl mb-2 max-w-[800px] font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] md:block">
                     {graduatePrograms.name}
                   </h1>
-                  <div className="flex flex-wrap gap-4 md:gap-6 mt-4">
-                    {[
-                      {
-                        label: 'Docentes',
-                        value: (graduatePrograms as any).count_r,
-                        icon: Users,
-                      },
-                      {
-                        label: 'Pós-graduações',
-                        value: (graduatePrograms as any).count_gp,
-                        icon: GraduationCap,
-                      },
-                      {
-                        label: 'Grupos de Pesquisa',
-                        value: gruposCount,
-                        icon: Users,
-                      },
-                      {
-                        label: 'Bolsistas Produtividade',
-                        value: bolsistasCount,
-                        icon: Award,
-                      },
-                    ].map(({ label, value, icon: Icon }) => (
-                      <div key={label} className="flex items-center gap-2">
-                        <Icon size={16} className="text-muted-foreground shrink-0" aria-hidden />
-                        <span className="text-sm text-muted-foreground">{label}:</span>
-                        <span className="text-xl md:text-2xl font-bold tracking-tight leading-none">
-                          {value != null ? Number(String(value)).toLocaleString('pt-BR') : '—'}
-                        </span>
+                  
+                  {/* INÍCIO DO NOVO CÓDIGO (CARDS) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full mt-6 mb-8">
+                    {/* Card Docentes */}
+                    <div className="group flex items-center gap-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-eng-blue/50 transition-all cursor-default">
+                      <div className="w-12 h-12 rounded-full bg-eng-blue/10 dark:bg-eng-blue/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                        <Users size={24} className="text-eng-blue" />
                       </div>
-                    ))}
+                      <div className="flex flex-col">
+                        <span className="text-3xl font-extrabold text-slate-800 dark:text-white leading-none">
+                          {(graduatePrograms as any).count_r != null ? Number(String((graduatePrograms as any).count_r)).toLocaleString('pt-BR') : '—'}
+                        </span>
+                        <span className="text-sm font-medium text-slate-500 mt-1 group-hover:text-eng-blue transition-colors">Docentes</span>
+                      </div>
+                    </div>
+
+                    {/* Card Pós-graduações */}
+                    <div className="group flex items-center gap-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-eng-blue/50 transition-all cursor-default">
+                      <div className="w-12 h-12 rounded-full bg-eng-blue/10 dark:bg-eng-blue/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                        <GraduationCap size={24} className="text-eng-blue" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-3xl font-extrabold text-slate-800 dark:text-white leading-none">
+                          {(graduatePrograms as any).count_gp != null ? Number(String((graduatePrograms as any).count_gp)).toLocaleString('pt-BR') : '—'}
+                        </span>
+                        <span className="text-sm font-medium text-slate-500 mt-1 group-hover:text-eng-blue transition-colors">Pós-graduações</span>
+                      </div>
+                    </div>
+
+                    {/* Card Grupos de Pesquisa */}
+                    <div className="group flex items-center gap-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-eng-blue/50 transition-all cursor-default">
+                      <div className="w-12 h-12 rounded-full bg-eng-blue/10 dark:bg-eng-blue/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                        <Users size={24} className="text-eng-blue" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-3xl font-extrabold text-slate-800 dark:text-white leading-none">
+                          {gruposCount != null ? Number(String(gruposCount)).toLocaleString('pt-BR') : '—'}
+                        </span>
+                        <span className="text-sm font-medium text-slate-500 mt-1 group-hover:text-eng-blue transition-colors">Grupos de Pesquisa</span>
+                      </div>
+                    </div>
+
+                    {/* Card Bolsistas */}
+                    <div className="group flex items-center gap-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-eng-blue/50 transition-all cursor-default">
+                      <div className="w-12 h-12 rounded-full bg-eng-blue/10 dark:bg-eng-blue/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                        <Award size={24} className="text-eng-blue" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-3xl font-extrabold text-slate-800 dark:text-white leading-none">
+                          {bolsistasCount != null ? Number(String(bolsistasCount)).toLocaleString('pt-BR') : '—'}
+                        </span>
+                        <span className="text-sm font-medium text-slate-500 mt-1 group-hover:text-eng-blue transition-colors">Bolsistas Produtividade</span>
+                      </div>
+                    </div>
                   </div>
+                  {/* FIM DO NOVO CÓDIGO */}
+
                 </div>
               </div>
             </div>
@@ -585,7 +610,10 @@ lg:flex-row
             </div>
             <TabsContent value="visao_geral" className="m-0"></TabsContent>
             <TabsContent value="producoes" className="m-0">
-              <ProducoesPrograma />
+              <ProducoesPrograma 
+                institutionId={graduatePrograms.id} 
+                institutionName={graduatePrograms.name} 
+              />
             </TabsContent>
             <TabsContent value="linhas_pesquisa" className="m-0">
               <LinhasPesquisaPrograma />
