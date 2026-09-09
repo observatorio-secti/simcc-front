@@ -67,22 +67,48 @@ export function DataTable<TData, TValue>({
     try {
       const convertJsonToCsv = (json: any[]): string => {
         const items = json;
+        if (!items?.length) {
+          return '';
+        }
+
         const replacer = (_: string, value: any) =>
-          value === null ? '' : value; // Handle null values
+          value === null ? '' : value;
         const header = Object.keys(items[0]);
         const csv = [
-          '\uFEFF' + header.join(';'), // Add BOM and CSV header
+          '\uFEFF' + header.join(';'),
           ...items.map((item) =>
             header
               .map((fieldName) => JSON.stringify(item[fieldName], replacer))
               .join(';'),
-          ), // CSV data
+          ),
         ].join('\r\n');
 
         return csv;
       };
 
-      const csvData = convertJsonToCsv(data);
+      const exportRows = () => {
+        if (table.getState().sorting.length > 0) {
+          return table.getSortedRowModel().rows.map((row) => row.original);
+        }
+
+        const sortKey = type === 'articles-home' ? 'title' : type === 'researchers-home' ? 'name' : null;
+
+        if (!sortKey) {
+          return data;
+        }
+
+        return [...data].sort((a: any, b: any) => {
+          const first = String(a?.[sortKey] ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+          const second = String(b?.[sortKey] ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+          return first.localeCompare(second, 'pt-BR', { sensitivity: 'base' });
+        });
+      };
+
+      const csvData = convertJsonToCsv(exportRows());
+      if (!csvData) {
+        return;
+      }
+
       const blob = new Blob([csvData], {
         type: 'text/csv;charset=windows-1252;',
       });
@@ -91,6 +117,7 @@ export function DataTable<TData, TValue>({
       link.download = `dados_simcc.csv`;
       link.href = url;
       link.click();
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error:', error);
     }

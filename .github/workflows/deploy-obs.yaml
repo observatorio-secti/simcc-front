@@ -1,0 +1,21 @@
+name: CI/CD Pipeline - Simcc Front
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd /opt/apps/prod/observatorio/observatorio-front
+            git pull origin main --ff-only
+            docker build --output type=local,dest=./dist .

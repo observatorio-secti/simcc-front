@@ -278,6 +278,10 @@ export function ArticlesModal() {
 
   const testeMensagem = `Resumo fiel e sem invenções sobre o artigo '${data.title}', onde um dos autores é '${data.researcher}'. ${data.doi != '' && data.doi != null && data.doi != undefined && `E o doi do artigo é ${data.doi}`}`;
 
+  const hasAbstract = Boolean(data?.abstract && String(data.abstract).trim() !== '' && String(data.abstract).trim().toLowerCase() !== 'null');
+  const hasAuthors = Boolean(data?.authors && String(data.authors).trim() !== '' && String(data.authors).trim().toLowerCase() !== 'null');
+  const hasKeywords = Boolean(data?.keywords && String(data.keywords).trim() !== '' && String(data.keywords).trim().toLowerCase() !== 'null');
+
   return (
     <Sheet open={isModalOpen} onOpenChange={onClose}>
       <SheetContent
@@ -511,14 +515,14 @@ export function ArticlesModal() {
               </div>
             )}
 
-            <div>
-              <div className="my-6 border-b dark:border-b-neutral-800"></div>
-              <h4 className="font-medium text-xl mb-4">Resumo</h4>
-              {data.abstract != '' ? (
+            {hasAbstract && (
+              <div>
+                <div className="my-6 border-b dark:border-b-neutral-800"></div>
+                <h4 className="font-medium text-xl mb-4">Resumo</h4>
                 <p className="text-sm text-gray-500 flex flex-wrap text-justify">
                   {data.abstract}
                 </p>
-              ) : (
+              {/* ) : (
                 <div>
                   <Button
                     onClick={() => handleSend(testeMensagem)}
@@ -577,12 +581,11 @@ export function ArticlesModal() {
                         </p>
                       </div>
                     )
-                  )}
-                </div>
-              )}
-            </div>
+                  )} */}
+              </div>
+            )}
 
-            {data.authors != '' && (
+            {hasAuthors && (
               <div>
                 <div className="my-6 border-b dark:border-b-neutral-800"></div>
                 <h4 className="font-medium text-xl mb-4">Autores</h4>
@@ -612,7 +615,7 @@ export function ArticlesModal() {
               </div>
             )}
 
-            {data.keywords != '' && (
+            {hasKeywords && (
               <div>
                 <div className="my-6 border-b dark:border-b-neutral-800"></div>
                 <h4 className="font-medium text-xl mb-4">Palavras-chaves</h4>

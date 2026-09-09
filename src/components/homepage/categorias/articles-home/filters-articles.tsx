@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Alert } from "../../../ui/alert";
 import { CalendarBlank, CheckSquare } from "phosphor-react";
 import debounce from "lodash.debounce"; // Importing debounce
-import { ArticleQualisSelector, ArticleYearSlider, qualisOptions } from "./article-filter-fields";
+import { ArticleQualisSelector, ArticleYearSlider, getDefaultYearRange, qualisOptions } from "./article-filter-fields";
 
 interface Props {
   onFilterUpdate: (newResearcher: Filter[]) => void;
@@ -15,9 +15,7 @@ type Filter = {
 
 export function FilterArticle(props: Props) {
   const [itensSelecionados, setItensSelecionados] = useState<string[]>([]);
-  const currentDate = new Date();
-  const year = currentDate.getFullYear();
-  const [filterYear, setFilterYear] = useState([1990]);
+  const [filterYear, setFilterYear] = useState<number[]>(() => [...getDefaultYearRange()]);
 
   const [isFirstRender, setIsFirstRender] = useState(true);
 

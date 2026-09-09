@@ -1,24 +1,16 @@
-import { useContext, useEffect, useState } from 'react';
-
-import { UserContext } from '../../context/context';
-import { useModalHomepage } from '../hooks/use-modal-homepage';
-
+import { useEffect, useState } from 'react';
 import { areasComCores, InstitutionItem } from './institution-item';
-
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-
 import { Alert } from '../ui/alert';
 import { MagnifyingGlass, Rows, SquaresFour } from 'phosphor-react';
 import { Input } from '../ui/input';
 import {
-  ArrowRight,
   ChevronDown,
   ChevronLeft,
   ChevronUp,
   Download,
   File,
-  Info,
   Landmark,
   Plus,
 } from 'lucide-react';
@@ -34,8 +26,6 @@ import {
 } from '../ui/accordion';
 import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-home';
 
-import { useModal } from '../hooks/use-modal-store';
-
 import { CardContent, CardHeader, CardTitle } from '../ui/card';
 
 import { Keepo } from '../dashboard/builder-page/builder-page';
@@ -43,6 +33,8 @@ import { collection, getDocs, getFirestore } from 'firebase/firestore';
 import { VisualizacaoInstituicao } from './visualizacao-instituicao';
 import { useInstitutions } from './hooks/use-institution-queries';
 import { Institution as InstitutionType } from '../../services/institution';
+import { columnsInstitution } from './columns-institution';
+import { DataTable } from '../homepage/categorias/researchers-home/data-table';
 
 export type Institution = InstitutionType;
 
@@ -51,7 +43,6 @@ const useQuery = () => {
 };
 
 export function Institution() {
-  const { urlGeralAdm } = useContext(UserContext);
   const queryUrl = useQuery();
   const params = useParams<{
     acronym?: string;
@@ -82,17 +73,17 @@ export function Institution() {
 
   const filteredTotal = Array.isArray(graduatePrograms)
     ? graduatePrograms.filter((item) => {
-        const normalizeString = (str: any) =>
-          (str || '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase();
+      const normalizeString = (str: any) =>
+        (str || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
 
-        const searchString = normalizeString(item.name) + ' ' + normalizeString(item.acronym);
-        const normalizedSearch = normalizeString(search);
+      const searchString = normalizeString(item.name) + ' ' + normalizeString(item.acronym);
+      const normalizedSearch = normalizeString(search);
 
-        return searchString.includes(normalizedSearch);
-      })
+      return searchString.includes(normalizedSearch);
+    })
     : [];
 
   const convertJsonToCsv = (json: any[]): string => {
@@ -230,29 +221,6 @@ export function Institution() {
 
                 <div className="hidden items-center gap-2 md:ml-auto md:flex"></div>
               </div>
-            </div>
-
-            <div className="justify-center px-4 md:px-8 w-full mx-auto flex max-w-[980px] flex-col items-center gap-2 pb-8  md:pb-8  ">
-              <Link
-                to={'/informacoes'}
-                className="inline-flex z-[2] items-center rounded-lg  bg-neutral-100 dark:bg-neutral-700  gap-2 mb-3 px-3 py-1 text-sm font-medium"
-              >
-                <Info size={12} />
-                <div className="h-full w-[1px] bg-neutral-200 dark:bg-neutral-800"></div>
-                Saiba o que é e como utilizar a plataforma
-                <ArrowRight size={12} />
-              </Link>
-
-              <h1 className="z-[2] text-center max-w-[800px] text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]  md:block mb-4 ">
-                Confira as{' '}
-                <strong className="bg-eng-blue  rounded-md px-3 pb-2 text-white font-medium">
-                  {' '}
-                  informações
-                </strong>{' '}
-                detalhadas sobre as instituições
-              </h1>
-
-              <p className="max-w-[750px] text-center text-lg font-light text-foreground"></p>
             </div>
 
             <main className="z-[2]  gap-4 md:gap-8 flex flex-col  pt-0 md:pt-0 w-full">
@@ -418,7 +386,6 @@ export function Institution() {
                                         <InstitutionItem
                                           key={index} // Adiciona uma chave para cada item
                                           {...props}
-                                          avatar={`${urlGeralAdm}institution/upload/${props.id}/icon`}
                                           url={'/instituicao'}
                                         />
                                       );
@@ -442,8 +409,7 @@ export function Institution() {
                         ) : loading ? (
                           <Skeleton className="w-full rounded-md h-[400px]" />
                         ) : (
-                          <div />
-                          // <DataTable columns={columnsGraduate} data={filteredTotal.filter(item => true)} />
+                          <DataTable columns={columnsInstitution} data={filteredTotal} />
                         )}
                       </AccordionContent>
                     </AccordionItem>

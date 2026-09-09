@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../../ui/avatar';
 import { User } from 'lucide-react';
 import { UserContext } from '../../../../context/context';
 import { useModal } from '../../../hooks/use-modal-store';
+import { cn } from '../../../../lib/utils';
 
 const defaultCenter = {
   latitude: -14.235,
@@ -25,9 +26,10 @@ type CityData = {
 
 interface Props {
   cityData: CityData[];
+  heightClass?: string;
 }
 
-export default function MapaResearcher({ cityData }: Props) {
+export default function MapaResearcher({ cityData, heightClass }: Props) {
   const [selectedCity, setSelectedCity] = useState<CityData | null>(null);
   const mapRef = useRef(null);
   const { theme } = useTheme();
@@ -45,7 +47,7 @@ export default function MapaResearcher({ cityData }: Props) {
   const { onOpen } = useModal();
 
   return (
-    <div className="h-[350px] w-full rounded-md ">
+    <div className={cn("w-full rounded-md", heightClass ?? "h-[350px]")}>
       <Map
         ref={mapRef}
         initialViewState={{

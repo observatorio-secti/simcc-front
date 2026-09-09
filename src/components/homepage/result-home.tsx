@@ -6,7 +6,7 @@ import { ResultProvider } from "../provider/result-provider";
 import { UserContext } from "../../context/context";
 
 import { Button } from "../ui/button";
-import { BookOpen, Building, Building2, ChevronDown, ChevronUp, Copyright, Download, MoreHorizontal, SlidersHorizontal, Ticket, Users } from "lucide-react";
+import { BookOpen, Building, Building2, ChevronDown, ChevronUp, Copyright, Download, Map as MapIconLucide, MoreHorizontal, SlidersHorizontal, Ticket, Users } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useModal } from "../hooks/use-modal-store";
 import { DotsThreeOutline, DotsThreeVertical, File, Plus, Quotes } from "phosphor-react";
@@ -16,6 +16,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { ResultFiltersSlotContext } from "./result-filters-slot-context";
+import { useIsMobile } from "../../hooks/use-mobile";
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
@@ -28,6 +29,8 @@ export function ResultHome() {
     const { onOpen: onOpenModal } = useModal();
 
     const [isOn, setIsOn] = useState(true);
+    const [articleDistinct, setArticleDistinct] = useState(false);
+    const isMobile = useIsMobile();
 
     const queryUrl = useQuery();
 
@@ -99,11 +102,13 @@ export function ResultHome() {
 
     //csv
     const [jsonData, setJsonData] = useState<any[]>([]);
+    const exportPageSize = 100;
+    const maxExportPages = 100;
 
 
     let urlPublicacoesPorPesquisador = ''
     if (typeResult == 'articles-home') {
-        urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_researcher?terms=${valoresSelecionadosExport}&researcher_id=&type=ARTICLE&qualis=&qualis=&year=1900`;
+        urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_researcher?terms=${valoresSelecionadosExport}&researcher_id=&type=ARTICLE&qualis=&qualis=&year=1900&distinct=${articleDistinct ? '1' : '0'}`;
     } else if (typeResult == 'researchers-home') {
         if (searchType === 'name') {
             urlPublicacoesPorPesquisador = `${urlGeral}researcherName?name=${valoresSelecionadosExport?.replace(/[;|()]/g, '')}`;
@@ -159,6 +164,15 @@ export function ResultHome() {
                         'Content-Type': 'text/plain'
                     }
                 });
+                if (!response.ok) {
+                    await response.text();
+                    return;
+                }
+                const ct = response.headers.get("content-type") || "";
+                if (!ct.includes("application/json")) {
+                    await response.text();
+                    return;
+                }
                 const data = await response.json();
                 if (data) {
                     setJsonData(data)
@@ -175,6 +189,10 @@ export function ResultHome() {
 
     const convertJsonToCsv = (json: any[]): string => {
         const items = json;
+        if (items.length === 0) {
+            return '';
+        }
+
         const replacer = (_: string, value: any) => (value === null ? '' : value); // Handle null values
         const header = Object.keys(items[0]);
         const csv = [
@@ -187,15 +205,76 @@ export function ResultHome() {
         return csv;
     };
 
+    const sortExportData = (items: any[]) => {
+        const sortField = typeResult === 'articles-home' ? 'title' : typeResult === 'researchers-home' ? 'name' : null;
+
+        if (!sortField || !items?.length) {
+            return items;
+        }
+
+        return [...items].sort((a, b) => {
+            const firstValue = String(a?.[sortField] ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            const secondValue = String(b?.[sortField] ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            return firstValue.localeCompare(secondValue, 'pt-BR', { sensitivity: 'base' });
+        });
+    };
+
     const handleDownloadJson = async () => {
         try {
-            const csvData = convertJsonToCsv(jsonData);
+            let dataToDownload = sortExportData(jsonData);
+
+            if (typeResult === 'articles-home' || typeResult === 'researchers-home') {
+                const pages: any[] = [];
+                let page = 1;
+                let pageData: any[];
+                const sortBy = typeResult === 'articles-home' ? 'title' : 'name';
+
+                do {
+                    const separator = urlPublicacoesPorPesquisador.includes('?') ? '&' : '?';
+                    const response = await fetch(
+                        `${urlPublicacoesPorPesquisador}${separator}page=${page}&sort_by=${sortBy}&sort_order=asc`,
+                        {
+                            mode: 'cors',
+                            headers: {
+                                'Access-Control-Allow-Origin': '*',
+                                'Access-Control-Allow-Methods': 'GET',
+                                'Access-Control-Allow-Headers': 'Content-Type',
+                                'Access-Control-Max-Age': '3600',
+                                'Content-Type': 'text/plain'
+                            }
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error(`Falha ao buscar a página ${page} dos resultados`);
+                    }
+
+                    pageData = await response.json();
+                    if (!Array.isArray(pageData)) {
+                        throw new Error('A API retornou um formato de dados inválido');
+                    }
+
+                    pages.push(...pageData);
+                    page += 1;
+                } while (pageData.length === exportPageSize && page <= maxExportPages);
+
+                dataToDownload = sortExportData(pages);
+            } else {
+                dataToDownload = sortExportData(dataToDownload);
+            }
+
+            const csvData = convertJsonToCsv(dataToDownload);
+            if (!csvData) {
+                return;
+            }
+
             const blob = new Blob([csvData], { type: 'text/csv;charset=windows-1252;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.download = `dados.csv`;
             link.href = url;
             link.click();
+            URL.revokeObjectURL(url);
         } catch (error) {
             console.error(error);
         }
@@ -225,7 +304,7 @@ export function ResultHome() {
     }, [itemsSelecionados]);
 
     return (
-        <ResultFiltersSlotContext.Provider value={filtersSlot}>
+        <ResultFiltersSlotContext.Provider value={{ slot: filtersSlot, articleDistinct, setArticleDistinct }}>
             <div ref={rootRef} className="min-h-full w-full flex flex-col">
                 <Helmet>
                 <title>
@@ -312,6 +391,16 @@ export function ResultHome() {
                                                 </div>
                                             )
                                         )}
+                                        {!isMobile && !((simcc && researcher == 'false' && itemsSelecionados.length == 0) && itemsSelecionados.length == 0) && (
+                                            searchType != 'name' && (
+                                                <div className={`transition-all`}>
+                                                    <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult == 'mapa-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('mapa-home')}>
+                                                        <MapIconLucide className="h-4 w-4" />
+                                                        Mapa
+                                                    </Button>
+                                                </div>
+                                            )
+                                        )}
                                     </div>
                                     <ScrollBar orientation="horizontal" />
                                 </ScrollArea>
@@ -364,7 +453,7 @@ export function ResultHome() {
 
                                         </DropdownMenuItem >
 
-                                        {(typeResult == 'researchers-home' || typeResult == 'articles-home') && (
+                                        {(typeResult == 'researchers-home' || typeResult == 'articles-home' || typeResult == 'mapa-home') && (
                                             <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2 lg:hidden">
 
                                                 <SlidersHorizontal size={16} className="" />

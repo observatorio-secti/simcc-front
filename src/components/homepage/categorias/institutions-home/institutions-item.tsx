@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { Alert } from '../../../ui/alert';
 import { UserContext } from '../../../../context/context';
 import { CardHeader, CardTitle } from '../../../ui/card';
-import { getInstitutionImage } from './institution-image';
-import { getInstitutionImageBackground } from './institution-image-background';
+import { useInstitutions } from '../../../../hooks/use-institution-queries';
 
 type Institutions = {
   among: string;
@@ -13,30 +12,19 @@ type Institutions = {
 };
 
 export function InstitutionsItem(props: Institutions) {
-  const { valoresSelecionadosExport, searchType, itemsSelecionados } =
-    useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
+  const { data: institutions } = useInstitutions();
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const buildAssetUrl = (path?: string | null) => {
+    if (!path) return null;
+    if (/^https?:\/\//.test(path)) return path;
+    const base = (urlGeral || '').replace(/\/$/, '');
+    return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
 
-  useEffect(() => {
-    const fetchImage = async () => {
-      const url = await getInstitutionImage(props.id);
-      setImageUrl(url);
-    };
-
-    fetchImage();
-  }, [props.id]);
-
-  const [imageUrlBg, setImageUrlBg] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchImage = async () => {
-      const url = await getInstitutionImageBackground(props.id);
-      setImageUrlBg(url);
-    };
-
-    fetchImage();
-  }, [props.id]);
+  const matched = (institutions as any[])?.find((i: any) => i.id === props.id);
+  const logoUrl = buildAssetUrl(matched?.image);
+  const coverUrl = buildAssetUrl(matched?.cover);
 
   return (
     <div className="flex w-full group">
@@ -45,13 +33,19 @@ export function InstitutionsItem(props: Institutions) {
           <div className="mb-3">
             <div>
               <Alert
-                className="rounded-md border-0 border-b  h-32 rounded-b-none  bg-no-repeat bg-center bg-cover"
-                style={{ backgroundImage: `url(${imageUrlBg})` }}
+                className="rounded-md border-0 border-b h-32 rounded-b-none bg-no-repeat bg-center bg-cover bg-neutral-100 dark:bg-neutral-100"
+                style={{
+                  backgroundImage: coverUrl ? `url(${coverUrl})` : undefined,
+                  backgroundColor: coverUrl ? undefined : '#f5f5f5',
+                }}
               ></Alert>
               <div className="relative group w-fit -top-8 px-4">
                 <Alert
-                  className="aspect-square dark:bg-white  bg-no-repeat bg-center bg-contain rounded-md h-20 bg-white "
-                  style={{ backgroundImage: `url(${imageUrl})` }}
+                  className="aspect-square bg-no-repeat bg-center bg-contain rounded-md h-20 bg-white dark:bg-white border"
+                  style={{
+                    backgroundImage: logoUrl ? `url(${logoUrl})` : undefined,
+                    backgroundColor: 'white',
+                  }}
                 ></Alert>
               </div>
             </div>

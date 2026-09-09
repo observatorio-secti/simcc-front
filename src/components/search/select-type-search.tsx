@@ -81,7 +81,7 @@ export function SelectTypeSearch() {
           <SelectItem value="abstract">
             <div className="flex gap-4 items-center mr-2">
               <div className="bg-yellow-500 flex rounded-sm h-4 w-4"></div>{' '}
-              Resumo
+              Resumo do lattes
             </div>
           </SelectItem>
           <SelectItem value="speaker">

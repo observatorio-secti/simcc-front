@@ -35,43 +35,59 @@ export function TabelaQualisQuantidade(props: Props) {
   const [dados, setDados] = useState<Dados[]>([]);
   const [anos, setAnos] = useState<number[]>([]);
   const [anoSelecionado, setAnoSelecionado] = useState<number | null>(null);
-  const [year, setYear] = useState(new Date().getFullYear() - 4);
+  const [year] = useState(new Date().getFullYear() - 4);
 
   const { urlGeral } = useContext(UserContext);
   const urlDados = `${urlGeral}graduate_program/${props.graduate_program_id}/article_production?year=${year}`;
-  const fetchData = async () => {
-    try {
-      const response = await fetch(urlDados, {
-        mode: 'cors',
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Access-Control-Max-Age': '3600',
-          'Content-Type': 'text/plain',
-        },
-      });
-      const data: Dados[] = await response.json();
-      if (data) {
-        setDados(data);
-
-        // Extrair os anos únicos
-        const uniqueYears = Array.from(
-          new Set(data.map((item) => item.year)),
-        ).sort((a, b) => a - b);
-        setAnos(uniqueYears);
-        setAnoSelecionado(uniqueYears[0]); // Definir o primeiro ano como padrão
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   useEffect(() => {
+    const controller = new AbortController();
+    const fetchData = async () => {
+      if (!urlGeral || !props.graduate_program_id) return;
+      try {
+        const response = await fetch(urlDados, {
+          mode: 'cors',
+          signal: controller.signal,
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600',
+            'Content-Type': 'text/plain',
+          },
+        });
+        if (!response.ok) throw new Error(`article_production ${response.status}`);
+        const raw = await response.json();
+        if (!Array.isArray(raw)) throw new Error('article_production not array');
+        const normalized: Dados[] = raw.map((r: Record<string, unknown>) => ({
+          name: String((r.name as string) ?? (r.researcher as string) ?? ''),
+          year: Number(r.year as number),
+          citations: Number((r.citations as number) ?? (r.citations_count as number) ?? 0),
+          A1: Number((r.A1 as number) ?? (r.a1 as number) ?? ((r.qualis as Record<string, unknown>)?.A1 as number) ?? ((r.qualis as Record<string, unknown>)?.a1 as number) ?? 0),
+          A2: Number((r.A2 as number) ?? (r.a2 as number) ?? ((r.qualis as Record<string, unknown>)?.A2 as number) ?? ((r.qualis as Record<string, unknown>)?.a2 as number) ?? 0),
+          A3: Number((r.A3 as number) ?? (r.a3 as number) ?? ((r.qualis as Record<string, unknown>)?.A3 as number) ?? ((r.qualis as Record<string, unknown>)?.a3 as number) ?? 0),
+          A4: Number((r.A4 as number) ?? (r.a4 as number) ?? ((r.qualis as Record<string, unknown>)?.A4 as number) ?? ((r.qualis as Record<string, unknown>)?.a4 as number) ?? 0),
+          B1: Number((r.B1 as number) ?? (r.b1 as number) ?? ((r.qualis as Record<string, unknown>)?.B1 as number) ?? ((r.qualis as Record<string, unknown>)?.b1 as number) ?? 0),
+          B2: Number((r.B2 as number) ?? (r.b2 as number) ?? ((r.qualis as Record<string, unknown>)?.B2 as number) ?? ((r.qualis as Record<string, unknown>)?.b2 as number) ?? 0),
+          B3: Number((r.B3 as number) ?? (r.b3 as number) ?? ((r.qualis as Record<string, unknown>)?.B3 as number) ?? ((r.qualis as Record<string, unknown>)?.b3 as number) ?? 0),
+          B4: Number((r.B4 as number) ?? (r.b4 as number) ?? ((r.qualis as Record<string, unknown>)?.B4 as number) ?? ((r.qualis as Record<string, unknown>)?.b4 as number) ?? 0),
+          C: Number((r.C as number) ?? (r.c as number) ?? ((r.qualis as Record<string, unknown>)?.C as number) ?? ((r.qualis as Record<string, unknown>)?.c as number) ?? 0),
+          SQ: Number((r.SQ as number) ?? (r.sq as number) ?? ((r.qualis as Record<string, unknown>)?.SQ as number) ?? ((r.qualis as Record<string, unknown>)?.sq as number) ?? 0),
+        }));
+        setDados(normalized);
+        const uniqueYears = Array.from(new Set(normalized.map((item) => item.year))).sort((a, b) => a - b);
+        setAnos(uniqueYears);
+        setAnoSelecionado(uniqueYears[0] ?? null);
+      } catch (err) {
+        if ((err as Error).name === 'AbortError') return;
+        setDados([]);
+        setAnos([]);
+        setAnoSelecionado(null);
+      }
+    };
     fetchData();
+    return () => controller.abort();
   }, [urlDados]);
-  console.log(urlDados);
-  console.log(dados);
 
   // Definição das colunas para o DataTable
   const columns: ColumnDef<Dados>[] = [
@@ -141,7 +157,7 @@ export function TabelaQualisQuantidade(props: Props) {
           </SelectTrigger>
           <SelectContent>
             {anos.map((ano) => (
-              <SelectItem value={String(ano)}>{ano}</SelectItem>
+              <SelectItem key={ano} value={String(ano)}>{ano}</SelectItem>
             ))}
           </SelectContent>
         </Select>

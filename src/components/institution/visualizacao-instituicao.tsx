@@ -16,7 +16,7 @@ import {
 import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList } from '../ui/tabs';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { UserContext } from '../../context/context';
 import { useModal } from '../hooks/use-modal-store';
 import Highcharts from 'highcharts';
@@ -35,7 +35,11 @@ import { LinhasPesquisaPrograma } from './linhas-pesquisa-programa';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { Keepo } from '../dashboard/builder-page/builder-page';
 import { useParams } from 'react-router-dom';
-import { useInstitution } from './hooks/use-institution-queries';
+import {
+  useInstitution,
+  useInstitutionBolsistas,
+  useInstitutionResearchGroups,
+} from './hooks/use-institution-queries';
 import { Institution as InstitutionType } from '../../services/institution';
 
 export type GraduateProgram = InstitutionType;
@@ -48,10 +52,9 @@ interface VisualizacaoInstituicaoProps {
   identifier?: string;
 }
 
-export function VisualizacaoInstituicao({
-  identifier: propIdentifier,
-}: VisualizacaoInstituicaoProps = {}) {
-  const { urlGeral, urlGeralAdm } = useContext(UserContext);
+export function VisualizacaoInstituicao({ identifier: propIdentifier }: VisualizacaoInstituicaoProps = {}) {
+
+  const { urlGeral } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams<{
@@ -69,14 +72,23 @@ export function VisualizacaoInstituicao({
     '';
 
   let effectiveIdentifier = rawIdentifier.trim();
-  try {
-    effectiveIdentifier = decodeURIComponent(effectiveIdentifier).trim();
-  } catch {
-    // fallback
-  }
 
-  const { data: graduatePrograms, isLoading: loading } =
-    useInstitution(effectiveIdentifier);
+  effectiveIdentifier = decodeURIComponent(effectiveIdentifier).trim();
+
+
+  const { data: institutions, isLoading: loading } = useInstitution(effectiveIdentifier);
+  const logoUrl = urlGeral.replace(/\/$/, "") + institutions?.image;
+  const coverUrl = urlGeral.replace(/\/$/, "") + institutions?.cover;
+  const gruposCount = institutions?.count_rg;
+  const bolsistasCount = institutions?.count_foment;
+
+  const normalizeForFilter = (str: string) =>
+    (str || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
 
   // Mapeamento de links das instituições
   const institutionLinks: { [key: string]: string } = {
@@ -103,11 +115,11 @@ export function VisualizacaoInstituicao({
   };
 
   const { theme } = useTheme();
-  const siteTitle = graduatePrograms?.name
-    ? `${graduatePrograms.name} | ${'Simcc'}`
+  const siteTitle = institutions?.name
+    ? `${institutions.name} | ${'Simcc'}`
     : `${'Simcc'} | ${'SECTI-BA'}`;
-  const siteDescription = graduatePrograms?.name
-    ? `${graduatePrograms.name} | Conectee`
+  const siteDescription = institutions?.name
+    ? `${institutions.name} | Conectee`
     : `${'Simcc'} | ${'SECTI-BA'}`;
   const tabs = [
     { id: 'producoes', label: 'Produções', icon: SquareLibrary },
@@ -123,18 +135,12 @@ export function VisualizacaoInstituicao({
   ];
   const tab = queryUrl.get('pagina');
   const [value, setValue] = useState(tab || tabs[0].id);
-  const updateFilters = (category: string, values: any) => {
-    if (values) {
-      queryUrl.set(category, values);
-    } else {
-      queryUrl.delete(category);
-    }
-  };
+
   useEffect(() => {
     const currentParams = new URLSearchParams(location.search);
     currentParams.set('pagina', value);
-    if (graduatePrograms?.id) {
-      currentParams.set('institution_id', graduatePrograms.id);
+    if (institutions?.id) {
+      currentParams.set('institution_id', institutions.id);
     }
     navigate(
       {
@@ -143,7 +149,7 @@ export function VisualizacaoInstituicao({
       },
       { replace: true },
     );
-  }, [value, graduatePrograms?.id]);
+  }, [value, institutions?.id]);
   const [loadingMessage, setLoadingMessage] = useState(
     'Estamos procurando todas as informações no nosso banco de dados, aguarde.',
   );
@@ -177,96 +183,25 @@ export function VisualizacaoInstituicao({
       }, 15000),
     );
     return () => {
-      // Limpa os timeouts ao desmontar ou quando isOpen mudar
       timeouts.forEach(clearTimeout);
     };
   }, []);
-  /////////////
-  const [keepoData, setKeepoData] = useState<Keepo>({
-    app: {
-      background_color: '',
-      background_image: '',
-      text_color: '',
-      status: 'publicar',
-      card_color: '',
-      card_text_color: '',
-      button_color: '',
-      button_text_color: '',
-    },
-    profile_info: {
-      avatar: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      jobTitle: '',
-      supporting: '',
-      button_text: '',
-      link: '',
-    },
-    content: [],
-  });
-  ////firebase
-  const graduate_program_id = queryUrl.get('graduate_program_id');
-  const group_id = queryUrl.get('group_id');
-  const dep_id = queryUrl.get('dep_id');
-  const documentId = graduate_program_id || group_id || dep_id;
-  const db = getFirestore();
-  const isDataLoaded = useRef(false); // Flag para evitar loop de salvamento
-  // Carregar dados ao montar a página
-  useEffect(() => {
-    if (documentId) {
-      const fetchData = async () => {
-        const docRef = doc(db, 'construtor-pagina', documentId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data() as Partial<Keepo>;
-          setKeepoData({
-            app: {
-              background_color: data.app?.background_color || '',
-              background_image: data.app?.background_image || '',
-              text_color: data.app?.text_color || '',
-              card_color: data.app?.card_color || '',
-              card_text_color: data.app?.card_text_color || '',
-              button_color: data.app?.button_color || '',
-              button_text_color: data.app?.button_text_color || '',
-              status: data.app?.status || '',
-            },
-            profile_info: {
-              avatar: data.profile_info?.avatar || '',
-              firstName: data.profile_info?.firstName || '',
-              lastName: data.profile_info?.lastName || '',
-              email: data.profile_info?.email || '',
-              jobTitle: data.profile_info?.jobTitle || '',
-              supporting: data.profile_info?.supporting || '',
-              button_text: data.profile_info?.button_text || '',
-              link: data.profile_info?.link || '',
-            },
-            content: data.content || [],
-          });
-          isDataLoaded.current = true; // Marca que os dados foram carregados
-        }
-      };
-      fetchData();
-    }
-  }, [documentId]);
+
+
   const { onOpen } = useModal();
 
-  // Função para obter o link da instituição
   const getInstitutionLink = () => {
-    if (!graduatePrograms?.name) return null;
+    if (!institutions?.name) return null;
 
-    // Procura primeiro por correspondência exata
-    if (institutionLinks[graduatePrograms.name]) {
-      return institutionLinks[graduatePrograms.name];
+    if (institutionLinks[institutions.name]) {
+      return institutionLinks[institutions.name];
     }
 
-    // Procura por correspondência parcial (sigla dentro do nome)
     const foundKey = Object.keys(institutionLinks).find(
       (key) =>
-        graduatePrograms.name.includes(key) ||
-        key.includes(graduatePrograms.name),
+        institutions.name.includes(key) ||
+        key.includes(institutions.name),
     );
-
     return foundKey ? institutionLinks[foundKey] : null;
   };
 
@@ -291,7 +226,7 @@ export function VisualizacaoInstituicao({
       </div>
     );
   }
-  if (!graduatePrograms) {
+  if (!institutions) {
     return (
       <div className="h-full bg-cover bg-center flex flex-col items-center justify-center bg-neutral-50 dark:bg-neutral-900">
         <div className="w-full flex flex-col items-center justify-center">
@@ -328,7 +263,7 @@ export function VisualizacaoInstituicao({
           <div className="md:p-8 p-4 pb-0">
             <div
               style={{
-                backgroundImage: `url(${urlGeralAdm}institution/upload/${graduatePrograms.id}/cover)`,
+                backgroundImage: coverUrl ? `url(${coverUrl})` : undefined,
               }}
               className="bg-eng-blue bg-no-repeat bg-center bg-cover border dark:border-neutral-800 w-full rounded-md h-[300px]"
             >
@@ -361,10 +296,10 @@ lg:flex-row
                       <h1 className="flex-1 shrink-0 text-white whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
                         Visão da instituição
                       </h1>
-                      {graduatePrograms.researchers?.length > 0 && (
+                      {institutions.researchers?.length > 0 && (
                         <div className=" hidden justify-between items-center md:flex">
                           <div className="flex items-center">
-                            {graduatePrograms.researchers
+                            {institutions.researchers
                               .slice(0, 5)
                               .map((item, index) => (
                                 <Avatar
@@ -387,12 +322,12 @@ lg:flex-row
                                   </AvatarFallback>
                                 </Avatar>
                               ))}
-                            {graduatePrograms.researchers.length > 5 && (
+                            {institutions.researchers.length > 5 && (
                               <div
                                 className="h-8 w-8 flex items-center justify-center text-gray-500 bg-gray-100 dark:bg-neutral-800 rounded-full border dark:border-neutral-700 text-xs font-medium"
                                 style={{ marginLeft: '-10px' }}
                               >
-                                +{graduatePrograms.researchers.length - 5}
+                                +{institutions.researchers.length - 5}
                               </div>
                             )}
                           </div>
@@ -406,18 +341,23 @@ lg:flex-row
                     <div className="absolute">
                       <Avatar
                         onClick={handleLogoClick}
-                        className={`rounded-lg h-24 w-24 relative -top-12 xl:top-0 ${getInstitutionLink() ? 'cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out ring-2 ring-transparent hover:ring-white/50' : ''}`}
+                        style={{ backgroundColor: 'white' }}
+                        className={`rounded-lg h-24 w-24 relative -top-12 xl:top-0 bg-white dark:bg-white ${getInstitutionLink() ? 'cursor-pointer hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out ring-2 ring-transparent hover:ring-white/50' : ''}`}
                         title={
                           getInstitutionLink()
-                            ? `Visitar site da ${graduatePrograms.name}`
+                            ? `Visitar site da ${institutions.name}`
                             : ''
                         }
                       >
                         <AvatarImage
-                          className={'rounded-md h-24 w-24'}
-                          src={`${urlGeralAdm}institution/upload/${graduatePrograms.id}/icon`}
+                          style={{ backgroundColor: 'white' }}
+                          className={'rounded-md h-24 w-24 object-contain bg-white dark:bg-white p-1'}
+                          src={logoUrl || undefined}
                         />
-                        <AvatarFallback className="flex items-center justify-center">
+                        <AvatarFallback
+                          style={{ backgroundColor: 'white' }}
+                          className="flex items-center justify-center bg-white dark:bg-white"
+                        >
                           <Building size={24} />
                         </AvatarFallback>
                       </Avatar>
@@ -429,11 +369,10 @@ lg:flex-row
                           {tabs.map(({ id, label, icon: Icon }) => (
                             <div
                               key={id}
-                              className={`pb-2 border-b-2 text-black dark:text-white transition-all ${
-                                value === id
-                                  ? 'border-b-white dark:border-b-neutral-800'
-                                  : 'border-b-transparent'
-                              }`}
+                              className={`pb-2 border-b-2 text-black dark:text-white transition-all ${value === id
+                                ? 'border-b-white dark:border-b-neutral-800'
+                                : 'border-b-transparent'
+                                }`}
                               onClick={() => setValue(id)}
                             >
                               <Button
@@ -460,34 +399,40 @@ lg:flex-row
               <div className="flex flex-col  gap-6 mt-8 px-8">
                 <div>
                   <h1 className="text-2xl mb-2 max-w-[800px] font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] md:block">
-                    {graduatePrograms.name}
+                    {institutions.name}
                   </h1>
-                  <p className="text-lg font-light text-foreground">
-                    <div className="flex flex-wrap gap-4 ">
-                      <div
-                        title="Docentes"
-                        className="text-gray-500 text-sm flex gap-1 items-center"
-                      >
-                        <Users size={12} className="flex-shrink-0" /> Docentes:
-                        <span className="truncate">
-                          {graduatePrograms.count_r}
+                  <div className="flex flex-wrap gap-4 md:gap-6 mt-4">
+                    {[
+                      {
+                        label: 'Docentes',
+                        value: (institutions as any).count_r,
+                        icon: Users,
+                      },
+                      {
+                        label: 'Pós-graduações',
+                        value: (institutions as any).count_gp,
+                        icon: GraduationCap,
+                      },
+                      {
+                        label: 'Grupos de Pesquisa',
+                        value: gruposCount,
+                        icon: Users,
+                      },
+                      {
+                        label: 'Bolsistas Produtividade',
+                        value: bolsistasCount,
+                        icon: Award,
+                      },
+                    ].map(({ label, value, icon: Icon }) => (
+                      <div key={label} className="flex items-center gap-2">
+                        <Icon size={16} className="text-muted-foreground shrink-0" aria-hidden />
+                        <span className="text-sm text-muted-foreground">{label}:</span>
+                        <span className="text-xl md:text-2xl font-bold tracking-tight leading-none">
+                          {value != null ? Number(String(value)).toLocaleString('pt-BR') : '—'}
                         </span>
                       </div>
-                      <div
-                        title="Pós-graduações"
-                        className="text-gray-500 text-sm flex gap-1 items-center"
-                      >
-                        <GraduationCapIcon
-                          size={12}
-                          className="flex-shrink-0"
-                        />{' '}
-                        Pós-graduações:
-                        <span className="truncate">
-                          {graduatePrograms.count_gp}
-                        </span>
-                      </div>
-                    </div>
-                  </p>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -500,11 +445,10 @@ lg:flex-row
                         {tabs.map(({ id, label, icon: Icon }) => (
                           <div
                             key={id}
-                            className={`pb-2 border-b-2 text-black dark:text-white transition-all ${
-                              value === id
-                                ? 'border-b-[#719CB8]'
-                                : 'border-b-transparent'
-                            }`}
+                            className={`pb-2 border-b-2 text-black dark:text-white transition-all ${value === id
+                              ? 'border-b-[#719CB8]'
+                              : 'border-b-transparent'
+                              }`}
                             onClick={() => setValue(id)}
                           >
                             <Button variant="ghost" className="m-0">
@@ -529,24 +473,24 @@ lg:flex-row
               <LinhasPesquisaPrograma />
             </TabsContent>
             <TabsContent value="docentes" className="m-0">
-              <DocentesInstitution institutionId={graduatePrograms.id} />
+              <DocentesInstitution institutionId={institutions.id} />
             </TabsContent>
             <TabsContent value="programas_pos" className="m-0">
               <ProgramasPosInstitution
-                institutionId={graduatePrograms.id}
-                institutionName={graduatePrograms.name}
+                institutionId={institutions.id}
+                institutionName={institutions.name}
               />
             </TabsContent>
             <TabsContent value="grupos_pesquisa" className="m-0">
               <GruposPesquisaInstitution
-                institutionId={graduatePrograms.id}
-                institutionName={graduatePrograms.name}
+                institutionId={institutions.id}
+                institutionName={institutions.name}
               />
             </TabsContent>
             <TabsContent value="bolsistas" className="m-0">
               <BolsistasInstitution
-                institutionId={graduatePrograms.id}
-                institutionName={graduatePrograms.name}
+                institutionId={institutions.id}
+                institutionName={institutions.name}
               />
             </TabsContent>
             <TabsContent value="indicadores" className="m-0">

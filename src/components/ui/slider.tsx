@@ -6,21 +6,31 @@ import { cn } from '../../lib/utils';
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <SliderPrimitive.Root
-    ref={ref}
-    className={cn(
-      'relative flex w-full touch-none select-none items-center',
-      className,
-    )}
-    {...props}
-  >
-    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-eng-blue dark:bg-eng-blue">
-      <SliderPrimitive.Range className="absolute h-full bg-slate-100 dark:bg-slate-800 " />
-    </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-eng-blue bg-white ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:border-eng-blue dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300" />
-  </SliderPrimitive.Root>
-));
+>(({ className, ...props }, ref) => {
+  const values = (props.value as number[] | undefined) ?? (props.defaultValue as number[] | undefined);
+  const thumbCount = Array.isArray(values) ? values.length : 1;
+
+  return (
+    <SliderPrimitive.Root
+      ref={ref}
+      className={cn(
+        'relative flex w-full touch-none select-none items-center',
+        className,
+      )}
+      {...props}
+    >
+      <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-eng-blue dark:bg-eng-blue">
+        <SliderPrimitive.Range className="absolute h-full bg-slate-100 dark:bg-slate-800 " />
+      </SliderPrimitive.Track>
+      {Array.from({ length: thumbCount }).map((_, i) => (
+        <SliderPrimitive.Thumb
+          key={i}
+          className="block h-5 w-5 rounded-full border-2 border-eng-blue bg-white ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:border-eng-blue dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300"
+        />
+      ))}
+    </SliderPrimitive.Root>
+  );
+});
 Slider.displayName = SliderPrimitive.Root.displayName;
 
 export { Slider };
