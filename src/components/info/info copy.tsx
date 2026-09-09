@@ -452,14 +452,6 @@ export function Info() {
                   Tenha acesso a lista de definições e atributos do banco de
                   dados
                 </div>
-                <div className="flex gap-3 mt-3">
-                  <Link to={`${urlGeral}dictionary.pdf`}>
-                    <Button size={'sm'}>
-                      <Download size={16} />
-                      Dicionário de dados
-                    </Button>
-                  </Link>
-                </div>
               </CardContent>
 
               <div></div>

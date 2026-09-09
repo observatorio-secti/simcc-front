@@ -1,6 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { UserContext } from '../../context/context';
 import { Button } from '../ui/button';
 import { StripeLogo, Student } from 'phosphor-react';
 import {
@@ -75,7 +74,6 @@ const TABS = [
 
 export function TodosPesquisadores() {
   const location = useLocation();
-  const { urlGeral } = useContext(UserContext);
 
   const [isOn] = useState(true);
   const [value, setValue] = useState('bolsistas');
@@ -212,12 +210,6 @@ export function TodosPesquisadores() {
                 </div>
                 <div className="hidden xl:flex xl:flex-nowrap gap-2">
                   <div className="md:flex md:flex-nowrap gap-2">
-                    <Link to={`${urlGeral}dictionary.pdf`} target="_blank">
-                      <Button variant="ghost" className="">
-                        <File size={16} className="" />
-                        Dicionário de dados
-                      </Button>
-                    </Link>
                     <Button
                       onClick={handleDownloadJson}
                       variant="ghost"
@@ -243,14 +235,6 @@ export function TodosPesquisadores() {
                     <DropdownMenuContent>
                       <DropdownMenuLabel>Mais opções</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <Link to={`${urlGeral}dictionary.pdf`} target="_blank">
-                        <DropdownMenuItem className="p-0">
-                          <Button variant="ghost" className="">
-                            <File size={16} className="" />
-                            Dicionário de dados
-                          </Button>
-                        </DropdownMenuItem>
-                      </Link>
                       <DropdownMenuItem className="p-0">
                         <Button
                           onClick={handleDownloadJson}

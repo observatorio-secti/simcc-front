@@ -4,7 +4,6 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
-  File,
   Plus,
   Shapes,
   SlidersHorizontal,
@@ -426,12 +425,6 @@ export function GruposPesquisaPage() {
 
                 <div className="hidden xl:flex xl:flex-nowrap gap-2">
                   <div className="md:flex md:flex-nowrap gap-2">
-                    <Link to={`${urlGeral}dictionary.pdf`} target="_blank">
-                      <Button variant="ghost" className="">
-                        <File size={16} className="" />
-                        Dicionário de dados
-                      </Button>
-                    </Link>
                     <Button
                       onClick={() => handleDownloadJson()}
                       variant="ghost"

@@ -38,7 +38,6 @@ import {
   BracketsCurly,
   Buildings,
   CalendarBlank,
-  File,
   FileCsv,
   Files,
   Quotes,
@@ -920,13 +919,6 @@ export function ResearcherPage() {
                             <FileCsv className="h-4 w-4" />
                             CSV dos artigos
                           </DropdownMenuItem>
-
-                          <Link to={`${urlGeral}dictionary.pdf`}>
-                            <DropdownMenuItem className="flex items-center gap-3">
-                              <File className="h-4 w-4" />
-                              Dicionário de dados
-                            </DropdownMenuItem>
-                          </Link>
 
                           <DropdownMenuItem
                             className="flex items-center gap-3"

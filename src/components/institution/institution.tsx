@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   ChevronUp,
   Download,
-  File,
   Landmark,
   Plus,
 } from 'lucide-react';
@@ -257,12 +256,6 @@ export function Institution() {
 
                       <div className="hidden xl:flex xl:flex-nowrap gap-2">
                         <div className="md:flex md:flex-nowrap gap-2">
-                          <Link to={`/api-docs`}>
-                            <Button variant="ghost" className="">
-                              <File size={16} className="" />
-                              Dicionário de dados
-                            </Button>
-                          </Link>
                           <Button
                             onClick={() => handleDownloadJson()}
                             variant="ghost"
