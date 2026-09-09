@@ -33,7 +33,6 @@ import {
 import { BookHome } from '../homepage/categorias/book-home';
 import { PatentHome } from '../homepage/categorias/patent-home';
 
-// ChapterHome não existe na branch simcc-prod
 import { useQuery } from '../dashboard/builder-page/tabelas/tabela-artigos';
 import { TextoRevistaHome } from '../listagens/texto-revista';
 import { WorkEventHome } from '../listagens/work-event-home';
@@ -44,7 +43,13 @@ import { SpeakerHome } from '../homepage/categorias/speaker-home';
 import { RelatorioTecnicoHome } from '../listagens/relatorio-tecnico-home';
 import { ProjetoPesquisaHome } from '../listagens/projeto-pesquisa-home';
 
-export function ProducoesPrograma() {
+// 1. CRIAMOS A INTERFACE PARA RECEBER O ID DA INSTITUIÇÃO DO PAI
+interface ProducoesProgramaProps {
+  institutionId?: string;
+  institutionName?: string;
+}
+
+export function ProducoesPrograma({ institutionId, institutionName }: ProducoesProgramaProps) {
   const [isOn, setIsOn] = useState(true);
   const queryUrl = useQuery();
   const tab = queryUrl.get('tab');
@@ -73,6 +78,7 @@ export function ProducoesPrograma() {
   const [value, setValue] = useState(tab || tabs[0].id);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const updateFilters = (category: string, values: any) => {
     if (values) {
@@ -81,15 +87,18 @@ export function ProducoesPrograma() {
       queryUrl.delete(category);
     }
   };
-  const location = useLocation();
 
   useEffect(() => {
+    // 2. GARANTIMOS QUE O ID NUNCA SEJA APAGADO DA URL NAS RENDERIZAÇÕES
+    if (institutionId) {
+      queryUrl.set('institution_id', institutionId);
+    }
     updateFilters('tab', value);
     navigate({
       pathname: location.pathname,
       search: queryUrl.toString(),
-    });
-  }, [value]);
+    }, { replace: true });
+  }, [value, institutionId]);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -164,11 +173,16 @@ export function ProducoesPrograma() {
                             onClick={() => {
                               setValue(id);
                               queryUrl.set('page', '1');
+                              
+                              // 3. GARANTIMOS QUE O CLIQUE NA ABA NÃO ZERE O ID
+                              if (institutionId) {
+                                queryUrl.set('institution_id', institutionId);
+                              }
 
                               navigate({
                                 pathname: location.pathname,
                                 search: queryUrl.toString(),
-                              });
+                              }, { replace: true });
                             }}
                           >
                             <Button variant="ghost" className="m-0">

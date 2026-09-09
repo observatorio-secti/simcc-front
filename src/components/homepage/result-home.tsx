@@ -6,7 +6,7 @@ import { ResultProvider } from "../provider/result-provider";
 import { UserContext } from "../../context/context";
 
 import { Button } from "../ui/button";
-import { BookOpen, Building, Building2, ChevronDown, ChevronUp, Copyright, Download, MoreHorizontal, SlidersHorizontal, Ticket, Users } from "lucide-react";
+import { BookOpen, Building, Building2, ChevronDown, ChevronUp, Copyright, Download, Map as MapIconLucide, MoreHorizontal, SlidersHorizontal, Ticket, Users } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useModal } from "../hooks/use-modal-store";
 import { DotsThreeOutline, DotsThreeVertical, File, Plus, Quotes } from "phosphor-react";
@@ -16,6 +16,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { ResultFiltersSlotContext } from "./result-filters-slot-context";
+import { useIsMobile } from "../../hooks/use-mobile";
 
 const useQuery = () => {
     return new URLSearchParams(useLocation().search);
@@ -29,6 +30,7 @@ export function ResultHome() {
 
     const [isOn, setIsOn] = useState(true);
     const [articleDistinct, setArticleDistinct] = useState(false);
+    const isMobile = useIsMobile();
 
     const queryUrl = useQuery();
 
@@ -389,6 +391,16 @@ export function ResultHome() {
                                                 </div>
                                             )
                                         )}
+                                        {!isMobile && !((simcc && researcher == 'false' && itemsSelecionados.length == 0) && itemsSelecionados.length == 0) && (
+                                            searchType != 'name' && (
+                                                <div className={`transition-all`}>
+                                                    <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult == 'mapa-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('mapa-home')}>
+                                                        <MapIconLucide className="h-4 w-4" />
+                                                        Mapa
+                                                    </Button>
+                                                </div>
+                                            )
+                                        )}
                                     </div>
                                     <ScrollBar orientation="horizontal" />
                                 </ScrollArea>
@@ -441,7 +453,7 @@ export function ResultHome() {
 
                                         </DropdownMenuItem >
 
-                                        {(typeResult == 'researchers-home' || typeResult == 'articles-home') && (
+                                        {(typeResult == 'researchers-home' || typeResult == 'articles-home' || typeResult == 'mapa-home') && (
                                             <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2 lg:hidden">
 
                                                 <SlidersHorizontal size={16} className="" />

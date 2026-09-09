@@ -15,7 +15,7 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Alert } from "../../ui/alert";
 import { CardContent, CardHeader, CardTitle } from "../../ui/card";
-import { Hash, MapIcon, Sparkles, Trash, User, X } from "lucide-react";
+import { Hash, Sparkles, Trash, User, X } from "lucide-react";
 import bg_popup from '../../../assets/bg_popup.png';
 import { ToggleGroup, ToggleGroupItem } from "../../ui/toggle-group"
 
@@ -24,26 +24,13 @@ import { SymbolEEWhite } from "../../svg/SymbolEEWhite";
 import { SymbolEE } from "../../svg/SymbolEE";
 import { useTheme } from "next-themes";
 import { MariaHome } from "../maria-home";
-import MapaResearcher from "./researchers-home/mapa-researcher";
 import { ResultFiltersSlotContext } from "../result-filters-slot-context";
 import { ResultFiltersSidebar, ResultFiltersSheet } from "../result-filters-shell";
-
-//mapa
-import municipios from './researchers-home/municipios.json';
 import { Input } from "../../ui/input";
 import { Separator } from "../../ui/separator";
 import { Badge } from "../../ui/badge";
 import { GraficoTitulacao } from "../../listagens/graficos/grafico-titulacao";
 import { GraficoAreaPesquisares } from "../../listagens/graficos/grafico-area-pesquisadores";
-
-type CityData = {
-    nome: string;
-    latitude: number;
-    longitude: number;
-    pesquisadores: number;
-    professores: string[];
-    lattes_10_id: string;
-};
 
 export type Research = {
     among: number,
@@ -792,7 +779,6 @@ export function ResearchersHome() {
     const [loading, setLoading] = useState(false);
     const [researcher, setResearcher] = useState<Research[]>([]);
     const [originalResearcher, setOriginalResearcher] = useState<Research[]>([]);
-    const [cityData, setCityData] = useState<CityData[]>([]);
     const [typeVisu, setTypeVisu] = useState('block');
     const [visibleResearchersCount, setVisibleResearchersCount] = useState(36);
     const { itemsSelecionados, urlGeral, searchType, simcc } = useContext(UserContext);
@@ -926,50 +912,6 @@ export function ResearchersHome() {
         fetchData();
     }, [urlTermPesquisadores, FinalOpenAlex, urlOpenAlex]);
 
-    useEffect(() => {
-        const processCityData = () => {
-            const cityMap = new Map<string, CityData>();
-
-            // Cria um mapa para associar o nome normalizado da cidade aos dados do município
-            const municipioMap = new Map(
-                municipios.map((m) => [normalizeCityName(m.nome), m])
-            );
-
-            researcher.forEach((r) => {
-                if (r.city) {
-                    const normalizedCity = normalizeCityName(r.city);
-                    const municipio = municipioMap.get(normalizedCity);
-
-                    if (!municipio) {
-                        console.warn(`Município não encontrado para a cidade: ${r.city}`);
-                        return;
-                    }
-
-                    if (!cityMap.has(normalizedCity)) {
-                        cityMap.set(normalizedCity, {
-                            nome: r.city,
-                            latitude: municipio.latitude,
-                            longitude: municipio.longitude,
-                            pesquisadores: 1,
-                            professores: [r.name],
-                            lattes_10_id: r.lattes_10_id,
-                        });
-                    } else {
-                        const city = cityMap.get(normalizedCity)!;
-                        city.pesquisadores += 1;
-                        city.professores.push(r.name);
-                    }
-                }
-            });
-
-            setCityData(Array.from(cityMap.values()));
-        };
-
-        processCityData();
-
-        console.log('cidades', cityData)
-    }, [researcher]);
-
     const items = Array.from({ length: 12 }, (_, index) => (
         <Skeleton key={index} className="w-full rounded-md h-[300px]" />
     ));
@@ -978,14 +920,6 @@ export function ResearchersHome() {
     const hasMoreResearchers = visibleResearchersCount < researcher.length;
 
     const { theme } = useTheme()
-
-    //mapa
-    const normalizeCityName = (cityName: string) => {
-        return cityName
-            .normalize("NFD") // Remove acentos
-            .replace(/[\u0300-\u036f]/g, "") // Remove diacríticos
-            .toLowerCase(); // Converte para minúsculas
-    };
 
     const { setSelectedAreas,
         setSelectedGraduations,
@@ -1267,34 +1201,6 @@ export function ResearchersHome() {
                         </div>
                     )}
 
-                    {(searchType != 'name' && simcc) && (
-                        <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
-                            <AccordionItem value="item-1" className="w-full ">
-                                <div className="flex mb-2">
-                                    <HeaderResultTypeHome title="Pesquisadores no mapa" icon={<MapIcon size={24} className="text-gray-400" />}>
-                                    </HeaderResultTypeHome>
-
-                                    <AccordionTrigger>
-
-                                    </AccordionTrigger>
-                                </div>
-                                <AccordionContent className="p-0">
-                                    {loading ? (
-                                        <Skeleton className="rounded-md w-full h-[300px] " />
-                                    ) : (
-                                        <div>
-                                            <Alert className="p-0">
-                                                <MapaResearcher
-                                                    cityData={cityData}
-                                                />
-                                            </Alert>
-                                        </div>
-                                    )}
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    )}
-                    
                     {searchType !== 'name' && searchType !== 'area' && (
                         <Accordion defaultValue="item-1" type="single" collapsible className="hidden md:flex ">
                             <AccordionItem value="item-1" className="w-full ">
@@ -1313,7 +1219,7 @@ export function ResearchersHome() {
                                         <div>
                                             <div className="grid gap-8 xl:grid-cols-2">
                                                 <GraficoTitulacao />
-                                                <GraficoAreaPesquisares />
+                                                <GraficoAreaPesquisares researchers={researcher} />
                                             </div>
                                         </div>
                                     )}
