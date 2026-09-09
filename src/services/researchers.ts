@@ -15,9 +15,13 @@ export interface SearchResearchersParams {
 export const getSearchResearchersPage = async (
   params: SearchResearchersParams,
 ): Promise<Research[]> => {
-  const { searchType, terms = '', idGraduateProgram = '', page = 1 } = params;
-  const cleanTerms = terms.replace(/[;|()]/g, '');
-  const gradProgramId = idGraduateProgram === '0' ? '' : idGraduateProgram;
+  const { searchType, page = 1 } = params;
+  const safeTerms = params.terms ?? '';
+  const cleanTerms = safeTerms.replace(/[;|()]/g, '');
+  const gradProgramId =
+    params.idGraduateProgram === '0' || !params.idGraduateProgram
+      ? ''
+      : params.idGraduateProgram;
 
   let endpoint = 'researcher';
   let queryParams: Record<string, any> = { page };
@@ -30,7 +34,7 @@ export const getSearchResearchersPage = async (
     case 'article':
       endpoint = 'researcher';
       queryParams = {
-        terms,
+        terms: safeTerms,
         university: '',
         type: 'ARTICLE',
         graduate_program_id: gradProgramId,
@@ -40,7 +44,7 @@ export const getSearchResearchersPage = async (
     case 'book':
       endpoint = 'researcherBook';
       queryParams = {
-        term: terms,
+        term: safeTerms,
         university: '',
         type: 'BOOK',
         graduate_program_id: gradProgramId,
@@ -50,7 +54,7 @@ export const getSearchResearchersPage = async (
     case 'area':
       endpoint = 'researcherArea_specialty';
       queryParams = {
-        area_specialty: terms,
+        area_specialty: safeTerms,
         university: '',
         graduate_program_id: gradProgramId,
         page,
@@ -59,7 +63,7 @@ export const getSearchResearchersPage = async (
     case 'speaker':
       endpoint = 'researcherParticipationEvent';
       queryParams = {
-        term: terms,
+        term: safeTerms,
         university: '',
         graduate_program_id: gradProgramId,
         page,
@@ -68,7 +72,7 @@ export const getSearchResearchersPage = async (
     case 'patent':
       endpoint = 'researcherPatent';
       queryParams = {
-        term: terms,
+        term: safeTerms,
         university: '',
         graduate_program_id: gradProgramId,
         page,
@@ -77,7 +81,7 @@ export const getSearchResearchersPage = async (
     case 'abstract':
       endpoint = 'researcher';
       queryParams = {
-        terms,
+        terms: safeTerms,
         university: '',
         type: 'ABSTRACT',
         graduate_program_id: gradProgramId,
@@ -87,7 +91,7 @@ export const getSearchResearchersPage = async (
     default:
       endpoint = 'researcher';
       queryParams = {
-        terms,
+        terms: safeTerms,
         university: '',
         graduate_program_id: gradProgramId,
         page,
@@ -123,7 +127,7 @@ export const getOpenAlexResearchers = async (
   terms?: string,
 ): Promise<ResearchOpenAlex[]> => {
   if (!terms) return [];
-  const cleanTerms = terms.replace(/[()|;]/g, '').trim();
+  const cleanTerms = String(terms).replace(/[()|;]/g, '').trim();
   if (!cleanTerms) return [];
 
   const { data } = await axios.get('https://api.openalex.org/authors', {

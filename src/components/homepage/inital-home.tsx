@@ -231,17 +231,17 @@ export function InitialHome() {
           </Link>
 
           <h1 className="z-[2] text-center text-3xl font-medium text-slate-800 leading-snug tracking-tight md:text-[2.6rem] lg:leading-[1.5] mb-8 mt-4">
-              Experimente{' '}
-              <span className="text-[#00757a] font-semibold border-b-[2px] border-[#00757a] pb-[4px]">
-                  pesquisar um tema
-              </span>
-              <br className="hidden md:block" />
-              e veja o que a plataforma pode
-              <br className="hidden md:block" />
-              filtrar para{' '}
-              <span className="text-[#9c1f2e] font-semibold">
-                  você.
-              </span>
+            Experimente{' '}
+            <span className="text-[#00757a] font-semibold border-b-[2px] border-[#00757a] pb-[4px]">
+              pesquisar um tema
+            </span>
+            <br className="hidden md:block" />
+            e veja o que a plataforma pode
+            <br className="hidden md:block" />
+            filtrar para{' '}
+            <span className="text-[#9c1f2e] font-semibold">
+              você.
+            </span>
           </h1>
 
           <div className="lg:max-w-[60vw] lg:w-[60vw] w-full">

@@ -10,14 +10,18 @@ import { GraficoAreaPesquisares } from '../../../../listagens/graficos/grafico-a
 import { GraficoTitulacao } from '../../../../listagens/graficos/grafico-titulacao';
 import { HeaderResultTypeHome } from '../../header-result-type-home';
 
+import { Research } from '../../../../../types/researcher';
+
 interface ResearchersChartsSectionProps {
   loading: boolean;
   searchType?: string;
+  researchers?: Research[];
 }
 
 export function ResearchersChartsSection({
   loading,
   searchType,
+  researchers = [],
 }: ResearchersChartsSectionProps) {
   if (searchType === 'name' || searchType === 'area') {
     return null;
@@ -45,7 +49,7 @@ export function ResearchersChartsSection({
             <div>
               <div className="grid gap-8 xl:grid-cols-2">
                 <GraficoTitulacao />
-                <GraficoAreaPesquisares />
+                <GraficoAreaPesquisares researchers={researchers} />
               </div>
             </div>
           )}

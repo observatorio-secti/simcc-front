@@ -445,34 +445,34 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
 
   const filteredTotal = Array.isArray(uniqueGraduatePrograms)
     ? uniqueGraduatePrograms.filter((item) => {
-        // Normaliza a string do item e da busca para comparação
-        const normalizeString = (str: any) =>
-          str
-            .normalize('NFD') // Decompõe os caracteres acentuados
-            .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
-            .toLowerCase(); // Converte para minúsculas
+      // Normaliza a string do item e da busca para comparação
+      const normalizeString = (str: any) =>
+        str
+          .normalize('NFD') // Decompõe os caracteres acentuados
+          .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
+          .toLowerCase(); // Converte para minúsculas
 
-        const searchString = normalizeString(item);
-        const normalizedSearch = normalizeString(search);
+      const searchString = normalizeString(item);
+      const normalizedSearch = normalizeString(search);
 
-        return searchString.includes(normalizedSearch);
-      })
+      return searchString.includes(normalizedSearch);
+    })
     : [];
 
   const filteredTotal2 = Array.isArray(uniqueCities)
     ? uniqueCities.filter((item) => {
-        // Normaliza a string do item e da busca para comparação
-        const normalizeString = (str: any) =>
-          str
-            .normalize('NFD') // Decompõe os caracteres acentuados
-            .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
-            .toLowerCase(); // Converte para minúsculas
+      // Normaliza a string do item e da busca para comparação
+      const normalizeString = (str: any) =>
+        str
+          .normalize('NFD') // Decompõe os caracteres acentuados
+          .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
+          .toLowerCase(); // Converte para minúsculas
 
-        const searchString = normalizeString(item);
-        const normalizedSearch = normalizeString(search2);
+      const searchString = normalizeString(item);
+      const normalizedSearch = normalizeString(search2);
 
-        return searchString.includes(normalizedSearch);
-      })
+      return searchString.includes(normalizedSearch);
+    })
     : [];
 
   return {
@@ -1068,27 +1068,26 @@ export function ResearchersHomeListagens() {
               <p className="text-sm font-medium">Filtros aplicados:</p>
               {selectedAreas.map((item) => (
                 <Badge
-                  className={` gap-2 items-center flex font-normal  rounded-md  dark:text-white py-2 px-3 ${
-                    item.includes('CIENCIAS AGRARIAS')
-                      ? 'bg-red-400'
-                      : item.includes('CIENCIAS EXATAS E DA TERRA')
-                        ? 'bg-green-400'
-                        : item.includes('CIENCIAS DA SAUDE')
-                          ? 'bg-[#20BDBE]'
-                          : item.includes('CIENCIAS HUMANAS')
-                            ? 'bg-[#F5831F]'
-                            : item.includes('CIENCIAS BIOLOGICAS')
-                              ? 'bg-[#EB008B]'
-                              : item.includes('ENGENHARIAS')
-                                ? 'bg-[#FCB712]'
-                                : item.includes('CIENCIAS SOCIAIS APLICADAS')
-                                  ? 'bg-[#009245]'
-                                  : item.includes('LINGUISTICA LETRAS E ARTES')
-                                    ? 'bg-[#A67C52]'
-                                    : item.includes('OUTROS')
-                                      ? 'bg-[#1B1464]'
-                                      : 'bg-[#000]'
-                  }`}
+                  className={` gap-2 items-center flex font-normal  rounded-md  dark:text-white py-2 px-3 ${item.includes('CIENCIAS AGRARIAS')
+                    ? 'bg-red-400'
+                    : item.includes('CIENCIAS EXATAS E DA TERRA')
+                      ? 'bg-green-400'
+                      : item.includes('CIENCIAS DA SAUDE')
+                        ? 'bg-[#20BDBE]'
+                        : item.includes('CIENCIAS HUMANAS')
+                          ? 'bg-[#F5831F]'
+                          : item.includes('CIENCIAS BIOLOGICAS')
+                            ? 'bg-[#EB008B]'
+                            : item.includes('ENGENHARIAS')
+                              ? 'bg-[#FCB712]'
+                              : item.includes('CIENCIAS SOCIAIS APLICADAS')
+                                ? 'bg-[#009245]'
+                                : item.includes('LINGUISTICA LETRAS E ARTES')
+                                  ? 'bg-[#A67C52]'
+                                  : item.includes('OUTROS')
+                                    ? 'bg-[#1B1464]'
+                                    : 'bg-[#000]'
+                    }`}
                 >
                   {item}
                   <div
