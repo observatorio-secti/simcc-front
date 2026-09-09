@@ -134,7 +134,7 @@ export function IncitesPage() {
         <div className="flex items-center gap-6 mb-8 justify-end">
           <div className="flex-1 text-right">
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl text-neutral-900 dark:text-neutral-100">
-              Observatório de Iniciativas de C&T&I (INCITES)
+              Observatório dos Institutos de Ciência, Inovação e Tecnologia do Estado da Bahia (INCITES)
             </h1>
             <p className="mt-2 text-neutral-600 dark:text-neutral-400 max-w-3xl ml-auto">
               Plataformas interativas que apresentam diagnósticos e informações
