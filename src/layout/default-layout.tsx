@@ -9,7 +9,7 @@ export default function DefaultLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <body className={cn('  h-screen bg-neutral-50 dark:bg-black ')}>
+    <main className={cn('  h-screen bg-neutral-50 dark:bg-black ')}>
       <ThemeProvider
         attribute="class"
         defaultTheme="light"
@@ -21,6 +21,6 @@ export default function DefaultLayout({
 
         {children}
       </ThemeProvider>
-    </body>
+    </main>
   );
 }
