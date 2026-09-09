@@ -12,7 +12,8 @@ export function FilterYearPopUp(props: Props) {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   
-  const availableYears = [];
+  // Adicionada a tipagem number[] para evitar o erro do TypeScript
+  const availableYears: number[] = [];
   // Trava o limite da lista visual em 1990 para não criar um menu gigante
   for (let y = currentYear; y >= 1990; y--) {
     availableYears.push(y);
