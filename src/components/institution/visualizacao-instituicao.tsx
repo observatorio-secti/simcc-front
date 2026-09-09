@@ -43,6 +43,22 @@ interface VisualizacaoInstituicaoProps {
   identifier?: string;
 }
 
+// NOVA FUNÇÃO: Formata o nome para deixar as preposições minúsculas
+const formatName = (name?: string) => {
+  if (!name) return '';
+  const prepositions = ['de', 'da', 'do', 'das', 'dos', 'e'];
+  return name
+    .split(' ')
+    .map((word, index) => {
+      // Se a palavra for uma preposição (e não for a primeira palavra), deixa minúscula
+      if (index !== 0 && prepositions.includes(word.toLowerCase())) {
+        return word.toLowerCase();
+      }
+      return word;
+    })
+    .join(' ');
+};
+
 export function VisualizacaoInstituicao({ identifier: propIdentifier }: VisualizacaoInstituicaoProps = {}) {
   const { urlGeral } = useContext(UserContext);
   const location = useLocation();
@@ -70,7 +86,9 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
   const gruposCount = institutions?.count_rg;
   const bolsistasCount = institutions?.count_foment;
 
-  // Mapeamento de links das instituições
+  // Aplica a formatação no nome da instituição
+  const formattedInstitutionName = formatName(institutions?.name);
+
   const institutionLinks: { [key: string]: string } = {
     EBMSP: 'https://www.bahiana.edu.br/',
     'Escola Bahiana de Medicina e Saúde Pública': 'https://www.bahiana.edu.br/',
@@ -110,8 +128,9 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
     navigate('/instituicao');
   };
 
-  const siteTitle = institutions?.name ? `${institutions.name} | Simcc` : `Simcc | SECTI-BA`;
-  const siteDescription = institutions?.name ? `${institutions.name} | Conectee` : `Simcc | SECTI-BA`;
+  // Usa o nome formatado também na aba do navegador e descrições do sistema
+  const siteTitle = formattedInstitutionName ? `${formattedInstitutionName} | Simcc` : `Simcc | SECTI-BA`;
+  const siteDescription = formattedInstitutionName ? `${formattedInstitutionName} | Conectee` : `Simcc | SECTI-BA`;
 
   const tabs = [
     { id: 'producoes', label: 'Produções', icon: SquareLibrary },
@@ -255,7 +274,7 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
                     className={`rounded-xl h-20 w-20 md:h-24 md:w-24 bg-white dark:bg-white shadow-xl border-2 border-white dark:border-neutral-800 ${
                       getInstitutionLink() ? 'cursor-pointer hover:scale-105 transition-all' : ''
                     }`}
-                    title={getInstitutionLink() ? `Visitar site da ${institutions.name}` : ''}
+                    title={getInstitutionLink() ? `Visitar site da ${formattedInstitutionName}` : ''}
                   >
                     <AvatarImage
                       className="rounded-lg h-full w-full object-contain p-2 bg-white"
@@ -273,9 +292,9 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
 
           <div className="max-w-7xl mx-auto px-4 md:px-8 pt-16 pb-6 w-full flex flex-col gap-6">
             
-            {/* Nome da Instituição */}
+            {/* Título da Instituição formatado corretamente */}
             <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white leading-tight">
-              {institutions.name}
+              {formattedInstitutionName}
             </h1>
 
             {/* Cards de Indicadores */}
@@ -288,8 +307,8 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
                 </div>
                 <div className="flex flex-col">
                   <span className="text-2xl font-extrabold text-slate-800 dark:text-white leading-none">
-                    {(institutions as any).count_r != null
-                      ? Number(String((institutions as any).count_r)).toLocaleString('pt-BR')
+                    {institutions.count_r != null
+                      ? Number(String(institutions.count_r)).toLocaleString('pt-BR')
                       : '—'}
                   </span>
                   <span className="text-xs font-medium text-slate-500 mt-1">Docentes</span>
@@ -303,8 +322,8 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
                 </div>
                 <div className="flex flex-col">
                   <span className="text-2xl font-extrabold text-slate-800 dark:text-white leading-none">
-                    {(institutions as any).count_gp != null
-                      ? Number(String((institutions as any).count_gp)).toLocaleString('pt-BR')
+                    {institutions.count_gp != null
+                      ? Number(String(institutions.count_gp)).toLocaleString('pt-BR')
                       : '—'}
                   </span>
                   <span className="text-xs font-medium text-slate-500 mt-1">Pós-graduações</span>

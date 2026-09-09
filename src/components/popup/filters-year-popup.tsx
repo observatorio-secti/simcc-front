@@ -68,7 +68,7 @@ export function FilterYearPopUp(props: Props) {
               <option value="all">Todos os anos</option>
               {availableYears.map((y) => (
                 <option key={y} value={y}>
-                  {y}
+                  A partir de {y}
                 </option>
               ))}
             </select>
