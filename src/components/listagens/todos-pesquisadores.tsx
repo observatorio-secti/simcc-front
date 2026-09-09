@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { UserContext } from '../../context/context';
 import { Button } from '../ui/button';
@@ -15,6 +15,7 @@ import {
   Files,
   FolderKanban,
   Info,
+  Loader2,
   MoreHorizontal,
   Ticket,
   UserCog,
@@ -47,232 +48,106 @@ import { SpeakerHome } from '../homepage/categorias/speaker-home';
 import { ProjetoPesquisaHome } from './projeto-pesquisa-home';
 import { OrientacoesHome } from './orientacoes-home';
 import { TechnicianHome } from './technician-home';
+import { useListagemExport } from '../../hooks/use-listagens-queries';
+import { toast } from 'sonner';
 
-type Research = {
-  among: number;
-  articles: number;
-  book: number;
-  book_chapters: number;
-  id: string;
-  name: string;
-  university: string;
-  lattes_id: string;
-  area: string;
-  lattes_10_id: string;
-  abstract: string;
-  city: string;
-  orcid: string;
-  image: string;
-  graduation: string;
-  patent: string;
-  software: string;
-  brand: string;
-  lattes_update: Date;
-  h_index: string;
-  relevance_score: string;
-  works_count: string;
-  cited_by_count: string;
-  i10_index: string;
-  scopus: string;
-  openalex: string;
-  subsidy: Bolsistas[];
-  graduate_programs: GraduatePrograms[];
-};
-
-interface Bolsistas {
-  aid_quantity: string;
-  call_title: string;
-  funding_program_name: string;
-  modality_code: string;
-  category_level_code: string;
-  institute_name: string;
-  modality_name: string;
-  scholarship_quantity: string;
-}
-
-interface GraduatePrograms {
-  graduate_program_id: string;
-  name: string;
-}
+const TABS = [
+  { id: 'bolsistas', label: 'Bolsistas CNPq', icon: UserSearch },
+  { id: 'pesquisadores', label: 'Pesquisadores', icon: Users },
+  { id: 'tecnicos', label: 'Técnicos', icon: UserCog, condition: false },
+  { id: 'article', label: 'Artigos', icon: File },
+  { id: 'book', label: 'Livros e capítulos', icon: BookOpen },
+  { id: 'patent', label: 'Patentes', icon: Copyright },
+  { id: 'software', label: 'Softwares', icon: Code },
+  { id: 'brand', label: 'Marcas', icon: StripeLogo },
+  { id: 'relatorio-tecnico', label: 'Relatório técnico', icon: Files },
+  { id: 'orientacoes', label: 'Orientações', icon: Student },
+  { id: 'speaker', label: 'Participação em eventos', icon: Ticket },
+  {
+    id: 'research-project',
+    label: 'Projetos de pesquisa',
+    icon: FolderKanban,
+  },
+  { id: 'texto-revista', label: 'Texto em revista', icon: BookOpenText },
+  { id: 'work-event', label: 'Trabalho em evento', icon: Briefcase },
+  { id: 'magazine', label: 'Revistas', icon: BookOpen },
+];
 
 export function TodosPesquisadores() {
   const location = useLocation();
-  const { urlGeral, searchType } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
 
-  const [search, setSearch] = useState('');
-  const [researcher, setResearcher] = useState<Research[]>([]);
-  const [loading, setLoading] = useState(false);
-  const urlTermPesquisadores = `${urlGeral}researcherName?name=`;
-  const [typeVisu, setTypeVisu] = useState('block');
-
-  useMemo(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(urlTermPesquisadores, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setResearcher(data);
-          setLoading(false);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [urlTermPesquisadores]);
-
-  const [isOn, setIsOn] = useState(true);
+  const [isOn] = useState(true);
   const [value, setValue] = useState('bolsistas');
-  const randomResearchers = useMemo(() => {
-    return researcher.sort(() => Math.random() - 0.5).slice(0, 40);
-  }, [researcher]);
 
-  const [jsonData, setJsonData] = useState<any[]>([]);
-  let urlPublicacoesPorPesquisador = '';
-  if (value == 'article') {
-    urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_researcher?terms=&researcher_id=&type=ARTICLE&qualis=&qualis=&year=1900`;
-  } else if (value == 'pesquisadores') {
-    urlPublicacoesPorPesquisador = `${urlGeral}researcherName?name=`;
-  } else if (value == 'speaker') {
-    urlPublicacoesPorPesquisador = `${urlGeral}pevent_researcher?researcher_id=&year=1900&term=&nature=`;
-  } else if (value == 'patent') {
-    urlPublicacoesPorPesquisador = `${urlGeral}patent_production_researcher?researcher_id=&year=1900&term=&distinct=`;
-  } else if (value == 'book') {
-    urlPublicacoesPorPesquisador = `${urlGeral}book_production_researcher?researcher_id=&year=1900&term=&distinct=0`;
-    urlPublicacoesPorPesquisador = `${urlGeral}book_chapter_production_researcher?researcher_id=&year=1900&term=&distinct=0`;
-  } else if (value == 'bolsistas') {
-    urlPublicacoesPorPesquisador = `${urlGeral}researcher/foment`;
-  } else if (value == 'software') {
-    urlPublicacoesPorPesquisador = `${urlGeral}software_production_researcher?researcher_id=&year=1900&distinct=0`;
-  } else if (value == 'brand') {
-    urlPublicacoesPorPesquisador = `${urlGeral}brand_production_researcher?researcher_id=&year=1900&distinct=0`;
-  } else if (value == 'relatorio-tecnico') {
-    urlPublicacoesPorPesquisador = `${urlGeral}researcher_report?researcher_id=&year=1900&distinct=0`;
-  } else if (value == 'orientacoes') {
-    urlPublicacoesPorPesquisador = `${urlGeral}guidance_researcher?researcher_id=&year=1990&distinct=0`;
-  } else if (value == 'speaker') {
-    urlPublicacoesPorPesquisador = `${urlGeral}pevent_researcher?researcher_id=&year=1990&term=&nature=&distinct=0`;
-  } else if (value == 'research-project') {
-    urlPublicacoesPorPesquisador = `${urlGeral}researcher_research_project?researcher_id=&term=&year=&distinct=0`;
-  } else if (value == 'texto-revista') {
-    urlPublicacoesPorPesquisador = `${urlGeral}papers_magazine?researcher_id=&year=1990&distinct=0`;
-  } else if (value == 'work-event') {
-    urlPublicacoesPorPesquisador = `${urlGeral}researcher_production/events?researcher_id=&year=1990&distinct=0`;
-  }
+  // Consulta otimizada com React Query e Axios com cache de 5 minutos por aba
+  const {
+    data: jsonData = [],
+    isLoading: isLoadingExport,
+    isFetching: isFetchingExport,
+  } = useListagemExport(value);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlPublicacoesPorPesquisador, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setJsonData(data);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [urlPublicacoesPorPesquisador]);
-
-  const tabs = [
-    { id: 'bolsistas', label: 'Bolsistas CNPq', icon: UserSearch },
-    { id: 'pesquisadores', label: 'Pesquisadores', icon: Users },
-    { id: 'tecnicos', label: 'Técnicos', icon: UserCog, condition: false },
-    { id: 'article', label: 'Artigos', icon: File },
-    { id: 'book', label: 'Livros e capítulos', icon: BookOpen },
-    { id: 'patent', label: 'Patentes', icon: Copyright },
-    { id: 'software', label: 'Softwares', icon: Code },
-    { id: 'brand', label: 'Marcas', icon: StripeLogo },
-    { id: 'relatorio-tecnico', label: 'Relatório técnico', icon: Files },
-    { id: 'orientacoes', label: 'Orientações', icon: Student },
-    { id: 'speaker', label: 'Participação em eventos', icon: Ticket },
-    {
-      id: 'research-project',
-      label: 'Projetos de pesquisa',
-      icon: FolderKanban,
-    },
-    { id: 'texto-revista', label: 'Texto em revista', icon: BookOpenText },
-    { id: 'work-event', label: 'Trabalho em evento', icon: Briefcase },
-    { id: 'magazine', label: 'Revistas', icon: BookOpen },
-  ];
-
-  // Efeito para ler o parâmetro 'tab' da URL e definir a aba ativa
+  // Sincroniza o parâmetro 'tab' da URL com a aba ativa
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tabFromUrl = params.get('tab');
 
-    // ✅ CORREÇÃO: Verifica se 'tabFromUrl' não é nulo antes de continuar
     if (tabFromUrl) {
-      const isValidTab = tabs.some((tab) => {
+      const isValidTab = TABS.some((tab) => {
         const isConditionMet =
           tab.condition === undefined ? true : !!tab.condition;
         return tab.id === tabFromUrl && isConditionMet;
       });
 
       if (isValidTab) {
-        // Agora é seguro, pois 'tabFromUrl' é uma string
         setValue(tabFromUrl);
       }
     }
   }, [location.search]);
 
   const convertJsonToCsv = (json: any[]): string => {
-    const items = json;
-    const replacer = (_: string, value: any) => (value === null ? '' : value);
-    const header = Object.keys(items[0]);
+    if (!json || json.length === 0) return '';
+    const replacer = (_: string, val: any) =>
+      val === null || val === undefined ? '' : val;
+    const header = Object.keys(json[0]);
     const csv = [
       '\uFEFF' + header.join(';'),
-      ...items.map((item) =>
+      ...json.map((item) =>
         header
-          .map((fieldName) => JSON.stringify(item[fieldName], replacer))
+          .map((fieldName) => JSON.stringify(item[fieldName] ?? '', replacer))
           .join(';'),
       ),
     ].join('\r\n');
     return csv;
   };
 
-  const handleDownloadJson = async () => {
+  const handleDownloadJson = () => {
     try {
+      if (!jsonData || jsonData.length === 0) {
+        toast.warning('Não há dados disponíveis para exportação no momento.');
+        return;
+      }
       const csvData = convertJsonToCsv(jsonData);
       const blob = new Blob([csvData], {
         type: 'text/csv;charset=windows-1252;',
       });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.download = `dados.csv`;
+      link.download = `listagem-${value}.csv`;
       link.href = url;
       link.click();
+      URL.revokeObjectURL(url);
+      toast.success('Download iniciado com sucesso!');
     } catch (error) {
-      console.error(error);
+      console.error('Erro ao exportar CSV:', error);
+      toast.error('Ocorreu um erro ao exportar os dados.');
     }
   };
 
-  const nomesAleatorios = Array.from({ length: 20 }, (_, i) => ({
-    name: `Pesquisador ${i + 1}`,
-  }));
+  const isExportLoading = isLoadingExport || isFetchingExport;
 
   return (
-    <main className=" w-full grid grid-cols-1 ">
+    <main className="w-full grid grid-cols-1">
       <Helmet>
         <title>Listagens | {'Simcc'}</title>
         <meta name="description" content={`Listagens | ${'Simcc'}`} />
@@ -281,17 +156,16 @@ export function TodosPesquisadores() {
       <div className="justify-center px-4 md:px-8 w-full mx-auto flex max-w-[980px] flex-col items-center gap-2 py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-20">
         <Link
           to={'/informacoes'}
-          className="inline-flex z-[2] items-center rounded-lg  bg-neutral-100 dark:bg-neutral-700  gap-2 mb-3 px-3 py-1 text-sm font-medium"
+          className="inline-flex z-[2] items-center rounded-lg bg-neutral-100 dark:bg-neutral-700 gap-2 mb-3 px-3 py-1 text-sm font-medium"
         >
           <Info size={12} />
           <div className="h-full w-[1px] bg-neutral-200 dark:bg-neutral-800"></div>
           Saiba como utilizar a plataforma
           <ArrowRight size={12} />
         </Link>
-        <h1 className="z-[2] text-center max-w-[800px] text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]  md:block mb-4 ">
+        <h1 className="z-[2] text-center max-w-[800px] text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1] md:block mb-4">
           Todas as{' '}
-          <strong className="bg-eng-blue  rounded-md px-3 pb-2 text-white font-medium">
-            {' '}
+          <strong className="bg-eng-blue rounded-md px-3 pb-2 text-white font-medium">
             listagens
           </strong>{' '}
           que a plataforma pode filtrar para você.
@@ -305,16 +179,14 @@ export function TodosPesquisadores() {
               className={`w-full ${isOn ? 'px-8' : 'px-4'} border-b border-b-neutral-200 dark:border-b-neutral-800`}
             >
               {isOn && (
-                <div className="w-full pt-4  flex justify-between items-center"></div>
+                <div className="w-full pt-4 flex justify-between items-center"></div>
               )}
-              <div
-                className={`flex pt-2 gap-8 justify-between  ${isOn ? '' : ''} `}
-              >
+              <div className="flex pt-2 gap-8 justify-between">
                 <div className="flex items-center gap-2">
                   <div className="relative grid grid-cols-1">
                     <ScrollArea className="relative overflow-x-auto">
                       <TabsList className="p-0 flex h-auto bg-transparent dark:bg-transparent">
-                        {tabs.map(
+                        {TABS.map(
                           ({ id, label, icon: Icon, condition = true }) =>
                             condition && (
                               <div
@@ -347,11 +219,16 @@ export function TodosPesquisadores() {
                       </Button>
                     </Link>
                     <Button
-                      onClick={() => handleDownloadJson()}
+                      onClick={handleDownloadJson}
                       variant="ghost"
+                      disabled={isExportLoading}
                       className=""
                     >
-                      <Download size={16} className="" />
+                      {isExportLoading ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Download size={16} className="" />
+                      )}
                       Baixar resultado
                     </Button>
                   </div>
@@ -376,11 +253,16 @@ export function TodosPesquisadores() {
                       </Link>
                       <DropdownMenuItem className="p-0">
                         <Button
-                          onClick={() => handleDownloadJson()}
+                          onClick={handleDownloadJson}
                           variant="ghost"
+                          disabled={isExportLoading}
                           className=""
                         >
-                          <Download size={16} className="" />
+                          {isExportLoading ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <Download size={16} className="" />
+                          )}
                           Baixar resultado
                         </Button>
                       </DropdownMenuItem>
