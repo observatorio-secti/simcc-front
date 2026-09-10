@@ -1,10 +1,13 @@
 import * as React from 'react';
 import {
   AArrowUp,
+  BarChart3,
   Bug,
   Building2,
   Download,
+  GraduationCap,
   Home,
+  Landmark,
   Link2,
   List,
   PanelsTopLeft,
@@ -79,9 +82,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             icon: Users,
           },
           {
+            title: 'Indicadores',
+            url: '/indicadores',
+            icon: BarChart3,
+          },
+          {
             title: 'Instituições',
             url: '/instituicao',
             icon: Building2,
+          },
+          {
+            title: 'Institutos de CT&I',
+            url: '/incites',
+            icon: Landmark,
+          },
+          {
+            title: 'Pós-Graduação',
+            url: '/pos-graduacao',
+            icon: GraduationCap,
           },
           {
             title: 'Vídeos',
