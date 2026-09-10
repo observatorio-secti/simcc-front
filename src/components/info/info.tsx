@@ -1,7 +1,7 @@
 import { Building2, Home, Mail, MapPin } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Alert, AlertTitle } from '../ui/alert';
 import { LinkSimple } from 'phosphor-react';
 import { getVersion } from '../../gerVersion';
@@ -41,28 +41,29 @@ export function Info() {
 
   const urlTermPesquisadores = `${urlGeral}logs`;
 
-  useMemo(() => {
+  useEffect(() => {
+    const controller = new AbortController();
     const fetchData = async () => {
+      if (!urlGeral) return;
       try {
         const response = await fetch(urlTermPesquisadores, {
           mode: 'cors',
+          signal: controller.signal,
           headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
             'Content-Type': 'text/plain',
           },
         });
+        if (!response.ok) throw new Error(`logs ${response.status}`);
         const data = await response.json();
-        if (data) {
-          setLog(data);
-        }
+        if (!Array.isArray(data)) throw new Error('logs not array');
+        setLog(data);
       } catch (err) {
-        console.log(err);
+        if ((err as Error).name === 'AbortError') return;
+        setLog([]);
       }
     };
     fetchData();
+    return () => controller.abort();
   }, [urlTermPesquisadores]);
 
   const colors = [
@@ -370,27 +371,30 @@ export function Info() {
             plataforma: usuários autenticados, visitantes e dados coletados de
             fontes públicas ou institucionais.
           </p>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tipo de Rotina</TableHead>
-                <TableHead>Data</TableHead>
-
-                <TableHead>Erro</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {log.map((log, index) => (
-                <TableRow key={index}>
-                  <TableCell>{log.routine_type}</TableCell>
-                  <TableCell>
-                    {format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss')}
-                  </TableCell>
-                  <TableCell>{log.error ? 'Sim' : 'Não'}</TableCell>
+          {Array.isArray(log) && log.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Tipo de Rotina</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Erro</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {log.map((item, index) => (
+                  <TableRow key={`${item.routine_type}-${item.created_at}-${index}`}>
+                    <TableCell>{item.routine_type}</TableCell>
+                    <TableCell>
+                      {item.created_at ? format(new Date(item.created_at), 'dd/MM/yyyy HH:mm:ss') : '-'}
+                    </TableCell>
+                    <TableCell>{item.error ? 'Sim' : 'Não'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-sm text-muted-foreground p-4 text-center">Sem dados para exibir</p>
+          )}
         </Alert>
 
         <Alert className="space-y-4 p-8">
@@ -402,8 +406,8 @@ export function Info() {
           </p>
 
           <div className="grid 2xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 grid-cols-1 gap-4">
-            {colaboradores.map((props) => (
-              <div className="flex">
+            {colaboradores.map((props, idx) => (
+              <div key={`${props.name}-${idx}`} className="flex">
                 <div className="w-2 rounded-l-md border border-r-0 bg-eng-blue"></div>
                 <Alert className=" rounded-l-none flex gap-3 p-8">
                   <div className="flex flex-1 flex-col">
