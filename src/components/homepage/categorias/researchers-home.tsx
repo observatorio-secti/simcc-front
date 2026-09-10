@@ -158,6 +158,7 @@ export function ResearchersHome() {
                             totalAmong={totalAmong}
                             searchType={searchType}
                             itemsSelecionados={itemsSelecionados}
+                            loading={loadingResearchers}
                         />
                     )}
 

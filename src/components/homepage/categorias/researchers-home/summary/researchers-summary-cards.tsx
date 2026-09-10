@@ -2,6 +2,7 @@ import { Hash, User } from 'lucide-react';
 import bg_popup from '../../../../../assets/bg_popup.png';
 import { Alert } from '../../../../ui/alert';
 import { CardContent, CardHeader, CardTitle } from '../../../../ui/card';
+import { Skeleton } from '../../../../ui/skeleton';
 
 interface ItemSelecionado {
   term: string;
@@ -12,6 +13,7 @@ interface ResearchersSummaryCardsProps {
   totalAmong: number;
   searchType?: string;
   itemsSelecionados?: ItemSelecionado[];
+  loading?: boolean;
 }
 
 export function ResearchersSummaryCards({
@@ -19,6 +21,7 @@ export function ResearchersSummaryCards({
   totalAmong,
   searchType,
   itemsSelecionados = [],
+  loading,
 }: ResearchersSummaryCardsProps) {
   const isAbstractOrNameOrArea =
     searchType === 'abstract' || searchType === 'name' || searchType === 'area';
@@ -37,9 +40,13 @@ export function ResearchersSummaryCards({
             <Hash className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {totalAmong.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalAmong.toLocaleString()}
+              </div>
+            )}
             <div className="flex items-center gap-3">
               <p className="text-xs text-muted-foreground">pela pesquisa</p>
 
@@ -98,7 +105,11 @@ export function ResearchersSummaryCards({
           <User className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalResearchers}</div>
+          {loading ? (
+            <Skeleton className="h-7 w-20" />
+          ) : (
+            <div className="text-2xl font-bold">{totalResearchers}</div>
+          )}
           <p className="text-xs text-muted-foreground">encontrados na busca</p>
         </CardContent>
       </Alert>
