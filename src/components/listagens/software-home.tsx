@@ -43,10 +43,12 @@ function SoftwareSummaryCard({
   totalSoftware,
   distinct,
   setDistinct,
+  loading,
 }: {
   totalSoftware: number;
   distinct: boolean;
   setDistinct: (val: boolean) => void;
+  loading?: boolean;
 }) {
   return (
     <div className="mt-4">
@@ -59,9 +61,13 @@ function SoftwareSummaryCard({
         </CardHeader>
         <CardContent className="flex justify-between items-end">
           <div>
-            <div className="text-2xl font-bold">
-              {totalSoftware.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalSoftware.toLocaleString()}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground flex gap-2">
               encontrados na busca
             </p>
@@ -331,6 +337,7 @@ export function SoftwareHome() {
           setDistinct(val);
           setPage(1);
         }}
+        loading={loadingCharts}
       />
 
       <SoftwareChartsAccordion loading={loadingCharts} chartData={chartData} />

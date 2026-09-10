@@ -1239,9 +1239,13 @@ export function ResearchersHomeListagens() {
                 <User className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {metrics.researcherCount}
-                </div>
+                {loading ? (
+                  <Skeleton className="h-7 w-20" />
+                ) : (
+                  <div className="text-2xl font-bold">
+                    {metrics.researcherCount}
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   encontrados na busca
                 </p>
@@ -1258,9 +1262,13 @@ export function ResearchersHomeListagens() {
                 <IdentificationBadge className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {metrics.orcidPercentage}%
-                </div>
+                {loading ? (
+                  <Skeleton className="h-7 w-20" />
+                ) : (
+                  <div className="text-2xl font-bold">
+                    {metrics.orcidPercentage}%
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">com ORCID</p>
               </CardContent>
             </Alert>
@@ -1275,9 +1283,13 @@ export function ResearchersHomeListagens() {
                 <StripeLogo className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {metrics.scopusPercentage}%
-                </div>
+                {loading ? (
+                  <Skeleton className="h-7 w-20" />
+                ) : (
+                  <div className="text-2xl font-bold">
+                    {metrics.scopusPercentage}%
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground">com SCOPUS</p>
               </CardContent>
             </Alert>

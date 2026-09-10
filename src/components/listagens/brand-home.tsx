@@ -42,10 +42,12 @@ function BrandSummaryCard({
   totalBrands,
   distinct,
   setDistinct,
+  loading,
 }: {
   totalBrands: number;
   distinct: boolean;
   setDistinct: (val: boolean) => void;
+  loading?: boolean;
 }) {
   return (
     <div className="mt-4">
@@ -56,9 +58,13 @@ function BrandSummaryCard({
         </CardHeader>
         <CardContent className="flex justify-between items-end">
           <div>
-            <div className="text-2xl font-bold">
-              {totalBrands.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalBrands.toLocaleString()}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground flex gap-2">
               encontrados na busca
             </p>
@@ -328,6 +334,7 @@ export function BrandHome() {
           setDistinct(val);
           setPage(1);
         }}
+        loading={loadingCharts}
       />
 
       <BrandChartsAccordion loading={loadingCharts} chartData={chartData} />

@@ -435,7 +435,6 @@ export function FiltersModal({
 
               <div className="w-full">
                 <Accordion
-                  defaultValue="item-1"
                   type="single"
                   collapsible
                   className="w-full"
@@ -1100,12 +1099,16 @@ export function GraduateProgram() {
                       <GraduationCap className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">
-                        {
-                          filteredTotal.filter((item) => item.visible == true)
-                            .length
-                        }
-                      </div>
+                      {loading ? (
+                        <Skeleton className="h-7 w-24" />
+                      ) : (
+                        <div className="text-2xl font-bold">
+                          {
+                            filteredTotal.filter((item) => item.visible == true)
+                              .length
+                          }
+                        </div>
+                      )}
                       <p className="text-xs text-muted-foreground">
                         encontrados na busca
                       </p>

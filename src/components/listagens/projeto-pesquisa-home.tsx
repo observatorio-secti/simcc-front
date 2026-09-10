@@ -75,10 +75,12 @@ function ProjectSummaryCard({
   totalProjects,
   distinct,
   setDistinct,
+  loading,
 }: {
   totalProjects: number;
   distinct: boolean;
   setDistinct: (val: boolean) => void;
+  loading?: boolean;
 }) {
   return (
     <div className="mt-4 ">
@@ -91,9 +93,13 @@ function ProjectSummaryCard({
         </CardHeader>
         <CardContent className="flex justify-between items-end">
           <div>
-            <div className="text-2xl font-bold">
-              {totalProjects.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalProjects.toLocaleString()}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground flex gap-2">
               encontrados na busca
             </p>
@@ -375,6 +381,7 @@ export function ProjetoPesquisaHome() {
           setDistinct(val);
           setPage(1);
         }}
+        loading={loadingCharts}
       />
 
       <ProjectChartsAccordion loading={loadingCharts} chartData={chartData} />

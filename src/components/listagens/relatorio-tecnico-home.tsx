@@ -45,10 +45,12 @@ function ReportSummaryCard({
   totalReports,
   distinct,
   setDistinct,
+  loading,
 }: {
   totalReports: number;
   distinct: boolean;
   setDistinct: (val: boolean) => void;
+  loading?: boolean;
 }) {
   return (
     <div className="mt-4">
@@ -61,9 +63,13 @@ function ReportSummaryCard({
         </CardHeader>
         <CardContent className="flex justify-between items-end">
           <div>
-            <div className="text-2xl font-bold">
-              {totalReports.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalReports.toLocaleString()}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground flex gap-2">
               encontrados na busca
             </p>
@@ -333,6 +339,7 @@ export function RelatorioTecnicoHome() {
           setDistinct(val);
           setPage(1);
         }}
+        loading={loadingCharts}
       />
 
       <ReportChartsAccordion loading={loadingCharts} chartData={chartData} />

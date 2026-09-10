@@ -46,10 +46,12 @@ function PatentSummaryCard({
   totalPatents,
   distinct,
   setDistinct,
+  loading,
 }: {
   totalPatents: number;
   distinct: boolean;
   setDistinct: (val: boolean) => void;
+  loading?: boolean;
 }) {
   return (
     <div className="mt-4">
@@ -62,9 +64,13 @@ function PatentSummaryCard({
         </CardHeader>
         <CardContent className="flex justify-between items-end">
           <div>
-            <div className="text-2xl font-bold">
-              {totalPatents.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalPatents.toLocaleString()}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground flex gap-2">
               encontrados na busca
             </p>
@@ -337,6 +343,7 @@ export function PatentHome() {
           setDistinct(val);
           setPage(1);
         }}
+        loading={loadingCharts}
       />
 
       <PatentChartsAccordion loading={loadingCharts} chartData={chartData} />

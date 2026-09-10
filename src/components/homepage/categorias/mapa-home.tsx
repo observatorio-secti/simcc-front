@@ -848,7 +848,11 @@ export function MapaHome() {
                   <User className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{researcher.length.toLocaleString("pt-BR")}</div>
+                  {loading ? (
+                    <Skeleton className="h-7 w-20" />
+                  ) : (
+                    <div className="text-2xl font-bold">{researcher.length.toLocaleString("pt-BR")}</div>
+                  )}
                   {originalResearcher.length !== researcher.length ? (
                     <p className="text-xs text-muted-foreground">de {originalResearcher.length.toLocaleString("pt-BR")} encontrados</p>
                   ) : (
@@ -862,7 +866,11 @@ export function MapaHome() {
                   <MapIcon className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{cityData.length.toLocaleString("pt-BR")}</div>
+                  {loading ? (
+                    <Skeleton className="h-7 w-16" />
+                  ) : (
+                    <div className="text-2xl font-bold">{cityData.length.toLocaleString("pt-BR")}</div>
+                  )}
                   <p className="text-xs text-muted-foreground">com pesquisadores localizados</p>
                 </CardContent>
               </Alert>

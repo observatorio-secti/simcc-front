@@ -66,7 +66,7 @@ function MagazineSearchBar({
   );
 }
 
-function MagazineSummaryCard({ totalMagazines }: { totalMagazines: number }) {
+function MagazineSummaryCard({ totalMagazines, loading }: { totalMagazines: number; loading?: boolean }) {
   return (
     <div className="mt-6">
       <Alert className="p-0 bg-cover bg-no-repeat bg-center">
@@ -77,9 +77,13 @@ function MagazineSummaryCard({ totalMagazines }: { totalMagazines: number }) {
           <BookOpen className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            {totalMagazines.toLocaleString()}
-          </div>
+          {loading ? (
+            <Skeleton className="h-7 w-20" />
+          ) : (
+            <div className="text-2xl font-bold">
+              {totalMagazines.toLocaleString()}
+            </div>
+          )}
           <p className="text-xs text-muted-foreground">
             encontradas na plataforma
           </p>
@@ -335,7 +339,7 @@ export function MagazineHome() {
         setPesquisaInput={setPesquisaInput}
       />
 
-      <MagazineSummaryCard totalMagazines={totalMagazines} />
+      <MagazineSummaryCard totalMagazines={totalMagazines} loading={loading} />
 
       <MagazineListAccordion
         loading={loading}

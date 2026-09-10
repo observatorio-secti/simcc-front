@@ -46,6 +46,7 @@ function BookSummaryCards({
   setDistinct,
   distinct2,
   setDistinct2,
+  loading,
 }: {
   totalBooks: number;
   totalChapters: number;
@@ -53,6 +54,7 @@ function BookSummaryCards({
   setDistinct: (val: boolean) => void;
   distinct2: boolean;
   setDistinct2: (val: boolean) => void;
+  loading?: boolean;
 }) {
   return (
     <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -63,9 +65,13 @@ function BookSummaryCards({
         </CardHeader>
         <CardContent className="flex justify-between items-end">
           <div>
-            <div className="text-2xl font-bold">
-              {totalBooks.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalBooks.toLocaleString()}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground flex gap-2">
               encontrados na busca
             </p>
@@ -91,9 +97,13 @@ function BookSummaryCards({
         </CardHeader>
         <CardContent className="flex justify-between items-end">
           <div>
-            <div className="text-2xl font-bold">
-              {totalChapters.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalChapters.toLocaleString()}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground flex gap-2">
               encontrados na busca
             </p>
@@ -546,6 +556,7 @@ export function BookHome() {
           setDistinct2(val);
           setPageChapter(1);
         }}
+        loading={loadingCharts}
       />
 
       <BookChartsAccordion
