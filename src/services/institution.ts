@@ -352,10 +352,36 @@ export const getInstitutionResearchGroups = async (): Promise<ResearchGroupItem[
   return Array.isArray(data) ? data : [];
 };
 
+export interface ScholarshipMetric {
+  modality_code: string;
+  category_level_code: string;
+  count: number;
+}
+
 /**
  * Bolsistas de produtividade / fomento
  */
-export const getInstitutionBolsistas = async (): Promise<BolsistaItem[]> => {
-  const { data } = await api.get('researcher/foment');
+export const getInstitutionBolsistas = async (
+  institutionId?: string,
+): Promise<BolsistaItem[]> => {
+  const { data } = await api.get('researcher/foment', {
+    params: {
+      institution_id: institutionId || '',
+    },
+  });
+  return Array.isArray(data) ? data : [];
+};
+
+/**
+ * Métricas de bolsas de produtividade (PQ/DT) da instituição
+ */
+export const getInstitutionBolsistaScholarshipMetrics = async (
+  institutionId?: string,
+): Promise<ScholarshipMetric[]> => {
+  const { data } = await api.get('metrics/researcher/scholarship', {
+    params: {
+      institution_id: institutionId || '',
+    },
+  });
   return Array.isArray(data) ? data : [];
 };

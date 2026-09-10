@@ -7,6 +7,7 @@ import {
   getInstitutionGraduatePrograms,
   getInstitutionResearchGroups,
   getInstitutionBolsistas,
+  getInstitutionBolsistaScholarshipMetrics,
 } from '../services/institution';
 
 export const useInstitutions = () => {
@@ -60,10 +61,20 @@ export const useInstitutionResearchGroups = () => {
   });
 };
 
-export const useInstitutionBolsistas = () => {
+export const useInstitutionBolsistas = (institutionId?: string) => {
   return useQuery({
-    queryKey: ['institution-bolsistas'],
-    queryFn: getInstitutionBolsistas,
+    queryKey: ['institution-bolsistas', institutionId],
+    queryFn: () => getInstitutionBolsistas(institutionId),
+    enabled: !!institutionId,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+export const useInstitutionBolsistaScholarshipMetrics = (institutionId?: string) => {
+  return useQuery({
+    queryKey: ['institution-bolsista-scholarship-metrics', institutionId],
+    queryFn: () => getInstitutionBolsistaScholarshipMetrics(institutionId),
+    enabled: !!institutionId,
     staleTime: 1000 * 60 * 10,
   });
 };
