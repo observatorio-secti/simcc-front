@@ -1076,7 +1076,11 @@ export function ResearchersHome() {
                                         <Hash className="h-4 w-4 text-muted-foreground" />
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="text-2xl font-bold">{totalAmong.toLocaleString()}</div>
+                                        {loading ? (
+                                            <Skeleton className="h-7 w-24" />
+                                        ) : (
+                                            <div className="text-2xl font-bold">{totalAmong.toLocaleString()}</div>
+                                        )}
                                         <div className="flex items-center gap-3">
                                             <p className="text-xs text-muted-foreground">
                                                 pela pesquisa
@@ -1111,7 +1115,11 @@ export function ResearchersHome() {
                                     <User className="h-4 w-4 text-muted-foreground" />
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold">{researcher.length}</div>
+                                    {loading ? (
+                                        <Skeleton className="h-7 w-20" />
+                                    ) : (
+                                        <div className="text-2xl font-bold">{researcher.length}</div>
+                                    )}
                                     <p className="text-xs text-muted-foreground">
                                         encontrados na busca
                                     </p>

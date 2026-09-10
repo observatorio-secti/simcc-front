@@ -49,10 +49,12 @@ function WorkEventSummaryCard({
   totalWorkEvents,
   distinct,
   setDistinct,
+  loading,
 }: {
   totalWorkEvents: number;
   distinct: boolean;
   setDistinct: (val: boolean) => void;
+  loading?: boolean;
 }) {
   return (
     <div className="mt-4 ">
@@ -65,9 +67,13 @@ function WorkEventSummaryCard({
         </CardHeader>
         <CardContent className="flex justify-between items-end">
           <div>
-            <div className="text-2xl font-bold">
-              {totalWorkEvents.toLocaleString()}
-            </div>
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              <div className="text-2xl font-bold">
+                {totalWorkEvents.toLocaleString()}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground flex gap-2">
               encontrados na busca
             </p>
@@ -337,6 +343,7 @@ export function WorkEventHome() {
           setDistinct(val);
           setPage(1);
         }}
+        loading={loadingCharts}
       />
 
       <WorkEventChartsAccordion loading={loadingCharts} chartData={chartData} />

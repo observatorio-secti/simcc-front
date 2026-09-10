@@ -84,7 +84,7 @@ const useQuery = () => {
     return new URLSearchParams(useLocation().search);
 }
 
-function ArticlesSummaryCard({ publicacoesLength, percentage, distinct, setDistinct }: { publicacoesLength: number, percentage: number, distinct: boolean, setDistinct: (val: boolean) => void }) {
+function ArticlesSummaryCard({ publicacoesLength, percentage, distinct, setDistinct, loading }: { publicacoesLength: number, percentage: number, distinct: boolean, setDistinct: (val: boolean) => void, loading?: boolean }) {
     return (
         <div className="pt-4">
             <Alert className="p-0 bg-cover bg-no-repeat bg-center">
@@ -96,10 +96,19 @@ function ArticlesSummaryCard({ publicacoesLength, percentage, distinct, setDisti
                 </CardHeader>
                 <CardContent className="flex justify-between items-end">
                     <div>
-                        <div className="text-2xl font-bold">{publicacoesLength.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground flex gap-2">
-                            encontrados na busca <span className="text-eng-blue">({percentage.toFixed(2)}% com DOI)</span>
-                        </p>
+                        {loading ? (
+                            <>
+                                <Skeleton className="h-7 w-24" />
+                                <Skeleton className="h-4 w-32 mt-2" />
+                            </>
+                        ) : (
+                            <>
+                                <div className="text-2xl font-bold">{publicacoesLength.toLocaleString()}</div>
+                                <p className="text-xs text-muted-foreground flex gap-2">
+                                    encontrados na busca <span className="text-eng-blue">({percentage.toFixed(2)}% com DOI)</span>
+                                </p>
+                            </>
+                        )}
                     </div>
                     <div className="gap-2 flex items-center h-fit text-xs text-gray-500 dark:text-gray-300">
                         <p>Artigos:</p>
@@ -479,6 +488,7 @@ export function ArticlesHome() {
                             percentage={percentage}
                             distinct={articleDistinct}
                             setDistinct={setArticleDistinct}
+                            loading={chartLoading}
                         />
 
                         <ArticlesChartsAccordion

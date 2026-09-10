@@ -494,12 +494,7 @@ export function GruposPesquisaPage() {
                             </div>
 
                             <div className="w-full">
-                              <Accordion
-                                defaultValue="item-1"
-                                type="single"
-                                collapsible
-                                className="w-full"
-                              >
+<Accordion type="single" collapsible className="w-full">
                                 <AccordionItem
                                   value="item-1"
                                   className="w-full"
@@ -730,7 +725,11 @@ export function GruposPesquisaPage() {
                 <Blocks className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{filteredTotal.length}</div>
+                {isLoading ? (
+                  <Skeleton className="h-7 w-20" />
+                ) : (
+                  <div className="text-2xl font-bold">{filteredTotal.length}</div>
+                )}
                 <p className="text-xs text-muted-foreground">
                   encontrados na busca
                 </p>
