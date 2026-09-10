@@ -6,6 +6,7 @@ import {
   getInstitutionResearchers,
   getInstitutionGraduatePrograms,
   getInstitutionResearchGroups,
+  getInstitutionResearchGroupMetrics,
   getInstitutionBolsistas,
   getInstitutionBolsistaScholarshipMetrics,
 } from '../services/institution';
@@ -53,10 +54,20 @@ export const useInstitutionGraduatePrograms = () => {
   });
 };
 
-export const useInstitutionResearchGroups = () => {
+export const useInstitutionResearchGroups = (institutionId?: string, page?: number) => {
   return useQuery({
-    queryKey: ['institution-research-groups'],
-    queryFn: getInstitutionResearchGroups,
+    queryKey: ['institution-research-groups', institutionId, page],
+    queryFn: () => getInstitutionResearchGroups(institutionId, page),
+    enabled: !!institutionId,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+export const useInstitutionResearchGroupMetrics = (institutionId?: string) => {
+  return useQuery({
+    queryKey: ['institution-research-group-metrics', institutionId],
+    queryFn: () => getInstitutionResearchGroupMetrics(institutionId),
+    enabled: !!institutionId,
     staleTime: 1000 * 60 * 10,
   });
 };
