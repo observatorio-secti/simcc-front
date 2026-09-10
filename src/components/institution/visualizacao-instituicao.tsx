@@ -138,7 +138,6 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
     { id: 'programas_pos', label: 'Programas de Pós-Graduação', icon: GraduationCap },
     { id: 'grupos_pesquisa', label: 'Grupos de Pesquisa', icon: Users },
     { id: 'bolsistas', label: 'Bolsistas de Produtividade', icon: Award },
-    { id: 'indicadores', label: 'Indicadores', icon: BarChartBig },
   ];
 
   const tab = queryUrl.get('pagina');

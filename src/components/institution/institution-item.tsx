@@ -114,6 +114,21 @@ const useQuery = () => {
 };
 
 export function InstitutionItem(props: GraduateProgram) {
+  // FUNÇÃO: Formata o nome para deixar as preposições minúsculas
+  const formatName = (name?: string) => {
+    if (!name) return '';
+    const prepositions = ['de', 'da', 'do', 'das', 'dos', 'e'];
+    return name
+      .split(' ')
+      .map((word, index) => {
+        if (index !== 0 && prepositions.includes(word.toLowerCase())) {
+          return word.toLowerCase();
+        }
+        return word;
+      })
+      .join(' ');
+  };
+
   const normalizeArea = (area: string): string =>
     area
       .toUpperCase()
@@ -133,8 +148,6 @@ export function InstitutionItem(props: GraduateProgram) {
 
   const queryUrl = useQuery();
   const navigate = useNavigate();
-
-  // Calcula a diferença em dias entre a data atual e a data do item
 
   const handlePesquisaFinal = () => {
     const targetIdentifier = props.acronym?.trim() || props.id;
@@ -156,7 +169,6 @@ export function InstitutionItem(props: GraduateProgram) {
   const logoUrl = buildAssetUrl(rawLogo);
   const coverUrl = buildAssetUrl(rawCover);
 
-  // Cada card faz 1 request para buscar fotos reais dos docentes dessa instituição específica
   const { data: docentesData = [] } = useInstitutionResearchers(props.id);
   const normalizeName = (str: string) =>
     (str || '')
@@ -165,7 +177,6 @@ export function InstitutionItem(props: GraduateProgram) {
       .toLowerCase()
       .trim();
 
-  // props.researchers são lattes_id (16 dígitos), não nomes - mapeia por lattes_id/id/lattes_10_id/nome
   const enrichedResearchers = useMemo(() => {
     const mapById = new Map<string, any>();
     const mapByLattesId = new Map<string, any>();
@@ -191,14 +202,12 @@ export function InstitutionItem(props: GraduateProgram) {
       if (img.startsWith('data:') || /^https?:\/\//.test(img)) return img;
       if (img.length > 100 && !img.includes('/')) return `data:image/jpeg;base64,${img}`;
     }
-    // Se encontrou o docente, usa o nome real (endpoint ?name=) que retorna 200; senão tenta researcher_id com UUID
     if (item.data?.name) {
       return `${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item.data.name)}`;
     }
     if (item.data?.id) {
       return `${urlGeral}ResearcherData/Image?researcher_id=${encodeURIComponent(String(item.data.id))}`;
     }
-    // Fallback: raw é lattes_id numérico - tenta por nome (vai 404) mas evita 422 de researcher_id numérico
     return `${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item.name)}`;
   };
 
@@ -233,12 +242,10 @@ export function InstitutionItem(props: GraduateProgram) {
 
         <Alert className="flex flex-col items-center pt-16 whitespace-normal">
           <div className="flex gap-3">
-            {/* <<<<<< ESTE PAI PRECISA PODER ENCOLHER >>>>>> */}
             <div className="items-center flex flex-col w-full min-w-0">
-              {/* largura do bloco do título */}
+              {/* O nome agora está envolvido na função formatName */}
               <div className="font-semibold text-lg w-full text-center">
-                {/* texto com ellipsis */}
-                {props.name} ({props.acronym})
+                {formatName(props.name)} ({props.acronym})
               </div>
 
               <TooltipProvider>
@@ -285,7 +292,6 @@ export function InstitutionItem(props: GraduateProgram) {
                     key={item.raw}
                     onClick={(event) => {
                       event.stopPropagation();
-                      // Usa nome real quando encontrado, senão o raw (id) - modal resolve por nome
                       onOpen('researcher-modal', { name: item.name });
                     }}
                     className="cursor-pointer rounded-full relative border dark:border-neutral-800 h-8 w-8 hover:z-10 transition-transform hover:scale-110"
