@@ -30,8 +30,14 @@ import { Info } from 'lucide-react';
 import { Alert } from '../ui/alert';
 import { Patrimonio } from './grupos-pesquisa';
 
+export interface AreaCountItem {
+  area: string;
+  count: number;
+}
+
 type ResearchData = {
-  group: Patrimonio[];
+  group?: Patrimonio[];
+  data?: AreaCountItem[];
 };
 
 const normalizeArea = (area: string): string => {
@@ -143,6 +149,16 @@ export function GraficoAreaGrupos(props: ResearchData) {
   };
 
   useEffect(() => {
+    if (props.data && props.data.length > 0) {
+      setChartData(
+        props.data.map((item) => ({
+          area: item.area || 'SEM ÁREA DEFINIDA',
+          count: item.count || 0,
+        })),
+      );
+      return;
+    }
+
     if (props.group) {
       const counts: { [area: string]: number } = {};
 
@@ -164,8 +180,10 @@ export function GraficoAreaGrupos(props: ResearchData) {
       }));
 
       setChartData(data);
+    } else {
+      setChartData([]);
     }
-  }, [props.group]);
+  }, [props.group, props.data]);
 
   return (
     <Alert className="pt-">

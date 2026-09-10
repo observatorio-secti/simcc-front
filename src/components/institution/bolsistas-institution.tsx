@@ -19,9 +19,12 @@ import {
 import { Button } from '../ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { UserContext } from '../../context/context';
-import { useInstitutionBolsistas } from './hooks/use-institution-queries';
+import {
+  useInstitutionBolsistas,
+  useInstitutionBolsistaScholarshipMetrics,
+} from './hooks/use-institution-queries';
 import { Skeleton } from '../ui/skeleton';
 import { Alert } from '../ui/alert';
 import { Input } from '../ui/input';
@@ -133,15 +136,19 @@ export function BolsistasInstitution({
   institutionId,
   institutionName,
 }: BolsistasInstitutionProps) {
-  const { data: rawBolsistas = [], isLoading } = useInstitutionBolsistas();
-  const total = rawBolsistas as Research[];
+  const { data: rawBolsistas = [], isLoading: isLoadingBolsistas } =
+    useInstitutionBolsistas(institutionId);
+  const { data: scholarshipMetrics = [], isLoading: isLoadingMetrics } =
+    useInstitutionBolsistaScholarshipMetrics(institutionId);
+
+  const institutionBolsistas = (rawBolsistas as Research[]) || [];
+  const isLoading = isLoadingBolsistas;
 
   const [count, setCount] = useState(24);
   const [search, setSearch] = useState('');
   const [selectedModalities, setSelectedModalities] = useState<string[]>([]);
   const [typeVisu, setTypeVisu] = useState('block');
   const [isOn, setIsOn] = useState(true);
-  const jsonData = total;
   const [open, setOpen] = useState(false);
   const [search2, setSearch2] = useState('');
   const [cityData, setCityData] = useState<CityData[]>([]);
@@ -149,60 +156,57 @@ export function BolsistasInstitution({
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Filtrar bolsistas por instituição
-  const filteredByInstitution = Array.isArray(total)
-    ? total.filter((item) => {
-        const normalizeString = (str: string) =>
-          str
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .trim();
-
-        const itemUniversity = normalizeString(item.university);
-        const targetInstitution = normalizeString(institutionName || '');
-        const targetId = normalizeString(institutionId);
-
-        return (
-          itemUniversity.includes(targetInstitution) ||
-          itemUniversity.includes(targetId) ||
-          targetInstitution.includes(itemUniversity)
-        );
-      })
-    : [];
-
-  // Extrair modalidades únicas dos bolsistas filtrados
-  const modalities = Array.isArray(filteredByInstitution)
-    ? [
-        ...new Set(
-          filteredByInstitution.flatMap((item) =>
-            Array.isArray(item.subsidy)
-              ? item.subsidy.map((s) => s.modality_name)
-              : [],
+  // Modalidades disponíveis na instituição
+  const modalities = useMemo(() => {
+    return Array.isArray(institutionBolsistas)
+      ? [
+          ...new Set(
+            institutionBolsistas.flatMap((item) =>
+              Array.isArray(item.subsidy)
+                ? item.subsidy.map((s) => s.modality_name)
+                : [],
+            ),
           ),
-        ),
-      ].filter(Boolean)
-    : [];
+        ].filter(Boolean)
+      : [];
+  }, [institutionBolsistas]);
 
-  const filteredTotal = filteredByInstitution.filter((item) => {
-    const normalizeString = (str: string) =>
-      str
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase();
+  const filteredTotal = useMemo(() => {
+    return institutionBolsistas.filter((item) => {
+      const normalizeString = (str: string) =>
+        str
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase();
 
-    const searchString = normalizeString(item.name);
-    const normalizedSearch = normalizeString(search);
+      const searchString = normalizeString(item.name || '');
+      const normalizedSearch = normalizeString(search || '');
 
-    const hasSelectedModality =
-      selectedModalities.length === 0 ||
-      (item.subsidy &&
-        item.subsidy.some((sub) =>
-          selectedModalities.includes(sub.modality_name),
-        ));
+      const hasSelectedModality =
+        selectedModalities.length === 0 ||
+        (item.subsidy &&
+          item.subsidy.some((sub) =>
+            selectedModalities.includes(sub.modality_name),
+          ));
 
-    return searchString.includes(normalizedSearch) && hasSelectedModality;
-  });
+      return searchString.includes(normalizedSearch) && hasSelectedModality;
+    });
+  }, [institutionBolsistas, search, selectedModalities]);
+
+  const hasActiveFilters = search.trim().length > 0 || selectedModalities.length > 0;
+
+  // Total oficial de bolsistas obtido a partir da rota /metrics/researcher/scholarship?institution_id=...
+  const totalScholarshipsFromMetrics = useMemo(() => {
+    if (Array.isArray(scholarshipMetrics) && scholarshipMetrics.length > 0) {
+      return scholarshipMetrics.reduce(
+        (acc, curr) => acc + (Number(curr.count) || 0),
+        0,
+      );
+    }
+    return institutionBolsistas.length;
+  }, [scholarshipMetrics, institutionBolsistas.length]);
+
+  const displayedCount = hasActiveFilters ? filteredTotal.length : totalScholarshipsFromMetrics;
 
   const getMetricsFromResearchers = (
     researchersList: Research[],
@@ -237,7 +241,15 @@ export function BolsistasInstitution({
     return Array.from(countsMap.values());
   };
 
-  const institutionMetrics = getMetricsFromResearchers(filteredTotal);
+  const institutionMetrics = useMemo(() => {
+    if (hasActiveFilters) {
+      return getMetricsFromResearchers(filteredTotal);
+    }
+    if (Array.isArray(scholarshipMetrics) && scholarshipMetrics.length > 0) {
+      return scholarshipMetrics;
+    }
+    return getMetricsFromResearchers(institutionBolsistas);
+  }, [hasActiveFilters, scholarshipMetrics, filteredTotal, institutionBolsistas]);
 
   const handleModalityChange = (value: string) => {
     setSelectedModalities((prev) =>
@@ -268,7 +280,7 @@ export function BolsistasInstitution({
 
   const handleDownloadJson = async () => {
     try {
-      const csvData = convertJsonToCsv(filteredByInstitution);
+      const csvData = convertJsonToCsv(filteredTotal);
       const blob = new Blob([csvData], {
         type: 'text/csv;charset=windows-1252;',
       });
@@ -314,7 +326,7 @@ export function BolsistasInstitution({
         municipios.map((m) => [normalizeCityName(m.nome), m]),
       );
 
-      filteredByInstitution.forEach((r) => {
+      filteredTotal.forEach((r) => {
         if (r.city) {
           const normalizedCity = normalizeCityName(r.city);
           const municipio = municipioMap.get(normalizedCity);
@@ -345,7 +357,7 @@ export function BolsistasInstitution({
     };
 
     processCityData();
-  }, [filteredByInstitution]);
+  }, [filteredTotal]);
 
   return (
     <main className="flex flex-1 flex-col">
@@ -470,7 +482,11 @@ export function BolsistasInstitution({
             <User className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{filteredTotal.length}</div>
+            {isLoadingMetrics && !hasActiveFilters ? (
+              <Skeleton className="h-8 w-20" />
+            ) : (
+              <div className="text-2xl font-bold">{displayedCount}</div>
+            )}
             <p className="text-xs text-muted-foreground">
               encontrados na instituição
             </p>
@@ -516,7 +532,7 @@ export function BolsistasInstitution({
               <AccordionTrigger></AccordionTrigger>
             </div>
             <AccordionContent className="p-0">
-              {isLoading ? (
+              {isLoadingBolsistas || (isLoadingMetrics && !hasActiveFilters) ? (
                 <Skeleton className="rounded-md w-full h-[300px]" />
               ) : (
                 <div className="grid gap-8 xl:grid-cols-2">

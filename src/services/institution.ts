@@ -344,18 +344,95 @@ export const getInstitutionGraduatePrograms = async (): Promise<GraduateProgramI
   return Array.isArray(data) ? data : [];
 };
 
+export interface ResearchGroupMetric {
+  area: string;
+  count: number;
+}
+
 /**
- * Grupos de pesquisa
+ * Grupos de pesquisa da instituição com suporte a paginação
  */
-export const getInstitutionResearchGroups = async (): Promise<ResearchGroupItem[]> => {
-  const { data } = await api.get('research_group');
+export const getInstitutionResearchGroups = async (
+  institutionId?: string,
+  page?: number,
+): Promise<ResearchGroupItem[]> => {
+  if (!institutionId) return [];
+
+  if (page !== undefined) {
+    const { data } = await api.get('research_group', {
+      params: {
+        institution_id: institutionId,
+        page,
+      },
+    });
+    return Array.isArray(data) ? data : [];
+  }
+
+  const allGroups: ResearchGroupItem[] = [];
+  let currentPage = 1;
+  let batch: ResearchGroupItem[] = [];
+
+  do {
+    const { data } = await api.get('research_group', {
+      params: {
+        institution_id: institutionId,
+        page: currentPage,
+      },
+    });
+    batch = Array.isArray(data) ? data : [];
+    allGroups.push(...batch);
+    currentPage++;
+    if (currentPage > 50 || batch.length < 100) break;
+  } while (batch.length > 0);
+
+  return allGroups;
+};
+
+/**
+ * Métricas e distribuição por área dos grupos de pesquisa da instituição
+ */
+export const getInstitutionResearchGroupMetrics = async (
+  institutionId?: string,
+): Promise<ResearchGroupMetric[]> => {
+  if (!institutionId) return [];
+  const { data } = await api.get('metrics/research-group/chart', {
+    params: {
+      institution_id: institutionId,
+    },
+  });
   return Array.isArray(data) ? data : [];
 };
+
+export interface ScholarshipMetric {
+  modality_code: string;
+  category_level_code: string;
+  count: number;
+}
 
 /**
  * Bolsistas de produtividade / fomento
  */
-export const getInstitutionBolsistas = async (): Promise<BolsistaItem[]> => {
-  const { data } = await api.get('researcher/foment');
+export const getInstitutionBolsistas = async (
+  institutionId?: string,
+): Promise<BolsistaItem[]> => {
+  const { data } = await api.get('researcher/foment', {
+    params: {
+      institution_id: institutionId || '',
+    },
+  });
+  return Array.isArray(data) ? data : [];
+};
+
+/**
+ * Métricas de bolsas de produtividade (PQ/DT) da instituição
+ */
+export const getInstitutionBolsistaScholarshipMetrics = async (
+  institutionId?: string,
+): Promise<ScholarshipMetric[]> => {
+  const { data } = await api.get('metrics/researcher/scholarship', {
+    params: {
+      institution_id: institutionId || '',
+    },
+  });
   return Array.isArray(data) ? data : [];
 };

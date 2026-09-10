@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Research } from '../../../../../types/researcher';
 
@@ -40,6 +40,16 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
   const [selectedDepartaments, setSelectedDepartaments] = useState<string[]>(() =>
     getArrayFromUrl('departments'),
   );
+
+  useEffect(() => {
+    setSelectedAreas(getArrayFromUrl('areas'));
+    setSelectedGraduations(getArrayFromUrl('graduations'));
+    setSelectedCities(getArrayFromUrl('cities'));
+    setSelectedUniversities(getArrayFromUrl('universities'));
+    setSelectedSubsidies(getArrayFromUrl('subsidy'));
+    setSelectedGraduatePrograms(getArrayFromUrl('graduatePrograms'));
+    setSelectedDepartaments(getArrayFromUrl('departments'));
+  }, [getArrayFromUrl]);
 
   const [searchGraduateProgram, setSearchGraduateProgram] = useState('');
   const [searchCity, setSearchCity] = useState('');

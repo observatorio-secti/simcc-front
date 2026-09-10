@@ -14,7 +14,7 @@ import {
 import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList } from '../ui/tabs';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { UserContext } from '../../context/context';
 import { useModal } from '../hooks/use-modal-store';
 import Highcharts from 'highcharts';
@@ -29,7 +29,10 @@ import { Helmet } from 'react-helmet';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { ProducoesPrograma } from './producoes-programa';
 import { LinhasPesquisaPrograma } from './linhas-pesquisa-programa';
-import { useInstitution } from './hooks/use-institution-queries';
+import {
+  useInstitution,
+  useInstitutionResearchGroupMetrics,
+} from './hooks/use-institution-queries';
 import { Institution as InstitutionType } from '../../services/institution';
 
 export type GraduateProgram = InstitutionType;
@@ -81,10 +84,22 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
   effectiveIdentifier = decodeURIComponent(effectiveIdentifier).trim();
 
   const { data: institutions, isLoading: loading } = useInstitution(effectiveIdentifier);
+  const { data: researchGroupMetrics = [] } = useInstitutionResearchGroupMetrics(institutions?.id);
   const logoUrl = urlGeral.replace(/\/$/, '') + institutions?.image;
   const coverUrl = urlGeral.replace(/\/$/, '') + institutions?.cover;
   const gruposCount = institutions?.count_rg;
   const bolsistasCount = institutions?.count_foment;
+
+  const totalGruposFromMetrics = useMemo(() => {
+    if (Array.isArray(researchGroupMetrics) && researchGroupMetrics.length > 0) {
+      return researchGroupMetrics.reduce(
+        (acc, curr) => acc + (Number(curr.count) || 0),
+        0,
+      );
+    }
+    return null;
+  }, [researchGroupMetrics]);
+  const displayGruposCount = totalGruposFromMetrics ?? gruposCount;
 
   // Aplica a formatação no nome da instituição
   const formattedInstitutionName = formatName(institutions?.name);
@@ -336,7 +351,7 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
                 </div>
                 <div className="flex flex-col">
                   <span className="text-2xl font-extrabold text-slate-800 dark:text-white leading-none">
-                    {gruposCount != null ? Number(String(gruposCount)).toLocaleString('pt-BR') : '—'}
+                    {displayGruposCount != null ? Number(String(displayGruposCount)).toLocaleString('pt-BR') : '—'}
                   </span>
                   <span className="text-xs font-medium text-slate-500 mt-1">Grupos de Pesquisa</span>
                 </div>

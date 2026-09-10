@@ -90,7 +90,7 @@ export function FiltersSheet({ filters }: FiltersSheetProps) {
               <FilterSections filters={filters} />
             </div>
 
-            <DialogFooter className="py-4">
+            <DialogFooter className="py-4 flex flex-row justify-between items-center w-full">
               <Button
                 variant="ghost"
                 onClick={filters.clearFilters}

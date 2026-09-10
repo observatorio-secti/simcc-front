@@ -6,7 +6,9 @@ import {
   getInstitutionResearchers,
   getInstitutionGraduatePrograms,
   getInstitutionResearchGroups,
+  getInstitutionResearchGroupMetrics,
   getInstitutionBolsistas,
+  getInstitutionBolsistaScholarshipMetrics,
 } from '../services/institution';
 
 export const useInstitutions = () => {
@@ -52,18 +54,38 @@ export const useInstitutionGraduatePrograms = () => {
   });
 };
 
-export const useInstitutionResearchGroups = () => {
+export const useInstitutionResearchGroups = (institutionId?: string, page?: number) => {
   return useQuery({
-    queryKey: ['institution-research-groups'],
-    queryFn: getInstitutionResearchGroups,
+    queryKey: ['institution-research-groups', institutionId, page],
+    queryFn: () => getInstitutionResearchGroups(institutionId, page),
+    enabled: !!institutionId,
     staleTime: 1000 * 60 * 10,
   });
 };
 
-export const useInstitutionBolsistas = () => {
+export const useInstitutionResearchGroupMetrics = (institutionId?: string) => {
   return useQuery({
-    queryKey: ['institution-bolsistas'],
-    queryFn: getInstitutionBolsistas,
+    queryKey: ['institution-research-group-metrics', institutionId],
+    queryFn: () => getInstitutionResearchGroupMetrics(institutionId),
+    enabled: !!institutionId,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+export const useInstitutionBolsistas = (institutionId?: string) => {
+  return useQuery({
+    queryKey: ['institution-bolsistas', institutionId],
+    queryFn: () => getInstitutionBolsistas(institutionId),
+    enabled: !!institutionId,
+    staleTime: 1000 * 60 * 10,
+  });
+};
+
+export const useInstitutionBolsistaScholarshipMetrics = (institutionId?: string) => {
+  return useQuery({
+    queryKey: ['institution-bolsista-scholarship-metrics', institutionId],
+    queryFn: () => getInstitutionBolsistaScholarshipMetrics(institutionId),
+    enabled: !!institutionId,
     staleTime: 1000 * 60 * 10,
   });
 };
