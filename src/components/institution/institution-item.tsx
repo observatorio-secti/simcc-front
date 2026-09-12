@@ -12,7 +12,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip';
-import { useInstitutionResearchers } from './hooks/use-institution-queries';
 
 interface GraduateProgram {
   id: string;
@@ -169,47 +168,7 @@ export function InstitutionItem(props: GraduateProgram) {
   const logoUrl = buildAssetUrl(rawLogo);
   const coverUrl = buildAssetUrl(rawCover);
 
-  const { data: docentesData = [] } = useInstitutionResearchers(props.id);
-  const normalizeName = (str: string) =>
-    (str || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim();
 
-  const enrichedResearchers = useMemo(() => {
-    const mapById = new Map<string, any>();
-    const mapByLattesId = new Map<string, any>();
-    const mapByLattes10 = new Map<string, any>();
-    const mapByName = new Map<string, any>();
-    (docentesData as any[]).forEach((d: any) => {
-      if (d?.id) mapById.set(String(d.id), d);
-      if (d?.lattes_id) mapByLattesId.set(String(d.lattes_id), d);
-      if (d?.lattes_10_id) mapByLattes10.set(String(d.lattes_10_id), d);
-      if (d?.name) mapByName.set(normalizeName(d.name), d);
-    });
-    return props.researchers.map((raw) => {
-      const str = String(raw).trim();
-      const found = mapByLattesId.get(str) || mapById.get(str) || mapByLattes10.get(str) || mapByName.get(normalizeName(str)) || null;
-      const displayName = found?.name || str;
-      return { raw, name: displayName, data: found };
-    });
-  }, [docentesData, props.researchers]);
-
-  const getResearcherImageUrl = (item: { raw: string; name: string; data: any | null }) => {
-    const img = item.data?.image;
-    if (img && typeof img === 'string' && img.trim() !== '') {
-      if (img.startsWith('data:') || /^https?:\/\//.test(img)) return img;
-      if (img.length > 100 && !img.includes('/')) return `data:image/jpeg;base64,${img}`;
-    }
-    if (item.data?.name) {
-      return `${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item.data.name)}`;
-    }
-    if (item.data?.id) {
-      return `${urlGeral}ResearcherData/Image?researcher_id=${encodeURIComponent(String(item.data.id))}`;
-    }
-    return `${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item.name)}`;
-  };
 
   return (
     <div
@@ -284,22 +243,22 @@ export function InstitutionItem(props: GraduateProgram) {
             </div>
           </div>
 
-          {enrichedResearchers.length > 0 && (
-            <div className="flex  items-center mt-8">
+          {Array.isArray(props.researchers) && props.researchers.length > 0 && (
+            <div className="flex items-center mt-8">
               <div className="flex items-center">
-                {enrichedResearchers.slice(0, 5).map((item, index) => (
+                {props.researchers.slice(0, 5).map((item, index) => (
                   <Avatar
-                    key={item.raw}
+                    key={item}
                     onClick={(event) => {
                       event.stopPropagation();
-                      onOpen('researcher-modal', { name: item.name });
+                      onOpen('researcher-modal', { name: item });
                     }}
                     className="cursor-pointer rounded-full relative border dark:border-neutral-800 h-8 w-8 hover:z-10 transition-transform hover:scale-110"
                     style={{ marginLeft: index > 0 ? '-10px' : '0px' }}
                   >
                     <AvatarImage
                       className="rounded-md h-8 w-8 object-cover"
-                      src={getResearcherImageUrl(item)}
+                      src={`${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item)}`}
                     />
                     <AvatarFallback className="flex items-center justify-center">
                       <User size={16} />
@@ -307,7 +266,7 @@ export function InstitutionItem(props: GraduateProgram) {
                   </Avatar>
                 ))}
 
-                {enrichedResearchers.length > 5 && (
+                {props.researchers.length > 5 && (
                   <div
                     onClick={(event) => {
                       event.stopPropagation();
@@ -318,9 +277,9 @@ export function InstitutionItem(props: GraduateProgram) {
                     }}
                     className="h-8 w-8 flex items-center justify-center text-gray-500 bg-gray-100 dark:bg-neutral-800 rounded-full border dark:border-neutral-700 text-xs font-medium cursor-pointer hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors"
                     style={{ marginLeft: '-10px' }}
-                    title={`Ver todos os ${enrichedResearchers.length} docentes - clique para abrir página de docentes`}
+                    title={`Ver todos os ${props.researchers.length} docentes - clique para abrir página de docentes`}
                   >
-                    +{enrichedResearchers.length - 5}
+                    +{props.researchers.length - 5}
                   </div>
                 )}
               </div>

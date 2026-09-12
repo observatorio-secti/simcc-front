@@ -619,28 +619,27 @@ export function MapaHome() {
       try {
         setLoading(true);
         const allResearchers: Research[] = [];
-        let page = 1;
         let batch: Research[] = [];
         const sep = urlTermPesquisadores.includes("?") ? "&" : "?";
         try {
-          do {
-            const response = await fetch(`${urlTermPesquisadores}${sep}page=${page}`, {
-              mode: "cors",
-              headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET",
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Max-Age": "3600",
-                "Content-Type": "text/plain",
-              },
-            });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const response = await fetch(`${urlTermPesquisadores}${sep}page=1`, {
+            mode: "cors",
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+              "Access-Control-Allow-Methods": "GET",
+              "Access-Control-Allow-Headers": "Content-Type",
+              "Access-Control-Max-Age": "3600",
+              "Content-Type": "text/plain",
+            },
+          });
+          if (response.ok) {
             batch = await response.json();
-            allResearchers.push(...batch);
-            page++;
-            if (batch.length < 100) break;
-            if (page > 100) break;
-          } while (batch.length > 0);
+            if (Array.isArray(batch)) {
+              allResearchers.push(...batch);
+            }
+          } else {
+            throw new Error(`HTTP ${response.status}`);
+          }
         } catch (err) {
           if (allResearchers.length === 0) {
             try {
@@ -654,8 +653,12 @@ export function MapaHome() {
                   "Content-Type": "text/plain",
                 },
               });
-              const single = await response.json();
-              allResearchers.push(...single);
+              if (response.ok) {
+                const single = await response.json();
+                if (Array.isArray(single)) {
+                  allResearchers.push(...single);
+                }
+              }
             } catch (singleErr) {
               console.error("Fallback fetch error:", singleErr);
             }

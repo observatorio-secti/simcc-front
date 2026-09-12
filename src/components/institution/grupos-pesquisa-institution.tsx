@@ -6,6 +6,8 @@ import {
   ChevronRight,
   ChevronUp,
   Download,
+  LoaderCircle,
+  Plus,
   Shapes,
   SlidersHorizontal,
   Trash,
@@ -18,7 +20,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  useInstitutionResearchGroups,
+  useInstitutionResearchGroupsInfinite,
   useInstitutionResearchGroupMetrics,
 } from './hooks/use-institution-queries';
 import { Skeleton } from '../ui/skeleton';
@@ -159,17 +161,25 @@ export function GruposPesquisaInstitution({
     return area.toUpperCase();
   };
 
-  // Busca grupos filtrados pela API com TanStack Query
-  const { data: rawGroups = [], isLoading: loadingGroups } =
-    useInstitutionResearchGroups(institutionId);
+  // Busca grupos paginados sob demanda com TanStack Query (100 por página)
+  const {
+    data: groupsData,
+    isLoading: loadingGroups,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInstitutionResearchGroupsInfinite(institutionId);
 
-  // Busca métricas por área para gráficos e cards de quantidade
+  // Busca métricas por área para gráficos e cards de quantidade (1 request agregada)
   const { data: chartMetrics = [], isLoading: loadingMetrics } =
     useInstitutionResearchGroupMetrics(institutionId);
 
   const isLoading = loadingGroups || loadingMetrics;
 
-  const total = (rawGroups as Patrimonio[]) || [];
+  const total = useMemo(
+    () => (groupsData?.pages.flatMap((page) => page) as Patrimonio[]) ?? [],
+    [groupsData],
+  );
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 12;
@@ -836,12 +846,55 @@ export function GruposPesquisaInstitution({
                         </div>
                       </div>
                     )}
+
+                    {hasNextPage && !hasActiveFilters && (
+                      <div className="w-full flex justify-center py-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fetchNextPage()}
+                          disabled={isFetchingNextPage}
+                          className="gap-2"
+                        >
+                          {isFetchingNextPage ? (
+                            <LoaderCircle size={16} className="animate-spin" />
+                          ) : (
+                            <Plus size={16} />
+                          )}
+                          {isFetchingNextPage
+                            ? 'Carregando mais grupos...'
+                            : 'Carregar mais grupos da instituição'}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )
               ) : isLoading ? (
                 <Skeleton className="w-full rounded-md h-[400px]" />
               ) : (
-                <DataTable columns={columns} data={filteredTotal} />
+                <div className="flex flex-col gap-4">
+                  <DataTable columns={columns} data={filteredTotal} />
+                  {hasNextPage && !hasActiveFilters && (
+                    <div className="w-full flex justify-center py-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetchingNextPage}
+                        className="gap-2"
+                      >
+                        {isFetchingNextPage ? (
+                          <LoaderCircle size={16} className="animate-spin" />
+                        ) : (
+                          <Plus size={16} />
+                        )}
+                        {isFetchingNextPage
+                          ? 'Carregando mais grupos...'
+                          : 'Carregar mais grupos da instituição'}
+                      </Button>
+                    </div>
+                  )}
+                </div>
               )}
             </AccordionContent>
           </AccordionItem>

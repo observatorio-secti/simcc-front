@@ -309,29 +309,22 @@ export const getInstitutionResearcherMetrics = async (
 };
 
 /**
- * Lista de pesquisadores / docentes da instituição com suporte a paginação backend
+ * Busca página pontual de pesquisadores / docentes da instituição (sob demanda)
  */
 export const getInstitutionResearchers = async (
   institutionId: string,
+  page: number = 1,
 ): Promise<PesquisadorInstitution[]> => {
-  const allResearchers: PesquisadorInstitution[] = [];
-  let page = 1;
-  let batch: PesquisadorInstitution[] = [];
-  do {
-    const { data } = await api.get('researcher', {
-      params: {
-        terms: '',
-        university: '',
-        institution_id: institutionId,
-        page: page,
-      },
-    });
-    batch = Array.isArray(data) ? data : [];
-    allResearchers.push(...batch);
-    page++;
-    if (page > 100) break;
-  } while (batch.length > 0);
-  return allResearchers;
+  if (!institutionId) return [];
+  const { data } = await api.get('researcher', {
+    params: {
+      terms: '',
+      university: '',
+      institution_id: institutionId,
+      page,
+    },
+  });
+  return Array.isArray(data) ? data : [];
 };
 
 /**
@@ -350,42 +343,21 @@ export interface ResearchGroupMetric {
 }
 
 /**
- * Grupos de pesquisa da instituição com suporte a paginação
+ * Grupos de pesquisa da instituição com suporte a paginação pontual (sob demanda)
  */
 export const getInstitutionResearchGroups = async (
   institutionId?: string,
-  page?: number,
+  page: number = 1,
 ): Promise<ResearchGroupItem[]> => {
   if (!institutionId) return [];
 
-  if (page !== undefined) {
-    const { data } = await api.get('research_group', {
-      params: {
-        institution_id: institutionId,
-        page,
-      },
-    });
-    return Array.isArray(data) ? data : [];
-  }
-
-  const allGroups: ResearchGroupItem[] = [];
-  let currentPage = 1;
-  let batch: ResearchGroupItem[] = [];
-
-  do {
-    const { data } = await api.get('research_group', {
-      params: {
-        institution_id: institutionId,
-        page: currentPage,
-      },
-    });
-    batch = Array.isArray(data) ? data : [];
-    allGroups.push(...batch);
-    currentPage++;
-    if (currentPage > 50 || batch.length < 100) break;
-  } while (batch.length > 0);
-
-  return allGroups;
+  const { data } = await api.get('research_group', {
+    params: {
+      institution_id: institutionId,
+      page,
+    },
+  });
+  return Array.isArray(data) ? data : [];
 };
 
 /**

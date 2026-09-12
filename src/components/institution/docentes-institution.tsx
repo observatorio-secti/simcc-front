@@ -1,9 +1,9 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { UserContext } from '../../context/context';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { Button } from '../ui/button';
-import { ChevronDown, ChevronUp, Plus, User } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { ChevronDown, ChevronUp, LoaderCircle, Plus, User } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Alert } from '../ui/alert';
 import { CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -130,7 +130,7 @@ const useQuery = () => {
 
 import {
   useInstitutionResearcherMetrics,
-  useInstitutionResearchers,
+  useInstitutionResearchersInfinite,
 } from './hooks/use-institution-queries';
 
 interface Total {
@@ -152,14 +152,23 @@ export function DocentesInstitution({
 
   const { data: total, isLoading: loadingMetrics } =
     useInstitutionResearcherMetrics(institutionId);
-  const { data: graduatePrograms = [], isLoading: loadingResearchers } =
-    useInstitutionResearchers(institutionId);
+  const {
+    data,
+    isLoading: loadingResearchers,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInstitutionResearchersInfinite(institutionId);
+
+  const allLoadedResearchers = useMemo(
+    () => data?.pages.flatMap((page) => page) ?? [],
+    [data],
+  );
 
   const loading = loadingMetrics || loadingResearchers;
   const [typeVisu, setTypeVisu] = useState('block');
   const [search, setSearch] = useState('');
   const [isOn, setIsOn] = useState(true);
-  const [count, setCount] = useState(100);
 
   const items = Array.from({ length: 12 }, (_, index) => (
     <Skeleton key={index} className="w-full rounded-md h-[300px]" />
@@ -167,28 +176,22 @@ export function DocentesInstitution({
 
   const currentDate = new Date().toLocaleDateString();
 
-  // Filtrar pesquisadores pela busca (sobre todos, antes do slice)
-  const filteredResearchers = graduatePrograms.filter((item) => {
+  // Filtrar pesquisadores carregados pela busca textual
+  const filteredResearchers = useMemo(() => {
+    if (!search.trim()) return allLoadedResearchers;
     const normalizeString = (str: string) =>
       str
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase();
 
-    const searchString = normalizeString(item.name);
     const normalizedSearch = normalizeString(search);
 
-    return searchString.includes(normalizedSearch);
-  });
-
-  const visibleResearchers = useMemo(
-    () => filteredResearchers.slice(0, count),
-    [filteredResearchers, count],
-  );
-
-  useEffect(() => {
-    setCount(100);
-  }, [search, institutionId]);
+    return allLoadedResearchers.filter((item) => {
+      const searchString = normalizeString(item.name || '');
+      return searchString.includes(normalizedSearch);
+    });
+  }, [allLoadedResearchers, search]);
 
   return (
     <main className="flex flex-1 flex-col">
@@ -249,11 +252,15 @@ export function DocentesInstitution({
                 <Skeleton className="h-7 w-20" />
               ) : (
                 <div className="text-2xl font-bold">
-                  {filteredResearchers.length}
+                  {Number(
+                    search.trim()
+                      ? filteredResearchers.length
+                      : (total?.researcher_count ?? allLoadedResearchers.length),
+                  ).toLocaleString('pt-BR')}
                 </div>
               )}
               <p className="text-xs text-muted-foreground">
-                {search ? 'encontrados na busca' : 'registrados'}
+                {search.trim() ? 'encontrados na busca' : 'registrados'}
               </p>
             </CardContent>
           </Alert>
@@ -309,16 +316,21 @@ export function DocentesInstitution({
                     </ResponsiveMasonry>
                   ) : (
                     <>
-                      <ResearchersBloco researcher={visibleResearchers} />
-                      {filteredResearchers.length > count && (
-                        <div className="w-full flex justify-center pb-8">
+                      <ResearchersBloco researcher={filteredResearchers} />
+                      {hasNextPage && !search.trim() && (
+                        <div className="w-full flex justify-center pb-8 pt-4">
                           <Button
-                            className="w-fit"
-                            onClick={() => setCount((c) => c + 100)}
+                            className="w-fit gap-2"
+                            onClick={() => fetchNextPage()}
+                            disabled={isFetchingNextPage}
                             aria-label="Mostrar mais 100 docentes"
                           >
-                            <Plus size={16} />
-                            Mostrar mais
+                            {isFetchingNextPage ? (
+                              <LoaderCircle size={16} className="animate-spin" />
+                            ) : (
+                              <Plus size={16} />
+                            )}
+                            {isFetchingNextPage ? 'Carregando mais docentes...' : 'Mostrar mais'}
                           </Button>
                         </div>
                       )}
@@ -327,7 +339,26 @@ export function DocentesInstitution({
                 ) : loading ? (
                   <Skeleton className="w-full rounded-md h-[400px]" />
                 ) : (
-                  <TableReseracherhome researcher={filteredResearchers} />
+                  <div className="flex flex-col gap-4">
+                    <TableReseracherhome researcher={filteredResearchers} />
+                    {hasNextPage && !search.trim() && (
+                      <div className="w-full flex justify-center pb-8 pt-4">
+                        <Button
+                          className="w-fit gap-2"
+                          onClick={() => fetchNextPage()}
+                          disabled={isFetchingNextPage}
+                          aria-label="Mostrar mais 100 docentes"
+                        >
+                          {isFetchingNextPage ? (
+                            <LoaderCircle size={16} className="animate-spin" />
+                          ) : (
+                            <Plus size={16} />
+                          )}
+                          {isFetchingNextPage ? 'Carregando mais docentes...' : 'Mostrar mais'}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </AccordionContent>
             </AccordionItem>
