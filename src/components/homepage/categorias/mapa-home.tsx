@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { lazy, Suspense, useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useModalResult } from "../../hooks/use-modal-result";
@@ -20,6 +20,8 @@ import { ResultFiltersSlotContext } from "../result-filters-slot-context";
 import { ResultFiltersSidebar, ResultFiltersSheet } from "../result-filters-shell";
 import MapaResearcher from "./researchers-home/mapa-researcher";
 import municipios from "./researchers-home/municipios.json";
+
+const BahiaTerritoriosMap = lazy(() => import("./researchers-home/mapa-researcher-v2"));
 
 type CityData = {
   nome: string;
@@ -583,7 +585,7 @@ function FiltersSheet({ filters }: { filters: FiltersData }) {
   );
 }
 
-export function MapaHome() {
+export function MapaHome({ version = 1 }: { version?: 1 | 2 } = {}) {
   const { isOpen, type } = useModalResult();
   const [loading, setLoading] = useState(false);
   const [researcher, setResearcher] = useState<Research[]>([]);
@@ -887,7 +889,13 @@ export function MapaHome() {
                   <AccordionTrigger></AccordionTrigger>
                 </div>
                 <AccordionContent className="p-0">
-                  {loading ? (
+                  {version === 2 ? (
+                    <Suspense fallback={<Skeleton className="rounded-md w-full h-[480px] lg:h-[520px] xl:h-[560px]" />}>
+                      <Alert className="p-0 overflow-hidden">
+                        <BahiaTerritoriosMap researchers={loading ? [] : researcher} />
+                      </Alert>
+                    </Suspense>
+                  ) : loading ? (
                     <Skeleton className="rounded-md w-full h-[480px] lg:h-[520px] xl:h-[560px]" />
                   ) : (
                     <div>
