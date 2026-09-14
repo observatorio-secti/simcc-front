@@ -38,6 +38,7 @@ import { SymbolEEWhite } from '../svg/SymbolEEWhite';
 import { useModal } from '../hooks/use-modal-store';
 import { LogoIapos } from '../svg/LogoIapos';
 import { LogoIaposWhite } from '../svg/LogoIaposWhite';
+import { LogoObservatorio } from '../svg/LogoObservatorio';
 import { Funnel, MagnifyingGlass, UserCircleGear } from 'phosphor-react';
 import { Badge } from '../ui/badge';
 import { ModeToggle } from '../mode-toggle';
@@ -120,20 +121,17 @@ export function Header() {
             />
 
             <div className="min-w-max">
-              <Link
-                to={'https://observatoriocti.secti.ba.gov.br/'}
-                target="_blank"
-                className="whitespace-nowrap text-sm font-medium hover:underline"
-              >
-                <Button variant="outline" size="sm" className="h-8 px-2 gap-2">
-                  <img
-                    src="/LOGO-OBS.png"
-                    alt="Logo Observatório"
-                    className="h-4 w-4 object-contain"
-                  />
+              <Button asChild variant="outline" size="sm" className="h-8 px-2 gap-2">
+                <a
+                  href="https://observatoriocti.secti.ba.gov.br/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="whitespace-nowrap text-sm font-medium"
+                >
+                  <LogoObservatorio className="h-4 w-4" />
                   Observatório
-                </Button>
-              </Link>
+                </a>
+              </Button>
             </div>
 
             <span className="absolute right-2 md:relative md:ml-3 md:mb-[1px]">
