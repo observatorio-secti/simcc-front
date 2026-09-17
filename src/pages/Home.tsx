@@ -19,8 +19,8 @@ export function Home() {
     }, [searchId]);
 
     useEffect(() => {
-        // Ao cair na página de resultados, carrega com a barra lateral principal colapsada
-        if (location.pathname == '/resultados') {
+        // Ao cair na página de resultados ou MarIA IA, carrega com a barra lateral principal colapsada
+        if (location.pathname == '/resultados' || location.pathname == '/resultados-ia' || location.pathname == '/marIA') {
             setIsCollapsed(false);
         }
     }, [location.pathname]);

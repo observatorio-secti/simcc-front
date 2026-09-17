@@ -39,6 +39,7 @@ import {
 } from '../components/ui/breadcrumb';
 import { useTheme } from 'next-themes';
 import { UserProfileInitialModal } from '../components/modals/user-profile-initial';
+import { cn } from '../lib';
 
 interface MailProps {
   defaultLayout: number[] | undefined;
@@ -243,6 +244,9 @@ export default function SearchLayout({
     breadcrumbItems = ['Página inicial', 'instituicao', pathSegments[0]];
   }
 
+  const isMariaChat =
+    router.pathname === '/resultados-ia' || router.pathname === '/marIA';
+
   return (
     <div>
       <SidebarProvider
@@ -253,9 +257,14 @@ export default function SearchLayout({
       >
         <AppSidebar />
 
-        <SidebarInset className=" ">
-          <main className="h-full flex flex-col flex-1 ">
-            <div className="flex p-8 pt-8 pb-2 h-[68px] items-center justify-between top-0 sticky z-[3] supports-[backdrop-filter]:bg-neutral-50/60 supports-[backdrop-filter]:dark:bg-neutral-900/60 backdrop-blur ">
+        <SidebarInset className={cn(isMariaChat && 'overflow-hidden')}>
+          <main
+            className={cn(
+              'h-full flex flex-col flex-1',
+              isMariaChat && 'min-h-0 overflow-hidden'
+            )}
+          >
+            <div className="flex p-8 pt-8 pb-2 h-[68px] shrink-0 items-center justify-between top-0 sticky z-[3] supports-[backdrop-filter]:bg-neutral-50/60 supports-[backdrop-filter]:dark:bg-neutral-900/60 backdrop-blur ">
               <div className="flex  pb-0 items-center gap-2">
                 <SidebarTrigger className="" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
@@ -304,7 +313,14 @@ export default function SearchLayout({
               <div className="flex items-center gap-2"></div>
             </div>
 
-            <div className="h-full ">{children}</div>
+            <div
+              className={cn(
+                'h-full',
+                isMariaChat && 'flex-1 min-h-0 overflow-hidden h-[calc(100%-68px)]'
+              )}
+            >
+              {children}
+            </div>
           </main>
         </SidebarInset>
         <Toaster />
