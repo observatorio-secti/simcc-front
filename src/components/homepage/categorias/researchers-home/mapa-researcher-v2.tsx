@@ -9,7 +9,7 @@ import {
   useMapEvents,
 } from 'react-leaflet';
 import L from 'leaflet';
-import { User } from 'lucide-react';
+import { Loader2, User } from 'lucide-react';
 import type {
   Feature,
   FeatureCollection,
@@ -22,7 +22,7 @@ import 'leaflet/dist/leaflet.css';
 import { UserContext } from '../../../../context/context';
 import { useModal } from '../../../hooks/use-modal-store';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../ui/avatar';
-import { Skeleton } from '../../../ui/skeleton';
+import { loadTerritoryGeoJson } from './territory-geojson';
 
 interface MunicipalityProperties {
   name: string;
@@ -195,30 +195,39 @@ function createMarkerIcon(count: number) {
   });
 }
 
+function MapLoading({ overlay = false }: { overlay?: boolean }) {
+  return (
+    <div
+      className={`flex items-center justify-center gap-3 rounded-md bg-slate-100 text-slate-600 dark:bg-neutral-800 dark:text-neutral-300 ${overlay ? 'absolute inset-0 z-[1001]' : 'h-[clamp(350px,60vh,650px)] w-full'}`}
+      role="status"
+      aria-live="polite"
+    >
+      <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+      Carregando territórios...
+    </div>
+  );
+}
+
 export default function BahiaTerritoriosMap({
   researchers,
   geoJsonUrl = '/territorio_relacionado.json',
 }: MapProps) {
   const [geoJson, setGeoJson] = useState<TerritoryGeoJson | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mapReady, setMapReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const controller = new AbortController();
+    let active = true;
     async function loadData() {
       try {
         setLoading(true);
+        setMapReady(false);
         setError(null);
 
-        const geoResponse = await fetch(geoJsonUrl, {
-          signal: controller.signal,
-        });
-
-        if (!geoResponse.ok) {
-          throw new Error('Erro ao carregar GeoJSON');
-        }
-
-        const geo = await geoResponse.json();
+        const geo = (await loadTerritoryGeoJson(
+          geoJsonUrl,
+        )) as TerritoryGeoJson;
 
         if (
           geo?.type !== 'FeatureCollection' ||
@@ -238,11 +247,11 @@ export default function BahiaTerritoriosMap({
         ) {
           throw new Error('GeoJSON de territórios inválido');
         }
-        if (controller.signal.aborted) return;
+        if (!active) return;
 
         setGeoJson(geo);
       } catch (error) {
-        if (controller.signal.aborted) return;
+        if (!active) return;
         setGeoJson(null);
         setError(
           error instanceof Error
@@ -251,12 +260,14 @@ export default function BahiaTerritoriosMap({
         );
         console.error('Erro ao carregar mapa:', error);
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        if (active) setLoading(false);
       }
     }
 
-    loadData();
-    return () => controller.abort();
+    void loadData();
+    return () => {
+      active = false;
+    };
   }, [geoJsonUrl]);
 
   /**
@@ -435,7 +446,7 @@ export default function BahiaTerritoriosMap({
   }, [municipalityGroups]);
 
   if (loading) {
-    return <Skeleton className="h-[480px] w-full lg:h-[520px] xl:h-[560px]" />;
+    return <MapLoading />;
   }
 
   if (error || !geoJson) {
@@ -448,24 +459,28 @@ export default function BahiaTerritoriosMap({
 
   return (
     <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_260px]">
-      <MapContainer
-        center={[-12.5, -41.7]}
-        zoom={7}
-        minZoom={6}
-        maxZoom={11}
-        boxZoom={false}
-        zoomControl
-        className="z-0 h-[clamp(350px,60vh,650px)] min-w-0 w-full rounded-lg [&:focus:not(:focus-visible)]:outline-none [&_.leaflet-interactive:focus:not(:focus-visible)]:outline-none [&_path.leaflet-interactive:focus-visible]:outline-none [&_path.leaflet-interactive:focus-visible]:stroke-gray-900 [&_path.leaflet-interactive:focus-visible]:stroke-[2px] [&_.leaflet-marker-icon:focus-visible]:outline-none [&_.leaflet-marker-icon:focus-visible_.territory-marker]:shadow-[0_0_0_3px_#111827]"
-      >
-        <FitBounds geoJson={geoJson} />
+      <div className="relative min-w-0">
+        <MapContainer
+          center={[-12.5, -41.7]}
+          zoom={7}
+          minZoom={6}
+          maxZoom={11}
+          boxZoom={false}
+          zoomControl
+          className="z-0 h-[clamp(350px,60vh,650px)] min-w-0 w-full rounded-lg [&:focus:not(:focus-visible)]:outline-none [&_.leaflet-interactive:focus:not(:focus-visible)]:outline-none [&_path.leaflet-interactive:focus-visible]:outline-none [&_path.leaflet-interactive:focus-visible]:stroke-gray-900 [&_path.leaflet-interactive:focus-visible]:stroke-[2px] [&_.leaflet-marker-icon:focus-visible]:outline-none [&_.leaflet-marker-icon:focus-visible_.territory-marker]:shadow-[0_0_0_3px_#111827]"
+        >
+          <FitBounds geoJson={geoJson} />
 
-        <ZoomAwareLayers
-          geoJson={geoJson}
-          groupedData={groupedData}
-          territoryMarkers={territoryMarkers}
-          municipalityMarkers={municipalityMarkers}
-        />
-      </MapContainer>
+          <ZoomAwareLayers
+            geoJson={geoJson}
+            groupedData={groupedData}
+            territoryMarkers={territoryMarkers}
+            municipalityMarkers={municipalityMarkers}
+            onReady={setMapReady}
+          />
+        </MapContainer>
+        {!mapReady && <MapLoading overlay />}
+      </div>
 
       <Legend geoJson={geoJson} groupedData={groupedData} />
     </div>
@@ -477,12 +492,16 @@ function ZoomAwareLayers({
   groupedData,
   territoryMarkers,
   municipalityMarkers,
+  onReady,
 }: {
   geoJson: TerritoryGeoJson;
   groupedData: Record<string, TerritoryGroup>;
   territoryMarkers: Array<TerritoryGroup & { position: L.LatLng }>;
   municipalityMarkers: Array<MunicipalityGroup & { position: L.LatLng }>;
+  onReady: (ready: boolean) => void;
 }) {
+  const map = useMap();
+  const geoJsonLayerRef = useRef<L.GeoJSON>(null);
   const [zoom, setZoom] = useState(7);
   useMapEvents({
     zoomend(event) {
@@ -496,9 +515,32 @@ function ZoomAwareLayers({
     [geoJson],
   );
 
+  useEffect(() => {
+    const layer = geoJsonLayerRef.current;
+    if (!layer) return;
+
+    let firstFrame = 0;
+    let secondFrame = 0;
+    const revealMap = () => {
+      firstFrame = requestAnimationFrame(() => {
+        secondFrame = requestAnimationFrame(() => onReady(true));
+      });
+    };
+
+    if (map.hasLayer(layer)) revealMap();
+    else layer.on('add', revealMap);
+
+    return () => {
+      layer.off('add', revealMap);
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+    };
+  }, [map, onReady, geoJson]);
+
   return (
     <>
       <GeoJSON
+        ref={geoJsonLayerRef}
         key={`${detailed}-${Object.keys(groupedData).sort().join(',')}`}
         data={geoJson}
         style={(feature) => ({

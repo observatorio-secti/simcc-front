@@ -16,6 +16,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { ResultFiltersSlotContext } from "./result-filters-slot-context";
+import { preloadTerritoryGeoJson } from "./categorias/researchers-home/territory-geojson";
 import { useIsMobile } from "../../hooks/use-mobile";
 
 const useQuery = () => {
@@ -23,6 +24,13 @@ const useQuery = () => {
 };
 
 export function ResultHome() {
+    useEffect(() => {
+        preloadTerritoryGeoJson();
+        void import('./categorias/researchers-home/mapa-researcher-v2').catch(() => {
+            // O Suspense exibirá o carregamento caso o módulo não esteja pronto.
+        });
+    }, []);
+
     const { isOpen, type } = useModalHomepage();
     const { onOpen, type: typeResult } = useModalResult();
     const { itemsSelecionados, searchType, simcc, urlGeral, valoresSelecionadosExport } = useContext(UserContext);

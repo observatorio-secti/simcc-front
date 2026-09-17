@@ -158,7 +158,7 @@ function App() {
   });
 
   const [historico, setHistorico] = useState<HistoricoItem[]>([]);
-  const db = getFirestore();
+  //const db = getFirestore();
 
   const normalizarTermo = (termo: string): string => {
     return termo
@@ -169,60 +169,60 @@ function App() {
       .trim();
   };
 
-  useEffect(() => {
-    const updateHistorico = async () => {
-      if (!user || !loggedIn || itemsSelecionados.length === 0) return;
+  // useEffect(() => {
+  //   const updateHistorico = async () => {
+  //     if (!user || !loggedIn || itemsSelecionados.length === 0) return;
 
-      const rawTermo = itemsSelecionados[itemsSelecionados.length - 1].term;
-      const termoNormalizado = normalizarTermo(rawTermo);
-      if (!termoNormalizado) return;
+  //     const rawTermo = itemsSelecionados[itemsSelecionados.length - 1].term;
+  //     const termoNormalizado = normalizarTermo(rawTermo);
+  //     if (!termoNormalizado) return;
 
-      const novoItem: HistoricoItem = {
-        termo: termoNormalizado,
-        tipo: searchType,
-      };
+  //     const novoItem: HistoricoItem = {
+  //       termo: termoNormalizado,
+  //       tipo: searchType,
+  //     };
 
-      let novoHistorico = [
-        novoItem,
-        ...historico.filter(
-          (h) => !(h.termo === termoNormalizado && h.tipo === searchType),
-        ),
-      ];
+  //     let novoHistorico = [
+  //       novoItem,
+  //       ...historico.filter(
+  //         (h) => !(h.termo === termoNormalizado && h.tipo === searchType),
+  //       ),
+  //     ];
 
-      if (novoHistorico.length > 10) {
-        novoHistorico = novoHistorico.slice(0, 10);
-      }
+  //     if (novoHistorico.length > 10) {
+  //       novoHistorico = novoHistorico.slice(0, 10);
+  //     }
 
-      setHistorico(novoHistorico);
+  //     setHistorico(novoHistorico);
 
-      const docRef = doc(db, 'historico', user.uid);
-      await setDoc(docRef, { termos: novoHistorico });
-    };
+  //     const docRef = doc(db, 'historico', user.uid);
+  //     await setDoc(docRef, { termos: novoHistorico });
+  //   };
 
-    updateHistorico();
-  }, [itemsSelecionados]);
+  //   updateHistorico();
+  // }, [itemsSelecionados]);
 
-  useEffect(() => {
-    const fetchHistorico = async () => {
-      if (user && loggedIn) {
-        const docRef = doc(db, 'historico', user.uid);
-        const docSnap = await getDoc(docRef);
+  // useEffect(() => {
+  //   const fetchHistorico = async () => {
+  //     if (user && loggedIn) {
+  //       const docRef = doc(db, 'historico', user.uid);
+  //       const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (Array.isArray(data.termos)) {
-            const termosNormalizados = data.termos.map((item: any) => ({
-              termo: normalizarTermo(item.termo),
-              tipo: item.tipo || 'article',
-            }));
-            setHistorico(termosNormalizados);
-          }
-        }
-      }
-    };
+  //       if (docSnap.exists()) {
+  //         const data = docSnap.data();
+  //         if (Array.isArray(data.termos)) {
+  //           const termosNormalizados = data.termos.map((item: any) => ({
+  //             termo: normalizarTermo(item.termo),
+  //             tipo: item.tipo || 'article',
+  //           }));
+  //           setHistorico(termosNormalizados);
+  //         }
+  //       }
+  //     }
+  //   };
 
-    fetchHistorico();
-  }, [user, loggedIn]);
+  //   fetchHistorico();
+  // }, [user, loggedIn]);
 
   const storedIsCollapsed = localStorage.getItem('isCollapsed');
   const [isCollapsed, setIsCollapsed] = useState(
@@ -327,23 +327,23 @@ function App() {
     );
   }, [pesquisadoresSelecionados]);
 
-  const logPageAccess = (url) => {
-    logEvent(analytics, 'page_view', {
-      page_url: url, // Aqui você pode passar a URL ou outros parâmetros que você queira
-      page_title: document.title, // Também pode passar o título da página
-    });
-  };
+  // const logPageAccess = (url) => {
+  //   logEvent(analytics, 'page_view', {
+  //     page_url: url, // Aqui você pode passar a URL ou outros parâmetros que você queira
+  //     page_title: document.title, // Também pode passar o título da página
+  //   });
+  // };
 
-  useEffect(() => {
-    const currentURL = window.location.hostname; // Obtém o domínio da página
-    if (
-      currentURL === 'conectee.eng.ufmg.br' ||
-      currentURL === 'iapos.cimatec.com.br' ||
-      currentURL === 'simcc.uesc.b'
-    ) {
-      logPageAccess(currentURL); // Registra o evento de acesso
-    }
-  }, []);
+  // useEffect(() => {
+  //   const currentURL = window.location.hostname; // Obtém o domínio da página
+  //   if (
+  //     currentURL === 'conectee.eng.ufmg.br' ||
+  //     currentURL === 'iapos.cimatec.com.br' ||
+  //     currentURL === 'simcc.uesc.b'
+  //   ) {
+  //     logPageAccess(currentURL); // Registra o evento de acesso
+  //   }
+  // }, []);
 
   return (
     <>
