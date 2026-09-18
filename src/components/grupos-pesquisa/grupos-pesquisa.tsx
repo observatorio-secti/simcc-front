@@ -170,33 +170,49 @@ export function GruposPesquisaPage() {
 
   const { urlGeral, simcc } = useContext(UserContext);
 
-  const urlPatrimonioInsert = ` ${urlGeral}research_group`;
+  const urlPatrimonioInsert = `${urlGeral}research_group`;
 
   useEffect(() => {
-    setIsLoading(true);
-    const fetchData = async () => {
+    const abortController = new AbortController();
+    const fetchAll = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch(urlPatrimonioInsert, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setTotal(data);
-          setIsLoading(false);
-          setJsonData(data);
+        const all: Patrimonio[] = [];
+        let page = 1;
+        let hasMore = true;
+        while (hasMore) {
+          const separator = urlPatrimonioInsert.includes('?') ? '&' : '?';
+          const url = `${urlPatrimonioInsert}${separator}page=${page}`;
+          const response = await fetch(url, {
+            mode: 'cors',
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET',
+              'Access-Control-Allow-Headers': 'Content-Type',
+              'Access-Control-Max-Age': '3600',
+              'Content-Type': 'text/plain',
+            },
+            signal: abortController.signal,
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data: Patrimonio[] = await response.json();
+          if (!Array.isArray(data)) break;
+          all.push(...data);
+          if (data.length < 100 || page >= 100) hasMore = false;
+          else page += 1;
         }
-      } catch (err) {
-        console.log(err);
+        if (!abortController.signal.aborted) {
+          setTotal(all);
+          setJsonData(all);
+        }
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') console.log(err);
+      } finally {
+        if (!abortController.signal.aborted) setIsLoading(false);
       }
     };
-    fetchData();
+    if (urlPatrimonioInsert) fetchAll();
+    return () => abortController.abort();
   }, [urlPatrimonioInsert]);
 
   console.log(urlPatrimonioInsert);
@@ -632,7 +648,7 @@ export function GruposPesquisaPage() {
                                 className="gap-2"
                               >
                                 <FadersHorizontal size={16} />
-                                Mostrar {filteredTotal.length} resultados
+                                Mostrar {filteredTotal.length.toLocaleString('pt-BR')} resultados
                               </Button>
                             </DialogFooter>
                           </ScrollArea>
@@ -721,7 +737,7 @@ export function GruposPesquisaPage() {
                 {isLoading ? (
                   <Skeleton className="h-7 w-20" />
                 ) : (
-                  <div className="text-2xl font-bold">{filteredTotal.length}</div>
+                  <div className="text-2xl font-bold">{filteredTotal.length.toLocaleString('pt-BR')}</div>
                 )}
                 <p className="text-xs text-muted-foreground">
                   encontrados na busca

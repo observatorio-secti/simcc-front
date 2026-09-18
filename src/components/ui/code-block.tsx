@@ -1,8 +1,18 @@
 'use client';
 import React from 'react';
-import { PrismAsync as SyntaxHighlighter } from 'react-syntax-highlighter';
+import SyntaxHighlighter from 'react-syntax-highlighter/dist/cjs/prism-light';
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { IconCheck, IconCopy } from '@tabler/icons-react';
+
+// Registre aqui as linguagens usadas pelo <CodeBlock> no projeto.
+// Hoje só foi encontrado uso com language="html" (em
+// src/components/dashboard/builder-page/sections/html.tsx).
+// Se adicionar novos usos com outra linguagem, importe e registre
+// aqui também (veja os nomes disponíveis em
+// node_modules/react-syntax-highlighter/dist/cjs/languages/prism).
+import html from 'react-syntax-highlighter/dist/cjs/languages/prism/markup';
+
+SyntaxHighlighter.registerLanguage('html', html);
 
 type CodeBlockProps = {
   language: string;

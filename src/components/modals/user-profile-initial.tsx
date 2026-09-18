@@ -247,7 +247,7 @@ export function UserProfileInitialModal() {
 
   const content = () => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 flex-1 min-h-0 overflow-hidden">
         <Alert className="rounded-t-md rounded-b-none bg-gradient-to-r from-eng-dark-blue  to-eng-blue p-6 border-0 border-b">
           <DialogTitle className="text-2xl font-medium max-w-[450px] text-white">
             Veja o que a plataforma pode oferecer
@@ -260,7 +260,7 @@ export function UserProfileInitialModal() {
         <DialogHeader className="p-4 pt-0 flex flex-col w-full">
           <Tabs defaultValue={String(tab)} value={String(tab)} className="">
             <TabsContent value="2" className="w-full">
-              <ScrollArea className="h-[350px]">
+              <ScrollArea className="h-[min(350px,calc(100dvh-260px))] md:h-[350px]">
                 <div className="grid  items-center gap-5">
                   <Label>Qual o seu perfil?</Label>
                   <ToggleGroup
@@ -310,7 +310,7 @@ export function UserProfileInitialModal() {
             </TabsContent>
 
             <TabsContent value="3">
-              <ScrollArea className="h-[350px]">
+              <ScrollArea className="h-[min(350px,calc(100dvh-260px))] md:h-[350px]">
                 <div className="p-6 rounded-lg w-full flex justify-center md:px-32">
                   <div className="relative w-full">
                     {resposta.map(
@@ -358,7 +358,7 @@ export function UserProfileInitialModal() {
             </TabsContent>
 
             <TabsContent value="1">
-              <ScrollArea className="h-[350px]">
+              <ScrollArea className="h-[min(350px,calc(100dvh-260px))] md:h-[350px]">
                 <div
                   className="h-[200px] w-full bg-cover bg-no-repeat bg-center"
                   style={{ backgroundImage: `url(${bg_popup})` }}
@@ -385,7 +385,7 @@ export function UserProfileInitialModal() {
           </Tabs>
         </DialogHeader>
 
-        <DialogFooter className="flex w-full justify-between  gap-2 p-4 pt-0">
+        <DialogFooter className="flex w-full justify-between gap-2 p-4 pt-0 shrink-0 bg-background">
           <div className="flex justify-between w-full">
             <div className="flex gap-2 ">
               <Link to={'/termos-uso'} target="_blank">
@@ -432,13 +432,15 @@ export function UserProfileInitialModal() {
   if (isMobile) {
     return (
       <Drawer open={isModalOpen} onOpenChange={onClose}>
-        <DrawerContent className="p-0 m-0">{content()}</DrawerContent>
+        <DrawerContent className="p-0 m-0 max-h-[90dvh] flex flex-col overflow-hidden">
+          {content()}
+        </DrawerContent>
       </Drawer>
     );
   } else {
     return (
       <Dialog open={isModalOpen} onOpenChange={onClose}>
-        <DialogContent className="p-0 min-w-[50vw] border">
+        <DialogContent className="p-0 min-w-[50vw] max-h-[90dvh] overflow-hidden border flex flex-col">
           {content()}
         </DialogContent>
       </Dialog>
