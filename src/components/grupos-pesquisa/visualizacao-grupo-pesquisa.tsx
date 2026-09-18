@@ -22,6 +22,7 @@ import { Rows, SquaresFour, Users } from 'phosphor-react';
 import { Skeleton } from '../ui/skeleton';
 import { TableReseracherhome } from '../homepage/categorias/researchers-home/table-reseracher-home';
 import { Alert } from '../ui/alert';
+import { Badge } from '../ui/badge';
 import { useModal } from '../hooks/use-modal-store';
 import { Helmet } from 'react-helmet';
 import { ResearchItem } from '../homepage/categorias/researchers-home/researcher-item';
@@ -37,11 +38,18 @@ interface Patrimonio {
   area: string;
   institution: string;
   first_leader: string;
-  first_leader_id: string;
-  second_leader: string;
-  second_leader_id: string;
+  first_leader_id: string | null;
+  second_leader: string | null;
+  second_leader_id: string | null;
   name: string;
   id: string;
+  census: string | null;
+  start_of_collection: string | null;
+  end_of_collection: string | null;
+  group_identifier: string | null;
+  year: string | null;
+  institution_name: string | null;
+  category: string | null;
 }
 
 type Research = {
@@ -276,9 +284,14 @@ export function VisualizacaoGrupo() {
 
         const firstData = await firstResponse.json();
 
-        // Fetch data for second_leader if exists
+        // Fetch data for second_leader if exists (trata null/"" / "nan")
         let secondData = [];
-        if (second_leader) {
+        if (
+          second_leader &&
+          second_leader.trim() !== '' &&
+          second_leader.toLowerCase() !== 'nan' &&
+          second_leader.toLowerCase() !== 'null'
+        ) {
           const secondResponse = await fetch(
             `${urlGeral}researcherName?name=${second_leader}`,
             {
@@ -404,6 +417,17 @@ export function VisualizacaoGrupo() {
     return area.toUpperCase(); // Converte para maiúsculas
   };
 
+  const formatDate = (dateStr: string | null): string => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('pt-BR');
+    } catch {
+      return dateStr;
+    }
+  };
+
   const [count, setCount] = useState(12);
   const { onOpen } = useModal();
 
@@ -442,10 +466,21 @@ export function VisualizacaoGrupo() {
           </h1>
 
           <div className="hidden items-center gap-2 md:ml-auto md:flex">
-            <Button size="sm">
-              <SquareArrowOutUpRight size={16} />
-              Visitar página do grupo no DGP CNPq
-            </Button>
+            {(() => {
+              const dgpId = graduatePrograms[0]?.group_identifier;
+              const dgpUrl = dgpId ? `https://dgp.cnpq.br/dgp/espelhogrupo/${dgpId}` : null;
+              return (
+                <Button
+                  size="sm"
+                  disabled={!dgpUrl}
+                  onClick={() => dgpUrl && window.open(dgpUrl, '_blank')}
+                  title={dgpUrl ? `Abrir DGP: ${dgpId}` : 'Identificador DGP não disponível para este grupo'}
+                >
+                  <SquareArrowOutUpRight size={16} />
+                  Visitar página do grupo no DGP CNPq
+                </Button>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -458,15 +493,44 @@ export function VisualizacaoGrupo() {
         </h1>
 
         {graduatePrograms.map((props) => (
-          <div className="flex flex-wrap gap-4 ">
+          <div className="flex flex-wrap gap-4 items-center">
             <div className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center">
               <Shapes size={12} />
               {props.area}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center capitalize">
+            <div
+              className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center capitalize"
+              title={props.institution_name || undefined}
+            >
               <Building size={12} />
               {props.institution}
             </div>
+            {props.category && (
+              <Badge variant="secondary" className="text-xs">
+                {props.category}
+              </Badge>
+            )}
+            {props.year && (
+              <Badge variant="outline" className="text-xs">
+                Criado em {props.year}
+              </Badge>
+            )}
+            {props.census && (
+              <Badge variant="outline" className="text-xs">
+                Censo {props.census}
+              </Badge>
+            )}
+            {props.group_identifier && (
+              <Badge variant="outline" className="text-xs font-mono">
+                DGP: {props.group_identifier}
+              </Badge>
+            )}
+            {(props.start_of_collection || props.end_of_collection) && (
+              <span className="text-xs text-muted-foreground">
+                Período coleta: {props.start_of_collection ? formatDate(props.start_of_collection) : '—'} até{' '}
+                {props.end_of_collection ? formatDate(props.end_of_collection) : '—'}
+              </span>
+            )}
           </div>
         ))}
       </div>
@@ -615,14 +679,24 @@ export function VisualizacaoGrupo() {
                         <Alert className="rounded-l-none">
                           <p className="text-xs text-gray-500 mb-2 flex items-center gap-2 justify-between">
                             {props.area}
+                            {props.major_area && (
+                              <span className="text-xs text-muted-foreground">• {props.major_area}</span>
+                            )}
                           </p>
-                          <h5 className="font-semibold mb-4">{props.line}</h5>
+                          <h5 className="font-semibold mb-2">{props.line}</h5>
+                          {props.objective && (
+                            <p className="text-sm text-muted-foreground mb-3">{props.objective}</p>
+                          )}
                           <div className="flex flex-wrap gap-3 mt-4">
-                            {props.keywords.split(';').map((item, index) => (
-                              <div className="text-xs" key={String(index)}>
-                                {item}
-                              </div>
-                            ))}
+                            {(props.keywords || '')
+                              .split(';')
+                              .map((item) => item.trim())
+                              .filter(Boolean)
+                              .map((item, index) => (
+                                <Badge key={String(index)} variant="secondary" className="text-xs">
+                                  {item}
+                                </Badge>
+                              ))}
                           </div>
                         </Alert>
                       </div>
