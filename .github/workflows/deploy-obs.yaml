@@ -18,4 +18,4 @@ jobs:
             set -euo pipefail
             cd /opt/apps/prod/observatorio/observatorio-front
             git pull origin main --ff-only
-            docker build --output type=local,dest=./dist .
+            docker build --build-arg VITE_BASE_PATH=/simcc/ --output type=local,dest=./dist .

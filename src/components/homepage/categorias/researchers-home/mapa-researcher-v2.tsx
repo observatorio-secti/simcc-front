@@ -224,7 +224,7 @@ function createMarkerIcon(count: number) {
 
 export default function BahiaTerritoriosMap({
   researchers,
-  geoJsonUrl = '/territorio_relacionado.json',
+  geoJsonUrl = `${import.meta.env.BASE_URL}territorio_relacionado.json`,
 }: MapProps) {
   const [geoJson, setGeoJson] = useState<TerritoryGeoJson | null>(null);
   const [loading, setLoading] = useState(true);
