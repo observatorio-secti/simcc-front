@@ -1,7 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import { lazy, Suspense, useContext, useEffect, useState } from 'react';
 import { useModalResult } from '../hooks/use-modal-result';
 import { UserContext } from '../../context/context';
-import municipios from '../homepage/categorias/researchers-home/municipios.json';
 import {
   ChartBar,
   FadersHorizontal,
@@ -46,7 +45,6 @@ import { Input } from '../ui/input';
 import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
 import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-home';
-import MapaResearcher from '../homepage/categorias/researchers-home/mapa-researcher';
 import { TableReseracherhome } from '../homepage/categorias/researchers-home/table-reseracher-home';
 import { ResearchersBloco } from '../homepage/categorias/researchers-home/researchers-bloco';
 import { HeaderResult } from '../homepage/header-results';
@@ -56,14 +54,9 @@ import {
 } from '../dashboard/graficos/grafico-bolsista-produtividade';
 import { GraficoBolsistasDT } from '../dashboard/graficos/grafico-bolsista-tecnologico';
 
-type CityData = {
-  nome: string;
-  latitude: number;
-  longitude: number;
-  pesquisadores: number;
-  professores: string[];
-  lattes_10_id: string;
-};
+const BahiaTerritoriosMap = lazy(
+  () => import('../homepage/categorias/researchers-home/mapa-researcher-v2'),
+);
 
 type Research = {
   among: number;
@@ -840,7 +833,6 @@ export function BolsistasHome() {
   const [loading, setLoading] = useState(false);
   const [researcher, setResearcher] = useState<Research[]>([]);
   const [originalResearcher, setOriginalResearcher] = useState<Research[]>([]);
-  const [cityData, setCityData] = useState<CityData[]>([]);
   const [typeVisu, setTypeVisu] = useState('block');
   const { itemsSelecionados, urlGeral, searchType, simcc } =
     useContext(UserContext);
@@ -938,57 +930,9 @@ export function BolsistasHome() {
     return () => abortController.abort();
   }, [urlTermPesquisadores, page]);
 
-  useEffect(() => {
-    const processCityData = () => {
-      const cityMap = new Map<string, CityData>();
-
-      const municipioMap = new Map(
-        municipios.map((m) => [normalizeCityName(m.nome), m]),
-      );
-
-      researcher.forEach((r) => {
-        if (r.city) {
-          const normalizedCity = normalizeCityName(r.city);
-          const municipio = municipioMap.get(normalizedCity);
-
-          if (!municipio) {
-            console.warn(`Município não encontrado para a cidade: ${r.city}`);
-            return;
-          }
-
-          if (!cityMap.has(normalizedCity)) {
-            cityMap.set(normalizedCity, {
-              nome: r.city,
-              latitude: municipio.latitude,
-              longitude: municipio.longitude,
-              pesquisadores: 1,
-              professores: [r.name],
-              lattes_10_id: r.lattes_10_id,
-            });
-          } else {
-            const city = cityMap.get(normalizedCity)!;
-            city.pesquisadores += 1;
-            city.professores.push(r.name);
-          }
-        }
-      });
-
-      setCityData(Array.from(cityMap.values()));
-    };
-
-    processCityData();
-  }, [researcher]);
-
   const items = Array.from({ length: 12 }, (_, index) => (
     <Skeleton key={index} className="w-full rounded-md h-[300px]" />
   ));
-
-  const normalizeCityName = (cityName: string) => {
-    return cityName
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-  };
 
   const {
     clearFilters,
@@ -1113,7 +1057,15 @@ export function BolsistasHome() {
                   <Skeleton className="rounded-md w-full h-[300px] " />
                 ) : (
                   <div>
-                    <MapaResearcher cityData={cityData} />
+                    <Alert className="p-0 overflow-hidden">
+                      <Suspense
+                        fallback={
+                          <Skeleton className="rounded-md w-full h-[300px]" />
+                        }
+                      >
+                        <BahiaTerritoriosMap researchers={researcher} />
+                      </Suspense>
+                    </Alert>
                   </div>
                 )}
               </AccordionContent>

@@ -88,6 +88,7 @@
         "js-cookie": "^3.0.5",
         "jspdf": "^2.5.1",
         "katex": "^0.16.18",
+        "leaflet": "^1.9.4",
         "lodash": "^4.17.21",
         "lodash.debounce": "^4.0.8",
         "lucide-react": "^0.354.0",
@@ -140,6 +141,7 @@
     },
     "devDependencies": {
         "@types/js-cookie": "^3.0.6",
+        "@types/leaflet": "^1.9.22",
         "@types/node": "^20.17.10",
         "@types/papaparse": "^5.3.14",
         "@types/react": "^18.2.56",

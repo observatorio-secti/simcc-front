@@ -91,7 +91,9 @@ export function ResultHome() {
 
     useEffect(() => {
         if (tab != null && tab != undefined) {
-            onOpen(tab as ModalType)
+            // Compat: aba antiga 'mapa-home-v2' agora abre o mapa unificado 'mapa-home'
+            const legacyTab = tab === 'mapa-home-v2' ? 'mapa-home' : tab;
+            onOpen(legacyTab as ModalType)
         }
 
     }, []);
