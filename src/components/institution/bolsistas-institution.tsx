@@ -19,7 +19,7 @@ import {
 import { Button } from '../ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useContext, useMemo, useState } from 'react';
 import { UserContext } from '../../context/context';
 import {
   useInstitutionBolsistas,
@@ -54,17 +54,10 @@ import {
   CategoryMetric,
 } from '../dashboard/graficos/grafico-bolsista-produtividade';
 import { GraficoBolsistasDT } from '../dashboard/graficos/grafico-bolsista-tecnologico';
-import municipios from '../homepage/categorias/researchers-home/municipios.json';
-import MapaResearcher from '../homepage/categorias/researchers-home/mapa-researcher';
 
-type CityData = {
-  nome: string;
-  latitude: number;
-  longitude: number;
-  pesquisadores: number;
-  professores: string[];
-  lattes_10_id: string;
-};
+const BahiaTerritoriosMap = lazy(
+  () => import('../homepage/categorias/researchers-home/mapa-researcher-v2'),
+);
 
 interface Bolsistas {
   aid_quantity: string;
@@ -151,7 +144,6 @@ export function BolsistasInstitution({
   const [isOn, setIsOn] = useState(true);
   const [open, setOpen] = useState(false);
   const [search2, setSearch2] = useState('');
-  const [cityData, setCityData] = useState<CityData[]>([]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -309,56 +301,6 @@ export function BolsistasInstitution({
       })
     : [];
 
-  // Função para normalizar nomes de cidade
-  const normalizeCityName = (cityName: string) => {
-    return cityName
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-  };
-
-  // Processar dados de cidade para o mapa
-  useEffect(() => {
-    const processCityData = () => {
-      const cityMap = new Map<string, CityData>();
-
-      const municipioMap = new Map(
-        municipios.map((m) => [normalizeCityName(m.nome), m]),
-      );
-
-      filteredTotal.forEach((r) => {
-        if (r.city) {
-          const normalizedCity = normalizeCityName(r.city);
-          const municipio = municipioMap.get(normalizedCity);
-
-          if (!municipio) {
-            console.warn(`Município não encontrado para a cidade: ${r.city}`);
-            return;
-          }
-
-          if (!cityMap.has(normalizedCity)) {
-            cityMap.set(normalizedCity, {
-              nome: r.city,
-              latitude: municipio.latitude,
-              longitude: municipio.longitude,
-              pesquisadores: 1,
-              professores: [r.name],
-              lattes_10_id: r.lattes_10_id,
-            });
-          } else {
-            const city = cityMap.get(normalizedCity)!;
-            city.pesquisadores += 1;
-            city.professores.push(r.name);
-          }
-        }
-      });
-
-      setCityData(Array.from(cityMap.values()));
-    };
-
-    processCityData();
-  }, [filteredTotal]);
-
   return (
     <main className="flex flex-1 flex-col">
       <div className="top-[68px] sticky z-[9] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
@@ -511,7 +453,15 @@ export function BolsistasInstitution({
               {isLoading ? (
                 <Skeleton className="rounded-md w-full h-[350px]" />
               ) : (
-                <MapaResearcher cityData={cityData} />
+                <Alert className="p-0 overflow-hidden">
+                  <Suspense
+                    fallback={
+                      <Skeleton className="rounded-md w-full h-[350px]" />
+                    }
+                  >
+                    <BahiaTerritoriosMap researchers={filteredTotal} />
+                  </Suspense>
+                </Alert>
               )}
             </AccordionContent>
           </AccordionItem>

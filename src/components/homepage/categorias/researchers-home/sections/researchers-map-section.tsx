@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { MapIcon } from 'lucide-react';
 import {
   Accordion,
@@ -7,19 +8,20 @@ import {
 } from '../../../../../components/ui/accordion';
 import { Alert } from '../../../../ui/alert';
 import { Skeleton } from '../../../../ui/skeleton';
-import { CityData } from '../../../../../types/researcher';
+import type { Research } from '../../../../../types/researcher';
 import { HeaderResultTypeHome } from '../../header-result-type-home';
-import MapaResearcher from '../mapa-researcher';
+
+const BahiaTerritoriosMap = lazy(() => import('../mapa-researcher-v2'));
 
 interface ResearchersMapSectionProps {
-  cityData: CityData[];
+  researchers: Research[];
   loading: boolean;
   searchType?: string;
   simcc?: boolean;
 }
 
 export function ResearchersMapSection({
-  cityData,
+  researchers,
   loading,
   searchType,
   simcc,
@@ -48,8 +50,14 @@ export function ResearchersMapSection({
             <Skeleton className="rounded-md w-full h-[300px]" />
           ) : (
             <div>
-              <Alert className="p-0">
-                <MapaResearcher cityData={cityData} />
+              <Alert className="p-0 overflow-hidden">
+                <Suspense
+                  fallback={
+                    <Skeleton className="rounded-md w-full h-[300px]" />
+                  }
+                >
+                  <BahiaTerritoriosMap researchers={researchers} />
+                </Suspense>
               </Alert>
             </div>
           )}

@@ -60,28 +60,48 @@ interface MapProps {
   geoJsonUrl?: string;
 }
 
-const CORES = [
-  '#e6194B',
-  '#3cb44b',
-  '#ffe119',
-  '#4363d8',
-  '#f58231',
-  '#911eb4',
-  '#42d4f4',
-  '#f032e6',
-  '#bfef45',
-  '#fabed4',
-  '#469990',
-  '#dcbeff',
-  '#9A6324',
-  '#800000',
-  '#aaffc3',
-  '#808000',
-  '#ffd8b1',
-  '#000075',
-  '#808080',
-  '#00e676',
-];
+/**
+ * Paleta em tons pastéis inspirada no mapa oficial dos Territórios de
+ * Identidade da Bahia (SEI, 2021 — Lei nº 14.172/2019).
+ *
+ * Cada território tem cor própria e fixa (não há reaproveitamento como
+ * num esquema de "cor por resto de divisão").
+ */
+const TERRITORY_COLORS: Record<string, string> = {
+  '1': '#ead091', // Irecê — bege
+  '2': '#bbda92', // Velho Chico — verde-claro
+  '3': '#c9c0ed', // Chapada Diamantina — lilás-claro
+  '4': '#cfe195', // Sisal — amarelo-esverdeado claro
+  '5': '#eaca7f', // Litoral Sul — pêssego claro
+  '6': '#daac69', // Baixo Sul — ocre claro
+  '7': '#c1dd94', // Extremo Sul — verde-claro
+  '8': '#cec3ab', // Médio Sudoeste — cinza quente claro
+  '9': '#c5dc92', // Vale do Jiquiriçá — verde-claro
+  '10': '#f2aed2', // Sertão do São Francisco — rosa-claro
+  '11': '#e9c67d', // Bacia do Rio Grande — âmbar claro
+  '12': '#f6acd2', // Bacia do Paramirim — rosa-claro
+  '13': '#ead493', // Sertão Produtivo — creme
+  '14': '#ebd798', // Piemonte do Paraguaçu — creme
+  '15': '#f3aac5', // Bacia do Jacuípe — rosa-claro
+  '16': '#e7db8d', // Piemonte da Diamantina — amarelo-claro
+  '17': '#e8ce8c', // Semiárido Nordeste II — areia clara
+  '18': '#ecc17c', // Litoral Norte e Agreste — laranja-claro
+  '19': '#ecdcb0', // Portal do Sertão — creme
+  '20': '#e6d789', // Sudoeste Baiano — amarelo-claro
+  '21': '#b0cae5', // Recôncavo — azul-acinzentado claro
+  '22': '#e8b2cd', // Médio Rio de Contas — malva claro
+  '23': '#f5aac4', // Bacia do Rio Corrente — rosa-claro
+  '24': '#e8df91', // Itaparica — amarelo-claro
+  '25': '#b8c5d3', // Piemonte Norte do Itapicuru — cinza-neutro claro
+  '26': '#e9bb78', // Metropolitano de Salvador — caramelo claro
+  '27': '#c7bdec', // Costa do Descobrimento — lilás-claro
+};
+
+/** Preenchimento dos territórios sem pesquisadores. */
+const EMPTY_FILL = '#e5e7eb';
+
+/** Fundo do mapa (áreas fora da Bahia). Bem mais claro que o cinza interno. */
+const MAP_BACKGROUND = '#f1f5f9';
 
 const MUNICIPAL_ZOOM = 8;
 
@@ -94,10 +114,17 @@ function normalizeCity(value?: string | null) {
 }
 
 function getColor(id?: string | number) {
+  const key = String(id ?? '');
+
+  if (TERRITORY_COLORS[key]) {
+    return TERRITORY_COLORS[key];
+  }
+
   const parsedId = Number(id);
   const numericId = Number.isInteger(parsedId) && parsedId > 0 ? parsedId : 1;
+  const palette = Object.values(TERRITORY_COLORS);
 
-  return CORES[(numericId - 1) % CORES.length];
+  return palette[(numericId - 1) % palette.length];
 }
 
 function getTerritoryBorders(
@@ -455,7 +482,8 @@ export default function BahiaTerritoriosMap({
         maxZoom={11}
         boxZoom={false}
         zoomControl
-        className="z-0 h-[clamp(350px,60vh,650px)] min-w-0 w-full rounded-lg [&:focus:not(:focus-visible)]:outline-none [&_.leaflet-interactive:focus:not(:focus-visible)]:outline-none [&_path.leaflet-interactive:focus-visible]:outline-none [&_path.leaflet-interactive:focus-visible]:stroke-gray-900 [&_path.leaflet-interactive:focus-visible]:stroke-[2px] [&_.leaflet-marker-icon:focus-visible]:outline-none [&_.leaflet-marker-icon:focus-visible_.territory-marker]:shadow-[0_0_0_3px_#111827]"
+        style={{ backgroundColor: MAP_BACKGROUND }}
+        className="z-0 h-[clamp(350px,60vh,650px)] min-w-0 w-full rounded-lg border border-slate-200 dark:border-neutral-800 [&:focus:not(:focus-visible)]:outline-none [&_.leaflet-interactive:focus:not(:focus-visible)]:outline-none [&_path.leaflet-interactive:focus-visible]:outline-none [&_path.leaflet-interactive:focus-visible]:stroke-gray-900 [&_path.leaflet-interactive:focus-visible]:stroke-[2px] [&_.leaflet-marker-icon:focus-visible]:outline-none [&_.leaflet-marker-icon:focus-visible_.territory-marker]:shadow-[0_0_0_3px_#111827]"
       >
         <FitBounds geoJson={geoJson} />
 
@@ -504,7 +532,7 @@ function ZoomAwareLayers({
         style={(feature) => ({
           fillColor: groupedData[feature?.properties?.territorio_id]
             ? getColor(feature?.properties?.territorio_id)
-            : '#d1d5db',
+            : EMPTY_FILL,
           fillOpacity: 0.85,
           weight: detailed ? 0.6 : 0,
           color: '#ffffff',
@@ -657,31 +685,43 @@ function Legend({
   }, [geoJson]);
 
   return (
-    <div className="grid content-start grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2 md:max-h-[clamp(350px,60vh,650px)] md:grid-cols-1 md:overflow-y-auto md:border-l md:border-slate-200 md:px-3 md:py-2 dark:md:border-neutral-800">
-      <div className="col-span-full font-bold">Territórios de Identidade</div>
+    <div className="flex min-h-0 flex-col rounded-lg border border-slate-200 bg-white text-sm dark:border-neutral-800 dark:bg-neutral-900 md:max-h-[clamp(350px,60vh,650px)]">
+      <div className="border-b border-slate-200 px-3 py-2.5 font-semibold dark:border-neutral-800">
+        Territórios de Identidade
+      </div>
 
-      {territories.map(([id, name]) => {
-        const count = groupedData[id]?.items?.length ?? 0;
+      <div className="grid content-start grid-cols-1 gap-0.5 overflow-y-auto p-2 sm:grid-cols-2 md:grid-cols-1">
+        {territories.map(([id, name]) => {
+          const count = groupedData[id]?.items?.length ?? 0;
 
-        return (
-          <div className="flex items-center gap-2" key={id}>
+          return (
             <div
-              className="h-4 w-4 shrink-0 rounded-[3px]"
-              style={{
-                backgroundColor: count > 0 ? getColor(id) : '#d1d5db',
-              }}
-            />
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-slate-100 dark:hover:bg-neutral-800"
+              key={id}
+              title={count > 0 ? `${count} pesquisador${count !== 1 ? 'es' : ''}` : 'Sem pesquisadores'}
+            >
+              <div
+                className="h-4 w-4 shrink-0 rounded-[4px] border border-black/10 dark:border-white/10"
+                style={{
+                  backgroundColor: count > 0 ? getColor(id) : EMPTY_FILL,
+                }}
+              />
 
-            <div className="min-w-0 [overflow-wrap:anywhere]">
-              <strong>{id}</strong>
-              {' - '}
-              {name}
+              <div className="min-w-0 flex-1 [overflow-wrap:anywhere]">
+                <span className="font-semibold">{id}</span>
+                <span className="text-muted-foreground"> - </span>
+                {name}
+              </div>
 
-              {count > 0 && <span className="legend-count"> ({count})</span>}
+              {count > 0 && (
+                <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium tabular-nums dark:bg-neutral-800">
+                  {count}
+                </span>
+              )}
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

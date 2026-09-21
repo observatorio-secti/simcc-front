@@ -91,7 +91,9 @@ export function ResultHome() {
 
     useEffect(() => {
         if (tab != null && tab != undefined) {
-            onOpen(tab as ModalType)
+            // Compat: aba antiga 'mapa-home-v2' agora abre o mapa unificado 'mapa-home'
+            const legacyTab = tab === 'mapa-home-v2' ? 'mapa-home' : tab;
+            onOpen(legacyTab as ModalType)
         }
 
     }, []);
@@ -401,16 +403,6 @@ export function ResultHome() {
                                                 </div>
                                             )
                                         )}
-                                         {!isMobile && !((simcc && researcher == 'false' && itemsSelecionados.length == 0) && itemsSelecionados.length == 0) && (
-                                            searchType != 'name' && (
-                                                <div className={`transition-all`}>
-                                                    <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult == 'mapa-home-v2' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('mapa-home-v2')}>
-                                                        <MapIconLucide className="h-4 w-4" />
-                                                        Mapa2
-                                                    </Button>
-                                                </div>
-                                            )
-                                        )}
                                     </div>
                                     <ScrollBar orientation="horizontal" />
                                 </ScrollArea>
@@ -448,7 +440,7 @@ export function ResultHome() {
 
                                         </DropdownMenuItem >
 
-                                        {(typeResult == 'researchers-home' || typeResult == 'articles-home' || typeResult == 'mapa-home' || typeResult == 'mapa-home-v2') && (
+                                        {(typeResult == 'researchers-home' || typeResult == 'articles-home' || typeResult == 'mapa-home') && (
                                             <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2 lg:hidden">
 
                                                 <SlidersHorizontal size={16} className="" />

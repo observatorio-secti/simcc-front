@@ -7,8 +7,7 @@ export type ModalType =
   | 'patent-home'
   | 'book-home'
   | 'speaker-home'
-  | 'mapa-home'
-  | 'mapa-home-v2';
+  | 'mapa-home';
 
 interface ModalStore {
   type: ModalType | null;

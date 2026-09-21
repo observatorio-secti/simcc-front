@@ -1,4 +1,4 @@
-import { lazy, Suspense, useContext, useEffect, useState } from "react";
+import { lazy, Suspense, useContext, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useModalResult } from "../../hooks/use-modal-result";
@@ -18,19 +18,8 @@ import { CardContent, CardHeader, CardTitle } from "../../ui/card";
 import { MagnifyingGlass } from "phosphor-react";
 import { ResultFiltersSlotContext } from "../result-filters-slot-context";
 import { ResultFiltersSidebar, ResultFiltersSheet } from "../result-filters-shell";
-import MapaResearcher from "./researchers-home/mapa-researcher";
-import municipios from "./researchers-home/municipios.json";
 
 const BahiaTerritoriosMap = lazy(() => import("./researchers-home/mapa-researcher-v2"));
-
-type CityData = {
-  nome: string;
-  latitude: number;
-  longitude: number;
-  pesquisadores: number;
-  professores: string[];
-  lattes_10_id: string;
-};
 
 export type Research = {
   among: number;
@@ -585,12 +574,11 @@ function FiltersSheet({ filters }: { filters: FiltersData }) {
   );
 }
 
-export function MapaHome({ version = 1 }: { version?: 1 | 2 } = {}) {
+export function MapaHome() {
   const { isOpen, type } = useModalResult();
   const [loading, setLoading] = useState(false);
   const [researcher, setResearcher] = useState<Research[]>([]);
   const [originalResearcher, setOriginalResearcher] = useState<Research[]>([]);
-  const [cityData, setCityData] = useState<CityData[]>([]);
   const { urlGeral, searchType, simcc } = useContext(UserContext);
   const { pesquisadoresSelecionados, idGraduateProgram } = useContext(UserContext);
   const { slot: filtersSlot } = useContext(ResultFiltersSlotContext);
@@ -682,38 +670,13 @@ export function MapaHome({ version = 1 }: { version?: 1 | 2 } = {}) {
     fetchData();
   }, [urlTermPesquisadores]);
 
-  const normalizeCityName = (cityName: string) => {
-    return cityName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  };
-
-  useEffect(() => {
-    const processCityData = () => {
-      const cityMap = new Map<string, CityData>();
-      const municipioMap = new Map(municipios.map((m) => [normalizeCityName(m.nome), m]));
-      researcher.forEach((r) => {
-        if (r.city) {
-          const normalizedCity = normalizeCityName(r.city);
-          const municipio = municipioMap.get(normalizedCity);
-          if (!municipio) return;
-          if (!cityMap.has(normalizedCity)) {
-            cityMap.set(normalizedCity, {
-              nome: r.city,
-              latitude: municipio.latitude,
-              longitude: municipio.longitude,
-              pesquisadores: 1,
-              professores: [r.name],
-              lattes_10_id: r.lattes_10_id,
-            });
-          } else {
-            const city = cityMap.get(normalizedCity)!;
-            city.pesquisadores += 1;
-            city.professores.push(r.name);
-          }
-        }
-      });
-      setCityData(Array.from(cityMap.values()));
-    };
-    processCityData();
+  const distinctCityCount = useMemo(() => {
+    const cities = new Set<string>();
+    researcher.forEach((r) => {
+      const city = r.city?.trim();
+      if (city) cities.add(city.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase());
+    });
+    return cities.size;
   }, [researcher]);
 
   const {
@@ -874,7 +837,7 @@ export function MapaHome({ version = 1 }: { version?: 1 | 2 } = {}) {
                   {loading ? (
                     <Skeleton className="h-7 w-16" />
                   ) : (
-                    <div className="text-2xl font-bold">{cityData.length.toLocaleString("pt-BR")}</div>
+                    <div className="text-2xl font-bold">{distinctCityCount.toLocaleString("pt-BR")}</div>
                   )}
                   <p className="text-xs text-muted-foreground">com pesquisadores localizados</p>
                 </CardContent>
@@ -892,20 +855,14 @@ export function MapaHome({ version = 1 }: { version?: 1 | 2 } = {}) {
                   <AccordionTrigger></AccordionTrigger>
                 </div>
                 <AccordionContent className="p-0">
-                  {version === 2 ? (
-                    <Suspense fallback={<Skeleton className="rounded-md w-full h-[480px] lg:h-[520px] xl:h-[560px]" />}>
-                      <Alert className="p-0 overflow-hidden">
-                        <BahiaTerritoriosMap researchers={loading ? [] : researcher} />
-                      </Alert>
-                    </Suspense>
-                  ) : loading ? (
+                  {loading ? (
                     <Skeleton className="rounded-md w-full h-[480px] lg:h-[520px] xl:h-[560px]" />
                   ) : (
-                    <div>
+                    <Suspense fallback={<Skeleton className="rounded-md w-full h-[480px] lg:h-[520px] xl:h-[560px]" />}>
                       <Alert className="p-0 overflow-hidden">
-                        <MapaResearcher cityData={cityData} heightClass="h-[480px] lg:h-[520px] xl:h-[560px]" />
+                        <BahiaTerritoriosMap researchers={researcher} />
                       </Alert>
-                    </div>
+                    </Suspense>
                   )}
                 </AccordionContent>
               </AccordionItem>
