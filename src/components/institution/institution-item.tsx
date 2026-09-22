@@ -2,6 +2,7 @@ import { GraduationCapIcon, Landmark, User, Users } from 'lucide-react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Alert } from '../ui/alert';
+import { Skeleton } from '../ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useModal } from '../hooks/use-modal-store';
 import { useContext, useMemo } from 'react';
@@ -28,6 +29,8 @@ interface GraduateProgram {
   researchers: string[];
   acronym: string;
   url: string;
+  groupsCount?: string;
+  groupsCountLoading?: boolean;
 }
 
 // Lista de áreas com cores associadas
@@ -233,7 +236,13 @@ export function InstitutionItem(props: GraduateProgram) {
                     <TooltipTrigger asChild>
                       <div className="text-gray-500 text-sm flex gap-1 items-center">
                         <Users size={12} className="flex-shrink-0" />
-                        <span className="truncate">{props.count_gps}</span>
+                        {props.groupsCountLoading ? (
+                          <Skeleton className="h-4 w-10" />
+                        ) : (
+                          <span className="truncate">
+                            {props.groupsCount ?? props.count_gps}
+                          </span>
+                        )}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>Grupos de pesquisa</TooltipContent>

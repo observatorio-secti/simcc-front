@@ -3,6 +3,7 @@ import { Button } from '../ui/button';
 import { ArrowUpDown, ExternalLink, GraduationCap, Users } from 'lucide-react';
 import { Institution } from '../../services/institution';
 import { Link } from 'react-router-dom';
+import { Skeleton } from '../ui/skeleton';
 
 export const columnsInstitution: ColumnDef<Institution>[] = [
   {
@@ -48,12 +49,15 @@ export const columnsInstitution: ColumnDef<Institution>[] = [
   {
     accessorKey: 'count_gps',
     header: () => <div>Grupos</div>,
-    cell: ({ row }) => (
-      <div className="flex gap-2 items-center">
-        <Users size={12} className="text-muted-foreground" />
-        {row.getValue('count_gps')}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const value = row.getValue('count_gps') as string;
+      return (
+        <div className="flex gap-2 items-center">
+          <Users size={12} className="text-muted-foreground" />
+          {value === '' ? <Skeleton className="h-4 w-8" /> : value}
+        </div>
+      );
+    },
   },
   {
     id: 'actions',

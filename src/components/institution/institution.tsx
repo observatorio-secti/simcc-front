@@ -30,8 +30,10 @@ import { CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Keepo } from '../dashboard/builder-page/builder-page';
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
 import { VisualizacaoInstituicao } from './visualizacao-instituicao';
-import { useInstitutions } from './hooks/use-institution-queries';
+import { useInstitutions, useSimccGroupsTotals } from './hooks/use-institution-queries';
 import { Institution as InstitutionType } from '../../services/institution';
+import { hasOdaBase } from '../../lib/api';
+import { lookupSimccCount } from '../../services/grupos-pesquisa';
 import { columnsInstitution } from './columns-institution';
 import { DataTable } from '../homepage/categorias/researchers-home/data-table';
 
@@ -65,6 +67,18 @@ export function Institution() {
   const programSelecionado = type_search;
 
   const { data: graduatePrograms = [], isLoading: loading } = useInstitutions();
+
+  // Totais ODA de grupos por instituição (SEDE) — Skeleton até resolver
+  const { data: simccTotals, isLoading: loadingSimccTotals } =
+    useSimccGroupsTotals();
+  const showSimccSkeleton = hasOdaBase() && loadingSimccTotals;
+  const resolveOdaGroupsCount = (
+    acronym?: string | null,
+    name?: string | null,
+  ): string | undefined => {
+    const v = lookupSimccCount(simccTotals, acronym, name);
+    return v != null ? v.toLocaleString('pt-BR') : undefined;
+  };
 
   const [search, setSearch] = useState('');
   const [isOn, setIsOn] = useState(true);
@@ -384,6 +398,11 @@ export function Institution() {
                                           key={index} // Adiciona uma chave para cada item
                                           {...props}
                                           url={'/instituicao'}
+                                          groupsCount={resolveOdaGroupsCount(
+                                            props.acronym,
+                                            props.name,
+                                          )}
+                                          groupsCountLoading={showSimccSkeleton}
                                         />
                                       );
                                     })}
@@ -406,7 +425,18 @@ export function Institution() {
                         ) : loading ? (
                           <Skeleton className="w-full rounded-md h-[400px]" />
                         ) : (
-                          <DataTable columns={columnsInstitution} data={filteredTotal} />
+                          <DataTable
+                            columns={columnsInstitution}
+                            data={filteredTotal.map((item) => ({
+                              ...item,
+                              count_gps: showSimccSkeleton
+                                ? ''
+                                : (resolveOdaGroupsCount(
+                                    item.acronym,
+                                    item.name,
+                                  ) ?? item.count_gps),
+                            }))}
+                          />
                         )}
                       </AccordionContent>
                     </AccordionItem>

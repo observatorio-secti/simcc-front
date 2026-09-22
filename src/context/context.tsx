@@ -114,6 +114,9 @@ interface UserContextType {
   urlGeral: string;
   setUrlGeral: React.Dispatch<React.SetStateAction<string>>;
 
+  urlGeral2: string;
+  setUrlGeral2: React.Dispatch<React.SetStateAction<string>>;
+
   urlGeralAdm: string;
   setUrlGeralAdm: React.Dispatch<React.SetStateAction<string>>;
 
@@ -207,6 +210,9 @@ export const UserContext = createContext<UserContextType>({
 
   urlGeral: '',
   setUrlGeral: () => {},
+
+  urlGeral2: '',
+  setUrlGeral2: () => {},
 
   urlGeralAdm: '',
   setUrlGeralAdm: () => {},
