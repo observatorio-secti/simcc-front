@@ -27,7 +27,6 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card';
-import MapaResearcher from '../homepage/categorias/researchers-home/mapa-researcher';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../context/context';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
@@ -933,18 +932,9 @@ export function VisualizacaoGrupo() {
             const cidade = firstOdaValue(odaRaw?.cidade);
             const uf = firstOdaValue(odaRaw?.uf);
             const cep = firstOdaValue(odaRaw?.cep);
-            const lat = firstOdaValue(odaRaw?.latitude);
-            const lng = firstOdaValue(odaRaw?.longitude);
             const hasAddress =
               logradouro || bairro || cidade || uf || cep;
-            const hasCoords =
-              lat != null &&
-              lng != null &&
-              Number(lat) !== 0 &&
-              Number(lng) !== 0 &&
-              !Number.isNaN(Number(lat)) &&
-              !Number.isNaN(Number(lng));
-            if (!hasAddress && !hasCoords) return null;
+            if (!hasAddress) return null;
             const addressLine = [
               logradouro && numero
                 ? `${logradouro}, ${numero}`
@@ -971,34 +961,13 @@ export function VisualizacaoGrupo() {
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-3">
-                  {addressLine && (
+                  {addressLine ? (
                     <p className="text-sm text-muted-foreground">
                       {addressLine}
                     </p>
-                  )}
-                  {hasCoords ? (
-                    <div className="rounded-md overflow-hidden border">
-                      <MapaResearcher
-                        heightClass="h-[300px] w-full"
-                        cityData={[
-                          {
-                            nome:
-                              (cidade as string) ||
-                              graduatePrograms[0]?.name ||
-                              'Sede',
-                            latitude: Number(lat),
-                            longitude: Number(lng),
-                            pesquisadores: 1,
-                            professores: [
-                              graduatePrograms[0]?.name || 'Grupo',
-                            ],
-                          },
-                        ]}
-                      />
-                    </div>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      Localização no mapa indisponível para este grupo.
+                      Endereço indisponível para este grupo.
                     </p>
                   )}
                 </CardContent>
