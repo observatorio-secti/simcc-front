@@ -94,6 +94,10 @@ function App() {
     import.meta.env.VITE_URL_GERAL || '',
   );
 
+  const [urlGeral2, setUrlGeral2] = useState(
+    import.meta.env.VITE_URL_GERAL2 || '',
+  );
+
   const [urlGeralAdm, setUrlGeralAdm] = useState(
     import.meta.env.VITE_URL_GERAL_ADM || '',
   );
@@ -363,6 +367,8 @@ function App() {
               setSearchType,
               urlGeral,
               setUrlGeral,
+              urlGeral2,
+              setUrlGeral2,
               pesquisadoresSelecionadosGroupBarema,
               setPesquisadoresSelecionadosGroupBarema,
               idGraduateProgram,

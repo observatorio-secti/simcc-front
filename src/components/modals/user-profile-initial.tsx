@@ -47,11 +47,15 @@ export function UserProfileInitialModal() {
   const { onClose, isOpen, type: typeModal, data } = useModal();
   const [isModalOpen1, setIsModalOpen1] = useState(false);
 
+  // DESABILITADO: mensagem automática de primeira visita.
+  // Mude para true para religar sem apagar o fluxo.
+  const AUTO_OPEN_ON_FIRST_VISIT = false;
+
   useEffect(() => {
     // Verifica no localStorage se o modal já foi exibido
     const hasVisited = localStorage.getItem('hasVisited');
 
-    if (!hasVisited && !isOpen) {
+    if (AUTO_OPEN_ON_FIRST_VISIT && !hasVisited && !isOpen) {
       // Se não foi exibido, abre o modal
       setIsModalOpen1(true);
       localStorage.setItem('hasVisited', 'true');

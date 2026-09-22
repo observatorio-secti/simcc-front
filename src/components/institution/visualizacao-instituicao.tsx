@@ -32,8 +32,12 @@ import { LinhasPesquisaPrograma } from './linhas-pesquisa-programa';
 import {
   useInstitution,
   useInstitutionResearchGroupMetrics,
+  useSimccGroupsTotals,
 } from './hooks/use-institution-queries';
 import { Institution as InstitutionType } from '../../services/institution';
+import { hasOdaBase } from '../../lib/api';
+import { lookupSimccCount } from '../../services/grupos-pesquisa';
+import { Skeleton } from '../ui/skeleton';
 
 export type GraduateProgram = InstitutionType;
 HC_wordcloud(Highcharts);
@@ -99,7 +103,18 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
     }
     return null;
   }, [researchGroupMetrics]);
-  const displayGruposCount = totalGruposFromMetrics ?? gruposCount;
+
+  // Total ODA de grupos sediados (SEDE) — Skeleton até resolver
+  const { data: simccTotals, isLoading: loadingSimccTotals } =
+    useSimccGroupsTotals();
+  const showSimccSkeleton = hasOdaBase() && loadingSimccTotals;
+  const odaGruposCount = lookupSimccCount(
+    simccTotals,
+    (institutions as any)?.acronym,
+    institutions?.name,
+  );
+  const displayGruposCount =
+    odaGruposCount ?? totalGruposFromMetrics ?? gruposCount;
 
   // Aplica a formatação no nome da instituição
   const formattedInstitutionName = formatName(institutions?.name);
@@ -351,7 +366,13 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
                 </div>
                 <div className="flex flex-col">
                   <span className="text-2xl font-extrabold text-slate-800 dark:text-white leading-none">
-                    {displayGruposCount != null ? Number(String(displayGruposCount)).toLocaleString('pt-BR') : '—'}
+                    {showSimccSkeleton ? (
+                      <Skeleton className="h-8 w-16" />
+                    ) : displayGruposCount != null ? (
+                      Number(String(displayGruposCount)).toLocaleString('pt-BR')
+                    ) : (
+                      '—'
+                    )}
                   </span>
                   <span className="text-xs font-medium text-slate-500 mt-1">Grupos de Pesquisa</span>
                 </div>
@@ -408,7 +429,7 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
                 <ProgramasPosInstitution institutionId={institutions.id} institutionName={institutions.name} />
               </TabsContent>
               <TabsContent value="grupos_pesquisa" className="m-0">
-                <GruposPesquisaInstitution institutionId={institutions.id} institutionName={institutions.name} />
+                <GruposPesquisaInstitution institutionId={institutions.id} institutionName={institutions.name} institutionAcronym={(institutions as any)?.acronym} />
               </TabsContent>
               <TabsContent value="bolsistas" className="m-0">
                 <BolsistasInstitution institutionId={institutions.id} institutionName={institutions.name} />

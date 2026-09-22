@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { hasOdaBase } from '../lib/api';
 import {
   getInstitutions,
   getInstitutionByIdOrAcronym,
@@ -12,6 +13,13 @@ import {
   PesquisadorInstitution,
   ResearchGroupItem,
 } from '../services/institution';
+import {
+  countSimccGroupsBySigla,
+  fetchSimccGroupsRaw,
+  filterSimccGroupsByInstitution,
+  normalizeOdaGrupo,
+  OdaGrupo,
+} from '../services/grupos-pesquisa';
 
 export const useInstitutions = () => {
   return useQuery({
@@ -107,6 +115,59 @@ export const useInstitutionResearchGroupMetrics = (institutionId?: string) => {
     queryFn: () => getInstitutionResearchGroupMetrics(institutionId),
     enabled: !!institutionId,
     staleTime: 1000 * 60 * 10,
+  });
+};
+
+/**
+ * Cache global dos grupos SIMCC crus da ODA (1 scan de ~24 págs, 60min).
+ * Base compartilhada dos totais por instituição e da lista por instituição.
+ */
+export const useSimccGroupsRaw = () => {
+  return useQuery<OdaGrupo[], Error>({
+    queryKey: ['simcc-groups-raw'],
+    queryFn: ({ signal }) => fetchSimccGroupsRaw(signal),
+    enabled: hasOdaBase(),
+    staleTime: 1000 * 60 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+};
+
+/**
+ * Totais de grupos por instituição (SEDE) a partir do cache global.
+ */
+export const useSimccGroupsTotals = () => {
+  const query = useQuery<OdaGrupo[], Error, Map<string, number>>({
+    queryKey: ['simcc-groups-raw'],
+    queryFn: ({ signal }) => fetchSimccGroupsRaw(signal),
+    select: (raw) => countSimccGroupsBySigla(raw),
+    enabled: hasOdaBase(),
+    staleTime: 1000 * 60 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+  return query;
+};
+
+type PatrimonioLike = ReturnType<typeof normalizeOdaGrupo>;
+
+/**
+ * Grupos de uma instituição via ODA (/grupos-pesquisa/simcc filtrado por
+ * sigla/nome client-side a partir do cache global). Provisória até migração total.
+ */
+export const useInstitutionSimccGroups = (acronymOrName?: string | null) => {
+  const key = (acronymOrName || '').trim();
+  return useQuery<OdaGrupo[], Error, { items: PatrimonioLike[]; fromOda: boolean }>({
+    queryKey: ['simcc-groups-raw'],
+    queryFn: ({ signal }) => fetchSimccGroupsRaw(signal),
+    select: (raw) => ({
+      items: filterSimccGroupsByInstitution(raw, key).map(normalizeOdaGrupo),
+      fromOda: true as const,
+    }),
+    enabled: !!key && hasOdaBase(),
+    staleTime: 1000 * 60 * 60,
+    refetchOnWindowFocus: false,
+    retry: 1,
   });
 };
 

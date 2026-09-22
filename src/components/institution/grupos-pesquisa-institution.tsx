@@ -22,7 +22,9 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   useInstitutionResearchGroupsInfinite,
   useInstitutionResearchGroupMetrics,
+  useInstitutionSimccGroups,
 } from './hooks/use-institution-queries';
+import { hasOdaBase } from '../../lib/api';
 import { Skeleton } from '../ui/skeleton';
 import { cn } from '../../lib';
 import { Alert } from '../ui/alert';
@@ -151,11 +153,13 @@ export const qualisColor: { [key: string]: string } = {
 interface GruposPesquisaInstitutionProps {
   institutionId: string;
   institutionName?: string;
+  institutionAcronym?: string;
 }
 
 export function GruposPesquisaInstitution({
   institutionId,
   institutionName,
+  institutionAcronym,
 }: GruposPesquisaInstitutionProps) {
   const normalizeArea = (area: string): string => {
     return area.toUpperCase();
@@ -171,15 +175,43 @@ export function GruposPesquisaInstitution({
   } = useInstitutionResearchGroupsInfinite(institutionId);
 
   // Busca métricas por área para gráficos e cards de quantidade (1 request agregada)
-  const { data: chartMetrics = [], isLoading: loadingMetrics } =
+  const { data: chartMetricsLegacy = [], isLoading: loadingMetrics } =
     useInstitutionResearchGroupMetrics(institutionId);
 
-  const isLoading = loadingGroups || loadingMetrics;
+  // ODA (urlGeral2): lista SIMCC filtrada por sigla/nome — provisória.
+  // Se a ODA falhar, cai para os hooks legados acima.
+  const odaKey = institutionAcronym || institutionName;
+  const odaEnabled = hasOdaBase() && Boolean(odaKey);
+  const {
+    data: odaResult,
+    isLoading: loadingOda,
+    isError: odaError,
+  } = useInstitutionSimccGroups(odaEnabled ? odaKey : undefined);
+  const useOda = odaEnabled && !odaError;
+  const odaItems = odaResult?.items ?? [];
 
-  const total = useMemo(
+  // Métricas por área: derivadas da lista ODA quando ativa, senão legado
+  const chartMetrics = useMemo(() => {
+    if (!useOda) return chartMetricsLegacy;
+    const counts: Record<string, number> = {};
+    odaItems.forEach((item) => {
+      if (item.area) counts[item.area] = (counts[item.area] || 0) + 1;
+    });
+    return Object.entries(counts).map(([area, count]) => ({ area, count }));
+  }, [useOda, chartMetricsLegacy, odaItems]);
+
+  const isLoading = useOda ? loadingOda : loadingGroups || loadingMetrics;
+
+  const legacyTotal = useMemo(
     () => (groupsData?.pages.flatMap((page) => page) as Patrimonio[]) ?? [],
     [groupsData],
   );
+
+  const total = useOda ? odaItems : legacyTotal;
+
+  // Paginação server-side legada não se aplica quando a ODA está ativa
+  const hasNextPageEff = useOda ? false : hasNextPage;
+  const isFetchingNextPageEff = useOda ? false : isFetchingNextPage;
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 12;
@@ -847,21 +879,21 @@ export function GruposPesquisaInstitution({
                       </div>
                     )}
 
-                    {hasNextPage && !hasActiveFilters && (
+                    {hasNextPageEff && !hasActiveFilters && (
                       <div className="w-full flex justify-center py-4">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => fetchNextPage()}
-                          disabled={isFetchingNextPage}
+                          disabled={isFetchingNextPageEff}
                           className="gap-2"
                         >
-                          {isFetchingNextPage ? (
+                          {isFetchingNextPageEff ? (
                             <LoaderCircle size={16} className="animate-spin" />
                           ) : (
                             <Plus size={16} />
                           )}
-                          {isFetchingNextPage
+                          {isFetchingNextPageEff
                             ? 'Carregando mais grupos...'
                             : 'Carregar mais grupos da instituição'}
                         </Button>
@@ -874,26 +906,26 @@ export function GruposPesquisaInstitution({
               ) : (
                 <div className="flex flex-col gap-4">
                   <DataTable columns={columns} data={filteredTotal} />
-                  {hasNextPage && !hasActiveFilters && (
+                  {hasNextPageEff && !hasActiveFilters && (
                     <div className="w-full flex justify-center py-4">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => fetchNextPage()}
-                        disabled={isFetchingNextPage}
+                        disabled={isFetchingNextPageEff}
                         className="gap-2"
                       >
-                        {isFetchingNextPage ? (
+                        {isFetchingNextPageEff ? (
                           <LoaderCircle size={16} className="animate-spin" />
                         ) : (
                           <Plus size={16} />
                         )}
-                        {isFetchingNextPage
+                        {isFetchingNextPageEff
                           ? 'Carregando mais grupos...'
                           : 'Carregar mais grupos da instituição'}
-                      </Button>
-                    </div>
-                  )}
+                        </Button>
+                      </div>
+                    )}
                 </div>
               )}
             </AccordionContent>

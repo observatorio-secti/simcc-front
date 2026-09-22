@@ -55,6 +55,7 @@ import { Label } from '../ui/label';
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 import { GraficoAreaGrupos } from './grafico-area';
 import { GraficoInstituicaoGrupos } from './grafico-instituicoes';
+import { fetchAllResearchGroups } from '../../services/grupos-pesquisa';
 export interface Patrimonio {
   area: string;
   institution: string;
@@ -168,7 +169,7 @@ export function GruposPesquisaPage() {
 
   const [total, setTotal] = useState<Patrimonio[]>([]);
 
-  const { urlGeral, simcc } = useContext(UserContext);
+  const { urlGeral, urlGeral2, simcc } = useContext(UserContext);
 
   const urlPatrimonioInsert = `${urlGeral}research_group`;
 
@@ -177,43 +178,23 @@ export function GruposPesquisaPage() {
     const fetchAll = async () => {
       setIsLoading(true);
       try {
-        const all: Patrimonio[] = [];
-        let page = 1;
-        let hasMore = true;
-        while (hasMore) {
-          const separator = urlPatrimonioInsert.includes('?') ? '&' : '?';
-          const url = `${urlPatrimonioInsert}${separator}page=${page}`;
-          const response = await fetch(url, {
-            mode: 'cors',
-            headers: {
-              'Access-Control-Allow-Origin': '*',
-              'Access-Control-Allow-Methods': 'GET',
-              'Access-Control-Allow-Headers': 'Content-Type',
-              'Access-Control-Max-Age': '3600',
-              'Content-Type': 'text/plain',
-            },
-            signal: abortController.signal,
-          });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          const data: Patrimonio[] = await response.json();
-          if (!Array.isArray(data)) break;
-          all.push(...data);
-          if (data.length < 100 || page >= 100) hasMore = false;
-          else page += 1;
-        }
+        const { items } = await fetchAllResearchGroups(
+          abortController.signal,
+        );
         if (!abortController.signal.aborted) {
-          setTotal(all);
-          setJsonData(all);
+          setTotal(items);
+          setJsonData(items);
         }
       } catch (err: any) {
-        if (err?.name !== 'AbortError') console.log(err);
+        if (err?.name !== 'AbortError' && err?.name !== 'CanceledError')
+          console.log(err);
       } finally {
         if (!abortController.signal.aborted) setIsLoading(false);
       }
     };
-    if (urlPatrimonioInsert) fetchAll();
+    fetchAll();
     return () => abortController.abort();
-  }, [urlPatrimonioInsert]);
+  }, [urlGeral, urlGeral2]);
 
   console.log(urlPatrimonioInsert);
   const normalizeArea = (area: string): string => {
@@ -878,10 +859,13 @@ export function GruposPesquisaPage() {
                                       </div>
                                     </div>
                                     <div className="line-clamp-2 flex-wrap text-xs text-muted-foreground flex gap-3">
-                                      <div className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center">
-                                        <Users size={12} />
-                                        {item.first_leader}
-                                      </div>
+                                      {item.first_leader != '' &&
+                                        item.first_leader != null && (
+                                          <div className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center">
+                                            <Users size={12} />
+                                            {item.first_leader}
+                                          </div>
+                                        )}
                                       <div className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center">
                                         <Building2 size={12} />
                                         {item.institution}

@@ -3,11 +3,31 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import {
   Building,
+  Building2,
+  Calendar,
   ChevronLeft,
+  FileText,
+  Globe,
+  Mail,
+  MapPin,
+  Phone,
   Plus,
   Shapes,
   SquareArrowOutUpRight,
 } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../ui/tooltip';
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../ui/card';
+import MapaResearcher from '../homepage/categorias/researchers-home/mapa-researcher';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../context/context';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
@@ -26,6 +46,12 @@ import { Badge } from '../ui/badge';
 import { useModal } from '../hooks/use-modal-store';
 import { Helmet } from 'react-helmet';
 import { ResearchItem } from '../homepage/categorias/researchers-home/researcher-item';
+import { apiOda, hasOdaBase } from '../../lib/api';
+import {
+  firstOdaValue,
+  formatInstituicao,
+  normalizeOdaGrupo,
+} from '../../services/grupos-pesquisa';
 
 import { InfiniteMovingResearchers } from '../ui/infinite-moving-researcher';
 import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-home';
@@ -43,13 +69,13 @@ interface Patrimonio {
   second_leader_id: string | null;
   name: string;
   id: string;
-  census: string | null;
-  start_of_collection: string | null;
-  end_of_collection: string | null;
-  group_identifier: string | null;
-  year: string | null;
-  institution_name: string | null;
-  category: string | null;
+  census?: string | null;
+  start_of_collection?: string | null;
+  end_of_collection?: string | null;
+  group_identifier?: string | null;
+  year?: string | null;
+  institution_name?: string | null;
+  category?: string | null;
 }
 
 type Research = {
@@ -91,6 +117,7 @@ type Research = {
   classe: string;
   rt: string;
   situacao: string;
+  imageUrl?: string | null;
 };
 
 interface Bolsistas {
@@ -143,17 +170,48 @@ export function VisualizacaoGrupo() {
 
   const queryUrl = useQuery();
   const type_search = queryUrl.get('group_id');
-  const { urlGeral } = useContext(UserContext);
+  const { urlGeral, urlGeral2 } = useContext(UserContext);
 
   const [graduatePrograms, setGraduatePrograms] = useState<Patrimonio[]>([]);
   const [linhasPesquisa, setLinhasPesquisa] = useState<LinhasPesquisa[]>([]);
+  const [usedOdaDetail, setUsedOdaDetail] = useState(false);
+  const [odaRaw, setOdaRaw] = useState<any>(null);
+  const isOdaActive = usedOdaDetail && odaRaw != null;
 
   const urlGraduateProgram = `${urlGeral}research_group?group_id=${type_search}`;
 
-  console.log(urlGraduateProgram);
-
   useEffect(() => {
+    if (!type_search) return;
+    let cancelled = false;
     const fetchData = async () => {
+      if (hasOdaBase()) {
+        try {
+          const { data, status } = await apiOda.get(
+            `grupos-pesquisa/${type_search}`,
+          );
+          if (status === 200 && data && (data as any).id) {
+            const raw: any = data;
+            setGraduatePrograms([normalizeOdaGrupo(raw)]);
+            setOdaRaw(raw);
+            const linhas = Array.isArray(raw.linhasPesquisa)
+              ? raw.linhasPesquisa.map((l: any) => ({
+                  line: l.titulo || '',
+                  area: '',
+                  keywords: '',
+                  major_area: '',
+                  objective: l.objetivo || '',
+                }))
+              : [];
+            setLinhasPesquisa(linhas);
+            setUsedOdaDetail(true);
+            return;
+          }
+          throw new Error('ODA empty detail');
+        } catch {
+          setUsedOdaDetail(false);
+          setOdaRaw(null);
+        }
+      }
       try {
         const response = await fetch(urlGraduateProgram, {
           mode: 'cors',
@@ -166,21 +224,23 @@ export function VisualizacaoGrupo() {
           },
         });
         const data = await response.json();
-        if (data) {
-          setGraduatePrograms(data);
+        if (!cancelled && data) {
+          setGraduatePrograms(Array.isArray(data) ? data : [data]);
         }
       } catch (err) {
         console.log(err);
       }
     };
     fetchData();
-  }, [urlGraduateProgram]);
-
-  //linhas pesquisa
+    return () => {
+      cancelled = true;
+    };
+  }, [urlGraduateProgram, type_search]);
 
   const urlLinhasPequisa = `${urlGeral}research_group_lines?group_id=${type_search}`;
 
   useEffect(() => {
+    if (!type_search || usedOdaDetail) return;
     const fetchData = async () => {
       try {
         const response = await fetch(urlLinhasPequisa, {
@@ -195,16 +255,14 @@ export function VisualizacaoGrupo() {
         });
         const data = await response.json();
         if (data) {
-          setLinhasPesquisa(data);
+          setLinhasPesquisa(Array.isArray(data) ? data : []);
         }
       } catch (err) {
         console.log(err);
       }
     };
     fetchData();
-  }, [urlLinhasPequisa]);
-
-  console.log(urlLinhasPequisa);
+  }, [urlLinhasPequisa, type_search, usedOdaDetail]);
 
   //
   const [researcher, setResearcher] = useState<Research[]>([]);
@@ -215,12 +273,67 @@ export function VisualizacaoGrupo() {
   const [allResearchers, setAllResearchers] = useState<Research[]>([]);
   const [loadingAllResearchers, setLoadingAllResearchers] = useState(false);
 
-  // Buscar todos os pesquisadores do grupo para o carrossel
+  // Buscar todos os pesquisadores do grupo para o carrossel (ODA primeiro, fallback legado)
   useEffect(() => {
     const fetchAllResearchers = async () => {
       if (!type_search) return;
 
       setLoadingAllResearchers(true);
+
+      if (hasOdaBase()) {
+        try {
+          const all: Research[] = [];
+          let page = 1;
+          let totalPages = Infinity;
+          while (page <= totalPages && page <= 20) {
+            const { data, status } = await apiOda.get(
+              `grupos-pesquisa/${type_search}/pesquisadores`,
+              { params: { page, size: 100 } },
+            );
+            if (status !== 200) throw new Error(`ODA status ${status}`);
+            const raw: any = data;
+            const arr = Array.isArray(raw)
+              ? raw
+              : Array.isArray(raw?.data)
+                ? raw.data
+                : [];
+            if (page === 1 && arr.length === 0) throw new Error('ODA empty');
+            const odaBase = (
+              apiOda.defaults.baseURL || ''
+            ).replace(/\/$/, '');
+            all.push(
+              ...arr.map((m: any) => {
+                const img = m.imageUrl
+                  ? m.imageUrl.startsWith('http')
+                    ? m.imageUrl
+                    : `${odaBase}${m.imageUrl.startsWith('/') ? '' : '/'}${m.imageUrl}`
+                  : null;
+                return {
+                  id: m.id || '',
+                  name: m.nome || '',
+                  graduation: m.formacaoAcademica || '',
+                  lattes_id: m.lattesId || '',
+                  orcid: m.orcidId || '',
+                  imageUrl: img,
+                } as Research;
+              }),
+            );
+            const tp = raw?.meta?.totalPages;
+            if (tp != null) {
+              totalPages = tp;
+              if (page >= totalPages) break;
+            } else if (arr.length < 100) break;
+            page += 1;
+          }
+          if (all.length > 0) {
+            setAllResearchers(all);
+            return;
+          }
+          throw new Error('ODA empty');
+        } catch {
+          // cai para o legado abaixo
+        }
+      }
 
       try {
         const response = await fetch(
@@ -238,7 +351,7 @@ export function VisualizacaoGrupo() {
         );
 
         const data = await response.json();
-        setAllResearchers(data || []);
+        setAllResearchers(Array.isArray(data) ? data : data || []);
       } catch (err) {
         console.log(err);
       } finally {
@@ -247,7 +360,7 @@ export function VisualizacaoGrupo() {
     };
 
     fetchAllResearchers();
-  }, [type_search, urlGeral]);
+  }, [type_search, urlGeral, urlGeral2]);
 
   // Filtrar pesquisadores do carrossel para excluir os líderes
   const filteredResearchers = allResearchers.filter((researcher) => {
@@ -267,9 +380,9 @@ export function VisualizacaoGrupo() {
       setLoading(true);
 
       try {
-        // Fetch data for first_leader
+        // Fetch data for first_leader (mantido na API legada)
         const firstResponse = await fetch(
-          `${urlGeral}researcherName?name=${first_leader}`,
+          `${urlGeral}researcherName?name=${encodeURIComponent(first_leader)}`,
           {
             mode: 'cors',
             headers: {
@@ -293,7 +406,7 @@ export function VisualizacaoGrupo() {
           second_leader.toLowerCase() !== 'null'
         ) {
           const secondResponse = await fetch(
-            `${urlGeral}researcherName?name=${second_leader}`,
+            `${urlGeral}researcherName?name=${encodeURIComponent(second_leader)}`,
             {
               mode: 'cors',
               headers: {
@@ -510,19 +623,33 @@ export function VisualizacaoGrupo() {
                 {props.category}
               </Badge>
             )}
+            {isOdaActive && odaRaw?.situacao && (
+              <div className="text-sm text-gray-500 dark:text-gray-300 font-normal flex gap-1 items-center">
+                <div
+                  className={`rounded-md h-4 w-4 ${String(odaRaw.situacao).toUpperCase() === 'ATIVO' ? 'bg-green-500' : 'bg-red-500'}`}
+                ></div>
+                <span className="capitalize">
+                  {String(odaRaw.situacao).replace(/_/g, ' ').toLowerCase()}
+                </span>
+              </div>
+            )}
             {props.year && (
-              <Badge variant="outline" className="text-xs">
-                Criado em {props.year}
-              </Badge>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="outline-none">
+                    <div className="py-2 px-4 border border-neutral-200 bg-white dark:bg-black dark:border-neutral-800 rounded-md text-xs flex gap-2 items-center">
+                      <Calendar size={12} /> Criado em {props.year}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Ano de formação do grupo</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
             {props.census && (
               <Badge variant="outline" className="text-xs">
                 Censo {props.census}
-              </Badge>
-            )}
-            {props.group_identifier && (
-              <Badge variant="outline" className="text-xs font-mono">
-                DGP: {props.group_identifier}
               </Badge>
             )}
             {(props.start_of_collection || props.end_of_collection) && (
@@ -534,6 +661,84 @@ export function VisualizacaoGrupo() {
           </div>
         ))}
       </div>
+
+      {isOdaActive &&
+        (() => {
+          const hasRepercussao =
+            odaRaw?.repercussao &&
+            String(odaRaw.repercussao).trim().length > 30;
+          const parceiras = (
+            Array.isArray(odaRaw?.instituicoes) ? odaRaw.instituicoes : []
+          ).filter((inst: any) => inst.tipoRelacao !== 'SEDE');
+          if (!hasRepercussao && parceiras.length === 0) return null;
+          return (
+            <div className="px-4 md:px-8 grid gap-4 md:grid-cols-2">
+              {hasRepercussao && (
+                <Alert className="p-0 md:col-span-2">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div className="flex flex-col gap-1">
+                      <CardTitle className="text-sm font-medium">
+                        Repercussão
+                      </CardTitle>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted">
+                      <FileText size={20} className="text-muted-foreground" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {String(odaRaw.repercussao)}
+                    </p>
+                  </CardContent>
+                </Alert>
+              )}
+
+              {parceiras.length > 0 && (
+                <Alert className="p-0 md:col-span-2">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div className="flex flex-col gap-1">
+                      <CardTitle className="text-sm font-medium">
+                        Instituições parceiras
+                      </CardTitle>
+                      <CardDescription>
+                        Parcerias do grupo por sede
+                      </CardDescription>
+                    </div>
+                    <div className="p-2 rounded-lg bg-muted">
+                      <Building2
+                        size={20}
+                        className="text-muted-foreground"
+                      />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex flex-wrap gap-2">
+                    {parceiras.map((inst: any) => (
+                      <Badge
+                        key={
+                          inst.id || `${inst.sigla}-${inst.nome}`
+                        }
+                        variant="outline"
+                        className="text-xs"
+                        title={
+                          [
+                            inst.unidade?.nome &&
+                              `Unidade: ${inst.unidade.nome}`,
+                            inst.estado?.nome &&
+                              `Estado: ${inst.estado.nome}`,
+                          ]
+                            .filter(Boolean)
+                            .join(' • ') || undefined
+                        }
+                      >
+                        {formatInstituicao(inst.sigla, inst.nome)}
+                      </Badge>
+                    ))}
+                  </CardContent>
+                </Alert>
+              )}
+            </div>
+          );
+        })()}
 
       <div className="px-4 md:px-8">
         <div>
@@ -651,6 +856,155 @@ export function VisualizacaoGrupo() {
             className="custom-class"
           />
         </div>
+
+        {isOdaActive &&
+          (() => {
+            const email = firstOdaValue(odaRaw?.email);
+            const telefone = firstOdaValue(odaRaw?.telefone);
+            const website = firstOdaValue(odaRaw?.website);
+            if (!email && !telefone && !website) return null;
+            const siteHref =
+              website &&
+              (/^https?:\/\//i.test(website)
+                ? website
+                : `https://${website}`);
+            return (
+              <Alert className="p-0 mt-6">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <div className="flex flex-col gap-1">
+                    <CardTitle className="text-sm font-medium">
+                      Contato
+                    </CardTitle>
+                    <CardDescription>
+                      E-mail • telefone • site
+                    </CardDescription>
+                  </div>
+                  <div className="p-2 rounded-lg bg-muted">
+                    <Mail size={20} className="text-muted-foreground" />
+                  </div>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-3 text-sm">
+                  {email && (
+                    <a
+                      href={`mailto:${email}`}
+                      className="flex gap-2 items-center font-normal hover:underline break-all"
+                    >
+                      <Mail
+                        size={16}
+                        className="text-muted-foreground shrink-0"
+                      />
+                      {email}
+                    </a>
+                  )}
+                  {telefone && (
+                    <span className="flex gap-2 items-center font-normal">
+                      <Phone
+                        size={16}
+                        className="text-muted-foreground shrink-0"
+                      />
+                      {telefone}
+                    </span>
+                  )}
+                  {website && siteHref && (
+                    <a
+                      href={siteHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex gap-2 items-center font-normal hover:underline break-all"
+                      title={website}
+                    >
+                      <Globe
+                        size={16}
+                        className="text-muted-foreground shrink-0"
+                      />
+                      {website}
+                    </a>
+                  )}
+                </CardContent>
+              </Alert>
+            );
+          })()}
+
+        {isOdaActive &&
+          (() => {
+            const logradouro = firstOdaValue(odaRaw?.logradouro);
+            const numero = firstOdaValue(odaRaw?.numero);
+            const bairro = firstOdaValue(odaRaw?.bairro);
+            const cidade = firstOdaValue(odaRaw?.cidade);
+            const uf = firstOdaValue(odaRaw?.uf);
+            const cep = firstOdaValue(odaRaw?.cep);
+            const lat = firstOdaValue(odaRaw?.latitude);
+            const lng = firstOdaValue(odaRaw?.longitude);
+            const hasAddress =
+              logradouro || bairro || cidade || uf || cep;
+            const hasCoords =
+              lat != null &&
+              lng != null &&
+              Number(lat) !== 0 &&
+              Number(lng) !== 0 &&
+              !Number.isNaN(Number(lat)) &&
+              !Number.isNaN(Number(lng));
+            if (!hasAddress && !hasCoords) return null;
+            const addressLine = [
+              logradouro && numero
+                ? `${logradouro}, ${numero}`
+                : logradouro || null,
+              bairro,
+              cidade && uf ? `${cidade} - ${uf}` : cidade || uf,
+              cep && `CEP ${cep}`,
+            ]
+              .filter(Boolean)
+              .join(' • ');
+            return (
+              <Alert className="p-0 overflow-hidden mt-6">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <div className="flex flex-col gap-1">
+                    <CardTitle className="text-sm font-medium">
+                      Endereço
+                    </CardTitle>
+                    <CardDescription>
+                      Localização da sede
+                    </CardDescription>
+                  </div>
+                  <div className="p-2 rounded-lg bg-muted">
+                    <MapPin size={20} className="text-muted-foreground" />
+                  </div>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-3">
+                  {addressLine && (
+                    <p className="text-sm text-muted-foreground">
+                      {addressLine}
+                    </p>
+                  )}
+                  {hasCoords ? (
+                    <div className="rounded-md overflow-hidden border">
+                      <MapaResearcher
+                        heightClass="h-[300px] w-full"
+                        cityData={[
+                          {
+                            nome:
+                              (cidade as string) ||
+                              graduatePrograms[0]?.name ||
+                              'Sede',
+                            latitude: Number(lat),
+                            longitude: Number(lng),
+                            pesquisadores: 1,
+                            professores: [
+                              graduatePrograms[0]?.name || 'Grupo',
+                            ],
+                          },
+                        ]}
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Localização no mapa indisponível para este grupo.
+                    </p>
+                  )}
+                </CardContent>
+              </Alert>
+            );
+          })()}
       </div>
 
       {linhasPesquisa.length != 0 && (
