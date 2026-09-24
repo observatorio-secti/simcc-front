@@ -147,27 +147,25 @@ export function normalizeOdaGrupo(g: OdaGrupo): Patrimonio {
 function extractOdaList(raw: any): {
   items: OdaGrupo[];
   totalPages?: number;
+  totalItems?: number;
+  size?: number;
 } {
   if (Array.isArray(raw)) return { items: raw as OdaGrupo[] };
   if (Array.isArray(raw?.data))
-    return { items: raw.data, totalPages: raw.meta?.totalPages };
+    return {
+      items: raw.data,
+      totalPages: raw.meta?.totalPages,
+      totalItems: raw.meta?.totalItems,
+      size: raw.meta?.size,
+    };
   if (Array.isArray(raw?.items)) return { items: raw.items };
   return { items: [] };
 }
 
-async function fetchOdaPage(
-  page: number,
-  size: number,
-  signal?: AbortSignal,
-): Promise<{ items: Patrimonio[]; totalPages?: number }> {
-  const { data, status } = await apiOda.get<OdaPaginated | OdaGrupo[]>(
-    'grupos-pesquisa/simcc',
-    { params: { page, size }, signal },
-  );
-  if (status !== 200) throw new Error(`ODA status ${status}`);
-  const { items, totalPages } = extractOdaList(data);
-  return { items: items.map(normalizeOdaGrupo), totalPages };
-}
+
+const SIMCC_SINGLE_SHOT = 10000;
+const SIMCC_MAX_PAGES = 100;
+const SIMCC_BATCH = 6;
 
 async function fetchLegacyPage(
   page: number,
@@ -192,8 +190,7 @@ export const normalizeText = (s?: string | null) =>
 
 /**
  * Exceção isolada: Fiocruz-BA (IGM) não possui grupos SEDE na ODA, só
- * participações. Chaves seguras (igualdade exata, sem substring/prefixo
- * genérico) para não vazar para outras instituições.
+ * participações. Chaves seguras para não vazar para outras instituições.
  */
 const FIOCRUZ_ALIASES = new Set([
   'fiocruz',
@@ -272,33 +269,48 @@ export async function fetchSimccGroupsRaw(
   signal?: AbortSignal,
 ): Promise<OdaGrupo[]> {
   if (!hasOdaBase()) throw new Error('ODA unavailable');
-  const size = 100;
-  const first = await apiOda.get<OdaPaginated>('grupos-pesquisa/simcc', {
-    params: { page: 1, size },
+  const single = await apiOda.get<OdaPaginated>('grupos-pesquisa/simcc', {
+    params: { page: 1, size: SIMCC_SINGLE_SHOT },
     signal,
   });
-  if (first.status !== 200) throw new Error(`ODA status ${first.status}`);
-  const { items: firstItems, totalPages } = extractOdaList(first.data);
-  if (firstItems.length === 0) throw new Error('ODA empty');
-  const all = [...firstItems];
-  const tp = Math.min(totalPages ?? 1, 100);
+  if (single.status !== 200) throw new Error(`ODA status ${single.status}`);
+  const singleParsed = extractOdaList(single.data);
+  if (singleParsed.items.length === 0) throw new Error('ODA empty');
+  if (
+    singleParsed.totalItems &&
+    singleParsed.totalItems > 0 &&
+    singleParsed.items.length === singleParsed.totalItems
+  ) {
+    return singleParsed.items;
+  }
+  const { totalPages, totalItems, size } = singleParsed;
+  const actualSize = size && size > 0 ? size : SIMCC_SINGLE_SHOT;
+  const fromTotal =
+    totalItems && totalItems > 0 ? Math.ceil(totalItems / actualSize) : null;
+  const pages = Math.min(fromTotal ?? totalPages ?? 1, SIMCC_MAX_PAGES);
+  const byPage: OdaGrupo[][] = new Array(pages);
+  byPage[0] = singleParsed.items;
   const rest: number[] = [];
-  for (let p = 2; p <= tp; p++) rest.push(p);
-  for (let i = 0; i < rest.length; i += 4) {
-    const batch = rest.slice(i, i + 4);
+  for (let p = 2; p <= pages; p++) rest.push(p);
+  for (let i = 0; i < rest.length; i += SIMCC_BATCH) {
+    const batch = rest.slice(i, i + SIMCC_BATCH);
     const results = await Promise.all(
       batch.map((p) =>
         apiOda.get<OdaPaginated>('grupos-pesquisa/simcc', {
-          params: { page: p, size },
+          params: { page: p, size: actualSize },
           signal,
         }),
       ),
     );
-    for (const r of results) {
+    results.forEach((r, idx) => {
       if (r.status !== 200) throw new Error(`ODA status ${r.status}`);
       const { items } = extractOdaList(r.data);
-      all.push(...items);
-    }
+      byPage[rest[i + idx] - 1] = items;
+    });
+  }
+  const all = byPage.flat();
+  if (totalItems && totalItems > 0 && all.length !== totalItems) {
+    throw new Error(`ODA incomplete: got ${all.length} of ${totalItems}`);
   }
   return all;
 }
@@ -321,20 +333,9 @@ export async function fetchAllResearchGroups(
 ): Promise<{ items: Patrimonio[]; fromOda: boolean }> {
   if (hasOdaBase()) {
     try {
-      const size = 100;
-      const all: Patrimonio[] = [];
-      let page = 1;
-      let totalPages = Infinity;
-      while (page <= totalPages && page <= 100) {
-        const { items, totalPages: tp } = await fetchOdaPage(page, size, signal);
-        if (page === 1 && items.length === 0) throw new Error('ODA empty page 1');
-        all.push(...items);
-        if (tp != null) totalPages = tp;
-        else if (items.length < size) break;
-        if (page >= totalPages) break;
-        page += 1;
-      }
-      if (all.length > 0) return { items: all, fromOda: true };
+      const raw = await fetchSimccGroupsRaw(signal);
+      if (raw.length > 0)
+        return { items: raw.map(normalizeOdaGrupo), fromOda: true };
       throw new Error('ODA empty');
     } catch (err: any) {
       if (err?.name === 'CanceledError' || err?.name === 'AbortError') throw err;
