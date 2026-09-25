@@ -43,6 +43,7 @@ import { Funnel, MagnifyingGlass, UserCircleGear } from 'phosphor-react';
 import { Badge } from '../ui/badge';
 import { ModeToggle } from '../mode-toggle';
 import { Separator } from '../ui/separator';
+import { PROFILE_RESULTS_PATH } from '../../lib/search-types';
 
 export function Header() {
   const {
@@ -68,6 +69,7 @@ export function Header() {
   const isVisible =
     location.pathname != '/' &&
     location.pathname != '/resultados' &&
+    location.pathname != PROFILE_RESULTS_PATH &&
     location.pathname != '/marIA' &&
     location.pathname != '/pos-graduacao';
 

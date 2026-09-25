@@ -79,6 +79,7 @@ import { logEvent } from '@firebase/analytics';
 import { analytics } from './lib/firebase';
 import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import { Observatorio } from './components/observatorio/observatorio';
+import { PROFILE_RESULTS_PATH } from './lib/search-types';
 
 interface HistoricoItem {
   termo: string;
@@ -424,6 +425,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/resultados" element={<Home />} />
+                  <Route path={PROFILE_RESULTS_PATH} element={<Home />} />
                   <Route path="/dicionario" element={<Home />} />
                   <Route path="/pos-graduacao" element={<Home />} />
                   <Route path="/grupos-pesquisa" element={<Home />} />

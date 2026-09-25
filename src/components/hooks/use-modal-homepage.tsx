@@ -4,6 +4,7 @@ export type ModalType =
   | 'initial-home'
   | 'maria-home'
   | 'result-home'
+  | 'result-profile-home'
   | 'graduation-home'
   | 'incites'
   | 'baremas'

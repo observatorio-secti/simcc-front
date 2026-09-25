@@ -9,6 +9,7 @@ import { Input } from '../ui/input';
 import { useModal } from '../hooks/use-modal-store';
 import { UserContext } from '../../context/context';
 import { SelectTypeSearch } from './select-type-search';
+import { isProfileSearch, resultsPathFor } from '../../lib/search-types';
 
 const useQuery = () => new URLSearchParams(useLocation().search);
 
@@ -20,9 +21,6 @@ export function Search() {
   const type_search = queryUrl.get('type_search');
   const terms = queryUrl.get('terms');
 
-  const posGrad = location.pathname === '/pos-graduacao';
-  const targetPath = posGrad ? '/pos-graduacao' : '/resultados';
-
   const { onOpen } = useModal();
   const {
     searchType,
@@ -31,6 +29,12 @@ export function Search() {
     itemsSelecionados,
     setItensSelecionados,
   } = useContext(UserContext);
+
+  const posGrad = location.pathname === '/pos-graduacao';
+  const targetPath =
+    posGrad && !isProfileSearch(searchType)
+      ? '/pos-graduacao'
+      : resultsPathFor(searchType);
 
   const [input, setInput] = useState('');
 
@@ -104,6 +108,8 @@ export function Search() {
                         key={index}
                         className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs text-white border-0 ${searchType === 'article'
                             ? 'bg-blue-500 dark:bg-blue-500'
+                            : searchType === 'profile'
+                              ? 'bg-indigo-500 dark:bg-indigo-500'
                             : searchType === 'abstract'
                               ? 'bg-yellow-500 dark:bg-yellow-500'
                               : searchType === 'speaker'
@@ -153,6 +159,8 @@ export function Search() {
                 variant="outline"
                 className={`text-white border-0 ${searchType === 'article'
                     ? 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white'
+                    : searchType === 'profile'
+                      ? 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'
                     : searchType === 'abstract'
                       ? 'bg-yellow-500 dark:bg-yellow-500 hover:bg-yellow-600 dark:hover:bg-yellow-600 hover:text-white'
                       : searchType === 'speaker'

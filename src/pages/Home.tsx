@@ -5,6 +5,7 @@ import { UserContext } from "../context/context";
 import { GeralProvider } from "../components/provider/geral-provider";
 import { useModalHomepage } from "../components/hooks/use-modal-homepage";
 import { useLocation, useParams } from "react-router-dom";
+import { PROFILE_RESULTS_PATH } from "../lib/search-types";
 
 
 
@@ -20,7 +21,7 @@ export function Home() {
 
     useEffect(() => {
         // Ao cair na página de resultados ou MarIA IA, carrega com a barra lateral principal colapsada
-        if (location.pathname == '/resultados' || location.pathname == '/resultados-ia' || location.pathname == '/marIA') {
+        if (location.pathname == '/resultados' || location.pathname == PROFILE_RESULTS_PATH || location.pathname == '/resultados-ia' || location.pathname == '/marIA') {
             setIsCollapsed(false);
         }
     }, [location.pathname]);
@@ -30,6 +31,8 @@ export function Home() {
             onOpen('initial-home')
         } else if (location.pathname == `/resultados`) {
             onOpen('result-home')
+        } else if (location.pathname == PROFILE_RESULTS_PATH) {
+            onOpen('result-profile-home')
         } else if (location.pathname == '/pos-graduacao') {
             onOpen('graduation-home')
         } else if (location.pathname == '/dicionario') {

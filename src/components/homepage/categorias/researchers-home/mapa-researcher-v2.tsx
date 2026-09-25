@@ -24,14 +24,14 @@ import { useModal } from '../../../hooks/use-modal-store';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../ui/avatar';
 import { Skeleton } from '../../../ui/skeleton';
 
-interface MunicipalityProperties {
+export interface MunicipalityProperties {
   name: string;
   territorio_id: string | number;
   territorio_identidade: string;
 }
 
-type Municipality = Feature<Polygon | MultiPolygon, MunicipalityProperties>;
-type TerritoryGeoJson = FeatureCollection<
+export type Municipality = Feature<Polygon | MultiPolygon, MunicipalityProperties>;
+export type TerritoryGeoJson = FeatureCollection<
   Polygon | MultiPolygon,
   MunicipalityProperties
 >;
@@ -98,14 +98,14 @@ const TERRITORY_COLORS: Record<string, string> = {
 };
 
 /** Preenchimento dos territórios sem pesquisadores. */
-const EMPTY_FILL = '#e5e7eb';
+export const EMPTY_FILL = '#e5e7eb';
 
 /** Fundo do mapa (áreas fora da Bahia). Bem mais claro que o cinza interno. */
-const MAP_BACKGROUND = '#f1f5f9';
+export const MAP_BACKGROUND = '#f1f5f9';
 
-const MUNICIPAL_ZOOM = 8;
+export const MUNICIPAL_ZOOM = 8;
 
-function normalizeCity(value?: string | null) {
+export function normalizeCity(value?: string | null) {
   return (value ?? '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -113,7 +113,7 @@ function normalizeCity(value?: string | null) {
     .toLowerCase();
 }
 
-function getColor(id?: string | number) {
+export function getColor(id?: string | number) {
   const key = String(id ?? '');
 
   if (TERRITORY_COLORS[key]) {
@@ -127,7 +127,7 @@ function getColor(id?: string | number) {
   return palette[(numericId - 1) % palette.length];
 }
 
-function getTerritoryBorders(
+export function getTerritoryBorders(
   geoJson: TerritoryGeoJson,
 ): Feature<MultiLineString> {
   const segments = new Map<
@@ -187,7 +187,7 @@ function getTerritoryBorders(
  * Faz o mapa se ajustar automaticamente aos limites
  * do GeoJSON.
  */
-function FitBounds({ geoJson }: { geoJson: TerritoryGeoJson }) {
+export function FitBounds({ geoJson }: { geoJson: TerritoryGeoJson }) {
   const map = useMap();
 
   useEffect(() => {

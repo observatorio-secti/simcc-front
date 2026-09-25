@@ -20,6 +20,7 @@ import { PaineisDadosExternos } from '../homepage/paines-dados-externos';
 import { IndicePesquisador } from '../indice-pesquisador/indice-pesquisador';
 import { ProvimentoCargo } from '../provimento-cargo/provimento-cargo';
 import { Institution } from '../institution/institution';
+import { ResearchersProfileHome } from '../homepage/categorias/researchers-profile-home/researchers-profile-home';
 
 const ModalContent = () => {
   const { type } = useModalHomepage();
@@ -33,6 +34,8 @@ const ModalContent = () => {
       return <GraduateProgram />;
     case 'result-home':
       return <ResultHome />;
+    case 'result-profile-home':
+      return <ResearchersProfileHome />;
     case 'indicadores':
       return <ContentIndicators />;
     case 'producoes-recentes':
