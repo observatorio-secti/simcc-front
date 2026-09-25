@@ -1,5 +1,4 @@
 import {
-  Info,
   Send,
   User,
   Square,
@@ -20,6 +19,11 @@ import {
   AlertCircle,
   Target,
   Hash,
+  HelpCircle,
+  X,
+  Shuffle,
+  CheckCircle2,
+  ArrowRight,
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
@@ -30,12 +34,19 @@ import { useTheme } from 'next-themes';
 import { SymbolEE } from '../svg/SymbolEE';
 import { SymbolEEWhite } from '../svg/SymbolEEWhite';
 import { UserContext } from '../../context/context';
-import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useModal } from '../hooks/use-modal-store';
 import { Helmet } from 'react-helmet';
 
 // --- Contratos de Domínio & Tipos ---
+
+export interface MariaResearcherMetrics {
+  articles?: number;
+  patents?: number;
+  h_index?: number | string;
+  software?: number;
+  books?: number;
+}
 
 export interface MariaResearcher {
   id: string;
@@ -44,6 +55,7 @@ export interface MariaResearcher {
   institution_acronym?: string;
   lattes_id?: string;
   abstract?: string;
+  metrics?: MariaResearcherMetrics;
 }
 
 export interface MariaProduction {
@@ -76,7 +88,26 @@ export interface MariaProduction {
     id?: string;
     name?: string;
     institution?: string;
+    metrics?: MariaResearcherMetrics;
   };
+}
+
+export interface MariaGlobalMetrics {
+  total_matched?: number;
+  sample_count?: number;
+  institution_shares?: Record<string, { share?: string; count?: number }>;
+}
+
+export interface MariaClarificationOption {
+  id: string;
+  label: string;
+  description?: string;
+}
+
+export interface MariaClarification {
+  question: string;
+  field_to_bind: string;
+  options: MariaClarificationOption[];
 }
 
 export interface MariaFilters {
@@ -92,6 +123,7 @@ export interface MariaMetadata {
   filters?: MariaFilters;
   researchers?: MariaResearcher[];
   productions?: MariaProduction[];
+  global_metrics?: MariaGlobalMetrics;
   sources?: string[];
 }
 
@@ -101,6 +133,8 @@ export interface ChatMessage {
   content: string;
   time: string;
   metadata?: MariaMetadata;
+  clarification?: MariaClarification;
+  clarificationSelectedOption?: string;
   error?: string;
   isStreaming?: boolean;
   interrupted?: boolean;
@@ -116,15 +150,105 @@ const INTENT_LABELS: Record<string, string> = {
   general_question: 'Consulta Geral',
 };
 
-// --- Sugestões Iniciais de Busca ---
-const STARTER_PROMPTS = [
-  { icon: Search, label: 'Pesquisadores em IA na UNEB', query: 'Pesquisadores em inteligência artificial na UNEB' },
-  { icon: Lightbulb, label: 'Patentes registradas na UFBA', query: 'Quais patentes foram desenvolvidas e registradas na UFBA?' },
-  { icon: Layers, label: 'Compare UFBA e UNEB em saúde pública', query: 'Compare a produção científica entre UFBA e UNEB na área de saúde pública' },
-  { icon: FileText, label: 'Artigos sobre leishmaniose', query: 'Artigos científicos publicados sobre leishmaniose na Bahia' },
-  { icon: Cpu, label: 'Softwares desenvolvidos na Bahia', query: 'Softwares e soluções computacionais desenvolvidas por pesquisadores baianos' },
-  { icon: BookOpen, label: 'Livros e capítulos em biotecnologia', query: 'Livros e capítulos publicados em biotecnologia' },
+// --- Sugestões Oficiais e Categorizadas da MarIA ---
+export interface MariaPromptRecommendation {
+  query: string;
+  label: string;
+  category: string;
+  icon: any;
+}
+
+export const ALL_RECOMMENDATIONS: MariaPromptRecommendation[] = [
+  {
+    query: 'Quais artigos sobre saúde coletiva e epidemiologia foram publicados a partir de 2021 na UFBA?',
+    label: 'Saúde coletiva na UFBA (a partir de 2021)',
+    category: 'Filtro Temporal',
+    icon: Calendar,
+  },
+  {
+    query: 'Livros publicados até 2012 sobre biodiversidade e processos ecológicos na Bahia',
+    label: 'Livros sobre biodiversidade até 2012',
+    category: 'Filtro Temporal',
+    icon: BookOpen,
+  },
+  {
+    query: 'Produções científicas sobre biopolímeros e reaproveitamento de resíduos entre 2015 e 2022',
+    label: 'Biopolímeros e resíduos (2015 a 2022)',
+    category: 'Filtro Temporal',
+    icon: Layers,
+  },
+  {
+    query: 'Como está o perfil de Eduardo Jorge na plataforma?',
+    label: 'Perfil de Eduardo Jorge',
+    category: 'Memória e Continuidade',
+    icon: User,
+  },
+  {
+    query: 'Quem é a pesquisadora Silvia Lúcia Ferreira da UFBA?',
+    label: 'Silvia Lúcia Ferreira (UFBA)',
+    category: 'Memória e Continuidade',
+    icon: User,
+  },
+  {
+    query: 'Quem é Claudia Brodskyn e quais patentes ela tem registradas?',
+    label: 'Claudia Brodskyn e patentes registradas',
+    category: 'Desambiguação',
+    icon: Search,
+  },
+  {
+    query: 'Quais os trabalhos do pesquisador Ricardo Brugger?',
+    label: 'Trabalhos de Ricardo Brugger (UFRB)',
+    category: 'Tolerância a Erros',
+    icon: Search,
+  },
+  {
+    query: 'O que Adilson pesquisa?',
+    label: 'O que Adilson pesquisa? (Clarificação)',
+    category: 'Clarificação',
+    icon: HelpCircle,
+  },
+  {
+    query: 'Existem softwares, aplicativos ou sistemas desenvolvidos voltados para idosos ou gestantes na Bahia?',
+    label: 'Softwares para idosos ou gestantes',
+    category: 'Softwares',
+    icon: Cpu,
+  },
+  {
+    query: 'Quais patentes e registros em odontologia ou próteses foram depositados na UFBA?',
+    label: 'Patentes em odontologia na UFBA',
+    category: 'Patentes',
+    icon: Lightbulb,
+  },
+  {
+    query: 'Quais pesquisadores trabalham com a cultura do cacau e polifenóis no sul da Bahia?',
+    label: 'Cacau e polifenóis no sul da Bahia',
+    category: 'Contexto Regional',
+    icon: Building2,
+  },
+  {
+    query: 'Pesquisas e relatórios sobre bandas, filarmônicas e música tradicional no Recôncavo Baiano',
+    label: 'Bandas e filarmônicas no Recôncavo',
+    category: 'Relatórios Técnicos',
+    icon: FileText,
+  },
+  {
+    query: 'Quais estudos da UNEB e UEFS abordam história das mulheres negras e comunidades quilombolas ou indígenas no sertão?',
+    label: 'Mulheres negras e quilombolas no sertão',
+    category: 'História e Sociedade',
+    icon: Bookmark,
+  },
+  {
+    query: 'Artigos publicados sobre clima urbano e mapeamento de ilhas de calor em Salvador',
+    label: 'Ilhas de calor e clima em Salvador',
+    category: 'Cidades Baianas',
+    icon: MapPin,
+  },
 ];
+
+export function getRandomRecommendations(count = 6): MariaPromptRecommendation[] {
+  const shuffled = [...ALL_RECOMMENDATIONS].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+}
 
 // --- Parser de Markdown Otimizado ---
 function parseMarkdownToHtml(markdown: string): string {
@@ -570,17 +694,336 @@ function SourcesSection({ sources }: { sources: string[] }) {
   );
 }
 
+// --- Segunda Coluna: Painel de Itens Retornados da Consulta ---
+interface MariaResultsColumnProps {
+  metadata: MariaMetadata;
+  onClose: () => void;
+  urlGeral?: string;
+  onOpenResearcherModal: (name: string) => void;
+}
+
+function MariaResultsColumn({
+  metadata,
+  onClose,
+  urlGeral,
+  onOpenResearcherModal,
+}: MariaResultsColumnProps) {
+  const [activeTab, setActiveTab] = useState<'all' | 'researchers' | 'productions'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const researchers = metadata.researchers || [];
+  const productions = metadata.productions || [];
+
+  const totalCount = researchers.length + productions.length;
+
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+
+  const filteredResearchers = useMemo(() => {
+    if (!normalizedSearch) return researchers;
+    return researchers.filter(
+      (r) =>
+        r.name.toLowerCase().includes(normalizedSearch) ||
+        (r.institution && r.institution.toLowerCase().includes(normalizedSearch)) ||
+        (r.institution_acronym && r.institution_acronym.toLowerCase().includes(normalizedSearch))
+    );
+  }, [researchers, normalizedSearch]);
+
+  const filteredProductions = useMemo(() => {
+    if (!normalizedSearch) return productions;
+    return productions.filter(
+      (p) =>
+        p.title.toLowerCase().includes(normalizedSearch) ||
+        (p.authors && p.authors.toLowerCase().includes(normalizedSearch)) ||
+        (p.type && p.type.toLowerCase().includes(normalizedSearch)) ||
+        (p.researcher?.name && p.researcher.name.toLowerCase().includes(normalizedSearch))
+    );
+  }, [productions, normalizedSearch]);
+
+  return (
+    <aside className="w-full sm:w-80 md:w-96 lg:w-[420px] shrink-0 border-l border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex flex-col h-full overflow-hidden min-h-0 transition-all duration-300 z-10 shadow-lg md:shadow-none">
+      {/* Cabeçalho da Coluna de Resultados */}
+      <div className="p-3 md:p-3.5 border-b border-slate-200 dark:border-neutral-800 flex items-center justify-between gap-2 bg-slate-50/70 dark:bg-neutral-900/80 shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="h-7 w-7 rounded-md bg-[#07677e]/10 dark:bg-[#559FB8]/20 flex items-center justify-center shrink-0">
+            <Layers className="w-4 h-4 text-[#07677e] dark:text-[#559FB8]" />
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h3 className="text-xs md:text-sm font-bold text-slate-900 dark:text-slate-100 font-lexend truncate">
+                Itens retornados
+              </h3>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#07677e] text-white">
+                {totalCount}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+              Registros da consulta ao SIMCC
+            </p>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-7 w-7 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 shrink-0"
+          title="Fechar painel de itens retornados"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Tabs & Busca interna rápida */}
+      <div className="p-2.5 border-b border-slate-100 dark:border-neutral-800/80 space-y-2 bg-white dark:bg-neutral-900 shrink-0">
+        <div className="flex rounded-lg bg-slate-100 dark:bg-neutral-800 p-0.5 text-xs font-medium">
+          <button
+            type="button"
+            onClick={() => setActiveTab('all')}
+            className={`flex-1 py-1 px-2 rounded-md text-center transition-all ${
+              activeTab === 'all'
+                ? 'bg-white dark:bg-neutral-900 text-slate-900 dark:text-slate-100 shadow-xs font-semibold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+            }`}
+          >
+            Tudo ({totalCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('researchers')}
+            className={`flex-1 py-1 px-2 rounded-md text-center transition-all ${
+              activeTab === 'researchers'
+                ? 'bg-white dark:bg-neutral-900 text-slate-900 dark:text-slate-100 shadow-xs font-semibold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+            }`}
+          >
+            Pesquisadores ({researchers.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('productions')}
+            className={`flex-1 py-1 px-2 rounded-md text-center transition-all ${
+              activeTab === 'productions'
+                ? 'bg-white dark:bg-neutral-900 text-slate-900 dark:text-slate-100 shadow-xs font-semibold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+            }`}
+          >
+            Produções ({productions.length})
+          </button>
+        </div>
+
+        {totalCount > 4 && (
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Filtrar por nome, título ou tipo..."
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-md bg-slate-50 dark:bg-neutral-800/60 border border-slate-200 dark:border-neutral-700/80 focus:outline-none focus:ring-1 focus:ring-[#07677e] dark:focus:ring-[#559FB8]"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Lista de Registros com Scroll */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0">
+        {/* Pesquisadores */}
+        {(activeTab === 'all' || activeTab === 'researchers') && filteredResearchers.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider font-lexend">
+              <span className="flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#07677e] dark:text-[#559FB8]" />
+                Pesquisadores ({filteredResearchers.length})
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {filteredResearchers.map((r, idx) => {
+                const instText = r.institution_acronym
+                  ? `${r.institution_acronym}`
+                  : r.institution || 'Instituição';
+
+                return (
+                  <div
+                    key={r.id || `${r.name}-${idx}`}
+                    onClick={() => onOpenResearcherModal(r.name)}
+                    className="group bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-lg p-2.5 hover:border-[#07677e]/60 dark:hover:border-[#559FB8]/60 hover:shadow-xs transition-all cursor-pointer space-y-1.5 border-l-4 border-l-[#719CB8]"
+                  >
+                    <div className="flex items-start gap-2">
+                      <Avatar className="h-7 w-7 rounded-md shrink-0 border border-slate-200 dark:border-neutral-800">
+                        <AvatarImage
+                          src={
+                            urlGeral
+                              ? `${urlGeral}ResearcherData/Image?name=${encodeURIComponent(r.name)}`
+                              : undefined
+                          }
+                          alt={r.name}
+                          className="rounded-md object-cover"
+                        />
+                        <AvatarFallback className="rounded-md bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-slate-300 text-[10px] font-bold">
+                          {r.name.slice(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <h5 className="text-xs font-semibold text-slate-900 dark:text-slate-100 truncate group-hover:text-[#07677e] dark:group-hover:text-[#559FB8] transition-colors font-lexend">
+                          {r.name}
+                        </h5>
+                        <span className="inline-flex items-center gap-1 text-[11px] text-[#07677e] dark:text-[#559FB8] font-medium truncate">
+                          <Building2 className="w-2.5 h-2.5 shrink-0" />
+                          {instText}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Badges de métricas de carreira */}
+                    {r.metrics && (
+                      <div className="flex flex-wrap items-center gap-1 pt-1 border-t border-slate-100 dark:border-neutral-900 text-[10px]">
+                        {r.metrics.articles !== undefined && (
+                          <span className="px-1.5 py-0.5 rounded font-medium bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/60">
+                            {r.metrics.articles} art.
+                          </span>
+                        )}
+                        {r.metrics.patents !== undefined && (
+                          <span className="px-1.5 py-0.5 rounded font-medium bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/60">
+                            {r.metrics.patents} pat.
+                          </span>
+                        )}
+                        {r.metrics.h_index !== undefined && (
+                          <span className="px-1.5 py-0.5 rounded font-medium bg-amber-50 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/60">
+                            H-index: {r.metrics.h_index}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Produções */}
+        {(activeTab === 'all' || activeTab === 'productions') && filteredProductions.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider font-lexend">
+              <span className="flex items-center gap-1.5">
+                <Bookmark className="w-3.5 h-3.5 text-[#07677e] dark:text-[#559FB8]" />
+                Produções ({filteredProductions.length})
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {filteredProductions.map((p, idx) => {
+                const config = PRODUCTION_TYPE_CONFIG[p.type] || {
+                  label: p.type,
+                  icon: FileText,
+                  badgeClass: 'bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-slate-300 border-slate-200',
+                };
+                const IconComp = config.icon;
+                const authorName = p.researcher?.name || p.authors || '';
+                const rm = p.researcher?.metrics;
+
+                return (
+                  <div
+                    key={p.id || `${p.title}-${idx}`}
+                    className="bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-lg p-2.5 hover:border-[#07677e]/40 dark:hover:border-[#559FB8]/40 hover:shadow-xs transition-all space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between gap-1">
+                      <span
+                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold border ${config.badgeClass}`}
+                      >
+                        <IconComp className="w-2.5 h-2.5 shrink-0" />
+                        {config.label}
+                      </span>
+                      {p.year && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-600 dark:bg-neutral-800 dark:text-slate-300">
+                          {p.year}
+                        </span>
+                      )}
+                    </div>
+
+                    <h5 className="text-xs font-semibold text-slate-900 dark:text-slate-100 leading-snug font-lexend line-clamp-2">
+                      {p.title}
+                    </h5>
+
+                    {authorName && (
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                        <span className="font-medium text-slate-600 dark:text-slate-300">Autores:</span>{' '}
+                        {authorName}
+                        {rm && (rm.articles !== undefined || rm.h_index !== undefined) && (
+                          <span className="text-[#07677e] dark:text-[#559FB8] font-medium ml-1">
+                            [{[
+                              rm.articles !== undefined ? `${rm.articles} art.` : null,
+                              rm.h_index !== undefined ? `H: ${rm.h_index}` : null,
+                            ]
+                              .filter(Boolean)
+                              .join(', ')}]
+                          </span>
+                        )}
+                      </p>
+                    )}
+
+                    {/* Metadados adicionais e DOI */}
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-neutral-900 text-[10.5px] text-slate-400">
+                      <span className="truncate max-w-[220px]">
+                        {p.details?.periodical || p.details?.publisher || p.details?.code || ''}
+                      </span>
+                      {p.doi && (
+                        <a
+                          href={`https://doi.org/${p.doi}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-0.5 text-[#07677e] dark:text-[#559FB8] hover:underline font-medium"
+                        >
+                          <ExternalLink className="w-2.5 h-2.5" />
+                          DOI
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {totalCount === 0 && (
+          <div className="p-6 text-center text-xs text-slate-400">
+            Nenhum registro associado a esta consulta.
+          </div>
+        )}
+      </div>
+    </aside>
+  );
+}
+
 // --- Componente Principal da MarIA ---
 export function Maria() {
-  const { urlGeral, user } = useContext(UserContext);
+  const { urlGeral, user, setIsCollapsed } = useContext(UserContext);
   const { theme } = useTheme();
+  const { onOpen } = useModal();
 
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  // Segunda coluna: resultados associados
+  const [activeResults, setActiveResults] = useState<MariaMetadata | null>(null);
+  const [isResultsPanelOpen, setIsResultsPanelOpen] = useState(false);
+
+  // Recomendações iniciais sorteadas aleatoriamente do catálogo oficial
+  const [starterPrompts, setStarterPrompts] = useState<MariaPromptRecommendation[]>(() =>
+    getRandomRecommendations(6)
+  );
+
+  const handleShufflePrompts = () => {
+    setStarterPrompts(getRandomRecommendations(6));
+  };
+
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const userName = user?.display_name || 'Você';
@@ -599,8 +1042,18 @@ export function Maria() {
     });
   };
 
+  // Ao abrir o chat da IA, contrai a barra lateral do layout principal
+  useEffect(() => {
+    setIsCollapsed(false);
+  }, [setIsCollapsed]);
+
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTo({
+        top: chatScrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -616,7 +1069,10 @@ export function Maria() {
   }, []);
 
   // --- Envio e Streaming SSE ---
-  const handleSendMessage = async (queryToSend?: string) => {
+  const handleSendMessage = async (
+    queryToSend?: string,
+    clarificationResponse?: { field: string; value: string }
+  ) => {
     const query = (queryToSend || question).trim();
     if (!query || isGenerating) return;
 
@@ -624,7 +1080,7 @@ export function Maria() {
     const newUserMessage: ChatMessage = {
       id: userMsgId,
       role: 'user',
-      content: query,
+      content: clarificationResponse ? `[Selecionado]: ${query}` : query,
       time: getCurrentTime(),
     };
 
@@ -651,15 +1107,21 @@ export function Maria() {
     let accumulatedMetadata: MariaMetadata | undefined = undefined;
 
     try {
+      const payload: any = {
+        query: query,
+        session_id: sessionId,
+      };
+
+      if (clarificationResponse) {
+        payload.clarification_response = clarificationResponse;
+      }
+
       const response = await fetch(streamEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          query: query,
-          session_id: sessionId,
-        }),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       });
 
@@ -686,20 +1148,44 @@ export function Maria() {
         for (const line of lines) {
           const trimmed = line.trim();
           if (trimmed.startsWith('data: ')) {
-            const payload = trimmed.slice(6);
-            if (!payload) continue;
+            const payloadStr = trimmed.slice(6);
+            if (!payloadStr) continue;
 
             try {
-              const event = JSON.parse(payload);
+              const event = JSON.parse(payloadStr);
 
               if (event.type === 'metadata' && event.data) {
                 accumulatedMetadata = event.data;
+
+                // Quando a IA retornar algo, abre a segunda coluna automaticamente
+                const hasResults =
+                  (event.data.researchers && event.data.researchers.length > 0) ||
+                  (event.data.productions && event.data.productions.length > 0) ||
+                  !!event.data.global_metrics;
+
+                if (hasResults) {
+                  setActiveResults(event.data);
+                  setIsResultsPanelOpen(true);
+                }
+
                 setMessages((prev) =>
                   prev.map((msg) =>
                     msg.id === botMsgId
                       ? {
                           ...msg,
                           metadata: accumulatedMetadata,
+                        }
+                      : msg
+                  )
+                );
+              } else if (event.type === 'clarification' && event.clarification) {
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === botMsgId
+                      ? {
+                          ...msg,
+                          clarification: event.clarification,
+                          isStreaming: false,
                         }
                       : msg
                   )
@@ -741,7 +1227,7 @@ export function Maria() {
                 );
               }
             } catch (e) {
-              console.error('Falha no parse do evento SSE:', e, payload);
+              console.error('Falha no parse do evento SSE:', e, payloadStr);
             }
           }
         }
@@ -781,6 +1267,27 @@ export function Maria() {
     }
   };
 
+  const handleSelectClarification = (
+    messageId: string,
+    option: MariaClarificationOption,
+    clarification: MariaClarification
+  ) => {
+    if (isGenerating) return;
+
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId
+          ? { ...msg, clarificationSelectedOption: option.id }
+          : msg
+      )
+    );
+
+    handleSendMessage(option.label, {
+      field: clarification.field_to_bind,
+      value: option.id,
+    });
+  };
+
   const handleStopGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -793,6 +1300,8 @@ export function Maria() {
       handleStopGeneration();
     }
     setMessages([]);
+    setActiveResults(null);
+    setIsResultsPanelOpen(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -802,8 +1311,12 @@ export function Maria() {
     }
   };
 
+  const totalResultsCount = activeResults
+    ? (activeResults.researchers?.length || 0) + (activeResults.productions?.length || 0)
+    : 0;
+
   return (
-    <main className="w-full h-full p-3 md:p-6 pb-2 flex flex-col font-lexend overflow-hidden">
+    <main className="w-full h-full max-h-full flex-1 flex flex-col font-lexend overflow-hidden min-h-0 p-2 md:p-3 pb-1">
       <Helmet>
         <title>MarIA - Assistente Científica | Simcc</title>
         <meta
@@ -813,281 +1326,366 @@ export function Maria() {
         <meta name="robots" content="index, follow" />
       </Helmet>
 
-      {/* Header com Identidade Visual & Ações */}
-      <header className="flex items-center justify-between pb-3 mb-2 border-b border-slate-200 dark:border-neutral-800">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 p-1 rounded-lg bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 flex items-center justify-center">
-            {theme === 'dark' ? <SymbolEEWhite /> : <SymbolEE />}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base md:text-lg font-bold text-slate-900 dark:text-slate-100 font-lexend">
-                MarIA
-              </h1>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#559FB8]/10 text-[#07677e] dark:text-[#559FB8] border border-[#559FB8]/30">
-                <Sparkles className="w-3 h-3 text-[#07677e] dark:text-[#559FB8]" />
-                Assistente IA
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Assistente Científica e Tecnológica da Bahia
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5">
-          {messages.length > 0 && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={handleClearHistory}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 gap-1.5 text-xs text-slate-600 dark:text-slate-300"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Nova conversa</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Reiniciar conversa com a MarIA</TooltipContent>
-            </Tooltip>
-          )}
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link to="/informacoes">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500">
-                  <Info className="w-4 h-4" />
-                  <span className="sr-only">Informações</span>
-                </Button>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Sobre a plataforma</TooltipContent>
-          </Tooltip>
-        </div>
-      </header>
-
-      {/* Área Central Expandida Bento Box */}
-      <div className="flex-1 overflow-y-auto px-1 md:px-4 space-y-4 max-w-6xl w-full mx-auto">
-        {messages.length === 0 ? (
-          /* Estado Inicial Hero */
-          <div className="h-full flex flex-col justify-center items-center text-center py-8 md:py-16">
-            <div className="max-w-3xl space-y-4">
-              <div className="flex justify-center mb-2">
-                <div className="h-16 w-16 p-2.5 rounded-2xl bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 shadow-sm flex items-center justify-center">
-                  {theme === 'dark' ? <SymbolEEWhite /> : <SymbolEE />}
-                </div>
-              </div>
-
-              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100 font-lexend tracking-tight">
-                <span className="bg-gradient-to-r from-blue-700 to-red-600 text-transparent bg-clip-text">
-                  Olá,
-                </span>{' '}
-                como posso apoiar sua pesquisa científica hoje?
-              </h2>
-
-              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-                Consulte em linguagem natural artigos, livros, patentes, softwares ou compare
-                linhas de pesquisa e competências acadêmicas entre instituições da Bahia.
-              </p>
-
-              {/* Bento de Sugestões de Consulta */}
-              <div className="pt-4">
-                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2.5">
-                  Sugestões Rápidas de Consulta
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-left">
-                  {STARTER_PROMPTS.map((starter, idx) => {
-                    const StarterIcon = starter.icon;
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => handleSendMessage(starter.query)}
-                        className="group flex items-center gap-2.5 p-3 rounded-lg bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 hover:border-[#559FB8] hover:shadow-xs transition-all cursor-pointer"
-                      >
-                        <div className="h-8 w-8 rounded-md bg-slate-50 dark:bg-neutral-800 flex items-center justify-center shrink-0 group-hover:bg-[#559FB8]/10 transition-colors">
-                          <StarterIcon className="w-4 h-4 text-[#07677e] dark:text-[#559FB8]" />
-                        </div>
-                        <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-[#07677e] dark:group-hover:text-[#559FB8] transition-colors leading-tight">
-                          {starter.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Histórico de Mensagens Bento */
-          <div className="space-y-5 pb-4">
-            {messages.map((msg) => {
-              const isUser = msg.role === 'user';
-
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
-                >
-                  {!isUser && (
-                    <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 flex items-center justify-center shrink-0 p-1 mt-0.5">
+      {/* Container Principal: Chat + Segunda Coluna de Resultados */}
+      <div className="flex-1 flex flex-row overflow-hidden min-h-0 w-full relative">
+        {/* Coluna 1: Chat Principal */}
+        <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 min-h-0">
+          <div
+            ref={chatScrollRef}
+            className="flex-1 overflow-y-auto min-h-0 px-1 md:px-4 space-y-4 max-w-5xl w-full mx-auto"
+          >
+            {messages.length === 0 ? (
+              /* Estado Inicial Hero */
+              <div className="h-full flex flex-col justify-center items-center text-center py-6 md:py-12">
+                <div className="max-w-3xl space-y-4 w-full">
+                  <div className="flex justify-center mb-1">
+                    <div className="h-14 w-14 p-2 rounded-2xl bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 shadow-sm flex items-center justify-center">
                       {theme === 'dark' ? <SymbolEEWhite /> : <SymbolEE />}
-                    </div>
-                  )}
-
-                  <div className={`flex flex-col ${isUser ? 'items-end max-w-2xl' : 'w-full'}`}>
-                    {/* Bento Box da Mensagem */}
-                    <div
-                      className={`p-4 md:p-5 rounded-xl shadow-xs transition-all ${
-                        isUser
-                          ? 'bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-slate-900 dark:text-blue-50 rounded-tr-xs'
-                          : 'bg-slate-50/60 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 text-slate-900 dark:text-slate-100 rounded-tl-xs w-full space-y-3'
-                      }`}
-                    >
-                      {/* Cabeçalho */}
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 font-lexend">
-                          {isUser ? userName : 'MarIA'}
-                        </span>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500">
-                          {msg.time}
-                        </span>
-                      </div>
-
-                      {/* Metadados Identificados (Pílulas) */}
-                      {!isUser && msg.metadata && <MetadataBadges metadata={msg.metadata} />}
-
-                      {/* 1. Bento Pesquisadores Identificados (Exibido no Topo) */}
-                      {!isUser && msg.metadata?.researchers && (
-                        <ResearchersBentoGrid researchers={msg.metadata.researchers} />
-                      )}
-
-                      {/* 2. Bento Produções Científicas e Tecnológicas (Exibido no Topo) */}
-                      {!isUser && msg.metadata?.productions && (
-                        <ProductionsBentoGrid productions={msg.metadata.productions} />
-                      )}
-
-                      {/* 3. Bloco de Síntese Textual Markdown */}
-                      <div className={!isUser ? 'bg-white dark:bg-neutral-950 p-3.5 md:p-4 rounded-lg border border-slate-200/80 dark:border-neutral-800/80 mt-2' : ''}>
-                        {isUser ? (
-                          <p className="text-sm whitespace-pre-wrap leading-relaxed text-slate-800 dark:text-slate-200 font-lexend">
-                            {msg.content}
-                          </p>
-                        ) : msg.content ? (
-                          <SimpleMarkdownRenderer
-                            content={msg.content}
-                            isStreaming={msg.isStreaming}
-                          />
-                        ) : msg.isStreaming ? (
-                          <div className="flex items-center gap-2 text-xs text-slate-500 py-1">
-                            <Sparkles className="w-3.5 h-3.5 animate-spin text-[#559FB8]" />
-                            <span>Sintetizando análise científica com IA...</span>
-                          </div>
-                        ) : null}
-                      </div>
-
-                      {/* Aviso de Interrupção */}
-                      {msg.interrupted && (
-                        <p className="text-xs italic text-slate-500 dark:text-slate-400">
-                          (Geração interrompida pelo usuário)
-                        </p>
-                      )}
-
-                      {/* Erros se houver */}
-                      {msg.error && (
-                        <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/70 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
-                          <AlertCircle className="w-4 h-4 shrink-0" />
-                          <span>{msg.error}</span>
-                        </div>
-                      )}
-
-                      {/* 4. Fontes Consultadas (Rodapé) */}
-                      {!isUser && msg.metadata?.sources && (
-                        <SourcesSection sources={msg.metadata.sources} />
-                      )}
                     </div>
                   </div>
 
-                  {isUser && (
-                    <Avatar className="h-8 w-8 rounded-md shrink-0 border border-slate-200 dark:border-neutral-800 mt-0.5">
-                      <AvatarImage src={userPhoto} alt={userName} className="rounded-md" />
-                      <AvatarFallback className="rounded-md bg-blue-100 dark:bg-blue-950 text-[#07677e] dark:text-[#559FB8] text-xs font-semibold">
-                        <User className="w-4 h-4" />
-                      </AvatarFallback>
-                    </Avatar>
+                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-slate-100 font-lexend tracking-tight">
+                    <span className="bg-gradient-to-r from-blue-700 to-red-600 text-transparent bg-clip-text">
+                      Olá,
+                    </span>{' '}
+                    como posso apoiar sua pesquisa científica hoje?
+                  </h2>
+
+                  <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                    Consulte em linguagem natural artigos, livros, patentes, softwares ou explore
+                    linhas de pesquisa e competências acadêmicas entre instituições da Bahia.
+                  </p>
+
+                  {/* Sugestões de Consulta Alternadas Aleatoriamente */}
+                  <div className="pt-2 text-left">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                        Sugestões de Consulta
+                      </p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleShufflePrompts}
+                        className="h-7 px-2 text-[11px] text-[#07677e] dark:text-[#559FB8] hover:bg-[#07677e]/10 gap-1.5"
+                      >
+                        <Shuffle className="w-3 h-3" />
+                        Sortear outras
+                      </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                      {starterPrompts.map((starter, idx) => {
+                        const StarterIcon = starter.icon;
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => handleSendMessage(starter.query)}
+                            className="group flex flex-col justify-between text-left p-3 rounded-lg bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 hover:border-[#07677e] dark:hover:border-[#559FB8] hover:shadow-xs transition-all cursor-pointer space-y-1.5"
+                          >
+                            <div className="flex items-center justify-between gap-1.5">
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-slate-300">
+                                {starter.category}
+                              </span>
+                              <StarterIcon className="w-3.5 h-3.5 text-[#07677e] dark:text-[#559FB8] shrink-0" />
+                            </div>
+                            <span className="text-xs font-medium text-slate-800 dark:text-slate-200 group-hover:text-[#07677e] dark:group-hover:text-[#559FB8] transition-colors leading-snug line-clamp-2">
+                              {starter.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Histórico de Mensagens */
+              <div className="space-y-4 pb-4">
+                {messages.map((msg) => {
+                  const isUser = msg.role === 'user';
+                  const msgTotalResults = msg.metadata
+                    ? (msg.metadata.researchers?.length || 0) + (msg.metadata.productions?.length || 0)
+                    : 0;
+
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
+                    >
+                      {!isUser && (
+                        <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 flex items-center justify-center shrink-0 p-1 mt-0.5">
+                          {theme === 'dark' ? <SymbolEEWhite /> : <SymbolEE />}
+                        </div>
+                      )}
+
+                      <div className={`flex flex-col ${isUser ? 'items-end max-w-2xl' : 'w-full'}`}>
+                        <div
+                          className={`p-4 md:p-5 rounded-xl shadow-xs transition-all ${
+                            isUser
+                              ? 'bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-slate-900 dark:text-blue-50 rounded-tr-xs'
+                              : 'bg-slate-50/60 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 text-slate-900 dark:text-slate-100 rounded-tl-xs w-full space-y-3'
+                          }`}
+                        >
+                          {/* Cabeçalho da Mensagem */}
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 font-lexend">
+                              {isUser ? userName : 'MarIA'}
+                            </span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                              {msg.time}
+                            </span>
+                          </div>
+
+                          {/* Metadados Identificados (Pílulas de Intenção/Filtros) */}
+                          {!isUser && msg.metadata && <MetadataBadges metadata={msg.metadata} />}
+
+                          {/* Botão de Atalho para Abrir a Segunda Coluna com os Resultados */}
+                          {!isUser && msg.metadata && (msgTotalResults > 0 || msg.metadata.global_metrics) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveResults(msg.metadata!);
+                                setIsResultsPanelOpen(true);
+                              }}
+                              className="w-full text-left p-2.5 rounded-lg bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 hover:border-[#07677e] dark:hover:border-[#559FB8] hover:shadow-xs transition-all flex items-center justify-between text-xs cursor-pointer group"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Layers className="w-4 h-4 text-[#07677e] dark:text-[#559FB8]" />
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">
+                                  {msgTotalResults} itens associados retornados
+                                </span>
+                                {msg.metadata.global_metrics?.total_matched && (
+                                  <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">
+                                    ({msg.metadata.global_metrics.total_matched} totais na base)
+                                  </span>
+                                )}
+                              </div>
+                              <span className="text-[11px] font-semibold text-[#07677e] dark:text-[#559FB8] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                                Ver na coluna lateral <ArrowRight className="w-3.5 h-3.5" />
+                              </span>
+                            </button>
+                          )}
+
+                          {/* Bloco de Síntese Textual Markdown */}
+                          <div className={!isUser ? 'bg-white dark:bg-neutral-950 p-3.5 md:p-4 rounded-lg border border-slate-200/80 dark:border-neutral-800/80 mt-2' : ''}>
+                            {isUser ? (
+                              <p className="text-sm whitespace-pre-wrap leading-relaxed text-slate-800 dark:text-slate-200 font-lexend">
+                                {msg.content}
+                              </p>
+                            ) : msg.content ? (
+                              <SimpleMarkdownRenderer
+                                content={msg.content}
+                                isStreaming={msg.isStreaming}
+                              />
+                            ) : msg.isStreaming ? (
+                              <div className="flex items-center gap-2 text-xs text-slate-500 py-1">
+                                <Sparkles className="w-3.5 h-3.5 animate-spin text-[#559FB8]" />
+                                <span>Sintetizando análise científica com IA...</span>
+                              </div>
+                            ) : null}
+                          </div>
+
+                          {/* Clarificação Interativa Human-in-the-Loop */}
+                          {!isUser && msg.clarification && (
+                            <div className="mt-3 p-3.5 rounded-lg bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 space-y-2.5">
+                              <div className="flex items-start gap-2">
+                                <HelpCircle className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                                <div>
+                                  <h5 className="text-xs font-bold text-slate-900 dark:text-slate-100 font-lexend">
+                                    Clarificação necessária
+                                  </h5>
+                                  <p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5 leading-relaxed">
+                                    {msg.clarification.question}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex flex-col gap-2 pt-1">
+                                {msg.clarification.options.map((opt) => {
+                                  const isSelected = msg.clarificationSelectedOption === opt.id;
+                                  const isAnswered = !!msg.clarificationSelectedOption;
+
+                                  return (
+                                    <button
+                                      key={opt.id}
+                                      type="button"
+                                      disabled={isGenerating || isAnswered}
+                                      onClick={() => handleSelectClarification(msg.id, opt, msg.clarification!)}
+                                      className={`text-left p-2.5 rounded-md border transition-all cursor-pointer ${
+                                        isSelected
+                                          ? 'bg-indigo-100 dark:bg-indigo-900/60 border-indigo-500 text-indigo-950 dark:text-indigo-100 shadow-xs'
+                                          : isAnswered
+                                          ? 'opacity-60 bg-white/50 dark:bg-neutral-900/50 border-slate-200 dark:border-neutral-800 cursor-not-allowed'
+                                          : 'bg-white dark:bg-neutral-900 border-indigo-200/80 dark:border-indigo-800/60 hover:border-indigo-500 hover:shadow-xs'
+                                      }`}
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-xs font-bold text-slate-900 dark:text-slate-100 font-lexend">
+                                          {opt.label}
+                                        </span>
+                                        {isSelected && (
+                                          <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                                        )}
+                                      </div>
+                                      {opt.description && (
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                          {opt.description}
+                                        </p>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Aviso de Interrupção */}
+                          {msg.interrupted && (
+                            <p className="text-xs italic text-slate-500 dark:text-slate-400">
+                              (Geração interrompida pelo usuário)
+                            </p>
+                          )}
+
+                          {/* Erros se houver */}
+                          {msg.error && (
+                            <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/70 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4 shrink-0" />
+                              <span>{msg.error}</span>
+                            </div>
+                          )}
+
+                          {/* Fontes Consultadas */}
+                          {!isUser && msg.metadata?.sources && (
+                            <SourcesSection sources={msg.metadata.sources} />
+                          )}
+                        </div>
+                      </div>
+
+                      {isUser && (
+                        <Avatar className="h-8 w-8 rounded-md shrink-0 border border-slate-200 dark:border-neutral-800 mt-0.5">
+                          <AvatarImage src={userPhoto} alt={userName} className="rounded-md" />
+                          <AvatarFallback className="rounded-md bg-blue-100 dark:bg-blue-950 text-[#07677e] dark:text-[#559FB8] text-xs font-semibold">
+                            <User className="w-4 h-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </div>
+
+          {/* Barra Inferior de Entrada */}
+          <footer className="pt-1 max-w-[95%] lg:max-w-4xl w-full mx-auto shrink-0">
+            <div className="relative border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-xl shadow-xs focus-within:ring-2 focus-within:ring-[#559FB8]/40 focus-within:border-[#559FB8] transition-all">
+              <Label htmlFor="maria-prompt-input" className="sr-only">
+                Pergunta para a MarIA
+              </Label>
+
+              <Textarea
+                ref={textareaRef}
+                id="maria-prompt-input"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isGenerating}
+                placeholder="Faça uma pergunta sobre pesquisadores, artigos, patentes, softwares..."
+                className="min-h-[46px] max-h-32 resize-none border-0 px-3 py-2 text-xs md:text-sm font-lexend focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
+              />
+
+              <div className="flex items-center justify-between p-2 pt-0 gap-2">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  {messages.length > 0 && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          onClick={handleClearHistory}
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 gap-1.5 hover:bg-slate-100 dark:hover:bg-neutral-800 rounded-md shrink-0"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Nova conversa</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">Reiniciar conversa</TooltipContent>
+                    </Tooltip>
+                  )}
+
+                  {activeResults && !isResultsPanelOpen && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsResultsPanelOpen(true)}
+                      className="h-7 px-2 text-xs font-medium text-[#07677e] dark:text-[#559FB8] border-[#07677e]/30 hover:bg-[#07677e]/10 gap-1.5 rounded-md shrink-0"
+                    >
+                      <Layers className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Ver itens retornados</span>
+                      <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-[#07677e] text-white">
+                        {totalResultsCount}
+                      </span>
+                    </Button>
+                  )}
+
+                  <div className="hidden lg:flex items-center gap-1 text-[11px] text-slate-400 pl-1">
+                    <span>Pressione</span>
+                    <kbd className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-neutral-800 text-[10px] font-mono">
+                      Enter
+                    </kbd>
+                    <span>para enviar</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {isGenerating ? (
+                    <Button
+                      onClick={handleStopGeneration}
+                      type="button"
+                      size="sm"
+                      variant="destructive"
+                      className="h-7 md:h-8 gap-1.5 text-xs rounded-lg font-medium"
+                    >
+                      <Square className="w-3.5 h-3.5 fill-current" />
+                      Parar geração
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => handleSendMessage()}
+                      disabled={!question.trim()}
+                      type="button"
+                      size="sm"
+                      className="h-7 md:h-8 gap-1.5 text-xs rounded-lg bg-[#07677e] hover:bg-[#024A60] text-white font-medium shadow-xs disabled:opacity-50 transition-colors"
+                    >
+                      Enviar
+                      <Send className="w-3.5 h-3.5" />
+                    </Button>
                   )}
                 </div>
-              );
-            })}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
-      </div>
-
-      {/* Barra Inferior de Entrada */}
-      <footer className="pt-2 max-w-6xl w-full mx-auto">
-        <div className="relative border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-xl shadow-sm focus-within:ring-2 focus-within:ring-[#559FB8]/40 focus-within:border-[#559FB8] transition-all">
-          <Label htmlFor="maria-prompt-input" className="sr-only">
-            Pergunta para a MarIA
-          </Label>
-
-          <Textarea
-            ref={textareaRef}
-            id="maria-prompt-input"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isGenerating}
-            placeholder="Faça uma pergunta sobre pesquisadores, artigos, patentes, softwares..."
-            className="min-h-[56px] max-h-36 resize-none border-0 p-3.5 text-sm font-lexend focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
-          />
-
-          <div className="flex items-center justify-between p-2 pt-0">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 pl-2">
-              <span className="hidden sm:inline">Pressione</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-neutral-800 text-[10px] font-mono">
-                Enter
-              </kbd>
-              <span className="hidden sm:inline">para enviar ou</span>
-              <kbd className="hidden sm:inline px-1.5 py-0.5 rounded bg-slate-100 dark:bg-neutral-800 text-[10px] font-mono">
-                Shift+Enter
-              </kbd>
-              <span className="hidden sm:inline">para nova linha</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              {isGenerating ? (
-                <Button
-                  onClick={handleStopGeneration}
-                  type="button"
-                  size="sm"
-                  variant="destructive"
-                  className="h-8 gap-1.5 text-xs rounded-lg font-medium"
-                >
-                  <Square className="w-3.5 h-3.5 fill-current" />
-                  Parar geração
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => handleSendMessage()}
-                  disabled={!question.trim()}
-                  type="button"
-                  size="sm"
-                  className="h-8 gap-1.5 text-xs rounded-lg bg-[#07677e] hover:bg-[#024A60] text-white font-medium shadow-xs disabled:opacity-50 transition-colors"
-                >
-                  Enviar
-                  <Send className="w-3.5 h-3.5" />
-                </Button>
-              )}
-            </div>
-          </div>
+            <p className="text-center text-[10.5px] text-slate-400 dark:text-slate-500 mt-1">
+              A MarIA pode apresentar informações imprecisas. Por favor, confira as fontes oficiais e
+              currículos Lattes.
+            </p>
+          </footer>
         </div>
 
-        <p className="text-center text-[11px] text-slate-400 dark:text-slate-500 mt-2">
-          A MarIA pode apresentar informações imprecisas. Por favor, confira as fontes oficiais e
-          currículos Lattes.
-        </p>
-      </footer>
+        {/* Coluna 2: Segunda Coluna com a Lista de Itens Retornados */}
+        {isResultsPanelOpen && activeResults && (
+          <MariaResultsColumn
+            metadata={activeResults}
+            onClose={() => setIsResultsPanelOpen(false)}
+            urlGeral={urlGeral}
+            onOpenResearcherModal={(name) => onOpen('researcher-modal', { name })}
+          />
+        )}
+      </div>
     </main>
   );
 }

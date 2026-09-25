@@ -128,16 +128,15 @@ export function InitialHome() {
     const interval = setInterval(() => {
       setVisibleChart((prev) => (prev + 1) % chartKeys.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [chartKeys.length]);
 
   const navigate = useNavigate();
 
   function handlePesquisaChange(term: string) {
-    setItensSelecionados([{ term }]);
-
-    navigate(`/resultados?type_search=article&terms=${term}`);
+    const cleanTerm = term.replace(/[()]/g, '').trim();
+    setItensSelecionados([{ term: cleanTerm }]);
+    navigate(`/resultados?type_search=article&terms=${cleanTerm}`);
   }
 
   const { onOpen: onOpenResult } = useModalResult();

@@ -6,21 +6,19 @@ import { ResultProvider } from "../provider/result-provider";
 import { UserContext } from "../../context/context";
 
 import { Button } from "../ui/button";
-import { BookOpen, Building, Building2, ChevronDown, ChevronUp, Copyright, Download, Map as MapIconLucide, MoreHorizontal, SlidersHorizontal, Ticket, Users } from "lucide-react";
+import { BookOpen, Building2, ChevronDown, ChevronUp, Copyright, Download, Map as MapIconLucide, MoreHorizontal, SlidersHorizontal, Ticket, Users } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useModal } from "../hooks/use-modal-store";
-import { DotsThreeOutline, DotsThreeVertical, File, Plus, Quotes } from "phosphor-react";
+import { File } from "phosphor-react";
 import { Search } from "../search/search";
 import { HeaderResult } from "./header-results";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { ResultFiltersSlotContext } from "./result-filters-slot-context";
 import { useIsMobile } from "../../hooks/use-mobile";
 
-const useQuery = () => {
-    return new URLSearchParams(useLocation().search);
-};
+const useQuery = () => new URLSearchParams(useLocation().search);
 
 export function ResultHome() {
     const { isOpen, type } = useModalHomepage();
@@ -33,128 +31,106 @@ export function ResultHome() {
     const isMobile = useIsMobile();
 
     const queryUrl = useQuery();
-
-
-
     const researcher = queryUrl.get('researcher');
-
     const type_search = queryUrl.get('type_search');
     const terms = queryUrl.get('terms');
-    const [previousTypeSearch, setPreviousTypeSearch] = useState(type_search);
-    const isModalOpen = isOpen && type === "result-home";
 
     useEffect(() => {
-        if (type_search == 'patent' && terms == '') {
-            onOpen('patent-home')
-        } else if (type_search == 'area' && terms == '') {
-            onOpen('researchers-home')
-        } else if (type_search == 'abstract' && terms == '') {
-            onOpen('researchers-home')
-        } else if (type_search == 'speaker' && terms == '') {
-            onOpen('speaker-home')
-        } else if (type_search == 'book' && terms == '') {
-            onOpen('book-home')
-        } else if (type_search == 'article' && terms == '') {
-            onOpen('articles-home')
-        } else if (type_search == 'name' && terms == '') {
-            onOpen('researchers-home')
-        } else if (typeResult == null || typeResult == undefined) {
-            onOpen('researchers-home')
+        if (type_search === 'patent' && !terms) {
+            onOpen('patent-home');
+        } else if (type_search === 'area' && !terms) {
+            onOpen('researchers-home');
+        } else if (type_search === 'abstract' && !terms) {
+            onOpen('researchers-home');
+        } else if (type_search === 'speaker' && !terms) {
+            onOpen('speaker-home');
+        } else if (type_search === 'book' && !terms) {
+            onOpen('book-home');
+        } else if (type_search === 'article' && !terms) {
+            onOpen('articles-home');
+        } else if (type_search === 'name' && !terms) {
+            onOpen('researchers-home');
+        } else if (!typeResult) {
+            onOpen('researchers-home');
         }
     }, [typeResult]);
 
-    ////
     const tab = queryUrl.get('tab');
     const navigate = useNavigate();
 
     const updateFilters = (category: string, values: any) => {
         if (values) {
-
             queryUrl.set(category, values);
-
         } else {
-            queryUrl.delete(category)
+            queryUrl.delete(category);
         }
-
     };
 
     useEffect(() => {
-        console.log("typeResult mudou para:", typeResult);
         updateFilters("tab", typeResult);
-
         navigate({
             pathname: '/resultados',
             search: queryUrl.toString(),
-        })
-
+        });
     }, [typeResult]);
 
     useEffect(() => {
-        if (tab != null && tab != undefined) {
-            // Compat: aba antiga 'mapa-home-v2' agora abre o mapa unificado 'mapa-home'
+        if (tab) {
             const legacyTab = tab === 'mapa-home-v2' ? 'mapa-home' : tab;
-            onOpen(legacyTab as ModalType)
+            onOpen(legacyTab as ModalType);
         }
-
     }, []);
 
-
-
-
-
-    //csv
     const [jsonData, setJsonData] = useState<any[]>([]);
     const exportPageSize = 100;
     const maxExportPages = 100;
 
+    const encodedTerm = encodeURIComponent(valoresSelecionadosExport || '');
 
-    let urlPublicacoesPorPesquisador = ''
-    if (typeResult == 'articles-home') {
-        urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_researcher?terms=${valoresSelecionadosExport}&researcher_id=&type=ARTICLE&qualis=&qualis=&year=1900&distinct=${articleDistinct ? '1' : '0'}`;
-    } else if (typeResult == 'researchers-home') {
+    let urlPublicacoesPorPesquisador = '';
+
+    if (typeResult === 'articles-home') {
+        urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_researcher?terms=${encodedTerm}&researcher_id=&type=ARTICLE&qualis=&year=1900&distinct=${articleDistinct ? '1' : '0'}`;
+    } else if (typeResult === 'researchers-home') {
         if (searchType === 'name') {
-            urlPublicacoesPorPesquisador = `${urlGeral}researcherName?name=${valoresSelecionadosExport?.replace(/[;|()]/g, '')}`;
+            urlPublicacoesPorPesquisador = `${urlGeral}researcherName?name=${encodedTerm}`;
         } else if (searchType === 'article') {
-            urlPublicacoesPorPesquisador = `${urlGeral}researcher?terms=${valoresSelecionadosExport}&university=&type=ARTICLE&graduate_program_id=`;
+            urlPublicacoesPorPesquisador = `${urlGeral}researcher?terms=${encodedTerm}&university=&type=ARTICLE&graduate_program_id=`;
         } else if (searchType === 'book') {
-            urlPublicacoesPorPesquisador = `${urlGeral}researcherBook?term=${valoresSelecionadosExport}&university=&type=BOOK&graduate_program_id=`; //
+            urlPublicacoesPorPesquisador = `${urlGeral}researcherBook?term=${encodedTerm}&university=&type=BOOK&graduate_program_id=`;
         } else if (searchType === 'area') {
-            urlPublicacoesPorPesquisador = `${urlGeral}researcherArea_specialty?area_specialty=${valoresSelecionadosExport}&university=&graduate_program_id=`;
+            urlPublicacoesPorPesquisador = `${urlGeral}researcherArea_specialty?area_specialty=${encodedTerm}&university=&graduate_program_id=`;
         } else if (searchType === 'speaker') {
-            urlPublicacoesPorPesquisador = `${urlGeral}researcherParticipationEvent?term=${valoresSelecionadosExport}&university=&graduate_program_id=`; //
+            urlPublicacoesPorPesquisador = `${urlGeral}researcherParticipationEvent?term=${encodedTerm}&university=&graduate_program_id=`;
         } else if (searchType === 'patent') {
-            urlPublicacoesPorPesquisador = `${urlGeral}researcherPatent?term=${valoresSelecionadosExport}&graduate_program_id=&university=`;
+            urlPublicacoesPorPesquisador = `${urlGeral}researcherPatent?term=${encodedTerm}&graduate_program_id=&university=`;
         } else if (searchType === 'abstract') {
-            urlPublicacoesPorPesquisador = `${urlGeral}researcher?terms=${valoresSelecionadosExport}&university=&type=ABSTRACT&graduate_program_id=`;
+            urlPublicacoesPorPesquisador = `${urlGeral}researcher?terms=${encodedTerm}&university=&type=ABSTRACT&graduate_program_id=`;
         }
-    } else if (typeResult == 'speaker-home') {
-        urlPublicacoesPorPesquisador = `${urlGeral}pevent_researcher?researcher_id=&year=1900&term=${valoresSelecionadosExport}&nature=`
-    } else if (typeResult == 'institutions-home') {
-        if (searchType == 'article') {
-            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${valoresSelecionadosExport}&university=&type=ARTICLE`
-        } else if (searchType == 'speaker') {
-            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${valoresSelecionadosExport}&university=&type=SPEAKER`
-        } else if (searchType == 'patent') {
-            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${valoresSelecionadosExport}&university=&type=PATENT`
-        } else if (searchType == 'book') {
-            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${valoresSelecionadosExport}&university=&type=BOOK`
-        } else if (searchType == 'abstract') {
-            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${valoresSelecionadosExport}&university=&type=ABSTRACT`
-        } else if (searchType == 'area') {
-            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${valoresSelecionadosExport}&university=&type=AREA`
+    } else if (typeResult === 'speaker-home') {
+        urlPublicacoesPorPesquisador = `${urlGeral}pevent_researcher?researcher_id=&year=1900&term=${encodedTerm}&nature=`;
+    } else if (typeResult === 'institutions-home') {
+        if (searchType === 'article') {
+            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${encodedTerm}&university=&type=ARTICLE`;
+        } else if (searchType === 'speaker') {
+            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${encodedTerm}&university=&type=SPEAKER`;
+        } else if (searchType === 'patent') {
+            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${encodedTerm}&university=&type=PATENT`;
+        } else if (searchType === 'book') {
+            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${encodedTerm}&university=&type=BOOK`;
+        } else if (searchType === 'abstract') {
+            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${encodedTerm}&university=&type=ABSTRACT`;
+        } else if (searchType === 'area') {
+            urlPublicacoesPorPesquisador = `${urlGeral}institutionFrequenci?terms=${encodedTerm}&university=&type=AREA`;
         }
-    } else if (typeResult == 'patent-home') {
-        urlPublicacoesPorPesquisador = `${urlGeral}patent_production_researcher?researcher_id=&year=1900&term=${valoresSelecionadosExport}&distinct=`
-    } else if (typeResult == 'book-home') {
-        urlPublicacoesPorPesquisador = `${urlGeral}book_production_researcher?researcher_id=&year=1900&term=${valoresSelecionadosExport}&distinct=0`
-
-        urlPublicacoesPorPesquisador = `${urlGeral}book_chapter_production_researcher?researcher_id=&year=1900&term=${valoresSelecionadosExport}&distinct=0`
+    } else if (typeResult === 'patent-home') {
+        urlPublicacoesPorPesquisador = `${urlGeral}patent_production_researcher?researcher_id=&year=1900&term=${encodedTerm}&distinct=`;
+    } else if (typeResult === 'book-home') {
+        urlPublicacoesPorPesquisador = `${urlGeral}book_production_researcher?researcher_id=&year=1900&term=${encodedTerm}&distinct=0`;
     }
-
 
     useEffect(() => {
         const fetchData = async () => {
-
             try {
                 const response = await fetch(urlPublicacoesPorPesquisador, {
                     mode: 'cors',
@@ -177,17 +153,14 @@ export function ResultHome() {
                 }
                 const data = await response.json();
                 if (data) {
-                    setJsonData(data)
+                    setJsonData(data);
                 }
             } catch (err) {
                 console.log(err);
-            } finally {
-
             }
         };
         fetchData();
     }, [urlPublicacoesPorPesquisador]);
-
 
     const convertJsonToCsv = (json: any[]): string => {
         const items = json;
@@ -195,13 +168,13 @@ export function ResultHome() {
             return '';
         }
 
-        const replacer = (_: string, value: any) => (value === null ? '' : value); // Handle null values
+        const replacer = (_: string, value: any) => (value === null ? '' : value);
         const header = Object.keys(items[0]);
         const csv = [
-            '\uFEFF' + header.join(';'), // Add BOM and CSV header
+            '\uFEFF' + header.join(';'),
             ...items.map((item) =>
                 header.map((fieldName) => JSON.stringify(item[fieldName], replacer)).join(';')
-            ) // CSV data
+            )
         ].join('\r\n');
 
         return csv;
@@ -282,7 +255,7 @@ export function ResultHome() {
         }
     };
 
-    const version = false
+    const version = false;
     const rootRef = useRef<HTMLDivElement>(null);
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
 
@@ -309,177 +282,156 @@ export function ResultHome() {
         <ResultFiltersSlotContext.Provider value={{ slot: filtersSlot, articleDistinct, setArticleDistinct }}>
             <div ref={rootRef} className="min-h-full w-full flex flex-col">
                 <Helmet>
-                <title>
-                    {itemsSelecionados.length === 0
+                    <title>
+                        {itemsSelecionados.length === 0
+                            ? 'Pesquisa'
+                            : `Pesquisa: ${itemsSelecionados.map((item) => item.term).join(' ')}`} | {version ? 'Conectee' : 'Simcc'}
+                    </title>
+                    <meta name="description" content={`Pesquisa | ${version ? 'Conectee' : 'Simcc'}`} />
+                    <meta name="robots" content="index, follow" />
+                </Helmet>
 
-                        ? 'Pesquisa'
-                        : 'Pesquisa: ' + itemsSelecionados
+                <div className="flex w-full">
+                    <div ref={filtersSlotRef} className="hidden lg:block shrink-0" />
 
-                            .map((item, index) => {
-                                const term = item.term.replace(/[|;]/g, ''); // Remove o conector para obter apenas o termo
-                                const connector = item.term.endsWith('|') ? 'ou' : 'e'; // Determina o conector
-                                return index < itemsSelecionados.length - 1 ? `${term} ${connector}` : term; // Adiciona o conector apenas se não for o último
-                            })
-                            .join(' ')} | {version ? ('Conectee') : ('Simcc')}
-                </title>
-                <meta name="description" content={`Pesquisa | ${version ? ('Conectee') : ('Simcc')}`} />
-                <meta name="robots" content="index, follow" />
-            </Helmet>
+                    <div className="flex-1 min-w-0">
+                        {(itemsSelecionados.length > 0 || (researcher === 'false')) && (
+                            <div ref={stickyHeaderRef} className="top-[68px] h-fit sticky z-[2] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
+                                <div className="w-full px-8 border-b border-b-neutral-200 dark:border-b-neutral-800">
+                                    {isOn && (
+                                        <div className="w-full pt-4 flex justify-between items-center">
+                                            <Search />
+                                        </div>
+                                    )}
+                                    {itemsSelecionados.length > 0 && <HeaderResult />}
+                                    <div className="flex w-full flex-wrap gap-4 pt-2 justify-between">
+                                        <div className="flex flex-1 w-full">
+                                            <ScrollArea>
+                                                <div className="w-full flex items-center gap-2">
+                                                    {!(researcher === 'false' && itemsSelecionados.length === 0) && (
+                                                        <div className="transition-all">
+                                                            <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult === 'researchers-home' ? 'bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white' : 'bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700'}`} onClick={() => onOpen('researchers-home')}>
+                                                                <Users className="h-4 w-4" />
+                                                                Pesquisadores
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                    {searchType === 'article' && (
+                                                        <div className="transition-all">
+                                                            <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult === 'articles-home' ? 'bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white' : 'bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700'}`} onClick={() => onOpen('articles-home')}>
+                                                                <File className="h-4 w-4" />
+                                                                Artigos
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                    {searchType === 'book' && (
+                                                        <div className="transition-all">
+                                                            <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult === 'book-home' ? 'bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white' : 'bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700'}`} onClick={() => onOpen('book-home')}>
+                                                                <BookOpen className="h-4 w-4" />
+                                                                Livros e capítulos
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                    {searchType === 'patent' && (
+                                                        <div className="transition-all">
+                                                            <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult === 'patent-home' ? 'bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white' : 'bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700'}`} onClick={() => onOpen('patent-home')}>
+                                                                <Copyright className="h-4 w-4" />
+                                                                Patentes
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                    {searchType === 'speaker' && (
+                                                        <div className="transition-all">
+                                                            <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult === 'speaker-home' ? 'bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white' : 'bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700'}`} onClick={() => onOpen('speaker-home')}>
+                                                                <Ticket className="h-4 w-4" />
+                                                                Participação em eventos
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                    {!(simcc && researcher === 'false' && itemsSelecionados.length === 0) && (
+                                                        searchType !== 'name' && (
+                                                            <div className="transition-all">
+                                                                <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult === 'institutions-home' ? 'bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white' : 'bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700'}`} onClick={() => onOpen('institutions-home')}>
+                                                                    <Building2 className="h-4 w-4" />
+                                                                    Instituições
+                                                                </Button>
+                                                            </div>
+                                                        )
+                                                    )}
+                                                    {!isMobile && !(simcc && researcher === 'false' && itemsSelecionados.length === 0) && (
+                                                        searchType !== 'name' && (
+                                                            <div className="transition-all">
+                                                                <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult === 'mapa-home' ? 'bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white' : 'bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700'}`} onClick={() => onOpen('mapa-home')}>
+                                                                    <MapIconLucide className="h-4 w-4" />
+                                                                    Mapa
+                                                                </Button>
+                                                            </div>
+                                                        )
+                                                    )}
+                                                </div>
+                                                <ScrollBar orientation="horizontal" />
+                                            </ScrollArea>
+                                        </div>
 
-            <div className="flex w-full">
-                <div ref={filtersSlotRef} className="hidden lg:block shrink-0" />
+                                        <div className="hidden xl:flex xl:flex-nowrap gap-2">
+                                            <div className="md:flex md:flex-nowrap gap-2">
+                                                <Button onClick={() => handleDownloadJson()} variant="ghost">
+                                                    <Download size={16} />
+                                                    Baixar resultado
+                                                </Button>
+                                            </div>
 
-                <div className="flex-1 min-w-0">
-                    {(itemsSelecionados.length > 0 || (researcher == 'false')) && (
-                        <div ref={stickyHeaderRef} className="top-[68px] h-fit sticky z-[2] supports-[backdrop-filter]:dark:bg-neutral-900/60 supports-[backdrop-filter]:bg-neutral-50/60 backdrop-blur">
-                    <div className={`w-full px-8 border-b border-b-neutral-200 dark:border-b-neutral-800`}>
-                        {isOn && (
-                            <div className="w-full pt-4  flex justify-between items-center">
-                                <Search />
+                                            <Button variant="ghost" size="icon" onClick={() => setIsOn(!isOn)}>
+                                                {isOn ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                            </Button>
+                                        </div>
+
+                                        <div className="block xl:hidden">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger>
+                                                    <Button variant="ghost" size="icon" className="p-0 xl:flex">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent>
+                                                    <DropdownMenuItem onClick={() => handleDownloadJson()} className="gap-2">
+                                                        <Download size={16} />
+                                                        Baixar resultado
+                                                    </DropdownMenuItem>
+                                                    {(typeResult === 'researchers-home' || typeResult === 'articles-home' || typeResult === 'mapa-home') && (
+                                                        <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2 lg:hidden">
+                                                            <SlidersHorizontal size={16} />
+                                                            Filtros
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )}
-                        {itemsSelecionados.length > 0 && <HeaderResult />}
-                        <div className={`flex w-full flex-wrap gap-4 pt-2 justify-between ${isOn ? '' : ''} `}>
-                            <div className="flex flex-1 w-full">
-                                <ScrollArea>
-                                    <div className="w-full flex  items-center gap-2">
-                                        {!((researcher == 'false' && itemsSelecionados.length == 0) && itemsSelecionados.length == 0) && (
-                                            <div className={`transition-all`}>
-                                                <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult == 'researchers-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('researchers-home')}>
-                                                    <Users className="h-4 w-4" />
-                                                    Pesquisadores
-                                                </Button>
-                                            </div>
-                                        )}
-                                        {searchType === 'article' && (
-                                            <div className={`transition-all`}>
-                                                <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult == 'articles-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('articles-home')}>
-                                                    <File className="h-4 w-4" />
-                                                    Artigos
-                                                </Button>
-                                            </div>
-                                        )}
-                                        {searchType === 'book' && (
-                                            <div className={`transition-all`}>
-                                                <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult == 'book-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('book-home')}>
-                                                    <BookOpen className="h-4 w-4" />
-                                                    Livros e capítulos
-                                                </Button>
-                                            </div>
-                                        )}
-                                        {searchType === 'patent' && (
-                                            <div className={`transition-all`}>
-                                                <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult == 'patent-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('patent-home')}>
-                                                    <Copyright className="h-4 w-4" />
-                                                    Patentes
-                                                </Button>
-                                            </div>
-                                        )}
-                                        {searchType === 'speaker' && (
-                                            <div className={`transition-all`}>
-                                                <Button variant="ghost" className={`text-base rounded-md px-4 m-0 ${typeResult == 'speaker-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('speaker-home')}>
-                                                    <Ticket className="h-4 w-4" />
-                                                    Participação em eventos
-                                                </Button>
-                                            </div>
-                                        )}
-                                        {!((simcc && researcher == 'false' && itemsSelecionados.length == 0) && itemsSelecionados.length == 0) && (
-                                            searchType != 'name' && (
-                                                <div className={`transition-all`}>
-                                                    <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult == 'institutions-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('institutions-home')}>
-                                                        <Building2 className="h-4 w-4" />
-                                                        Instituições
-                                                    </Button>
-                                                </div>
-                                            )
-                                        )}
-                                        {!isMobile && !((simcc && researcher == 'false' && itemsSelecionados.length == 0) && itemsSelecionados.length == 0) && (
-                                            searchType != 'name' && (
-                                                <div className={`transition-all`}>
-                                                    <Button variant="ghost" className={`text-base rounded-md px-4 ${typeResult == 'mapa-home' ? ('bg-eng-blue text-white hover:bg-eng-dark-blue hover:text-white dark:bg-eng-blue dark:text-white dark:hover:bg-eng-dark-blue dark:hover:text-white') : ('bg-[#eeeeee] text-neutral-700 hover:bg-[#e5e5e5] dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700')}`} onClick={() => onOpen('mapa-home')}>
-                                                        <MapIconLucide className="h-4 w-4" />
-                                                        Mapa
-                                                    </Button>
-                                                </div>
-                                            )
-                                        )}
-                                    </div>
-                                    <ScrollBar orientation="horizontal" />
-                                </ScrollArea>
-                            </div>
 
-                            <div className="hidden xl:flex xl:flex-nowrap gap-2">
-                                <div className="md:flex md:flex-nowrap gap-2">
-                                    <Button onClick={() => handleDownloadJson()} variant="ghost" className="">
-                                        <Download size={16} className="" />
-                                        Baixar resultado
-                                    </Button>
+                        <div className="relative">
+                            {(itemsSelecionados.length > 0 || (researcher === 'false')) ? (
+                                <div className="px-8 h-full">
+                                    <ResultProvider />
                                 </div>
-
-                                <Button variant="ghost" size="icon" onClick={() => setIsOn(!isOn)}>
-                                    {isOn ? (
-                                        <ChevronUp className="h-4 w-4" />
-                                    ) : (
-                                        <ChevronDown className="h-4 w-4" />
-                                    )}
-                                </Button>
-                            </div>
-
-                            <div className="block xl:hidden">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger>
-                                        <Button variant="ghost" size={'icon'} className=" p-0 xl:flex">
-                                            <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem onClick={() => handleDownloadJson()} className="gap-2" >
-
-                                            <Download size={16} className="" />
-                                            Baixar resultado
-
-                                        </DropdownMenuItem >
-
-                                        {(typeResult == 'researchers-home' || typeResult == 'articles-home' || typeResult == 'mapa-home') && (
-                                            <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2 lg:hidden">
-
-                                                <SlidersHorizontal size={16} className="" />
-                                                Filtros
-
-                                            </DropdownMenuItem>
-                                        )}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
+                            ) : (
+                                <div className="h-[calc(100vh-134px)] flex flex-col md:p-8 p-4 md:pt-4">
+                                    <Search />
+                                    <div className="w-full flex flex-col items-center justify-center h-full">
+                                        <p className="text-9xl text-eng-blue font-bold mb-16 animate-pulse">^_^</p>
+                                        <p className="font-medium text-lg">
+                                            Experimente pesquisar um tema e veja o que a plataforma pode filtrar para você.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
-
                 </div>
-            )}
-
-            <div className="relative">
-                {(itemsSelecionados.length > 0 || (researcher == 'false')) ? (
-                    <div className="px-8 h-full">
-                        <ResultProvider />
-                    </div>
-                ) : (
-                    <div className="h-[calc(100vh-134px)] flex flex-col md:p-8 p-4 md:pt-4">
-                        <Search />
-
-                        <div className="w-full flex flex-col items-center justify-center h-full">
-                            <p className="text-9xl text-eng-blue font-bold mb-16 animate-pulse">^_^</p>
-                            <p className="font-medium text-lg">
-                                Experimente pesquisar um tema e veja o que a plataforma pode filtrar para você.
-                            </p>
-                        </div>
-                    </div>
-                )}
-
             </div>
-            </div>
-            </div>
-        </div>
         </ResultFiltersSlotContext.Provider>
-
     );
 }

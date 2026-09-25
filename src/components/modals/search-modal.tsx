@@ -46,6 +46,7 @@ import { Play, Trash } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
 
+// BARRA DE BUSCA DE CIMA
 export function SearchModal() {
   //retorna url
   const queryUrl = useQuery();
@@ -205,7 +206,7 @@ export function SearchModal() {
     let lastConnector = '';
 
     valores.forEach((item) => {
-      let term = item.term.trim();
+      let term = item.term.trim().replace(/[()]/g, '');
       const connector = term.slice(-1);
 
       if (connector === ';' || connector === '|') {
@@ -217,12 +218,12 @@ export function SearchModal() {
         lastConnector = ';';
       } else if (connector === '|') {
         tempTerms.push(term);
-        result += '(' + tempTerms.join(';') + ')|';
+        result += tempTerms.join(';') + '|';
         tempTerms = [];
         lastConnector = '|';
       } else {
         if (tempTerms.length > 0) {
-          result += '(' + tempTerms.join(';') + ')|';
+          result += tempTerms.join(';') + '|';
           tempTerms = [];
         }
         result += term + '|';
@@ -231,12 +232,12 @@ export function SearchModal() {
     });
 
     if (tempTerms.length > 0) {
-      result += '(' + tempTerms.join(';') + ')';
+      result += tempTerms.join(';');
     } else if (result.endsWith('|')) {
       result = result.slice(0, -1);
     }
 
-    return result;
+    return result.replace(/[()]/g, '').trim();
   }
 
   const [termosformatados, setTermosformatados] = useState(
@@ -267,80 +268,46 @@ export function SearchModal() {
       return;
     }
 
-    if (itemsSelecionadosPopUp.length > 0 && posGrad) {
+    const targetPath = posGrad ? '/pos-graduacao' : '/resultados';
+
+    if (itemsSelecionadosPopUp.length > 0) {
+      const cleanTerms = formatTerms(itemsSelecionadosPopUp);
       TypeSearch = searchType;
-      Terms = termosformatados;
+      Terms = cleanTerms;
       setInput('');
 
       queryUrl.set('type_search', searchType);
-      if (searchType == 'name') {
-        queryUrl.set('terms', Terms.replace(/[()]/g, ''));
-        setItensSelecionados(itemsSelecionadosPopUp);
-      } else {
-        queryUrl.set('terms', Terms);
-        setItensSelecionados(itemsSelecionadosPopUp);
-      }
+      queryUrl.set('terms', cleanTerms);
+      setItensSelecionados(
+        itemsSelecionadosPopUp.map((item) => ({
+          term: item.term.replace(/[()]/g, '').replace(/[|;]$/, '').trim(),
+        }))
+      );
+      setValoresSelecionadosExport(cleanTerms);
+
       navigate({
-        pathname: '/pos-graduacao',
-        search: queryUrl.toString(),
-      });
-
-      onOpenResult('researchers-home');
-
-      onClose();
-    } else if (itemsSelecionadosPopUp.length > 0) {
-      TypeSearch = searchType;
-      Terms = termosformatados;
-      setInput('');
-
-      queryUrl.set('type_search', searchType);
-      if (searchType == 'name') {
-        queryUrl.set('terms', Terms.replace(/[()]/g, ''));
-        setItensSelecionados(itemsSelecionadosPopUp);
-      } else {
-        queryUrl.set('terms', Terms);
-        setItensSelecionados(itemsSelecionadosPopUp);
-      }
-      navigate({
-        pathname: '/resultados',
+        pathname: targetPath,
         search: queryUrl.toString(),
       });
 
       onOpenResult('researchers-home');
       onClose();
     } else if (itemsSelecionadosPopUp.length == 0 && input.length > 0) {
-      const newItems = [{ term: input }];
+      const cleanInput = input.trim().replace(/[()]/g, '');
+      const newItems = [{ term: cleanInput }];
       setItensSelecionadosPopUp(newItems);
       setItensSelecionados(newItems);
+      setValoresSelecionadosExport(cleanInput);
       TypeSearch = searchType;
-      Terms = formatTerms(newItems);
+      Terms = cleanInput;
 
-      if (posGrad) {
-        queryUrl.set('type_search', searchType);
-        if (searchType == 'name') {
-          queryUrl.set('terms', formatTerms(newItems));
-        } else {
-          queryUrl.set('terms', `(${input.split(' ').join(';')})`);
-        }
+      queryUrl.set('type_search', searchType);
+      queryUrl.set('terms', cleanInput);
 
-        navigate({
-          pathname: '/pos-graduacao',
-          search: queryUrl.toString(),
-        });
-      } else {
-        queryUrl.set('type_search', searchType);
-
-        if (searchType == 'name') {
-          queryUrl.set('terms', formatTerms(newItems));
-        } else {
-          queryUrl.set('terms', `(${input.split(' ').join(';')})`);
-        }
-
-        navigate({
-          pathname: '/resultados',
-          search: queryUrl.toString(),
-        });
-      }
+      navigate({
+        pathname: targetPath,
+        search: queryUrl.toString(),
+      });
 
       onOpenResult('researchers-home');
       setMode('');
@@ -451,20 +418,13 @@ export function SearchModal() {
   };
 
   //conectores
-  // Função para alterar o conector, considerando termos entre parênteses
   const handleConnectorChange = (index: number, connector: string) => {
     const newItems = [...itemsSelecionadosPopUp];
-    let term = newItems[index].term.trim();
+    let term = newItems[index].term.trim().replace(/[()]/g, '');
 
-    // Remove qualquer conector existente no final, mas preserve os parênteses
+    // Remove qualquer conector existente no final
     term = term.replace(/[|;]$/, '');
-
-    // Se o termo estiver entre parênteses, adicione o conector fora dos parênteses
-    if (term.startsWith('(') && term.endsWith(')')) {
-      term = term.slice(0, -1) + connector + ')';
-    } else {
-      term += connector;
-    }
+    term += connector;
 
     newItems[index].term = term;
     setItensSelecionadosPopUp(newItems);
