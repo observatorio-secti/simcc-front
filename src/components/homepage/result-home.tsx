@@ -6,7 +6,8 @@ import { ResultProvider } from "../provider/result-provider";
 import { UserContext } from "../../context/context";
 
 import { Button } from "../ui/button";
-import { BookOpen, Building2, ChevronDown, ChevronUp, Copyright, Download, Map as MapIconLucide, MoreHorizontal, SlidersHorizontal, Ticket, Users } from "lucide-react";
+import { BookOpen, Building2, ChevronDown, ChevronUp, Copyright, Download, Loader2, Map as MapIconLucide, MoreHorizontal, SlidersHorizontal, Ticket, Users } from "lucide-react";
+import { toast } from "sonner";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { useModal } from "../hooks/use-modal-store";
 import { File } from "phosphor-react";
@@ -82,6 +83,7 @@ export function ResultHome() {
     }, []);
 
     const [jsonData, setJsonData] = useState<any[]>([]);
+    const [isExporting, setIsExporting] = useState(false);
     const exportPageSize = 100;
     const maxExportPages = 100;
 
@@ -195,6 +197,8 @@ export function ResultHome() {
     };
 
     const handleDownloadJson = async () => {
+        if (isExporting) return;
+        setIsExporting(true);
         try {
             let dataToDownload = sortExportData(jsonData);
 
@@ -250,8 +254,11 @@ export function ResultHome() {
             link.href = url;
             link.click();
             URL.revokeObjectURL(url);
+            toast.success('Arquivo baixado');
         } catch (error) {
-            console.error(error);
+            toast.error('Falha ao exportar, tente novamente');
+        } finally {
+            setIsExporting(false);
         }
     };
 
@@ -375,9 +382,13 @@ export function ResultHome() {
 
                                         <div className="hidden xl:flex xl:flex-nowrap gap-2">
                                             <div className="md:flex md:flex-nowrap gap-2">
-                                                <Button onClick={() => handleDownloadJson()} variant="ghost">
-                                                    <Download size={16} />
-                                                    Baixar resultado
+                                                <Button onClick={() => handleDownloadJson()} variant="ghost" disabled={isExporting} aria-busy={isExporting}>
+                                                    {isExporting ? (
+                                                        <Loader2 size={16} className="animate-spin" />
+                                                    ) : (
+                                                        <Download size={16} />
+                                                    )}
+                                                    {isExporting ? 'Gerando arquivo…' : 'Baixar resultado'}
                                                 </Button>
                                             </div>
 
@@ -394,9 +405,13 @@ export function ResultHome() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent>
-                                                    <DropdownMenuItem onClick={() => handleDownloadJson()} className="gap-2">
-                                                        <Download size={16} />
-                                                        Baixar resultado
+                                                    <DropdownMenuItem onClick={() => handleDownloadJson()} className="gap-2" disabled={isExporting}>
+                                                        {isExporting ? (
+                                                            <Loader2 size={16} className="animate-spin" />
+                                                        ) : (
+                                                            <Download size={16} />
+                                                        )}
+                                                        {isExporting ? 'Gerando arquivo…' : 'Baixar resultado'}
                                                     </DropdownMenuItem>
                                                     {(typeResult === 'researchers-home' || typeResult === 'articles-home' || typeResult === 'mapa-home') && (
                                                         <DropdownMenuItem onClick={() => onOpenModal('filters')} className="gap-2 lg:hidden">
