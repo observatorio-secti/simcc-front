@@ -16,6 +16,26 @@ export function AppliedFiltersBadges({ filters }: AppliedFiltersBadgesProps) {
       <div className="flex flex-wrap gap-3 items-center">
         <p className="text-sm font-medium">Filtros aplicados:</p>
 
+        {/* Territórios de Identidade */}
+        {filters.selectedIdentityTerritories.map((item) => (
+          <Badge
+            key={item}
+            className="bg-eng-blue gap-2 items-center flex font-normal rounded-md dark:bg-eng-blue dark:text-white py-2 px-3"
+          >
+            {item}
+            <div
+              className="cursor-pointer"
+              onClick={() =>
+                filters.handleIdentityTerritoryToggle(
+                  filters.selectedIdentityTerritories.filter((i) => i !== item),
+                )
+              }
+            >
+              <X size={16} />
+            </div>
+          </Badge>
+        ))}
+
         {/* Áreas */}
         {filters.selectedAreas.map((item) => (
           <Badge

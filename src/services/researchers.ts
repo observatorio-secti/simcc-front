@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { api } from '../lib/api';
-import { Research, ResearchOpenAlex } from '../types/researcher';
+import {
+  Research,
+  ResearchOpenAlex,
+  ResearcherFilterApiResponse,
+  ResearcherMetrics,
+} from '../types/researcher';
 
 export interface SearchResearchersParams {
   searchType: string;
@@ -137,4 +142,57 @@ export const getOpenAlexResearchers = async (
   });
 
   return Array.isArray(data?.results) ? data.results : [];
+};
+
+/**
+ * Busca opções de filtros disponíveis diretamente do endpoint /researcher_filter
+ */
+export const getResearcherFilterOptions = async (
+  params?: Record<string, any>,
+): Promise<ResearcherFilterApiResponse> => {
+  try {
+    const { data } = await api.get('researcher_filter', { params });
+    return data ?? {
+      area: [],
+      graduation: [],
+      city: [],
+      institution: [],
+      modality: [],
+      graduate_program: [],
+      departament: [],
+      identity_territory: [],
+    };
+  } catch (error) {
+    console.error('Erro ao buscar opções de filtros em /researcher_filter:', error);
+    return {
+      area: [],
+      graduation: [],
+      city: [],
+      institution: [],
+      modality: [],
+      graduate_program: [],
+      departament: [],
+      identity_territory: [],
+    };
+  }
+};
+
+/**
+ * Consulta métricas globais consolidadas dos pesquisadores em /metrics/researcher/chart
+ */
+export const getResearcherMetrics = async (
+  params: Record<string, any>,
+): Promise<ResearcherMetrics | null> => {
+  try {
+    const { data } = await api.get('metrics/researcher/chart', {
+      params,
+    });
+    if (Array.isArray(data) && data.length > 0) {
+      return data[0];
+    }
+    return null;
+  } catch (error) {
+    console.error('Erro ao buscar métricas de pesquisador em /metrics/researcher/chart:', error);
+    return null;
+  }
 };

@@ -63,6 +63,18 @@ export interface Research {
   graduate_programs: GraduatePrograms[];
   departments: Departments[];
   speaker?: string;
+  identity_territory?: string;
+  institution?: {
+    id?: string;
+    name?: string;
+    acronym?: string;
+    image?: string;
+    cover?: string;
+    identity_territory?: string;
+    workload?: number;
+    city_id?: string;
+    city?: string;
+  };
 }
 
 export interface SummaryStats {
@@ -103,4 +115,23 @@ export interface ResearcherFilterValues {
   subsidies: string[];
   graduatePrograms: string[];
   departments: string[];
+  identityTerritories: string[];
+}
+
+export interface ResearcherFilterApiResponse {
+  area: string[];
+  graduation: string[];
+  city: string[];
+  institution: string[];
+  modality: string[];
+  graduate_program: string[];
+  departament: string[];
+  identity_territory: string[];
+}
+
+export interface ResearcherMetrics {
+  researcher_count: number;
+  orcid_count: number;
+  scopus_count: number;
+  among: number;
 }

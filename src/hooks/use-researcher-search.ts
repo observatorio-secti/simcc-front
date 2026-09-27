@@ -2,9 +2,16 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import {
   getSearchResearchersPage,
   getOpenAlexResearchers,
+  getResearcherFilterOptions,
+  getResearcherMetrics,
   SearchResearchersParams,
 } from '../services/researchers';
-import { Research, ResearchOpenAlex } from '../types/researcher';
+import {
+  Research,
+  ResearchOpenAlex,
+  ResearcherFilterApiResponse,
+  ResearcherMetrics,
+} from '../types/researcher';
 
 /**
  * Hook de busca paginada sob demanda de pesquisadores (100 itens por página).
@@ -26,6 +33,36 @@ export const useSearchResearchersInfinite = (
       return (lastPageParam as number) + 1;
     },
     enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutos de cache
+  });
+};
+
+/**
+ * Hook de busca de opções de filtros diretamente em /researcher_filter
+ */
+export const useResearcherFilterOptions = (
+  params?: Record<string, any>,
+  enabled: boolean = true,
+) => {
+  return useQuery<ResearcherFilterApiResponse, Error>({
+    queryKey: ['researcher-filter-options', params],
+    queryFn: () => getResearcherFilterOptions(params),
+    enabled,
+    staleTime: 1000 * 60 * 5, // 5 minutos de cache
+  });
+};
+
+/**
+ * Hook de busca de métricas consolidadas em /metrics/researcher/chart
+ */
+export const useResearcherMetrics = (
+  params: Record<string, any>,
+  enabled: boolean = true,
+) => {
+  return useQuery<ResearcherMetrics | null, Error>({
+    queryKey: ['researcher-metrics', params],
+    queryFn: () => getResearcherMetrics(params),
+    enabled: enabled && Boolean(params.terms || params.type),
     staleTime: 1000 * 60 * 5, // 5 minutos de cache
   });
 };
