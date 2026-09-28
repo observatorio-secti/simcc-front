@@ -17,6 +17,7 @@ import {
   UserPlus,
   Users,
   Wrench,
+  GitGraph,
 } from 'lucide-react';
 
 import { NavMain } from './nav-main';
@@ -67,6 +68,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             title: 'Dados',
             url: '/paines-dados-externos',
             icon: Link2,
+          },
+          {
+            title: 'Grafos',
+            url: '/grafos',
+            icon: GitGraph,
           },
         ],
       },

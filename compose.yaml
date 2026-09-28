@@ -8,4 +8,4 @@ services:
     restart: unless-stopped
     env_file: ./.env
     ports:
-      - "7004:80"
+      - "8082:80"

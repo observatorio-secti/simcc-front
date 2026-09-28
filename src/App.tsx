@@ -12,6 +12,7 @@ import { Dashboard } from './pages/Dashboard';
 import DefaultLayout from './layout/default-layout';
 
 import { Authentication } from './pages/Authentication';
+import { GrafosPage } from './pages/GrafosPage';
 
 interface User {
   institution_id: string;
@@ -432,6 +433,7 @@ function App() {
                   <Route path="/departamentos" element={<Home />} />
                   <Route path="/researcher" element={<Home />} />
                   <Route path="/resultados-ia" element={<Home />} />
+                  <Route path="/grafos" element={<GrafosPage />} />
                   <Route path="/paines-dados-externos" element={<Home />} />
                   <Route path="/indice-pesquisador" element={<Home />} />
                   <Route path="/provimento-cargo" element={<Home />} />
