@@ -142,11 +142,11 @@ interface Firebase {
 
 interface SomaTotalPorGrupoEPesquisador {
   [grupoId: string]:
-    | {
-        titulo: string;
-        pesquisadores: { id: string; name: string; total: number }[];
-      }
-    | { [pesquisadorId: string]: string };
+  | {
+    titulo: string;
+    pesquisadores: { id: string; name: string; total: number }[];
+  }
+  | { [pesquisadorId: string]: string };
 }
 
 type PesquisadorUpdate = {
@@ -442,11 +442,10 @@ export function BaremasHome() {
         row += valoresCategorias.join(',') + ',';
 
         // Adicionar a coluna do total
-        row += `${
-          pesquisador.total >= pesquisador.quantidade_max_pontos
+        row += `${pesquisador.total >= pesquisador.quantidade_max_pontos
             ? pesquisador.quantidade_max_pontos
             : parseFloat(pesquisador.total).toFixed(2)
-        }\n`;
+          }\n`;
 
         csvContent += row;
       });
@@ -643,7 +642,7 @@ export function BaremasHome() {
           const pesquisadoresFiltradosTitulacao = pesquisadores
             .map((pesquisador) =>
               pesquisador.graduation.toUpperCase() ===
-              criterioItem.toUpperCase()
+                criterioItem.toUpperCase()
                 ? formatResearcherData(pesquisador, criterioId)
                 : undefined,
             )
@@ -775,7 +774,7 @@ export function BaremasHome() {
       description: 'Valores de anos alterados para últimos 4 anos de produção',
       action: {
         label: 'Fechar',
-        onClick: () => {},
+        onClick: () => { },
       },
     });
   };
@@ -1014,7 +1013,7 @@ export function BaremasHome() {
           description: 'Você pode acessá-lo em meus baremas',
           action: {
             label: 'Fechar',
-            onClick: () => {},
+            onClick: () => { },
           },
         });
       } else {
@@ -1046,7 +1045,7 @@ export function BaremasHome() {
           description: 'Você pode acessá-lo em meus baremas',
           action: {
             label: 'Fechar',
-            onClick: () => {},
+            onClick: () => { },
           },
         });
       }
@@ -1057,7 +1056,7 @@ export function BaremasHome() {
         description: 'Erro ao salvar barema',
         action: {
           label: 'Fechar',
-          onClick: () => {},
+          onClick: () => { },
         },
       });
     }
@@ -1403,7 +1402,7 @@ export function BaremasHome() {
                                                 <Dialog
                                                   open={
                                                     openPopovers[grupoIndex]?.[
-                                                      index
+                                                    index
                                                     ] || false
                                                   }
                                                   onOpenChange={(isOpen) => {
@@ -1413,11 +1412,11 @@ export function BaremasHome() {
                                                         (groupOpen, gi) =>
                                                           gi === grupoIndex
                                                             ? groupOpen.map(
-                                                                (open, ci) =>
-                                                                  ci === index
-                                                                    ? isOpen
-                                                                    : open,
-                                                              )
+                                                              (open, ci) =>
+                                                                ci === index
+                                                                  ? isOpen
+                                                                  : open,
+                                                            )
                                                             : groupOpen,
                                                       );
                                                     // Update the state
@@ -1544,25 +1543,25 @@ export function BaremasHome() {
                                                 <div className="overflow-x-auto flex-nowrap flex-1">
                                                   {pesquisadoresSelecionados.length !=
                                                     0 && (
-                                                    <PesquisadorItemBarema
-                                                      pontos={Number(
-                                                        categoria.pontos,
-                                                      )}
-                                                      pontuacao_max={Number(
-                                                        categoria.pontuacao_max,
-                                                      )}
-                                                      id_criterio={
-                                                        categoria.id_criterio
-                                                      }
-                                                      researcherSelecionados={
-                                                        researcherSelecionados
-                                                      }
-                                                      onPesquisadoresUpdate={
-                                                        handleResearcherUpdate
-                                                      }
-                                                      grupos={grupos}
-                                                    />
-                                                  )}
+                                                      <PesquisadorItemBarema
+                                                        pontos={Number(
+                                                          categoria.pontos,
+                                                        )}
+                                                        pontuacao_max={Number(
+                                                          categoria.pontuacao_max,
+                                                        )}
+                                                        id_criterio={
+                                                          categoria.id_criterio
+                                                        }
+                                                        researcherSelecionados={
+                                                          researcherSelecionados
+                                                        }
+                                                        onPesquisadoresUpdate={
+                                                          handleResearcherUpdate
+                                                        }
+                                                        grupos={grupos}
+                                                      />
+                                                    )}
                                                 </div>
 
                                                 <TooltipProvider>
@@ -1771,15 +1770,15 @@ export function BaremasHome() {
                                                         return (
                                                           subAcc +
                                                           (pesquisador.total >=
-                                                          Number(
-                                                            categoria.pontuacao_max,
-                                                          )
+                                                            Number(
+                                                              categoria.pontuacao_max,
+                                                            )
                                                             ? Number(
-                                                                categoria.pontuacao_max,
-                                                              )
+                                                              categoria.pontuacao_max,
+                                                            )
                                                             : parseFloat(
-                                                                pesquisador.total.toString(),
-                                                              ))
+                                                              pesquisador.total.toString(),
+                                                            ))
                                                         );
                                                       }
                                                       return subAcc;
@@ -1798,7 +1797,7 @@ export function BaremasHome() {
                                             >
                                               <div className="rounded-md border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 h-10 px-4 py-2 text-gray-600 text-sm dark:text-white font-normal">
                                                 {totalPorColuna >=
-                                                grupo.quantidade_max_pontos
+                                                  grupo.quantidade_max_pontos
                                                   ? grupo.quantidade_max_pontos
                                                   : totalPorColuna.toFixed(2)}
                                               </div>
@@ -1810,11 +1809,11 @@ export function BaremasHome() {
                                         <TableCell className="text-center">
                                           <div className="rounded-md border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950 h-10 px-4 py-2 text-gray-600 text-sm dark:text-white font-normal">
                                             {grupoOrdenado.total >=
-                                            grupoOrdenado.quantidade_max_pontos
+                                              grupoOrdenado.quantidade_max_pontos
                                               ? grupoOrdenado.quantidade_max_pontos
                                               : parseFloat(
-                                                  grupoOrdenado.total,
-                                                ).toFixed(2)}
+                                                grupoOrdenado.total,
+                                              ).toFixed(2)}
                                           </div>
                                         </TableCell>
                                       </TableRow>

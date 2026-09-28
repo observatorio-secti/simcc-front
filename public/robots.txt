@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://conectee.eng.ufmg.br/sitemap.xml

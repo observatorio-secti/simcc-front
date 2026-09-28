@@ -14,8 +14,10 @@ import {
 import { Button } from '../ui/button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { UserContext } from '../../context/context';
+import { hasOdaBase } from '../../lib/api';
+import { useSimccGroupsRaw } from '../../hooks/use-institution-queries';
 import { Skeleton } from '../ui/skeleton';
 import { cn } from '../../lib';
 import { Alert } from '../ui/alert';
@@ -55,7 +57,10 @@ import { Label } from '../ui/label';
 import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 import { GraficoAreaGrupos } from './grafico-area';
 import { GraficoInstituicaoGrupos } from './grafico-instituicoes';
-import { fetchAllResearchGroups } from '../../services/grupos-pesquisa';
+import {
+  fetchAllResearchGroups,
+  normalizeOdaGrupo,
+} from '../../services/grupos-pesquisa';
 export interface Patrimonio {
   area: string;
   institution: string;
@@ -165,43 +170,44 @@ export function GruposPesquisaPage() {
 
   const programSelecionado = type_search || '';
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [total, setTotal] = useState<Patrimonio[]>([]);
-
   const { urlGeral, urlGeral2, simcc } = useContext(UserContext);
 
-  const urlPatrimonioInsert = `${urlGeral}research_group`;
+  const simccRaw = useSimccGroupsRaw();
+  const odaFailed = simccRaw.isError;
+  const [legacyItems, setLegacyItems] = useState<Patrimonio[]>([]);
+  const [legacyLoading, setLegacyLoading] = useState(false);
 
   useEffect(() => {
+    if (hasOdaBase() && !odaFailed) return;
     const abortController = new AbortController();
-    const fetchAll = async () => {
-      setIsLoading(true);
+    const fetchLegacy = async () => {
+      setLegacyLoading(true);
       try {
         const { items } = await fetchAllResearchGroups(
           abortController.signal,
         );
-        if (!abortController.signal.aborted) {
-          setTotal(items);
-          setJsonData(items);
-        }
+        if (!abortController.signal.aborted) setLegacyItems(items);
       } catch (err: any) {
         if (err?.name !== 'AbortError' && err?.name !== 'CanceledError')
           console.log(err);
       } finally {
-        if (!abortController.signal.aborted) setIsLoading(false);
+        if (!abortController.signal.aborted) setLegacyLoading(false);
       }
     };
-    fetchAll();
+    fetchLegacy();
     return () => abortController.abort();
-  }, [urlGeral, urlGeral2]);
+  }, [urlGeral, urlGeral2, odaFailed]);
 
-  console.log(urlPatrimonioInsert);
+  const total: Patrimonio[] = useMemo(
+    () => simccRaw.data?.map(normalizeOdaGrupo) ?? legacyItems,
+    [simccRaw.data, legacyItems],
+  );
+  const isLoading =
+    hasOdaBase() && !odaFailed ? simccRaw.isLoading : legacyLoading;
+
   const normalizeArea = (area: string): string => {
     return area.toUpperCase(); // Converte para maiúsculas
   };
-
-  console.log(total);
   const [count, setCount] = useState(12);
 
   const [search, setSearch] = useState('');
@@ -305,8 +311,6 @@ export function GruposPesquisaPage() {
 
   const [isOn, setIsOn] = useState(true);
 
-  const [jsonData, setJsonData] = useState<any[]>([]);
-
   const convertJsonToCsv = (json: any[]): string => {
     const items = json;
     const replacer = (_: string, value: any) => (value === null ? '' : value); // Handle null values
@@ -325,7 +329,7 @@ export function GruposPesquisaPage() {
 
   const handleDownloadJson = async () => {
     try {
-      const csvData = convertJsonToCsv(jsonData);
+      const csvData = convertJsonToCsv(total);
       const blob = new Blob([csvData], {
         type: 'text/csv;charset=windows-1252;',
       });

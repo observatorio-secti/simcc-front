@@ -107,6 +107,9 @@ export function GraficoInstituicaoGrupos(props: ResearchData) {
                 tickMargin={10}
                 axisLine={false}
                 textAnchor="middle"
+                tickFormatter={(value: string) =>
+                  String(value).split(' - ')[0]
+                }
               />
               <CartesianGrid vertical={false} horizontal={false} />
               <ChartTooltip

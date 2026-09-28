@@ -38,11 +38,8 @@ export function HeaderResult() {
         console.warn('No matching documents.');
         return [];
       }
-
       const files = querySnapshot.docs.map((doc) => doc.data() as Csv);
-
       const mappedFiles = files.filter((file) => file.type_ === search);
-
       return mappedFiles;
     } catch (error) {
       console.error('Erro ao buscar arquivos:', error);
