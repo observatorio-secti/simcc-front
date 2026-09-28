@@ -1,9 +1,7 @@
 // LoadingWrapper.tsx
 import React, { useState, useEffect, useContext } from 'react';
-import { LogoConectee } from './svg/LogoConectee';
 import { UserContext } from '../context/context';
 import { useTheme } from 'next-themes';
-import { LogoConecteeWhite } from './svg/LogoConecteeWhite';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -95,11 +93,13 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
                 setRole(JSON.parse(storedRole));
               }
 
-              setTimeout(() => {
-                setLoading(false);
-              }, 2000);
+              setLoading(false);
+            } else {
+              setLoading(false);
             }
-          } catch (err) {}
+          } catch (err) {
+            setLoading(false);
+          }
         };
 
         fetchData();
@@ -118,7 +118,13 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
       setPermission(JSON.parse(storedPermission));
     }
 
+    // Segurança: se o Firebase não responder, libera a tela mesmo assim.
+    const safetyTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      clearTimeout(safetyTimeout);
       if (firebaseUser) {
         if (firebaseUser.uid !== '') {
           // Recupera as informações adicionais do seu banco de dados aqui
@@ -155,38 +161,28 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
                   setRole(JSON.parse(storedRole));
                 }
 
-                setTimeout(() => {
-                  setLoading(false);
-                }, 2000); // 2000 ms = 2 segundos
+                setLoading(false);
+              } else {
+                setLoading(false);
               }
             } catch (err) {
-            } finally {
-              setTimeout(() => {
-                setLoading(false);
-              }, 2000); // 2000 ms = 2 segundos
+              setLoading(false);
             }
           };
 
           fetchData();
         } else {
           setLoggedIn(false);
-          setTimeout(() => {
-            setLoading(false);
-          }, 2000); // 2000 ms = 2 segundos
+          setLoading(false);
         }
       } else {
         setLoggedIn(false);
-        setTimeout(() => {
-          setLoading(false);
-        }, 2000); // 2000 ms = 2 segundos
-      }
-
-      setTimeout(() => {
         setLoading(false);
-      }, 2000); // 2000 ms = 2 segundos
+      }
     });
 
     return () => {
+      clearTimeout(safetyTimeout);
       unsubscribe();
     };
   }, []);
@@ -198,15 +194,9 @@ const LoadingWrapper: React.FC<LoadingWrapperProps> = ({ children }) => {
       {loading ? (
         <main className="h-screen w-full flex items-center justify-center">
           <div className="h-16 animate-pulse">
-            {false ? (
-              <div className="h-16  ">
-                {theme == 'dark' ? <LogoConecteeWhite /> : <LogoConectee />}
-              </div>
-            ) : (
-              <div className="h-16  ">
-                {theme == 'dark' ? <LogoIaposWhite /> : <LogoIapos />}
-              </div>
-            )}
+            <div className="h-16  ">
+              {theme == 'dark' ? <LogoIaposWhite /> : <LogoIapos />}
+            </div>
           </div>
         </main>
       ) : (
