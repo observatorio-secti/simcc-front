@@ -148,9 +148,14 @@ const useQuery = () => {
 type FiltersModalProps = {
   researcher: Research[];
   setResearcher: React.Dispatch<React.SetStateAction<Research[]>>;
+  resetList?: Research[];
 };
 
-export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
+export function FiltersModal({
+  researcher,
+  setResearcher,
+  resetList,
+}: FiltersModalProps) {
   const queryUrl = useQuery();
   const getArrayFromUrl = (key: string) => queryUrl.get(key)?.split(';') || [];
   const { onClose, isOpen, type: typeModal } = useModal();
@@ -343,7 +348,7 @@ export function FiltersModal({ researcher, setResearcher }: FiltersModalProps) {
     setSelectedSubsidies([]);
     setSelectedDepartaments([]);
     setSelectedGraduatePrograms([]);
-    setResearcher(researcher);
+    setResearcher(resetList ?? researcher);
     onClose();
   };
 
@@ -846,6 +851,52 @@ export function BolsistasHome() {
   const [metrics, setMetrics] = useState<CategoryMetric[]>([]);
   const totalBolsistas = metrics.reduce((acc, curr) => acc + curr.count, 0);
 
+  const [fullBase, setFullBase] = useState<Research[] | null>(null);
+  const [loadingMap, setLoadingMap] = useState(true);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    const fetchFull = async () => {
+      try {
+        const all: Research[] = [];
+        let p = 1;
+        while (p <= 10) {
+          const response = await fetch(
+            `${urlGeral}researcher/foment?page=${p}&lenght=500`,
+            {
+              mode: 'cors',
+              headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Max-Age': '3600',
+                'Content-Type': 'text/plain',
+              },
+              signal: abortController.signal,
+            },
+          );
+          const data = await response.json();
+          if (!Array.isArray(data) || abortController.signal.aborted) break;
+          all.push(...data);
+          if (data.length < 500) break;
+          p += 1;
+        }
+        if (!abortController.signal.aborted && all.length > 0) {
+          setFullBase(all);
+        }
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          console.error('Full base fetch error:', err);
+        }
+      } finally {
+        if (!abortController.signal.aborted) setLoadingMap(false);
+      }
+    };
+
+    fetchFull();
+    return () => abortController.abort();
+  }, [urlGeral]);
+
   useEffect(() => {
     localStorage.setItem(
       'pesquisadoresSelecionados',
@@ -934,6 +985,8 @@ export function BolsistasHome() {
     <Skeleton key={index} className="w-full rounded-md h-[300px]" />
   ));
 
+  const mapBase = fullBase ?? originalResearcher;
+
   const {
     clearFilters,
     selectedAreas,
@@ -945,7 +998,8 @@ export function BolsistasHome() {
     selectedSubsidies,
     selectedUniversities,
   } = FiltersModal({
-    researcher: originalResearcher,
+    researcher: mapBase,
+    resetList: originalResearcher,
     setResearcher,
   });
 
@@ -1053,7 +1107,7 @@ export function BolsistasHome() {
                 <AccordionTrigger></AccordionTrigger>
               </div>
               <AccordionContent className="p-0">
-                {loading && researcher.length === 0 ? (
+                {loadingMap || (loading && researcher.length === 0) ? (
                   <Skeleton className="rounded-md w-full h-[300px] " />
                 ) : (
                   <div>
@@ -1063,7 +1117,7 @@ export function BolsistasHome() {
                           <Skeleton className="rounded-md w-full h-[300px]" />
                         }
                       >
-                        <BahiaTerritoriosMap researchers={researcher} />
+                        <BahiaTerritoriosMap researchers={mapBase} />
                       </Suspense>
                     </Alert>
                   </div>
