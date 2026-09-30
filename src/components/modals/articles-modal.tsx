@@ -515,7 +515,7 @@ export function ArticlesModal() {
               </div>
             )}
 
-            {hasAbstract && (
+            {hasAbstract ? (
               <div>
                 <div className="my-6 border-b dark:border-b-neutral-800"></div>
                 <h4 className="font-medium text-xl mb-4">Resumo</h4>
@@ -582,6 +582,14 @@ export function ArticlesModal() {
                       </div>
                     )
                   )} */}
+              </div>
+            ) : (
+              <div>
+                <div className="my-6 border-b dark:border-b-neutral-800"></div>
+                <h4 className="font-medium text-xl mb-4">Resumo</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-justify">
+                  Resumo indisponível para este artigo.
+                </p>
               </div>
             )}
 
