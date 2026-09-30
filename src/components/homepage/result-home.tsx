@@ -16,7 +16,7 @@ import { HeaderResult } from "./header-results";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { ResultFiltersSlotContext } from "./result-filters-slot-context";
+import { ResultFiltersSlotContext, ArticleExportFilters } from "./result-filters-slot-context";
 import { useIsMobile } from "../../hooks/use-mobile";
 
 const useQuery = () => new URLSearchParams(useLocation().search);
@@ -29,6 +29,7 @@ export function ResultHome() {
 
     const [isOn, setIsOn] = useState(true);
     const [articleDistinct, setArticleDistinct] = useState(false);
+    const [articleExportFilters, setArticleExportFilters] = useState<ArticleExportFilters>({ qualis: [], year: [] });
     const isMobile = useIsMobile();
 
     const queryUrl = useQuery();
@@ -88,11 +89,19 @@ export function ResultHome() {
     const maxExportPages = 100;
 
     const encodedTerm = encodeURIComponent(valoresSelecionadosExport || '');
+    const articleYearMin = articleExportFilters.year[0] ?? 1900;
+    const articleQualis = encodeURIComponent(articleExportFilters.qualis.join(';'));
 
     let urlPublicacoesPorPesquisador = '';
 
     if (typeResult === 'articles-home') {
-        urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_researcher?terms=${encodedTerm}&researcher_id=&type=ARTICLE&qualis=&year=1900&distinct=${articleDistinct ? '1' : '0'}`;
+        if (searchType === 'name') {
+            urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_researcher?terms=${encodedTerm}&researcher_id=&type=ARTICLE&qualis=${articleQualis}&year=${articleYearMin}`;
+        } else if (searchType === 'area') {
+            urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_article_area?area_specialty=${encodedTerm.replace(/%3B/g, '%20')}&great_area=&year=${articleYearMin}&qualis=${articleQualis}`;
+        } else {
+            urlPublicacoesPorPesquisador = `${urlGeral}bibliographic_production_article?terms=${encodedTerm}&year=${articleYearMin}&qualis=${articleQualis}&university=&distinct=${articleDistinct ? '1' : '0'}&graduate_program_id=`;
+        }
     } else if (typeResult === 'researchers-home') {
         if (searchType === 'name') {
             urlPublicacoesPorPesquisador = `${urlGeral}researcherName?name=${encodedTerm}`;
@@ -196,6 +205,54 @@ export function ResultHome() {
         });
     };
 
+    const getQueryFilterValues = (key: string) =>
+        queryUrl.get(key)?.split(';').filter(Boolean) || [];
+
+    const filterResearchersForExport = (items: any[]) => {
+        const selectedAreas = getQueryFilterValues('areas');
+        const selectedGraduations = getQueryFilterValues('graduations');
+        const selectedCities = getQueryFilterValues('cities');
+        const selectedUniversities = getQueryFilterValues('universities');
+        const selectedSubsidies = getQueryFilterValues('subsidy');
+        const selectedGraduatePrograms = getQueryFilterValues('graduatePrograms');
+        const selectedDepartments = getQueryFilterValues('departments');
+
+        return items.filter((researcherItem) => {
+            const areas = typeof researcherItem.area === 'string'
+                ? researcherItem.area.split(';').map((area: string) => area.trim())
+                : [];
+            const subsidies = Array.isArray(researcherItem.subsidy) ? researcherItem.subsidy : [];
+            const graduatePrograms = Array.isArray(researcherItem.graduate_programs)
+                ? researcherItem.graduate_programs
+                : [];
+            const departments = Array.isArray(researcherItem.departments)
+                ? researcherItem.departments
+                : [];
+
+            return (selectedAreas.length === 0 || selectedAreas.some((selected) => areas.some((area: string) => area.includes(selected))))
+                && (selectedGraduations.length === 0 || selectedGraduations.includes(researcherItem.graduation))
+                && (selectedCities.length === 0 || selectedCities.includes(researcherItem.city))
+                && (selectedUniversities.length === 0 || selectedUniversities.includes(researcherItem.university))
+                && (selectedSubsidies.length === 0 || subsidies.some((sub: any) => selectedSubsidies.includes(sub.modality_name)))
+                && (selectedGraduatePrograms.length === 0 || graduatePrograms.some((program: any) => selectedGraduatePrograms.includes(program.name)))
+                && (selectedDepartments.length === 0 || departments.some((department: any) => selectedDepartments.includes(department.dep_sigla)));
+        });
+    };
+
+    const filterArticlesForExport = (items: any[]) => {
+        const [minYear, maxYear] = articleExportFilters.year.length === 2
+            ? articleExportFilters.year
+            : [1900, 9999];
+
+        return items.filter((article) => {
+            const year = Number(article.year);
+            const yearMatches = Number.isNaN(year) || (year >= minYear && year <= maxYear);
+            const qualisMatches = articleExportFilters.qualis.length === 0
+                || articleExportFilters.qualis.includes(article.qualis);
+            return yearMatches && qualisMatches;
+        });
+    };
+
     const handleDownloadJson = async () => {
         if (isExporting) return;
         setIsExporting(true);
@@ -237,7 +294,10 @@ export function ResultHome() {
                     page += 1;
                 } while (pageData.length === exportPageSize && page <= maxExportPages);
 
-                dataToDownload = sortExportData(pages);
+                dataToDownload = typeResult === 'articles-home'
+                    ? filterArticlesForExport(pages)
+                    : filterResearchersForExport(pages);
+                dataToDownload = sortExportData(dataToDownload);
             } else {
                 dataToDownload = sortExportData(dataToDownload);
             }
@@ -286,7 +346,7 @@ export function ResultHome() {
     }, [itemsSelecionados]);
 
     return (
-        <ResultFiltersSlotContext.Provider value={{ slot: filtersSlot, articleDistinct, setArticleDistinct }}>
+        <ResultFiltersSlotContext.Provider value={{ slot: filtersSlot, articleDistinct, setArticleDistinct, articleExportFilters, setArticleExportFilters }}>
             <div ref={rootRef} className="min-h-full w-full flex flex-col">
                 <Helmet>
                     <title>

@@ -211,7 +211,7 @@ function ArticlesListAccordion({ loading, publicacoes, typeVisu, setTypeVisu, di
 }
 export function ArticlesHome() {
     const { urlGeral, searchType, valoresSelecionadosExport } = useContext(UserContext);
-    const { slot: filtersSlot, articleDistinct, setArticleDistinct } = useContext(ResultFiltersSlotContext);
+    const { slot: filtersSlot, articleDistinct, setArticleDistinct, setArticleExportFilters } = useContext(ResultFiltersSlotContext);
     const queryUrl = useQuery();
     const institutionId = queryUrl.get('institution_id');
 
@@ -233,6 +233,13 @@ export function ArticlesHome() {
         const interval = filters.length > 0 ? normalizeYearRange(filters[0].year) : getDefaultYearRange();
         return interval;
     }, [filters]);
+
+    useEffect(() => {
+        setArticleExportFilters({
+            qualis: filters.length > 0 ? filters[0].qualis : [],
+            year: yearInterval,
+        });
+    }, [filters, yearInterval, setArticleExportFilters]);
 
     // Filtragem cliente: backend filtra só piso (year >= min), max aplicado aqui
     const publicacoes = useMemo(() => {

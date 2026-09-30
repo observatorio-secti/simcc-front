@@ -31,7 +31,7 @@ export function FilterSections({ filters }: FilterSectionsProps) {
           <div className="flex gap-2 items-center">
             {filters.selectedAreas.length > 0 && (
               <Button
-                onClick={() => filters.setSelectedAreas([])}
+                onClick={() => filters.handleAreaToggle([])}
                 className="lg:h-8 lg:w-8"
                 variant={'destructive'}
                 size={'icon'}
@@ -95,7 +95,7 @@ export function FilterSections({ filters }: FilterSectionsProps) {
           <div className="flex gap-2 items-center">
             {filters.selectedGraduations.length > 0 && (
               <Button
-                onClick={() => filters.setSelectedGraduations([])}
+                onClick={() => filters.handleGraduationToggle([])}
                 className="lg:h-8 lg:w-8"
                 variant={'destructive'}
                 size={'icon'}
@@ -134,7 +134,7 @@ export function FilterSections({ filters }: FilterSectionsProps) {
           <div className="flex gap-2 items-center">
             {filters.selectedCities.length > 0 && (
               <Button
-                onClick={() => filters.setSelectedCities([])}
+                onClick={() => filters.handleCityToggle([])}
                 className="lg:h-8 lg:w-8"
                 variant={'destructive'}
                 size={'icon'}
@@ -186,7 +186,7 @@ export function FilterSections({ filters }: FilterSectionsProps) {
           <div className="flex gap-2 items-center">
             {filters.selectedUniversities.length > 0 && (
               <Button
-                onClick={() => filters.setSelectedUniversities([])}
+                onClick={() => filters.handleUniversityToggle([])}
                 className="lg:h-8 lg:w-8"
                 variant={'destructive'}
                 size={'icon'}
@@ -225,7 +225,7 @@ export function FilterSections({ filters }: FilterSectionsProps) {
           <div className="flex gap-2 items-center">
             {filters.selectedSubsidies.length > 0 && (
               <Button
-                onClick={() => filters.setSelectedSubsidies([])}
+                onClick={() => filters.handleSubsidyToggle([])}
                 className="lg:h-8 lg:w-8"
                 variant={'destructive'}
                 size={'icon'}
@@ -268,7 +268,7 @@ export function FilterSections({ filters }: FilterSectionsProps) {
           <div className="flex gap-2 items-center">
             {filters.selectedGraduatePrograms.length > 0 && (
               <Button
-                onClick={() => filters.setSelectedGraduatePrograms([])}
+                onClick={() => filters.handleGraduateProgramToggle([])}
                 className="lg:h-8 lg:w-8"
                 variant={'destructive'}
                 size={'icon'}
