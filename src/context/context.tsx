@@ -9,26 +9,9 @@ export interface ItemsSelecionados {
   term: string;
 }
 
-export interface PesquisadoresSelecionados {
-  id: string;
-  name: string;
-  university: string;
-  lattes_id: string;
-  city: string;
-  area: string;
-  graduation: string;
-}
-
-export interface Permission {
-  permission: string;
-  id: string;
-}
-
 export interface UserContextType {
   test: boolean;
   setTest: React.Dispatch<React.SetStateAction<boolean>>;
-  loggedIn: boolean;
-  setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   navbar: boolean;
   mapModal: boolean;
   setMapModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -43,9 +26,6 @@ export interface UserContextType {
 
   valoresSelecionadosExport: string;
   setValoresSelecionadosExport: React.Dispatch<React.SetStateAction<string>>;
-
-  idDocumentBarema: string;
-  setIdDocumentBarema: React.Dispatch<React.SetStateAction<string>>;
 
   messagesMaria: any[];
   setMessagesMaria: React.Dispatch<React.SetStateAction<any[]>>;
@@ -63,11 +43,6 @@ export interface UserContextType {
   sugestoes: ItemsSelecionados[];
   setSugestoes: React.Dispatch<React.SetStateAction<ItemsSelecionados[]>>;
 
-  pesquisadoresSelecionados: PesquisadoresSelecionados[];
-  setPesquisadoresSelecionados: React.Dispatch<
-    React.SetStateAction<PesquisadoresSelecionados[]>
-  >;
-
   valorDigitadoPesquisaDireta: string;
   setValorDigitadoPesquisaDireta: React.Dispatch<React.SetStateAction<string>>;
 
@@ -79,14 +54,6 @@ export interface UserContextType {
 
   urlGeral2: string;
   setUrlGeral2: React.Dispatch<React.SetStateAction<string>>;
-
-  urlGeralAdm: string;
-  setUrlGeralAdm: React.Dispatch<React.SetStateAction<string>>;
-
-  pesquisadoresSelecionadosGroupBarema: string;
-  setPesquisadoresSelecionadosGroupBarema: React.Dispatch<
-    React.SetStateAction<string>
-  >;
 
   idGraduateProgram: string;
   setIdGraduateProgram: React.Dispatch<React.SetStateAction<string>>;
@@ -106,12 +73,6 @@ export interface UserContextType {
   mode: string;
   setMode: React.Dispatch<React.SetStateAction<string>>;
 
-  role: string;
-  setRole: React.Dispatch<React.SetStateAction<string>>;
-
-  permission: Permission[];
-  setPermission: React.Dispatch<React.SetStateAction<Permission[]>>;
-
   navCollapsedSize: number;
   setNavCollapsedSize: React.Dispatch<React.SetStateAction<number>>;
 
@@ -120,8 +81,6 @@ export interface UserContextType {
 }
 
 export const UserContext = createContext<UserContextType>({
-  loggedIn: false,
-  setLoggedIn: () => {},
   test: false,
   setTest: () => {},
   mapModal: false,
@@ -145,26 +104,14 @@ export const UserContext = createContext<UserContextType>({
   itemsSelecionadosPopUp: [],
   setItensSelecionadosPopUp: () => {},
 
-  role: '',
-  setRole: () => {},
-
-  permission: [],
-  setPermission: () => {},
-
   sugestoes: [],
   setSugestoes: () => {},
-
-  pesquisadoresSelecionados: [],
-  setPesquisadoresSelecionados: () => {},
 
   messagesMaria: [],
   setMessagesMaria: () => {},
 
   valorDigitadoPesquisaDireta: '',
   setValorDigitadoPesquisaDireta: () => {},
-
-  idDocumentBarema: '',
-  setIdDocumentBarema: () => {},
 
   inputMaria: '',
   setInputMaria: () => {},
@@ -174,12 +121,6 @@ export const UserContext = createContext<UserContextType>({
 
   urlGeral2: '',
   setUrlGeral2: () => {},
-
-  urlGeralAdm: '',
-  setUrlGeralAdm: () => {},
-
-  pesquisadoresSelecionadosGroupBarema: '',
-  setPesquisadoresSelecionadosGroupBarema: () => {},
 
   searchType: '',
   setSearchType: () => {},

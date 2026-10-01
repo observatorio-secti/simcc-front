@@ -857,17 +857,8 @@ export function ResearchersHomeListagens() {
   const [researcher, setResearcher] = useState<Research[]>([]);
   const [originalResearcher, setOriginalResearcher] = useState<Research[]>([]);
   const [typeVisu, setTypeVisu] = useState('block');
-  const { itemsSelecionados, urlGeral, searchType, simcc } =
+  const { itemsSelecionados, urlGeral, searchType, simcc, idGraduateProgram } =
     useContext(UserContext);
-  const { pesquisadoresSelecionados, idGraduateProgram } =
-    useContext(UserContext);
-
-  useEffect(() => {
-    localStorage.setItem(
-      'pesquisadoresSelecionados',
-      JSON.stringify(pesquisadoresSelecionados),
-    );
-  }, [pesquisadoresSelecionados]);
 
   const queryUrl = useQuery();
 

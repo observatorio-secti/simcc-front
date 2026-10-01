@@ -123,7 +123,7 @@ const useQuery = () => {
 };
 
 export function VisualizacaoPrograma() {
-  const { urlGeral, itemsSelecionados, searchType, permission, urlGeralAdm } =
+  const { urlGeral, itemsSelecionados, searchType } =
     useContext(UserContext);
   const { onOpen: onOpenModal } = useModal();
   const history = useNavigate();
@@ -176,24 +176,10 @@ export function VisualizacaoPrograma() {
     DOUTORADO: 'bg-blue-800',
   };
 
-  const has_visualizar_indicadores_pos_graduacao = permission.some(
-    (perm) => perm.permission === 'visualizar_indicadores_pos_graduacao',
-  );
-
   const [tab, setTab] = useState('all');
-
-  useEffect(() => {
-    if (!has_visualizar_indicadores_pos_graduacao) {
-      setTab('all');
-    }
-  }, [permission]);
 
   const [isOpenSheet, setIsOpenSheet] = useState(false);
   const [expand, setExpand] = useState(false);
-
-  const has_editar_informacoes_programa = permission.some(
-    (perm) => perm.permission === 'editar_informacoes_programa',
-  );
 
   const graduate_program_id =
     graduatePrograms && graduatePrograms[0]

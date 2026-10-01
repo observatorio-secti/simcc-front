@@ -72,7 +72,6 @@ export function SearchModal() {
     itemsSelecionados,
     setItensSelecionados,
     setValorDigitadoPesquisaDireta,
-    loggedIn,
     historico,
   } = useContext(UserContext);
   const [input, setInput] = useState('');
@@ -570,7 +569,7 @@ export function SearchModal() {
         </Alert>
 
         {((input.length >= 3 && filteredItems.length != 0) ||
-          (loggedIn && historico.length > 0)) && (
+          historico.length > 0) && (
             <Alert className="w-full">
               {historico.length > 0 && (
                 <div>

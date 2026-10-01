@@ -5,7 +5,7 @@ import {
   Routes,
   Route,
 } from 'react-router-dom';
-import { UserContext, HistoricoItem, ItemsSelecionados, PesquisadoresSelecionados, Permission } from '../src/context/context';
+import { UserContext, HistoricoItem, ItemsSelecionados } from '../src/context/context';
 
 import DefaultLayout from './layout/default-layout';
 import { CookiesProvider } from 'react-cookie';
@@ -20,7 +20,6 @@ import { PROFILE_RESULTS_PATH } from './lib/search-types';
 import { initGA, trackPageView } from './lib/analytics';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
   const [navbar, setNavbar] = useState(false);
   const [user, setUser] = useState<any>(null);
 
@@ -32,14 +31,7 @@ function App() {
     import.meta.env.VITE_URL_GERAL2 || '',
   );
 
-  const [urlGeralAdm, setUrlGeralAdm] = useState(
-    import.meta.env.VITE_URL_GERAL_ADM || '',
-  );
-
   const [mapModal, setMapModal] = useState(false);
-
-  const [role, setRole] = useState('');
-  const [permission, setPermission] = useState<Permission[]>([]);
 
   const [simcc, setSimcc] = useState(
     import.meta.env.VITE_SIMCC === 'false' ? false : true,
@@ -48,10 +40,6 @@ function App() {
     import.meta.env.VITE_TEST_FUNCTIONS === 'false' ? false : true,
   );
   const [searchType, setSearchType] = useState('article');
-  const [
-    pesquisadoresSelecionadosGroupBarema,
-    setPesquisadoresSelecionadosGroupBarema,
-  ] = useState('');
   const [idGraduateProgram, setIdGraduateProgram] = useState('0');
   const [valoresSelecionadosExport, setValoresSelecionadosExport] =
     useState('');
@@ -66,11 +54,7 @@ function App() {
     ItemsSelecionados[]
   >([]);
   const [sugestoes, setSugestoes] = useState<ItemsSelecionados[]>([]);
-  const [pesquisadoresSelecionados, setPesquisadoresSelecionados] = useState<
-    PesquisadoresSelecionados[]
-  >([]);
   const [messagesMaria, setMessagesMaria] = useState<any[]>([]);
-  const [idDocumentBarema, setIdDocumentBarema] = useState('');
 
   const [historico, setHistorico] = useState<HistoricoItem[]>([]);
 
@@ -110,21 +94,6 @@ function App() {
 
   useWindowResize(() => {});
 
-  useEffect(() => {
-    const storedPesquisadores = localStorage.getItem(
-      'pesquisadoresSelecionados',
-    );
-    if (storedPesquisadores) {
-      setPesquisadoresSelecionados(JSON.parse(storedPesquisadores));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      'pesquisadoresSelecionados',
-      JSON.stringify(pesquisadoresSelecionados),
-    );
-  }, [pesquisadoresSelecionados]);
 
   return (
     <>
@@ -132,12 +101,8 @@ function App() {
         <CookiesProvider>
           <UserContext.Provider
             value={{
-              loggedIn,
-              setLoggedIn,
               navbar,
               setNavbar,
-              urlGeralAdm,
-              setUrlGeralAdm,
               user,
               setUser,
               searchType,
@@ -146,8 +111,6 @@ function App() {
               setUrlGeral,
               urlGeral2,
               setUrlGeral2,
-              pesquisadoresSelecionadosGroupBarema,
-              setPesquisadoresSelecionadosGroupBarema,
               idGraduateProgram,
               setIdGraduateProgram,
               valoresSelecionadosExport,
@@ -166,10 +129,6 @@ function App() {
               setItensSelecionados,
               sugestoes,
               setSugestoes,
-              pesquisadoresSelecionados,
-              setPesquisadoresSelecionados,
-              idDocumentBarema,
-              setIdDocumentBarema,
               itemsSelecionadosPopUp,
               setItensSelecionadosPopUp,
               isCollapsed,
@@ -180,10 +139,6 @@ function App() {
               setNavCollapsedSize,
               defaultLayout,
               setDefaultLayout,
-              role,
-              setRole,
-              permission,
-              setPermission,
               simcc,
               setSimcc,
               isCollapsedRight,

@@ -8,8 +8,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '../../../../components/ui/dropdown-menu';
-import { ArrowUpDown, Copy, Maximize2, MoreHorizontal, X } from 'lucide-react';
-import { Buildings, MapPin, Plus, ShareNetwork } from 'phosphor-react';
+import { ArrowUpDown, Copy, Maximize2, MoreHorizontal } from 'lucide-react';
+import { Buildings, MapPin, ShareNetwork } from 'phosphor-react';
 import { GraduationCap } from 'lucide-react';
 import { useContext } from 'react';
 import { UserContext } from '../../../../context/context';
@@ -118,56 +118,8 @@ export const columns: ColumnDef<Research>[] = [
         useContext(UserContext);
       const urlShare = `${urlGeral}researcher/${row.id}/${searchType}/${valoresSelecionadosExport}`;
       const { onOpen } = useModal();
-      const { pesquisadoresSelecionados, setPesquisadoresSelecionados } =
-        useContext(UserContext);
       return (
-        <div className="flex gap-3 ml-auto w-full">
-          <Button
-            onClick={() => {
-              // Verifica se o pesquisador já está selecionado pelo nome
-              if (
-                pesquisadoresSelecionados.some(
-                  (pesquisador) => pesquisador.name === row.original.name,
-                )
-              ) {
-                // Remove o pesquisador selecionado com o nome correspondente
-                setPesquisadoresSelecionados((prev) =>
-                  prev.filter(
-                    (pesquisador) => pesquisador.name !== row.original.name,
-                  ),
-                );
-              } else {
-                // Adiciona o novo pesquisador selecionado
-                setPesquisadoresSelecionados((prev) => [
-                  ...prev,
-                  {
-                    id: row.original.id,
-                    name: row.original.name,
-                    university: row.original.university,
-                    lattes_id: row.original.lattes_id,
-                    city: row.original.city,
-                    area: row.original.area,
-                    graduation: row.original.graduation,
-                  },
-                ]);
-              }
-            }}
-            size={'icon'}
-            className={` ml-auto flex transition-all h-8 w-8  ${
-              pesquisadoresSelecionados.some(
-                (pesquisador) => pesquisador.name === row.original.name,
-              ) && 'bg-red-500 hover:bg-red-600 text-white'
-            }`}
-          >
-            {pesquisadoresSelecionados.some(
-              (pesquisador) => pesquisador.name === row.original.name,
-            ) ? (
-              <X size={16} className="" />
-            ) : (
-              <Plus size={16} className="" />
-            )}
-          </Button>
-
+        <div className="flex gap-3 ml-auto w-full justify-end">
           <Button
             onClick={() =>
               onOpen('researcher-modal', { name: row.original.name })

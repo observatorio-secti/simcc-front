@@ -6,9 +6,7 @@ export type ModalType =
   | 'map-researchers-modal'
   | 'researcher-modal'
   | 'filters'
-  | 'pesquisadores-selecionados'
   | 'gratuate-program'
-  | 'relatar-problema'
   | 'filters-graduate'
   | 'filters-researcher-listagens'
   | (string & {});

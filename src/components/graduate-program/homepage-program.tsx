@@ -297,7 +297,7 @@ const useQuery = () => {
 export function HomepageProgram(props: Props) {
   const [researcher, setResearcher] = useState<Research[]>([]);
 
-  const { urlGeral, urlGeralAdm } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
 
   const queryUrl = useQuery();
 
@@ -567,32 +567,7 @@ export function HomepageProgram(props: Props) {
 
   //pesos prod
 
-  const [a1, seta1] = useState('');
-  const [a2, seta2] = useState('');
-  const [a3, seta3] = useState('');
-  const [a4, seta4] = useState('');
-  const [b1, setb1] = useState('');
-  const [b2, setb2] = useState('');
-  const [b3, setb3] = useState('');
-  const [b4, setb4] = useState('');
-  const [c, setc] = useState('');
-  const [sq, setsq] = useState('');
-
-  const [livro, setLivro] = useState('');
-  const [capLivro, setCapLivro] = useState('');
-
-  const [t1, setT1] = useState('');
-  const [t2, setT2] = useState('');
-  const [t3, setT3] = useState('');
-  const [t4, setT4] = useState('');
-  const [t5, setT5] = useState('');
-
-  const [software, setSoftware] = useState('');
-  const [patenteCondecida, setPatenteConcedida] = useState('');
-  const [patenteNaoConcedida, setPatenteNaoConcedida] = useState('');
-  const [relTec, setRelTec] = useState('');
-
-  const FALLBACK_PESOS: PesosProducao = {
+  const pesosProducao: PesosProducao = {
     a1: '1',
     a2: '0.875',
     a3: '0.75',
@@ -617,63 +592,6 @@ export function HomepageProgram(props: Props) {
     book: '1',
     book_chapter: '0.25',
   };
-
-  const [pesosProducao, setPesosProducao] = useState<PesosProducao>(FALLBACK_PESOS);
-
-  const urlGet =
-    urlGeralAdm +
-    `indprod/query?institution_id=083a16f0-cccf-47d2-a676-d10b8931f66b`;
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const fetchData = async () => {
-      if (!urlGeralAdm) return;
-      try {
-        const response = await fetch(urlGet, {
-          mode: 'cors',
-          signal: controller.signal,
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        if (!response.ok) throw new Error(`indprod ${response.status}`);
-        const data = await response.json();
-        if (!Array.isArray(data) || data.length === 0) throw new Error('indprod empty');
-        const newData = data[0];
-        seta1(newData.a1);
-        seta2(newData.a2);
-        seta3(newData.a3);
-        seta4(newData.a4);
-        setb1(newData.b1);
-        setb2(newData.b2);
-        setb3(newData.b3);
-        setb4(newData.b4);
-        setc(newData.c);
-        setsq(newData.sq);
-        setT1(newData.f1);
-        setT2(newData.f2);
-        setT3(newData.f3);
-        setT4(newData.f4);
-        setT5(newData.f5);
-        setLivro(newData.book);
-        setCapLivro(newData.book_chapter);
-        setSoftware(newData.software);
-        setPatenteConcedida(newData.patent_granted);
-        setPatenteNaoConcedida(newData.patent_not_granted);
-        setRelTec(newData.report);
-        setPesosProducao(newData);
-      } catch (err) {
-        if ((err as Error).name === 'AbortError') return;
-        setPesosProducao(FALLBACK_PESOS);
-      }
-    };
-    fetchData();
-    return () => controller.abort();
-  }, [urlGet]);
 
   return (
     <main className="h-full w-full flex flex-col">

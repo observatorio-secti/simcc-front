@@ -144,7 +144,6 @@ import {
   LoaderCircle,
   Minus,
   MoreHorizontal,
-  Plus,
   Waypoints,
 } from 'lucide-react';
 
@@ -183,9 +182,6 @@ export function ResearcherModal() {
     setItensSelecionadosPopUp,
     searchType,
     valoresSelecionadosExport,
-    setPesquisadoresSelecionados,
-    pesquisadoresSelecionados,
-    permission,
   } = useContext(UserContext);
 
   const [, setResearcherData] = useState<ResearchOpenAlex[]>([]);
@@ -366,9 +362,6 @@ export function ResearcherModal() {
     fetchData();
   }, [urlPublicacoesPorPesquisador]);
 
-  const hasBaremaAvaliacao = permission.some(
-    (perm) => perm.permission === 'criar_barema_avaliacao',
-  );
 
   const convertJsonToCsv = (json: any[]): string => {
     const items = json;
@@ -547,67 +540,6 @@ export function ResearcherModal() {
                   </div>
 
                   <div className="hidden lg:flex gap-3">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant={'default'}
-                            onClick={() => {
-                              // Verifica se o pesquisador já está selecionado pelo nome
-                              if (
-                                pesquisadoresSelecionados.some(
-                                  (pesquisador) =>
-                                    pesquisador.name === props.name,
-                                )
-                              ) {
-                                // Remove o pesquisador selecionado com o nome correspondente
-                                setPesquisadoresSelecionados((prev) =>
-                                  prev.filter(
-                                    (pesquisador) =>
-                                      pesquisador.name !== props.name,
-                                  ),
-                                );
-                              } else {
-                                // Adiciona o novo pesquisador selecionado
-                                setPesquisadoresSelecionados((prev) => [
-                                  ...prev,
-                                  {
-                                    id: props.id,
-                                    name: props.name,
-                                    university: props.university,
-                                    lattes_id: props.lattes_id,
-                                    city: props.city,
-                                    area: props.area,
-                                    graduation: props.graduation,
-                                  },
-                                ]);
-                              }
-                            }}
-                            className={`
-                                h-8 w-8 p-0 text-white dark:text-white 
-                                ${pesquisadoresSelecionados.some((pesquisador) => pesquisador.name === props.name) && 'bg-red-500 hover:bg-red-600 text-white'}
-                              `}
-                          >
-                            {pesquisadoresSelecionados.some(
-                              (pesquisador) => pesquisador.name === props.name,
-                            ) ? (
-                              <X size={16} className="" />
-                            ) : (
-                              <Plus size={16} className="" />
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {' '}
-                          {pesquisadoresSelecionados.some(
-                            (pesquisador) => pesquisador.name === props.name,
-                          )
-                            ? 'Remover pesquisador(a) do barema'
-                            : 'Adicionar pesquisador(a) ao barema'}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>

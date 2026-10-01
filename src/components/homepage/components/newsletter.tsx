@@ -6,13 +6,13 @@ import { UserContext } from '../../../context/context';
 import { toast } from 'sonner';
 
 export function Newsletter() {
-  const { urlGeralAdm } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
 
   const [input, setInput] = useState('');
 
   const handleSubmitBolsista = async () => {
     try {
-      const urlBolsistaInsert = `${urlGeralAdm}/newsletter?email=${input}`;
+      const urlBolsistaInsert = `${urlGeral}newsletter?email=${input}`;
 
       const response = await fetch(urlBolsistaInsert, {
         mode: 'cors',

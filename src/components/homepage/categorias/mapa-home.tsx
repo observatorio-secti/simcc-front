@@ -579,8 +579,8 @@ export function MapaHome() {
   const [loading, setLoading] = useState(false);
   const [researcher, setResearcher] = useState<Research[]>([]);
   const [originalResearcher, setOriginalResearcher] = useState<Research[]>([]);
-  const { urlGeral, searchType, simcc } = useContext(UserContext);
-  const { pesquisadoresSelecionados, idGraduateProgram } = useContext(UserContext);
+  const { urlGeral, searchType, simcc, idGraduateProgram } =
+    useContext(UserContext);
   const { slot: filtersSlot } = useContext(ResultFiltersSlotContext);
 
   const queryUrl = useQuery();

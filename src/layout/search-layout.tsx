@@ -80,17 +80,6 @@ export default function SearchLayout({
     localStorage.setItem('hasVisited', 'true');
   };
 
-  ///BUG
-  const location = useLocation();
-
-  useEffect(() => {
-    if (location.pathname == '/relatar-problema') {
-      onOpen('relatar-problema');
-    } else if (location.pathname == '/pesquisadores-selecionados') {
-      onOpen('pesquisadores-selecionados');
-    }
-  }, [location]);
-
   const router = useLocation();
   const pathSegments = router.pathname.split('/').filter(Boolean); // Divide a URL em segmentos e remove a primeira parte vazia
 

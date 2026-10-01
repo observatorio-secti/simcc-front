@@ -41,13 +41,10 @@ import { PROFILE_RESULTS_PATH } from '../../lib/search-types';
 
 export function Header() {
   const {
-    loggedIn,
-    role,
     setItensSelecionados,
     searchType,
     maria,
     user,
-    permission,
   } = useContext(UserContext);
 
   const { theme, setTheme } = useTheme();

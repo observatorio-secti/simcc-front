@@ -176,111 +176,33 @@ export function ResearcherIndicators(props: Research) {
 
   const yearString = filters.length > 0 ? filters[0].year.join(';') : '';
 
-  const { urlGeralAdm, urlGeral } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
 
-  const [a1, seta1] = useState('');
-  const [a2, seta2] = useState('');
-  const [a3, seta3] = useState('');
-  const [a4, seta4] = useState('');
-  const [b1, setb1] = useState('');
-  const [b2, setb2] = useState('');
-  const [b3, setb3] = useState('');
-  const [b4, setb4] = useState('');
-  const [c, setc] = useState('');
-  const [sq, setsq] = useState('');
-
-  const [livro, setLivro] = useState('');
-  const [capLivro, setCapLivro] = useState('');
-
-  const [t1, setT1] = useState('');
-  const [t2, setT2] = useState('');
-  const [t3, setT3] = useState('');
-  const [t4, setT4] = useState('');
-  const [t5, setT5] = useState('');
-
-  const [software, setSoftware] = useState('');
-  const [patenteCondecida, setPatenteConcedida] = useState('');
-  const [patenteNaoConcedida, setPatenteNaoConcedida] = useState('');
-  const [relTec, setRelTec] = useState('');
-
-  const [pesosProducao, setPesosProducao] = useState<PesosProducao>({
-    a1: a1,
-    a2: a2,
-    a3: a3,
-    a4: a4,
-    b1: b1,
-    b2: b2,
-    b3: b3,
-    b4: b4,
-    c: c,
-    sq: sq,
-    f1: t1,
-    f2: t2,
-    f3: t3,
-    f4: t4,
-    f5: t5,
-    livro: livro,
-    cap_livro: capLivro,
-    software: software,
-    patent_granted: patenteCondecida,
-    patent_not_granted: patenteNaoConcedida,
-    report: relTec,
-    book: livro,
-    book_chapter: capLivro,
-  });
-
-  const urlGet =
-    urlGeralAdm +
-    `indprod/query?institution_id=083a16f0-cccf-47d2-a676-d10b8931f66b`;
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlGet, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data.length != 0) {
-          const newData = data[0]; // Assumindo que data é um array e tem apenas um elemento
-          seta1(newData.a1);
-          seta2(newData.a2);
-          seta3(newData.a3);
-          seta4(newData.a4);
-          setb1(newData.b1);
-          setb2(newData.b2);
-          setb3(newData.b3);
-          setb4(newData.b4);
-          setc(newData.c);
-          setsq(newData.sq);
-          setT1(newData.f1);
-          setT2(newData.f2);
-          setT3(newData.f3);
-          setT4(newData.f4);
-          setT5(newData.f5);
-          setLivro(newData.book);
-          setCapLivro(newData.book_chapter);
-          setSoftware(newData.software);
-          setPatenteConcedida(newData.patent_granted);
-          setPatenteNaoConcedida(newData.patent_not_granted);
-          setRelTec(newData.report);
-
-          setPesosProducao(newData);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, []);
-
-  console.log(pesosProducao);
+  const pesosProducao: PesosProducao = {
+    a1: '1',
+    a2: '0.875',
+    a3: '0.75',
+    a4: '0.625',
+    b1: '0.5',
+    b2: '0.375',
+    b3: '0.25',
+    b4: '0.125',
+    c: '0',
+    sq: '0',
+    f1: '2',
+    f2: '1.5',
+    f3: '1',
+    f4: '0.5',
+    f5: '0.1',
+    livro: '1',
+    cap_livro: '0.25',
+    software: 't5',
+    patent_granted: 't4',
+    patent_not_granted: 't4',
+    report: 't5',
+    book: '1',
+    book_chapter: '0.25',
+  };
 
   const urlDados = `${urlGeral}researcher/DadosGerais?researcher_id=${props.id}&year=${yearString}`;
 
@@ -409,84 +331,84 @@ export function ResearcherIndicators(props: Research) {
 
           <div className="flex flex-wrap gap-4 mt-6">
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#34663C] rounded-md"></div> A1 - {a1}
+              <div className="h-4 w-4 bg-[#34663C] rounded-md"></div> A1 - {pesosProducao.a1}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#9DC356] rounded-md"></div> A2 - {a2}
+              <div className="h-4 w-4 bg-[#9DC356] rounded-md"></div> A2 - {pesosProducao.a2}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#B1C38A] rounded-md"></div>A3 - {a3}
+              <div className="h-4 w-4 bg-[#B1C38A] rounded-md"></div>A3 - {pesosProducao.a3}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#BEC4B3] rounded-md"></div> A4 - {a4}
+              <div className="h-4 w-4 bg-[#BEC4B3] rounded-md"></div> A4 - {pesosProducao.a4}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#D56438] rounded-md"></div> B1 - {b1}
+              <div className="h-4 w-4 bg-[#D56438] rounded-md"></div> B1 - {pesosProducao.b1}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#DD883D] rounded-md"></div> B2 - {b2}
+              <div className="h-4 w-4 bg-[#DD883D] rounded-md"></div> B2 - {pesosProducao.b2}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#E3B081] rounded-md"></div> B3 - {b3}
+              <div className="h-4 w-4 bg-[#E3B081] rounded-md"></div> B3 - {pesosProducao.b3}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#E3AC96] rounded-md"></div> B4 - {b4}
+              <div className="h-4 w-4 bg-[#E3AC96] rounded-md"></div> B4 - {pesosProducao.b4}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#CE3830] rounded-md"></div> C - {c}
+              <div className="h-4 w-4 bg-[#CE3830] rounded-md"></div> C - {pesosProducao.c}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
               <div className="h-4 w-4 bg-[#4A1314] rounded-md"></div> Sem qualis
-              - {sq}
+              - {pesosProducao.sq}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-200 rounded-md"></div> T1 - {t1}
+              <div className="h-4 w-4 bg-blue-200 rounded-md"></div> T1 - {pesosProducao.f1}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-300 rounded-md"></div> T2 - {t2}
+              <div className="h-4 w-4 bg-blue-300 rounded-md"></div> T2 - {pesosProducao.f2}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-400 rounded-md"></div> T3 - {t3}
+              <div className="h-4 w-4 bg-blue-400 rounded-md"></div> T3 - {pesosProducao.f3}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-500 rounded-md"></div> T4 - {t4}
+              <div className="h-4 w-4 bg-blue-500 rounded-md"></div> T4 - {pesosProducao.f4}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-600 rounded-md"></div> T5 - {t5}
+              <div className="h-4 w-4 bg-blue-600 rounded-md"></div> T5 - {pesosProducao.f5}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
               <div className="h-4 w-4 bg-[#096670] rounded-md"></div> Software -{' '}
-              {software.toUpperCase()}
+              {pesosProducao.software.toUpperCase()}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
               <div className="h-4 w-4 bg-[#662D91] rounded-md"></div> Relatório
-              Técnico - {relTec.toUpperCase()}
+              Técnico - {pesosProducao.report.toUpperCase()}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
               <div className="h-4 w-4 bg-[#6BC26B] rounded-md"></div> Patente
-              concedida - {patenteCondecida.toUpperCase()}
+              concedida - {pesosProducao.patent_granted.toUpperCase()}
             </div>
 
             <div className="flex items-center gap-2 text-xs ">
               <div className="h-4 w-4 bg-[#CE3830] rounded-md"></div> Patente
-              não concedida - {patenteNaoConcedida.toUpperCase()}
+              não concedida - {pesosProducao.patent_not_granted.toUpperCase()}
             </div>
           </div>
         </div>

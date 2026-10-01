@@ -39,7 +39,6 @@ export function ResearchersHome() {
     const {
         itemsSelecionados,
         searchType,
-        pesquisadoresSelecionados,
         idGraduateProgram,
     } = useContext(UserContext);
     const { slot: filtersSlot } = useContext(ResultFiltersSlotContext);
@@ -48,14 +47,6 @@ export function ResearchersHome() {
     const terms = queryUrl.get('terms') || '';
     const openAlexState = queryUrl.get('open_alex');
     const finalOpenAlex = openAlexState || '';
-
-    // Persiste a seleção de pesquisadores no localStorage
-    useEffect(() => {
-        localStorage.setItem(
-            'pesquisadoresSelecionados',
-            JSON.stringify(pesquisadoresSelecionados),
-        );
-    }, [pesquisadoresSelecionados]);
 
     // Consulta paginada via TanStack Query (100 itens por página)
     const {

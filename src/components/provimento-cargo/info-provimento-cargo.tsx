@@ -60,10 +60,7 @@ export function InfoPavimentoCargo(props: Props) {
     setItensSelecionadosPopUp,
     searchType,
     valoresSelecionadosExport,
-    setPesquisadoresSelecionados,
-    pesquisadoresSelecionados,
     setItensSelecionados,
-    permission,
   } = useContext(UserContext);
 
   const [mestrado, setMestrado] = useState('');

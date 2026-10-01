@@ -78,8 +78,7 @@ export const InfiniteMovingArticle = ({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const { onOpen } = useModal();
-  const { urlGeral, setPesquisadoresSelecionados, pesquisadoresSelecionados } =
-    useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
 
   useEffect(() => {
     addAnimation();

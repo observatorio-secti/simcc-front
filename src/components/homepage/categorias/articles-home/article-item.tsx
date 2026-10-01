@@ -5,7 +5,7 @@ import { UserContext } from '../../../../context/context';
 import { toast } from 'sonner';
 import { Button } from '../../../ui/button';
 import { Link } from 'react-router-dom';
-import { Maximize2, Pencil, Star } from 'lucide-react';
+import { Maximize2, Star } from 'lucide-react';
 import { useModalSecundary } from '../../../hooks/use-modal-store-secundary';
 
 type Articles = {
@@ -131,7 +131,7 @@ const highlightText = (
 };
 
 export function ArticleItem(props: Articles) {
-  const { urlGeral, itemsSelecionados, user, permission } =
+  const { urlGeral, itemsSelecionados, user } =
     useContext(UserContext);
 
   const qualisColor = {
@@ -154,10 +154,6 @@ export function ArticleItem(props: Articles) {
   const { onOpen } = useModalSecundary();
 
   const highlightedTitleEvent = highlightText(props.title, itemsSelecionados);
-
-  const has_editar_producao = permission.some(
-    (perm) => perm.permission === 'editar_producao',
-  );
 
   const handleFileDelete = async () => {
     const urlDelete = `${urlGeral}image/${props.id}?type=ARTICLE`;
@@ -274,43 +270,6 @@ export function ArticleItem(props: Articles) {
                 >
                   <ShareNetwork size={16} />
                 </Button>
-
-                {(user?.lattes_id == props.lattes_id ||
-                  has_editar_producao) && (
-                  <Button
-                    onClick={() =>
-                      onOpen('edit-article', {
-                        id: props.id,
-                        doi: doi,
-                        qualis: props.qualis,
-                        title: props.title,
-                        year: props.year,
-                        jif: props.jif,
-                        lattes_10_id: props.lattes_10_id,
-                        researcher_id: props.researcher_id,
-                        magazine: props.magazine,
-                        abstract: props.abstract,
-                        article_institution: props.article_institution,
-                        authors: props.authors,
-                        authors_institution: props.authors_institution,
-                        citations_count: props.citations_count,
-                        issn: props.issn,
-                        keywords: props.keywords,
-                        landing_page_url: props.landing_page_url,
-                        language: props.language,
-                        pdf: props.pdf,
-                        researcher: props.researcher,
-                        has_image: props.has_image,
-                        relevance: props.relevance,
-                      })
-                    }
-                    variant={'outline'}
-                    className="h-8 w-8 text-gray-500 dark:text-white hidden group-hover:flex"
-                    size={'icon'}
-                  >
-                    <Pencil size={16} />
-                  </Button>
-                )}
 
                 <Button
                   onClick={() =>

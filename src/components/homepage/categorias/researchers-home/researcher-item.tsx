@@ -1,21 +1,14 @@
 import { useContext, useState, useEffect } from 'react';
 import { Alert } from '../../../ui/alert';
 import { UserContext } from '../../../../context/context';
-import { MapPin, Plus, X } from 'phosphor-react';
+import { MapPin } from 'phosphor-react';
 import { Building2, GraduationCap } from 'lucide-react';
 import { useModal } from '../../../hooks/use-modal-store';
-import { Button } from '../../../ui/button';
 
 import dt from '../../../../assets/dt.png';
 import pq from '../../../../assets/pq.png';
 import { CardTitle } from '../../../ui/card';
 import { InfiniteMovingCards } from '../../../ui/infinite-moving-cards';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../../../ui/tooltip';
 
 type Research = {
   among: number;
@@ -158,18 +151,9 @@ function useUniversitySigla(urlGeral: string, university: string) {
 
 export function ResearchItem(props: Research) {
   const { onOpen } = useModal();
-  const {
-    urlGeral,
-    setPesquisadoresSelecionados,
-    permission,
-    pesquisadoresSelecionados,
-  } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
 
   const universitySigla = useUniversitySigla(urlGeral, props.university);
-
-  const hasBaremaAvaliacao = permission.some(
-    (perm) => perm.permission === 'criar_barema_avaliacao',
-  );
 
   return (
     <div
@@ -186,70 +170,12 @@ export function ResearchItem(props: Research) {
           <div className="flex flex-col justify-between h-full">
             <div className="z-[1] w-full  p-4 flex gap-3 justify-end">
               <div className="mr-auto">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={(event) => {
-                          event.stopPropagation(); // Impede a propagação do evento de clique para o contêiner pai
-
-                          if (
-                            pesquisadoresSelecionados.some(
-                              (pesquisador) => pesquisador.name === props.name,
-                            )
-                          ) {
-                            setPesquisadoresSelecionados((prev) =>
-                              prev.filter(
-                                (pesquisador) =>
-                                  pesquisador.name !== props.name,
-                              ),
-                            );
-                          } else {
-                            setPesquisadoresSelecionados((prev) => [
-                              ...prev,
-                              {
-                                id: props.id,
-                                name: props.name,
-                                university: props.university,
-                                lattes_id: props.lattes_id,
-                                city: props.city,
-                                area: props.area,
-                                graduation: props.graduation,
-                              },
-                            ]);
-                          }
-                        }}
-                        size={'icon'}
-                        className={`hidden group-hover:flex transition-all h-8 w-8 ${pesquisadoresSelecionados.some((pesquisador) => pesquisador.name === props.name) && 'bg-red-500 hover:bg-red-600 text-white'}`}
-                      >
-                        {pesquisadoresSelecionados.some(
-                          (pesquisador) => pesquisador.name === props.name,
-                        ) ? (
-                          <X size={16} />
-                        ) : (
-                          <Plus size={16} />
-                        )}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {' '}
-                      {pesquisadoresSelecionados.some(
-                        (pesquisador) => pesquisador.name === props.name,
-                      )
-                        ? 'Remover pesquisador(a) do barema'
-                        : 'Adicionar pesquisador(a) ao barema'}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-
-                <div className="flex group-hover:hidden">
-                  <div className="flex text-white gap-2 items-center">
-                    <div
-                      className={` rounded-md h-4 w-4 ${props.status ? 'bg-green-500' : 'bg-red-500'}`}
-                    ></div>
-                    <div className="flex-1 flex">
-                      {props.status ? 'Ativo' : 'Inativo'}
-                    </div>
+                <div className="flex text-white gap-2 items-center">
+                  <div
+                    className={` rounded-md h-4 w-4 ${props.status ? 'bg-green-500' : 'bg-red-500'}`}
+                  ></div>
+                  <div className="flex-1 flex">
+                    {props.status ? 'Ativo' : 'Inativo'}
                   </div>
                 </div>
               </div>

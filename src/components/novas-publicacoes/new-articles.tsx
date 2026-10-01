@@ -145,7 +145,7 @@ export function NewsArticles() {
 
   const [tab, setTab] = useState('all');
 
-  const { urlGeral, urlGeralAdm } = useContext(UserContext);
+  const { urlGeral } = useContext(UserContext);
   const [pesquisaInput, setPesquisaInput] = useState('');
 
   let urlMagazine = `${urlGeral}magazine?initials=nat&issn=`;

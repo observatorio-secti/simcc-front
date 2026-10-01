@@ -1,17 +1,7 @@
-import { useContext } from 'react';
-import { Plus, X } from 'phosphor-react';
 import { Building2, GraduationCap } from 'lucide-react';
-import { UserContext } from '../../../../context/context';
 import { useModal } from '../../../hooks/use-modal-store';
 import { Alert } from '../../../ui/alert';
-import { Button } from '../../../ui/button';
 import { CardTitle } from '../../../ui/card';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../../../ui/tooltip';
 import { resolveApiUrl } from '../../../../services/researchers-v2';
 import {
   ResearcherCountsV2,
@@ -48,45 +38,12 @@ export function ProfileResearcherCard({
   researcher,
 }: ProfileResearcherCardProps) {
   const { onOpen } = useModal();
-  const { pesquisadoresSelecionados, setPesquisadoresSelecionados } =
-    useContext(UserContext);
 
   const institutions = researcher.affiliations.map(
     (affiliation) => affiliation.institution,
   );
   const matches = researcher.matches;
   const counts = COUNT_LABELS.filter(({ key }) => researcher.counts[key] > 0);
-
-  const isSelected = pesquisadoresSelecionados.some(
-    (pesquisador) => pesquisador.name === researcher.name,
-  );
-
-  const toggleSelected = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    if (isSelected) {
-      setPesquisadoresSelecionados((prev) =>
-        prev.filter((pesquisador) => pesquisador.name !== researcher.name),
-      );
-    } else {
-      setPesquisadoresSelecionados((prev) => [
-        ...prev,
-        {
-          id: researcher.researcher_id,
-          name: researcher.name,
-          university: institutions
-            .map((institution) => institution.name)
-            .join(';'),
-          lattes_id: '',
-          city: researcher.affiliations
-            .map((affiliation) => affiliation.city?.name)
-            .filter(Boolean)
-            .join(';'),
-          area: '',
-          graduation: researcher.graduation ?? '',
-        },
-      ]);
-    }
-  };
 
   return (
     <div
@@ -102,27 +59,8 @@ export function ProfileResearcherCard({
         <div className="bg-[#000000] rounded-md bg-opacity-30 hover:bg-opacity-70 transition-all absolute w-full h-full rounded-t-md">
           <div className="flex flex-col justify-between h-full">
             <div className="z-[1] w-full p-4 flex gap-3 justify-between items-start">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={toggleSelected}
-                      size={'icon'}
-                      className={`hidden group-hover:flex transition-all h-8 w-8 ${isSelected && 'bg-red-500 hover:bg-red-600 text-white'}`}
-                    >
-                      {isSelected ? <X size={16} /> : <Plus size={16} />}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {isSelected
-                      ? 'Remover pesquisador(a) do barema'
-                      : 'Adicionar pesquisador(a) ao barema'}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
               {researcher.classification && (
-                <span className="group-hover:hidden rounded-md bg-white/20 backdrop-blur px-2 py-0.5 text-xs font-semibold text-white">
+                <span className="rounded-md bg-white/20 backdrop-blur px-2 py-0.5 text-xs font-semibold text-white">
                   {researcher.classification}
                 </span>
               )}

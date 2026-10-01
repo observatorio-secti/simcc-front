@@ -839,9 +839,7 @@ export function BolsistasHome() {
   const [researcher, setResearcher] = useState<Research[]>([]);
   const [originalResearcher, setOriginalResearcher] = useState<Research[]>([]);
   const [typeVisu, setTypeVisu] = useState('block');
-  const { itemsSelecionados, urlGeral, searchType, simcc } =
-    useContext(UserContext);
-  const { pesquisadoresSelecionados, idGraduateProgram } =
+  const { itemsSelecionados, urlGeral, searchType, simcc, idGraduateProgram } =
     useContext(UserContext);
 
   const [page, setPage] = useState(1);
@@ -897,12 +895,6 @@ export function BolsistasHome() {
     return () => abortController.abort();
   }, [urlGeral]);
 
-  useEffect(() => {
-    localStorage.setItem(
-      'pesquisadoresSelecionados',
-      JSON.stringify(pesquisadoresSelecionados),
-    );
-  }, [pesquisadoresSelecionados]);
 
   const queryUrl = useQuery();
 

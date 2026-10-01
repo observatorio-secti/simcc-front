@@ -2,7 +2,6 @@ import * as React from 'react';
 import {
   AArrowUp,
   BarChart3,
-  Bug,
   Building2,
   Download,
   GraduationCap,
@@ -14,7 +13,6 @@ import {
   SearchCheck,
   Sparkles,
   SquarePlay,
-  UserPlus,
   Users,
   Wrench,
 } from 'lucide-react';
@@ -29,11 +27,9 @@ import {
 import { UserContext } from '../context/context';
 import { useContext } from 'react';
 import { DotsThree } from 'phosphor-react';
-import { useModal } from './hooks/use-modal-store';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { urlGeral } = useContext(UserContext);
-  const { onOpen } = useModal();
 
   const data = {
 
@@ -105,16 +101,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: DotsThree,
         isActive: true,
         items: [
-          {
-            title: 'Selecionados',
-            icon: UserPlus,
-            onClick: () => onOpen('pesquisadores-selecionados'),
-          },
-          {
-            title: 'Relatar problema',
-            icon: Bug,
-            onClick: () => onOpen('relatar-problema'),
-          },
           {
             title: 'Índice pesquisador',
             url: '/indice-pesquisador',

@@ -73,7 +73,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Copy, MoreHorizontal, Plus } from 'lucide-react';
+import { Copy, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { TimeLineResearcher } from './timeline-researcher';
@@ -190,10 +190,7 @@ export function ResearcherPage() {
     setItensSelecionadosPopUp,
     searchType,
     valoresSelecionadosExport,
-    setPesquisadoresSelecionados,
-    pesquisadoresSelecionados,
     setItensSelecionados,
-    permission,
   } = useContext(UserContext);
 
   const history = useNavigate();
@@ -394,16 +391,6 @@ export function ResearcherPage() {
     fetchData();
   }, [urlPublicacoesPorPesquisador]);
 
-  const has_visualizar_indices_pesquisador = permission.some(
-    (perm) => perm.permission === 'visualizar_indices_pesquisador',
-  );
-
-  useEffect(() => {
-    if (!has_visualizar_indices_pesquisador) {
-      setTab('all');
-    }
-  }, [permission]);
-
   const convertJsonToCsv = (json: any[]): string => {
     const items = json;
     const replacer = (_: string, value: any) => (value === null ? '' : value); // Handle null values
@@ -533,12 +520,6 @@ export function ResearcherPage() {
     );
   };
 
-  ////////////PERMISSÕES
-
-  const hasBaremaAvaliacao = permission.some(
-    (perm) => perm.permission === 'criar_barema_avaliacao',
-  );
-
   const [typeVisu, setTypeVisu] = useState('block');
 
   const items = Array.from({ length: 12 }, (_, index) => (
@@ -610,7 +591,6 @@ export function ResearcherPage() {
                     Visão geral
                   </TabsTrigger>
                   <TabsTrigger
-                    disabled={!has_visualizar_indices_pesquisador}
                     value="indicators"
                     onClick={() => setTab('indicators')}
                   >
@@ -817,73 +797,6 @@ export function ResearcherPage() {
                           })}
                         </SheetContent>
                       </Sheet>
-
-                      {hasBaremaAvaliacao && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant={'default'}
-                                onClick={() => {
-                                  // Verifica se o pesquisador já está selecionado pelo nome
-                                  if (
-                                    pesquisadoresSelecionados.some(
-                                      (pesquisador) =>
-                                        pesquisador.name === props.name,
-                                    )
-                                  ) {
-                                    // Remove o pesquisador selecionado com o nome correspondente
-                                    setPesquisadoresSelecionados((prev) =>
-                                      prev.filter(
-                                        (pesquisador) =>
-                                          pesquisador.name !== props.name,
-                                      ),
-                                    );
-                                  } else {
-                                    // Adiciona o novo pesquisador selecionado
-                                    setPesquisadoresSelecionados((prev) => [
-                                      ...prev,
-                                      {
-                                        id: props.id,
-                                        name: props.name,
-                                        university: props.university,
-                                        lattes_id: props.lattes_id,
-                                        city: props.city,
-                                        area: props.area,
-                                        graduation: props.graduation,
-                                      },
-                                    ]);
-                                  }
-                                }}
-                                className={`h-8 w-8 p-0 text-white dark:text-white ${
-                                  pesquisadoresSelecionados.some(
-                                    (pesquisador) =>
-                                      pesquisador.name === props.name,
-                                  ) && 'bg-red-500 hover:bg-red-600 text-white'
-                                }`}
-                              >
-                                {pesquisadoresSelecionados.some(
-                                  (pesquisador) =>
-                                    pesquisador.name === props.name,
-                                ) ? (
-                                  <X size={16} className="" />
-                                ) : (
-                                  <Plus size={16} className="" />
-                                )}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {' '}
-                              {pesquisadoresSelecionados.some(
-                                (pesquisador) =>
-                                  pesquisador.name === props.name,
-                              )
-                                ? 'Remover pesquisador(a) do barema'
-                                : 'Adicionar pesquisador(a) ao barema'}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
