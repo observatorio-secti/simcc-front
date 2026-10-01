@@ -319,7 +319,7 @@ export function VisualizacaoInstituicao({ identifier: propIdentifier }: Visualiz
             </div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 md:px-8 pt-16 pb-6 w-full flex flex-col gap-6">
+          <div className="max-w-[1600px] mx-auto px-4 md:px-8 pt-16 pb-6 w-full flex flex-col gap-6">
             
             {/* Título da Instituição formatado corretamente */}
             <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white leading-tight">
