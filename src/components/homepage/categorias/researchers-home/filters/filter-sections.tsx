@@ -19,11 +19,65 @@ interface FilterSectionsProps {
 export function FilterSections({ filters }: FilterSectionsProps) {
   return (
     <Accordion
-      defaultValue="item-1"
+      defaultValue="item-0"
       type="single"
       collapsible
       className="w-full"
     >
+      {/* 0. Território de Identidade */}
+      <AccordionItem value="item-0" className="w-full">
+        <div className="flex items-center justify-between">
+          <Label>Território de Identidade</Label>
+          <div className="flex gap-2 items-center">
+            {filters.selectedIdentityTerritories.length > 0 && (
+              <Button
+                onClick={() => filters.setSelectedIdentityTerritories([])}
+                className="lg:h-8 lg:w-8"
+                variant={'destructive'}
+                size={'icon'}
+              >
+                <Trash size={16} />
+              </Button>
+            )}
+            <AccordionTrigger />
+          </div>
+        </div>
+        <AccordionContent>
+          {filters.uniqueIdentityTerritories.length > 5 && (
+            <Alert className="h-12 p-2 mb-4 flex items-center justify-between w-full">
+              <div className="flex items-center gap-2 w-full flex-1">
+                <MagnifyingGlass size={16} className="whitespace-nowrap w-10" />
+                <Input
+                  onChange={(e) => filters.setSearchIdentityTerritory(e.target.value)}
+                  value={filters.searchIdentityTerritory}
+                  type="text"
+                  placeholder="Buscar território..."
+                  className="border-0 w-full"
+                />
+              </div>
+            </Alert>
+          )}
+
+          <ToggleGroup
+            type="multiple"
+            variant={'outline'}
+            value={filters.selectedIdentityTerritories}
+            onValueChange={filters.handleIdentityTerritoryToggle}
+            className="aspect-auto flex flex-wrap items-start justify-start gap-2"
+          >
+            {filters.filteredIdentityTerritoriesList.map((territory) => (
+              <ToggleGroupItem
+                key={territory}
+                value={territory}
+                className="px-3 py-2 h-auto min-h-10 max-w-full whitespace-normal break-words text-left"
+              >
+                {territory}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </AccordionContent>
+      </AccordionItem>
+
       {/* 1. Área de especialidade */}
       <AccordionItem value="item-1" className="w-full">
         <div className="flex items-center justify-between">

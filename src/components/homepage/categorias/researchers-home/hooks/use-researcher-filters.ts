@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Research } from '../../../../../types/researcher';
+import { Research, ResearcherFilterApiResponse } from '../../../../../types/researcher';
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -8,9 +8,13 @@ const useQuery = () => {
 
 export interface UseResearcherFiltersProps {
   researchers: Research[];
+  apiFilters?: ResearcherFilterApiResponse;
 }
 
-export function useResearcherFilters({ researchers }: UseResearcherFiltersProps) {
+export function useResearcherFilters({
+  researchers,
+  apiFilters,
+}: UseResearcherFiltersProps) {
   const queryUrl = useQuery();
   const navigate = useNavigate();
 
@@ -19,6 +23,10 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     [queryUrl],
   );
 
+  const [selectedIdentityTerritories, setSelectedIdentityTerritories] = useState<string[]>(() => {
+    const t = getArrayFromUrl('identity_territories');
+    return t.length > 0 ? t : getArrayFromUrl('identity_territory');
+  });
   const [selectedAreas, setSelectedAreas] = useState<string[]>(() =>
     getArrayFromUrl('areas'),
   );
@@ -42,6 +50,10 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
   );
 
   useEffect(() => {
+    const territories = getArrayFromUrl('identity_territories');
+    setSelectedIdentityTerritories(
+      territories.length > 0 ? territories : getArrayFromUrl('identity_territory'),
+    );
     setSelectedAreas(getArrayFromUrl('areas'));
     setSelectedGraduations(getArrayFromUrl('graduations'));
     setSelectedCities(getArrayFromUrl('cities'));
@@ -51,6 +63,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     setSelectedDepartaments(getArrayFromUrl('departments'));
   }, [getArrayFromUrl]);
 
+  const [searchIdentityTerritory, setSearchIdentityTerritory] = useState('');
   const [searchGraduateProgram, setSearchGraduateProgram] = useState('');
   const [searchCity, setSearchCity] = useState('');
 
@@ -79,6 +92,8 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
 
   const updateFiltersAndUrl = (key: string, values: string[]) => {
     updateUrlParams({
+      identity_territories:
+        key === 'identity_territories' ? values : selectedIdentityTerritories,
       areas: key === 'areas' ? values : selectedAreas,
       graduations: key === 'graduations' ? values : selectedGraduations,
       cities: key === 'cities' ? values : selectedCities,
@@ -87,6 +102,11 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
       graduatePrograms: key === 'graduatePrograms' ? values : selectedGraduatePrograms,
       departments: key === 'departments' ? values : selectedDepartaments,
     });
+  };
+
+  const handleIdentityTerritoryToggle = (value: string[]) => {
+    setSelectedIdentityTerritories(value);
+    updateFiltersAndUrl('identity_territories', value);
   };
 
   const handleAreaToggle = (value: string[]) => {
@@ -125,6 +145,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
   };
 
   const clearFilters = () => {
+    setSelectedIdentityTerritories([]);
     setSelectedAreas([]);
     setSelectedGraduations([]);
     setSelectedCities([]);
@@ -133,6 +154,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     setSelectedDepartaments([]);
     setSelectedGraduatePrograms([]);
     updateUrlParams({
+      identity_territories: [],
       areas: [],
       graduations: [],
       cities: [],
@@ -143,8 +165,24 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     });
   };
 
-  // Extrai listas únicas a partir dos pesquisadores carregados
+  // Extrai listas de opções: prioriza retorno de /researcher_filter (apiFilters) com fallback nos pesquisadores carregados
+  const uniqueIdentityTerritories = useMemo(() => {
+    if (apiFilters?.identity_territory && apiFilters.identity_territory.length > 0) {
+      return apiFilters.identity_territory;
+    }
+    return Array.from(
+      new Set(
+        researchers.map(
+          (res) => res.identity_territory || res.institution?.identity_territory,
+        ),
+      ),
+    ).filter(Boolean) as string[];
+  }, [apiFilters, researchers]);
+
   const uniqueAreas = useMemo(() => {
+    if (apiFilters?.area && apiFilters.area.length > 0) {
+      return apiFilters.area;
+    }
     return Array.from(
       new Set(
         researchers.flatMap((res) =>
@@ -152,25 +190,37 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
         ),
       ),
     ).filter(Boolean);
-  }, [researchers]);
+  }, [apiFilters, researchers]);
 
   const uniqueGraduations = useMemo(() => {
+    if (apiFilters?.graduation && apiFilters.graduation.length > 0) {
+      return apiFilters.graduation;
+    }
     return Array.from(
       new Set(researchers.map((res) => res.graduation)),
     ).filter(Boolean);
-  }, [researchers]);
+  }, [apiFilters, researchers]);
 
   const uniqueCities = useMemo(() => {
+    if (apiFilters?.city && apiFilters.city.length > 0) {
+      return apiFilters.city;
+    }
     return Array.from(new Set(researchers.map((res) => res.city))).filter(Boolean);
-  }, [researchers]);
+  }, [apiFilters, researchers]);
 
   const uniqueUniversities = useMemo(() => {
+    if (apiFilters?.institution && apiFilters.institution.length > 0) {
+      return apiFilters.institution;
+    }
     return Array.from(
       new Set(researchers.map((res) => res.university)),
     ).filter(Boolean);
-  }, [researchers]);
+  }, [apiFilters, researchers]);
 
   const uniqueSubsidies = useMemo(() => {
+    if (apiFilters?.modality && apiFilters.modality.length > 0) {
+      return apiFilters.modality;
+    }
     return Array.from(
       new Set(
         researchers.flatMap((res) =>
@@ -180,9 +230,12 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
         ),
       ),
     ).filter(Boolean);
-  }, [researchers]);
+  }, [apiFilters, researchers]);
 
   const uniqueGraduatePrograms = useMemo(() => {
+    if (apiFilters?.graduate_program && apiFilters.graduate_program.length > 0) {
+      return apiFilters.graduate_program;
+    }
     return Array.from(
       new Set(
         researchers.flatMap((res) =>
@@ -192,9 +245,12 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
         ),
       ),
     ).filter(Boolean);
-  }, [researchers]);
+  }, [apiFilters, researchers]);
 
   const uniqueDepartaments = useMemo(() => {
+    if (apiFilters?.departament && apiFilters.departament.length > 0) {
+      return apiFilters.departament;
+    }
     return Array.from(
       new Set(
         researchers.flatMap((res) =>
@@ -204,7 +260,22 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
         ),
       ),
     ).filter(Boolean);
-  }, [researchers]);
+  }, [apiFilters, researchers]);
+
+  // Territórios de identidade filtrados pela busca
+  const filteredIdentityTerritoriesList = useMemo(() => {
+    if (!searchIdentityTerritory.trim()) return uniqueIdentityTerritories;
+    const normalizeString = (str: string) =>
+      str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+    const normalizedSearch = normalizeString(searchIdentityTerritory);
+    return uniqueIdentityTerritories.filter((item) =>
+      normalizeString(item).includes(normalizedSearch),
+    );
+  }, [uniqueIdentityTerritories, searchIdentityTerritory]);
 
   // Cidades filtradas pela busca interna no accordion
   const filteredCitiesList = useMemo(() => {
@@ -243,6 +314,16 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
         res.area && typeof res.area === 'string'
           ? res.area.split(';').map((area) => area.trim())
           : [];
+
+      const hasSelectedIdentityTerritory =
+        selectedIdentityTerritories.length === 0 ||
+        selectedIdentityTerritories.some((selectedTerritory) => {
+          const t =
+            res.identity_territory ||
+            res.institution?.identity_territory ||
+            '';
+          return t.toLowerCase().includes(selectedTerritory.toLowerCase());
+        });
 
       const hasSelectedArea =
         selectedAreas.length === 0 ||
@@ -286,6 +367,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
           ));
 
       return (
+        hasSelectedIdentityTerritory &&
         hasSelectedArea &&
         hasSelectedGraduation &&
         hasSelectedCity &&
@@ -297,6 +379,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     });
   }, [
     researchers,
+    selectedIdentityTerritories,
     selectedAreas,
     selectedGraduations,
     selectedCities,
@@ -307,6 +390,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
   ]);
 
   const hasActiveFilters =
+    selectedIdentityTerritories.length > 0 ||
     selectedAreas.length > 0 ||
     selectedGraduations.length > 0 ||
     selectedCities.length > 0 ||
@@ -316,6 +400,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     selectedDepartaments.length > 0;
 
   return {
+    selectedIdentityTerritories,
     selectedAreas,
     selectedGraduations,
     selectedCities,
@@ -323,6 +408,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     selectedSubsidies,
     selectedGraduatePrograms,
     selectedDepartaments,
+    setSelectedIdentityTerritories,
     setSelectedAreas,
     setSelectedGraduations,
     setSelectedCities,
@@ -330,6 +416,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     setSelectedSubsidies,
     setSelectedGraduatePrograms,
     setSelectedDepartaments,
+    handleIdentityTerritoryToggle,
     handleAreaToggle,
     handleGraduationToggle,
     handleCityToggle,
@@ -337,6 +424,7 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     handleSubsidyToggle,
     handleGraduateProgramToggle,
     handleDepartamentToggle,
+    uniqueIdentityTerritories,
     uniqueAreas,
     uniqueGraduations,
     uniqueCities,
@@ -344,8 +432,11 @@ export function useResearcherFilters({ researchers }: UseResearcherFiltersProps)
     uniqueSubsidies,
     uniqueGraduatePrograms,
     uniqueDepartaments,
+    filteredIdentityTerritoriesList,
     filteredCitiesList,
     filteredGraduateProgramsList,
+    searchIdentityTerritory,
+    setSearchIdentityTerritory,
     searchCity,
     setSearchCity,
     searchGraduateProgram,

@@ -5,6 +5,8 @@ import { UserContext } from '../../../context/context';
 import {
     useSearchResearchersInfinite,
     useOpenAlexResearchers,
+    useResearcherFilterOptions,
+    useResearcherMetrics,
 } from '../../../hooks/use-researcher-search';
 import { MariaHome } from '../maria-home';
 import { useResearcherFilters } from './researchers-home/hooks/use-researcher-filters';
@@ -127,12 +129,102 @@ export function ResearchersHome() {
         }));
     }, [openAlexResults]);
 
+    // Parâmetros para buscar opções dinâmicas em /researcher_filter
+    const filterOptionsParams = useMemo(() => {
+        const safeTerms = terms ?? '';
+        let typeParam = 'ARTICLE';
+        switch (searchType) {
+            case 'article': typeParam = 'ARTICLE'; break;
+            case 'book': typeParam = 'BOOK'; break;
+            case 'speaker': typeParam = 'SPEAKER'; break;
+            case 'patent': typeParam = 'PATENT'; break;
+            case 'abstract': typeParam = 'ABSTRACT'; break;
+            case 'area': typeParam = 'AREA'; break;
+            case 'name': typeParam = 'NAME'; break;
+            default: typeParam = 'ARTICLE';
+        }
+
+        const p: Record<string, any> = {};
+        if (safeTerms) p.terms = safeTerms;
+        if (typeParam) p.type = typeParam;
+        if (idGraduateProgram && idGraduateProgram !== '0') {
+            p.graduate_program_id = idGraduateProgram;
+        }
+        return p;
+    }, [terms, searchType, idGraduateProgram]);
+
+    const { data: apiFilterOptions } = useResearcherFilterOptions(filterOptionsParams);
+
     // Gerenciamento e aplicação de filtros nos pesquisadores carregados
     const filters = useResearcherFilters({
         researchers: allLoadedResearchers,
+        apiFilters: apiFilterOptions,
     });
 
-    // Soma total de ocorrências
+    // Parâmetros para calcular métricas consolidadas em /metrics/researcher/chart
+    const metricsParams = useMemo(() => {
+        const safeTerms = terms ?? '';
+        let typeParam = 'ARTICLE';
+        switch (searchType) {
+            case 'article': typeParam = 'ARTICLE'; break;
+            case 'book': typeParam = 'BOOK'; break;
+            case 'speaker': typeParam = 'SPEAKER'; break;
+            case 'patent': typeParam = 'PATENT'; break;
+            case 'abstract': typeParam = 'ABSTRACT'; break;
+            case 'area': typeParam = 'AREA'; break;
+            case 'name': typeParam = 'NAME'; break;
+            default: typeParam = 'ARTICLE';
+        }
+
+        const p: Record<string, any> = {
+            terms: safeTerms,
+            type: typeParam,
+        };
+
+        if (idGraduateProgram && idGraduateProgram !== '0') {
+            p.graduate_program_id = idGraduateProgram;
+        }
+        if (filters.selectedIdentityTerritories.length > 0) {
+            p.identity_territory = filters.selectedIdentityTerritories.join(';');
+        }
+        if (filters.selectedCities.length > 0) {
+            p.city = filters.selectedCities.join(';');
+        }
+        if (filters.selectedUniversities.length > 0) {
+            p.university = filters.selectedUniversities.join(';');
+        }
+        if (filters.selectedAreas.length > 0) {
+            p.area = filters.selectedAreas.join(';');
+        }
+        if (filters.selectedGraduations.length > 0) {
+            p.graduation = filters.selectedGraduations.join(';');
+        }
+        if (filters.selectedSubsidies.length > 0) {
+            p.modality = filters.selectedSubsidies.join(';');
+        }
+        if (filters.selectedGraduatePrograms.length > 0) {
+            p.graduate_program = filters.selectedGraduatePrograms.join(';');
+        }
+        return p;
+    }, [
+        terms,
+        searchType,
+        idGraduateProgram,
+        filters.selectedIdentityTerritories,
+        filters.selectedCities,
+        filters.selectedUniversities,
+        filters.selectedAreas,
+        filters.selectedGraduations,
+        filters.selectedSubsidies,
+        filters.selectedGraduatePrograms,
+    ]);
+
+    const { data: metricsData, isLoading: loadingMetrics } = useResearcherMetrics(
+        metricsParams,
+        Boolean(terms && terms.trim().length > 0),
+    );
+
+    // Soma total de ocorrências local (fallback caso a rota de métricas não esteja disponível)
     const totalAmong = useMemo(() => {
         return filters.filteredResearchers.reduce(
             (sum, researcher) => sum + (researcher.among || 0),
@@ -154,11 +246,19 @@ export function ResearchersHome() {
                     {/* Cards de estatísticas e ocorrências */}
                     {!isOpenAlex && finalOpenAlex !== 'true' && (
                         <ResearchersSummaryCards
-                            totalResearchers={filters.filteredCount}
-                            totalAmong={totalAmong}
+                            totalResearchers={
+                                metricsData?.researcher_count !== undefined
+                                    ? metricsData.researcher_count
+                                    : filters.filteredCount
+                            }
+                            totalAmong={
+                                metricsData?.among !== undefined
+                                    ? metricsData.among
+                                    : totalAmong
+                            }
                             searchType={searchType}
                             itemsSelecionados={itemsSelecionados}
-                            loading={loadingResearchers}
+                            loading={loadingMetrics || (loadingResearchers && !metricsData)}
                         />
                     )}
 

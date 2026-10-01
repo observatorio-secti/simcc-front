@@ -9,6 +9,12 @@ import {
 import { UserContext } from '../../context/context';
 import { useModalResult } from '../hooks/use-modal-result';
 import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  isProfileSearch,
+  LEGACY_RESULTS_PATH,
+  PROFILE_RESULTS_PATH,
+  resultsPathFor,
+} from '../../lib/search-types';
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -19,7 +25,9 @@ export function SelectTypeSearch() {
   const navigate = useNavigate();
   const posGrad = location.pathname == '/pos-graduacao';
 
-  const resultados = location.pathname == '/resultados';
+  const resultados =
+    location.pathname == LEGACY_RESULTS_PATH ||
+    location.pathname == PROFILE_RESULTS_PATH;
 
   const { onOpen } = useModalResult();
   const queryUrl = useQuery();
@@ -33,12 +41,13 @@ export function SelectTypeSearch() {
         value={searchType}
         onValueChange={(value) => {
           setSearchType(value);
-          onOpen('researchers-home');
+          if (!isProfileSearch(value)) onOpen('researchers-home');
 
           if (resultados) {
+            // A busca por perfil tem página própria; os demais tipos seguem em /resultados.
             queryUrl.set('type_search', value);
             navigate({
-              pathname: '/resultados',
+              pathname: resultsPathFor(value),
               search: queryUrl.toString(),
             });
           }
@@ -50,6 +59,12 @@ export function SelectTypeSearch() {
           </div>
         </SelectTrigger>
         <SelectContent className="z-[9999]">
+          <SelectItem value="profile">
+            <div className="flex gap-4 items-center mr-2">
+              <div className="bg-indigo-500 flex rounded-sm h-4 w-4"></div>{' '}
+              Perfil completo
+            </div>
+          </SelectItem>
           <SelectItem value="article">
             <div className="flex gap-4 items-center mr-2">
               <div className="bg-blue-500 flex rounded-sm h-4 w-4"></div>{' '}

@@ -45,6 +45,7 @@ import { useModalResult } from '../hooks/use-modal-result';
 import { Play, Trash } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
+import { isProfileSearch, resultsPathFor } from '../../lib/search-types';
 
 // BARRA DE BUSCA DE CIMA
 export function SearchModal() {
@@ -147,7 +148,7 @@ export function SearchModal() {
     setInput(value);
   };
 
-  const handlePesquisa = (value: string, type: string) => {
+  const handlePesquisa = (value: string, type: string, restoreType = false) => {
     setInput('');
     setShowInput(false);
     setBigrama([]);
@@ -168,6 +169,13 @@ export function SearchModal() {
       newSearchType = 'abstract';
     } else if (type === 'AREA') {
       newSearchType = 'area';
+    } else if (type === 'PROFILE') {
+      newSearchType = 'profile';
+    }
+    // A busca por perfil cobre todas as camadas: sugestões de qualquer tipo
+    // entram como termo sem trocar o tipo de busca selecionado.
+    if (!restoreType && isProfileSearch(searchType)) {
+      newSearchType = searchType;
     }
     const hasSameType = newSearchType === searchType;
 
@@ -268,7 +276,13 @@ export function SearchModal() {
       return;
     }
 
-    const targetPath = posGrad ? '/pos-graduacao' : '/resultados';
+    const targetPath =
+      posGrad && !isProfileSearch(searchType)
+        ? '/pos-graduacao'
+        : resultsPathFor(searchType);
+    const openLegacyResult = () => {
+      if (!isProfileSearch(searchType)) onOpenResult('researchers-home');
+    };
 
     if (itemsSelecionadosPopUp.length > 0) {
       const cleanTerms = formatTerms(itemsSelecionadosPopUp);
@@ -290,7 +304,7 @@ export function SearchModal() {
         search: queryUrl.toString(),
       });
 
-      onOpenResult('researchers-home');
+      openLegacyResult();
       onClose();
     } else if (itemsSelecionadosPopUp.length == 0 && input.length > 0) {
       const cleanInput = input.trim().replace(/[()]/g, '');
@@ -309,7 +323,7 @@ export function SearchModal() {
         search: queryUrl.toString(),
       });
 
-      onOpenResult('researchers-home');
+      openLegacyResult();
       setMode('');
       setInput('');
       onClose();
@@ -478,6 +492,8 @@ export function SearchModal() {
                           <div
                             className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs ${searchType == 'article'
                               ? 'bg-blue-500 dark:bg-blue-500'
+                              : searchType == 'profile'
+                                ? 'bg-indigo-500 dark:bg-indigo-500'
                               : searchType == 'abstract'
                                 ? 'bg-yellow-500 dark:bg-yellow-500 '
                                 : searchType == 'speaker'
@@ -598,6 +614,7 @@ export function SearchModal() {
     ${searchType == 'patent' && 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'}
     ${searchType == 'name' && 'bg-red-500 dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white'}
     ${searchType == 'area' && 'bg-green-500 dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 hover:text-white'}
+    ${searchType == 'profile' && 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'}
     ${searchType == '' && 'bg-blue-700 dark:bg-blue-700 hover:bg-blue-800 dark:hover:bg-blue-800 hover:text-white'}
     text-white border-0 z-[9999]
   `}
@@ -621,7 +638,7 @@ export function SearchModal() {
                       <div
                         key={index}
                         onClick={() => {
-                          handlePesquisa(props.termo, props.tipo.toUpperCase());
+                          handlePesquisa(props.termo, props.tipo.toUpperCase(), true);
                         }}
                         className={`
                             ${props.tipo == 'article' && 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white'}
@@ -631,6 +648,7 @@ export function SearchModal() {
       ${props.tipo == 'patent' && 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'}
       ${props.tipo == 'name' && 'bg-red-500 dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white'}
       ${props.tipo == 'area' && 'bg-green-500 dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 hover:text-white'}
+      ${props.tipo == 'profile' && 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'}
       ${props.tipo == '' && 'bg-blue-700 dark:bg-blue-700 hover:bg-blue-800 dark:hover:bg-blue-800 hover:text-white'}
                           flex gap-2 h-8 capitalize cursor-pointer transition-all text-white items-center p-2 px-3 rounded-md text-xs`}
                       >
