@@ -33,7 +33,7 @@ import {
 import { BookHome } from '../homepage/categorias/book-home';
 import { PatentHome } from '../homepage/categorias/patent-home';
 
-import { useQuery } from '../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../hooks/use-query';
 import { TextoRevistaHome } from '../listagens/texto-revista';
 import { WorkEventHome } from '../listagens/work-event-home';
 import { BrandHome } from '../listagens/brand-home';

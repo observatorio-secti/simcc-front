@@ -1,13 +1,19 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  MapContainer,
-  GeoJSON,
-  Marker,
-  Popup,
-  Tooltip,
+  MapContainer as MapContainerComponent,
+  GeoJSON as GeoJSONComponent,
+  Marker as MarkerComponent,
+  Popup as PopupComponent,
+  Tooltip as TooltipComponent,
   useMap,
   useMapEvents,
 } from 'react-leaflet';
+
+const MapContainer = MapContainerComponent as any;
+const GeoJSON = GeoJSONComponent as any;
+const Marker = MarkerComponent as any;
+const Popup = PopupComponent as any;
+const Tooltip = TooltipComponent as any;
 import L from 'leaflet';
 import { User } from 'lucide-react';
 import type {

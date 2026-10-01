@@ -20,7 +20,7 @@ import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { BlockItemGeral } from '../homepage/categorias/book-home/block-item-geral';
 import { TableReseracherMarcasPopup } from '../popup/columns/producoes-tecnicas/table-marcas-popup';
 import { GraficoTrabalhoEvento } from '../popup/graficos/grafico-trabalho-evento';
-import { useQuery } from '../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../hooks/use-query';
 
 type Patente = {
   authors: string;

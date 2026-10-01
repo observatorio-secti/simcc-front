@@ -19,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '../ui/dropdown-menu';
-import { useQuery } from '../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../hooks/use-query';
 import { Alert } from '../ui/alert';
 import bg_popup from '../../assets/bg_indicadores.png';
 import { Badge } from '../ui/badge';

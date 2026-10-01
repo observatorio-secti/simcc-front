@@ -3,40 +3,15 @@ import { useModalSecundary } from './use-modal-store-secundary';
 
 export type ModalType =
   | 'search'
-  | 'add-graduate-program'
   | 'map-researchers-modal'
   | 'researcher-modal'
-  | 'confirm-delete-researcher'
-  | 'confirm-delete-pos-graduate-program'
-  | 'edit-graduate-program'
-  | 'add-researcher-graduation'
-  | 'add-researcher-csv'
-  | 'add-student-graduation'
-  | 'add-grupo-pesquisa'
   | 'filters'
   | 'pesquisadores-selecionados'
-  | 'list-student-program'
-  | 'add-researcher-graduation-two'
   | 'gratuate-program'
-  | 'confirm-delete-researcher-graduate-program'
-  | 'reset-peso-producoes'
-  | 'confirm-delete-student-graduate-program'
-  | 'import-bolsistas'
-  | 'import-docentes'
-  | 'import-taes'
-  | 'add-departamento'
-  | 'confirm-delete-departamento'
-  | 'edit-departamento'
-  | 'import-disciplina'
-  | 'confirm-delete-researcher-departament'
-  | 'minha-area'
-  | 'add-background'
   | 'relatar-problema'
-  | 'confirm-delete-institution'
   | 'filters-graduate'
   | 'filters-researcher-listagens'
-  | 'user-profile-initial'
-  | 'edit-background';
+  | (string & {});
 
 interface ModalData {
   onSuccess?: any;

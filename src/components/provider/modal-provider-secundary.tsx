@@ -3,12 +3,9 @@
 import { useEffect, useState } from 'react';
 
 import { ArticlesModal } from '../modals/articles-modal';
-
 import { useModalSecundary } from '../hooks/use-modal-store-secundary';
-import { EditArticle } from '../modals/edit-article';
 import { ProjectModal } from '../modals/project-modal';
 import { CoautoresModal } from '../modals/coautores-modal';
-import { EditorpageModal } from '../modals/editor-page';
 import { ShareArticleModal } from '../modals/share-article-modal';
 
 const ModalContentSecundary = () => {
@@ -17,14 +14,10 @@ const ModalContentSecundary = () => {
   switch (type) {
     case 'articles-modal':
       return <ArticlesModal />;
-    case 'edit-article':
-      return <EditArticle />;
     case 'project-modal':
       return <ProjectModal />;
     case 'coautores':
       return <CoautoresModal />;
-    case 'editor-page':
-      return <EditorpageModal />;
     case 'share-article':
       return <ShareArticleModal />;
     default:

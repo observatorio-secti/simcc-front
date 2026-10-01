@@ -3,7 +3,7 @@ import { Button } from '../ui/button';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList } from '../ui/tabs';
 import { useEffect, useState } from 'react';
-import { useQuery } from '../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../hooks/use-query';
 import { ChartBar } from 'phosphor-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 

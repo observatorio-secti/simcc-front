@@ -52,7 +52,7 @@ import { BarChart, Bar, XAxis, LabelList, CartesianGrid } from 'recharts';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HC_wordcloud from 'highcharts/modules/wordcloud';
-import { GraficoArtigosPorQualis } from '../dashboard/graficos/grafico-qualis';
+import { GraficoArtigosPorQualis } from '../graficos/grafico-qualis';
 import { GraficoIndiceProdBibli } from './grafico-indice-producao-bibliografica';
 import { AdminGraficoGraduateProgram } from './admin-graficos-graduate-program';
 

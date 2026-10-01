@@ -88,17 +88,6 @@ type Publicacao = {
   relevance: boolean;
 };
 
-interface Departamentos {
-  dep_id: string;
-  org_cod: string;
-  dep_nom: string;
-  dep_des: string;
-  dep_email: string;
-  dep_site: string;
-  dep_tel: string;
-  img_data: string;
-  dep_sigla: string;
-}
 
 type Research = {
   among: number;
@@ -157,11 +146,6 @@ export function NewsArticles() {
   const [tab, setTab] = useState('all');
 
   const { urlGeral, urlGeralAdm } = useContext(UserContext);
-
-  const [total, setTotal] = useState<Departamentos[]>([]);
-  const [totalSelecionado, setTotalSelecionado] =
-    useState<Departamentos | null>(null);
-
   const [pesquisaInput, setPesquisaInput] = useState('');
 
   let urlMagazine = `${urlGeral}magazine?initials=nat&issn=`;
@@ -224,9 +208,7 @@ export function NewsArticles() {
 
   const [publicacoes, setPublicacoes] = useState<Publicacao[]>([]);
 
-  const urlTermPublicacoes =
-    urlGeral +
-    `recently_updated?year=2024&university=&dep_id=${totalSelecionado != null ? totalSelecionado?.dep_id : ''}`;
+  const urlTermPublicacoes = `${urlGeral}recently_updated?year=2024&university=&dep_id=`;
   console.log(urlTermPublicacoes);
   useMemo(() => {
     const fetchData = async () => {
@@ -279,33 +261,7 @@ export function NewsArticles() {
     }
   };
 
-  const urlPatrimonioInsert = `${urlGeralAdm}departamentos`;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlPatrimonioInsert, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setTotal(data);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchData();
-  }, [urlPatrimonioInsert]);
-
-  console.log(totalSelecionado?.dep_nom || '');
 
   // pesquisadores
 
@@ -467,16 +423,12 @@ export function NewsArticles() {
               ) : (
                 <div className="h-6 mb-4">{<LogoIapos />}</div>
               )}
-              <h1
-                className={`  ${totalSelecionado != null ? 'max-w-[800px]' : 'max-w-[500px]'} text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] md:block mb-3`}
-              >
+              <h1 className="max-w-[500px] text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1] md:block mb-3">
                 Todos os artigos mais{' '}
                 <strong className="bg-eng-blue rounded-md px-3 pb-2 text-white font-medium">
                   recentes
                 </strong>{' '}
-                {totalSelecionado != null
-                  ? totalSelecionado.dep_nom
-                  : 'da instituição'}
+                da instituição
               </h1>
             </div>
 

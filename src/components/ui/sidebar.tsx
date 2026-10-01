@@ -24,8 +24,6 @@ import {
 } from '../ui/tooltip';
 import { Header } from '../header/Header';
 import { UserContext } from '../../context/context';
-import { useLocation } from 'react-router-dom';
-import { ApacheViewDashboard } from '../dashboard/apache-view-dashboard';
 import { toast } from 'sonner';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
@@ -335,71 +333,6 @@ const SidebarInset = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'main'> & { props2?: React.ReactNode }
 >(({ className, props2, ...props }, ref) => {
-  const location = useLocation();
-  const [isOpenConsole, setIsOpenConsole] = React.useState(false);
-  const { permission, urlGeralAdm } = React.useContext(UserContext);
-
-  const has_atualizar_apache_hop = permission.some(
-    (perm) => perm.permission === 'atualizar_apache_hop',
-  );
-
-  const handleSubmit = async () => {
-    const data = [
-      {
-        state: true,
-      },
-    ];
-
-    const urlProgram = urlGeralAdm + 's/hop';
-    const fetchData = async () => {
-      try {
-        const response = await fetch(urlProgram, {
-          mode: 'cors',
-          method: 'POST',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (response.ok) {
-          toast('Apache hop iniciado', {
-            description: 'Atualizando dados dos pesquisadores',
-            action: {
-              label: 'Fechar',
-              onClick: () => {},
-            },
-          });
-        } else if (response.status === 423) {
-          toast('O Apache hop já está rodando, tente novamente mais tarde', {
-            description:
-              'Em processo de atualização dos dados dos pesquisadores',
-            action: {
-              label: 'Fechar',
-              onClick: () => {},
-            },
-          });
-        } else {
-          toast('Erro ao iniciar o Apache Hop', {
-            description: 'Tente novamente mais tarde',
-            action: {
-              label: 'Fechar',
-              onClick: () => {},
-            },
-          });
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchData();
-  };
-
   const { isMobile } = useSidebar();
 
   return (
@@ -421,52 +354,6 @@ const SidebarInset = React.forwardRef<
             />
           </div>
           {props2 && <div>{props2}</div>}
-
-          <div className="bottom-0 flex flex-col w-full absolute ">
-            {location.pathname == '/dashboard/administrativo' &&
-              has_atualizar_apache_hop && (
-                <div className="bottom-0 flex flex-col w-full  ">
-                  <div className=" relative">
-                    <div
-                      className={`h-[50px] w-full border dark:border-neutral-800  px-4 bg-neutral-50 ${!isOpenConsole && 'rounded-b-xl'} dark:bg-neutral-900 flex items-center justify-between `}
-                    >
-                      <div className="flex items-center gap-3 font-medium text-sm">
-                        <Terminal size={16} /> Terminal Apache Hop
-                      </div>
-
-                      <div className="flex items-center gap-3 font-medium text-sm">
-                        <Button
-                          size={'sm'}
-                          onClick={() => handleSubmit()}
-                          className="h-8"
-                        >
-                          <Play size={16} />
-                          Atualizar dados
-                        </Button>
-                        <Button
-                          size={'icon'}
-                          variant={'outline'}
-                          onClick={() => setIsOpenConsole(!isOpenConsole)}
-                          className="h-8 w-8"
-                        >
-                          {isOpenConsole ? (
-                            <ChevronDown size={16} />
-                          ) : (
-                            <ChevronUp size={16} />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    {isOpenConsole && (
-                      <div>
-                        <ApacheViewDashboard />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-          </div>
         </div>
       </main>
     </div>

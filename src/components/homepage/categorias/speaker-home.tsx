@@ -22,7 +22,7 @@ import {
 } from '../../popup/graficos/grafico-eventos';
 import { BlockItemGeral } from './book-home/block-item-geral';
 import { Switch } from '../../ui/switch';
-import { useQuery } from '../../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../../hooks/use-query';
 
 type Patente = {
   event_name: string;

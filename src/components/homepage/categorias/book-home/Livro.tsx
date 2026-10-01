@@ -199,11 +199,7 @@ export function BookItem(props: Publicacao) {
   );
 
   const { onOpen } = useModalSecundary();
-  const { urlGeral, user, permission } = useContext(UserContext);
-
-  const has_editar_producao = permission.some(
-    (perm) => perm.permission === 'editar_producao',
-  );
+  const { urlGeral } = useContext(UserContext);
 
   const handleFileDelete = async () => {
     const urlDelete = `${urlGeral}image/${props.id}?type=ARTICLE`;
@@ -330,29 +326,6 @@ export function BookItem(props: Publicacao) {
               )}
 
               <div className="flex gap-3 min-w-20">
-                {(user?.lattes_id == props.lattes_id || has_editar_producao) &&
-                  (props.type == 'article' ||
-                    props.type == 'patente' ||
-                    props.type == 'livro' ||
-                    props.type == 'capLivro') && (
-                    <Button
-                      onClick={() =>
-                        onOpen('edit-article', {
-                          id: props.id,
-
-                          researcher: props.researcher,
-                          has_image: props.has_image,
-                          relevance: props.relevance,
-                        })
-                      }
-                      variant={'outline'}
-                      className="h-8 w-8 text-gray-500 dark:text-white hidden group-hover:flex"
-                      size={'icon'}
-                    >
-                      <Pencil size={16} />
-                    </Button>
-                  )}
-
                 {props.type == 'research-project' && (
                   <Button
                     onClick={() =>

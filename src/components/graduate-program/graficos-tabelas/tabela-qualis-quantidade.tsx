@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../../context/context';
-import { DataTable } from '../../dashboard/data-table';
+import { DataTable } from '../../ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Label } from '../../ui/label';
 import {

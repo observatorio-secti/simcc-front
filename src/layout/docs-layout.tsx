@@ -20,7 +20,6 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '../components/ui/breadcrumb';
-import { UserProfileInitialModal } from '../components/modals/user-profile-initial';
 import { AppSidebarDocs } from '../components/app-sidebar-docs';
 
 interface MailProps {
@@ -37,11 +36,7 @@ export default function DocsLayout({
 }: MailProps) {
   const {
     isCollapsed,
-    loggedIn,
     setIsCollapsed,
-    permission,
-    pesquisadoresSelecionados,
-    setItensSelecionados,
   } = useContext(UserContext);
 
   const { onOpen, isOpen, type: typeModal } = useModal();
@@ -94,10 +89,6 @@ export default function DocsLayout({
       onOpen('pesquisadores-selecionados');
     }
   }, [location]);
-
-  const hasBaremaAvaliacao = permission.some(
-    (perm) => perm.permission === 'criar_barema_avaliacao',
-  );
 
   const router = useLocation();
   const pathSegments = router.pathname.split('/').filter(Boolean); // Divide a URL em segmentos e remove a primeira parte vazia
@@ -167,8 +158,6 @@ export default function DocsLayout({
           </main>
         </SidebarInset>
         <Toaster />
-
-        <UserProfileInitialModal />
       </SidebarProvider>
     </div>
   );

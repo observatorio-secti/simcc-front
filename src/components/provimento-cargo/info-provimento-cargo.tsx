@@ -27,7 +27,7 @@ import {
 } from '../ui/accordion';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
-import { DataTable } from '../dashboard/data-table';
+import { DataTable } from '../ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';

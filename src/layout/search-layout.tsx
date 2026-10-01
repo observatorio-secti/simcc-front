@@ -2,26 +2,10 @@ import { Toaster } from 'sonner';
 
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../context/context';
-import {
-  BarChartBig,
-  Blocks,
-  BookOpen,
-  Bug,
-  Building2,
-  Download,
-  GraduationCap,
-  Home,
-  Info,
-  Link2,
-  List,
-  SearchCheck,
-  Sparkles,
-  UserPlus,
-} from 'lucide-react';
 
 import { useModal } from '../components/hooks/use-modal-store';
 
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useModalSecundary } from '../components/hooks/use-modal-store-secundary';
 import {
   SidebarInset,
@@ -37,8 +21,6 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from '../components/ui/breadcrumb';
-import { useTheme } from 'next-themes';
-import { UserProfileInitialModal } from '../components/modals/user-profile-initial';
 import { cn } from '../lib';
 
 interface MailProps {
@@ -55,11 +37,7 @@ export default function SearchLayout({
 }: MailProps) {
   const {
     isCollapsed,
-    loggedIn,
     setIsCollapsed,
-    permission,
-    pesquisadoresSelecionados,
-    setItensSelecionados,
   } = useContext(UserContext);
 
   const { onOpen, isOpen, type: typeModal } = useModal();
@@ -112,113 +90,6 @@ export default function SearchLayout({
       onOpen('pesquisadores-selecionados');
     }
   }, [location]);
-
-  const links = [
-    {
-      title: 'Página inicial',
-      label: '',
-      icon: Home,
-      link: '/',
-    },
-    {
-      title: 'Pesquisar',
-      label: '',
-      icon: SearchCheck,
-      link: '/resultados',
-    },
-    {
-      title: 'Pesquisar com IA',
-      label: '',
-      icon: Sparkles,
-      link: '/resultados-ia',
-    },
-    {
-      title: 'Indicadores',
-      label: '',
-      icon: BarChartBig,
-      link: '/indicadores',
-    },
-    {
-      title: 'Dicionário',
-      label: '',
-      icon: List,
-      link: '/dicionario',
-    },
-    {
-      title: 'Listagens',
-      label: '',
-      icon: Download,
-      link: '/listagens',
-    },
-    {
-      title: 'Produções recentes',
-      label: '',
-      icon: BookOpen,
-      link: '/producoes-recentes',
-    },
-  ];
-
-  const links2 = [
-
-    {
-      title: 'Pós-graduação',
-      label: '',
-      icon: GraduationCap,
-      link: '/pos-graduacao',
-    },
-
-    {
-      title: 'Grupos de pesquisa',
-      label: '',
-      icon: Blocks,
-      link: '/grupos-pesquisa',
-    },
-    {
-      title: 'Painéis de dados externos',
-      label: '',
-      icon: Link2,
-      link: '/paines-dados-externos',
-    },
-  ];
-
-  const hasBaremaAvaliacao = permission.some(
-    (perm) => perm.permission === 'criar_barema_avaliacao',
-  );
-
-  const links3 = [
-    ...(hasBaremaAvaliacao
-      ? [
-          {
-            title: 'Pesquisadores selecionados',
-            label: `${pesquisadoresSelecionados.length == 0 ? '' : pesquisadoresSelecionados.length}`,
-            icon: UserPlus,
-            link: '/pesquisadores-selecionados',
-          },
-        ]
-      : []),
-
-    {
-      title: 'Relatar problema',
-      label: '',
-      icon: Bug,
-      link: '/relatar-problema',
-    },
-    {
-      title: 'Informações',
-      label: '',
-      icon: Info,
-      link: '/informacoes',
-    },
-  ];
-
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate('/');
-    setItensSelecionados([]);
-  };
-
-  const { theme, setTheme } = useTheme();
 
   const router = useLocation();
   const pathSegments = router.pathname.split('/').filter(Boolean); // Divide a URL em segmentos e remove a primeira parte vazia
@@ -324,8 +195,6 @@ export default function SearchLayout({
           </main>
         </SidebarInset>
         <Toaster />
-
-        <UserProfileInitialModal />
       </SidebarProvider>
     </div>
   );

@@ -12,7 +12,6 @@ import { ContentIndicators } from '../indicators/content-indicators';
 import { IncitesPage } from '../incites/content-incites';
 import { NewsArticles } from '../novas-publicacoes/new-articles';
 import { GruposPesquisaPage } from '../grupos-pesquisa/grupos-pesquisa';
-import { DepartamentPage } from '../departamentos/departamentos-page';
 import { ResearcherPage } from '../researcher/researcher-page';
 import { Maria } from '../maria/maria';
 import { TodosPesquisadores } from '../listagens/todos-pesquisadores';
@@ -44,8 +43,6 @@ const ModalContent = () => {
       return <GruposPesquisaPage />;
     case 'incites':
       return <IncitesPage />;
-    case 'departamentos':
-      return <DepartamentPage />;
     case 'pesquisador':
       return <ResearcherPage />;
     case 'maria':

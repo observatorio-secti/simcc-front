@@ -20,7 +20,7 @@ import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { BlockItemGeral } from '../homepage/categorias/book-home/block-item-geral';
 import { GraficoProjetoPesquisa } from '../popup/graficos/grafico-projeto-pesquisa';
 import { TableReseracherProject } from '../popup/columns/table-projetos-pesquisa';
-import { useQuery } from '../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../hooks/use-query';
 
 type Projeto = {
   agency_code: string;

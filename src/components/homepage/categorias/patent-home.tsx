@@ -19,7 +19,7 @@ import { CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { BlockItemGeral } from './book-home/block-item-geral';
 import { GraficoPatente } from './patent-home/grafico-patent';
 import { Switch } from '../../ui/switch';
-import { useQuery } from '../../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../../hooks/use-query';
 
 type Patente = {
   id: string;

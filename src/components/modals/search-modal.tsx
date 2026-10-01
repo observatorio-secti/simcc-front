@@ -37,9 +37,6 @@ const useQuery = () => {
   return new URLSearchParams(useLocation().search);
 };
 
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { query, where } from 'firebase/firestore';
-
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useModalResult } from '../hooks/use-modal-result';
 import { Play, Trash } from 'lucide-react';
@@ -78,7 +75,6 @@ export function SearchModal() {
     loggedIn,
     historico,
   } = useContext(UserContext);
-  const db = getFirestore();
   const [input, setInput] = useState('');
 
   const handleClickTermos = (type: string, value: string) => {
@@ -90,61 +86,9 @@ export function SearchModal() {
     setItensSelecionadosPopUp(itemsSelecionados);
   }, [itemsSelecionados]);
 
-  const [filteredItems, setFilteredItems] = useState<Csv[]>([]);
-  /////////////////
-  const banco = import.meta.env.VITE_BANCO_FIREBASE_SEARCH;
-
-  const searchFilesByTermPrefix = async (prefix: string) => {
-    if (prefix.length >= 3) {
-      try {
-        // Consulta os documentos cujo term começa com o prefixo fornecido
-        const filesRef = collection(
-          db,
-          import.meta.env.VITE_BANCO_FIREBASE_SEARCH,
-        );
-        const q = query(
-          filesRef,
-          where('term_normalize', '>=', prefix),
-          where('term_normalize', '<=', prefix + '\uf8ff'),
-        );
-
-        const querySnapshot = await getDocs(q);
-        const files = querySnapshot.docs.map((doc) => doc.data());
-
-        console.log('files', files);
-        const mappedFiles = files.map((file) => ({
-          great_area: file.great_area,
-          term: file.term,
-          frequency: file.frequency,
-          type_: file.type_,
-          term_normalize: file.term_normalize,
-        }));
-
-        // Define os dados encontrados em filteredItems
-        setFilteredItems(mappedFiles);
-      } catch (error) {
-        console.error('Erro ao buscar arquivos:', error);
-        return [];
-      }
-    }
-  };
-
-  console.log('filter', filteredItems);
-
-  const normalizeInput = (value: string): string => {
-    // Remove acentos e diacríticos
-    value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    // Converte para minúsculas
-    value = value.toLowerCase();
-    // Remove caracteres especiais, mantendo letras, números e espaços
-    value = value.replace(/[^a-z0-9\s]/g, '');
-    return value;
-  };
+  const [filteredItems] = useState<Csv[]>([]);
 
   const handleChangeInput = (value: string) => {
-    const normalizedValue = normalizeInput(value);
-    console.log(normalizedValue);
-    searchFilesByTermPrefix(normalizedValue);
     setInput(value);
   };
 

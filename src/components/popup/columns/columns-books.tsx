@@ -64,7 +64,7 @@ export const columns: ColumnDef<Livros>[] = [
     accessorKey: 'name',
     header: 'Nome',
     cell: ({ row }) => {
-      const { urlGeral, user, permission } = useContext(UserContext);
+      const { urlGeral } = useContext(UserContext);
 
       const { onOpen: onOpen2, isOpen: isOpen2 } = useModal();
       return (

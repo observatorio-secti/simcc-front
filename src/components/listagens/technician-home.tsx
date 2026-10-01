@@ -30,16 +30,16 @@ import { Button } from '../ui/button';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { DataTable } from '../popup/columns/popup-data-table';
 import { columnsTecnicos } from './columns/colums-tecnicos';
-import { GraficoTecnicosGenero } from '../dashboard/graficos/grafico-tecnicos-genero';
+import { GraficoTecnicosGenero } from '../graficos/grafico-tecnicos-genero';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip';
-import { GraficoTecnicosRt } from '../dashboard/graficos/grafico-tecnicos-rt';
-import { GraficoTecnicosCargo } from '../dashboard/graficos/grafico-tecnico-cargo';
-import { GraficoProgressaoTecnicos } from '../dashboard/graficos/grafico-progressao-tecnicos';
+import { GraficoTecnicosRt } from '../graficos/grafico-tecnicos-rt';
+import { GraficoTecnicosCargo } from '../graficos/grafico-tecnico-cargo';
+import { GraficoProgressaoTecnicos } from '../graficos/grafico-progressao-tecnicos';
 import { GraficoSetorTecnicos } from './graficos/grafico-setor-tecnico';
 import { Input } from '../ui/input';
 

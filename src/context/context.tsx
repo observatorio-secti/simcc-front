@@ -1,49 +1,15 @@
 import { createContext } from 'react';
-import { Keepo } from '../components/dashboard/builder-page/builder-page';
 
-interface User {
-  institution_id: string;
-  user_id: string;
-  display_name: string;
-  email: string;
-  uid: string;
-  photo_url: string;
-  dep_id: string;
-  roles: Roles[];
-  linkedin: string;
-  lattes_id: string;
-  shib_id: string;
-  graduate_program: GraduateProgram[];
-  researcger_name: string;
-  departaments: Departaments[];
-  provider: string;
-}
-
-interface HistoricoItem {
+export interface HistoricoItem {
   termo: string;
   tipo: string;
 }
 
-interface Departaments {
-  dep_nom: string;
-  dep_id: string;
-}
-
-interface GraduateProgram {
-  graduate_program_id: string;
-  name: string;
-}
-
-interface Roles {
-  id: string;
-  role_id: string;
-}
-
-interface ItemsSelecionados {
+export interface ItemsSelecionados {
   term: string;
 }
 
-interface PesquisadoresSelecionados {
+export interface PesquisadoresSelecionados {
   id: string;
   name: string;
   university: string;
@@ -53,12 +19,12 @@ interface PesquisadoresSelecionados {
   graduation: string;
 }
 
-interface Permission {
+export interface Permission {
   permission: string;
   id: string;
 }
 
-interface UserContextType {
+export interface UserContextType {
   test: boolean;
   setTest: React.Dispatch<React.SetStateAction<boolean>>;
   loggedIn: boolean;
@@ -69,11 +35,8 @@ interface UserContextType {
   setNavbar: React.Dispatch<React.SetStateAction<boolean>>;
   maria: boolean;
   setMaria: React.Dispatch<React.SetStateAction<boolean>>;
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-
-  keepoData: Keepo;
-  setKeepoData: React.Dispatch<React.SetStateAction<Keepo>>;
+  user: any;
+  setUser: React.Dispatch<React.SetStateAction<any>>;
 
   historico: HistoricoItem[];
   setHistorico: React.Dispatch<React.SetStateAction<HistoricoItem[]>>;
@@ -84,8 +47,8 @@ interface UserContextType {
   idDocumentBarema: string;
   setIdDocumentBarema: React.Dispatch<React.SetStateAction<string>>;
 
-  messagesMaria: any[]; // Aqui você define messagesMaria como um array de qualquer tipo
-  setMessagesMaria: React.Dispatch<React.SetStateAction<any[]>>; // Aqui você define setMessagesMaria como uma função que atualiza um array de qualquer tipo
+  messagesMaria: any[];
+  setMessagesMaria: React.Dispatch<React.SetStateAction<any[]>>;
 
   itemsSelecionados: ItemsSelecionados[];
   setItensSelecionados: React.Dispatch<
@@ -167,10 +130,8 @@ export const UserContext = createContext<UserContextType>({
   setNavbar: () => {},
   maria: false,
   setMaria: () => {},
-  user: {} as User,
+  user: null,
   setUser: () => {},
-  keepoData: {} as Keepo,
-  setKeepoData: () => {},
 
   historico: [],
   setHistorico: () => {},

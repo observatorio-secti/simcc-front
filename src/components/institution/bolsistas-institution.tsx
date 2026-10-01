@@ -52,8 +52,8 @@ import { DataTable } from '../homepage/categorias/researchers-home/data-table';
 import {
   GraficoBolsistasPQ,
   CategoryMetric,
-} from '../dashboard/graficos/grafico-bolsista-produtividade';
-import { GraficoBolsistasDT } from '../dashboard/graficos/grafico-bolsista-tecnologico';
+} from '../graficos/grafico-bolsista-produtividade';
+import { GraficoBolsistasDT } from '../graficos/grafico-bolsista-tecnologico';
 
 const BahiaTerritoriosMap = lazy(
   () => import('../homepage/categorias/researchers-home/mapa-researcher-v2'),

@@ -6,12 +6,17 @@
 // cidade aplica o filtro correspondente. Paleta, bordas e GeoJSON são os mesmos.
 import { useEffect, useMemo, useState } from 'react';
 import {
-  GeoJSON,
-  MapContainer,
-  Marker,
-  Tooltip,
+  GeoJSON as GeoJSONComponent,
+  MapContainer as MapContainerComponent,
+  Marker as MarkerComponent,
+  Tooltip as TooltipComponent,
   useMapEvents,
 } from 'react-leaflet';
+
+const GeoJSON = GeoJSONComponent as any;
+const MapContainer = MapContainerComponent as any;
+const Marker = MarkerComponent as any;
+const Tooltip = TooltipComponent as any;
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Check } from 'lucide-react';

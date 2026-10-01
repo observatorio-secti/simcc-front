@@ -27,8 +27,6 @@ import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-
 
 import { CardContent, CardHeader, CardTitle } from '../ui/card';
 
-import { Keepo } from '../dashboard/builder-page/builder-page';
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
 import { VisualizacaoInstituicao } from './visualizacao-instituicao';
 import { useInstitutions, useSimccGroupsTotals } from './hooks/use-institution-queries';
 import { Institution as InstitutionType } from '../../services/institution';
@@ -183,27 +181,6 @@ export function Institution() {
   };
 
   const [count, setCount] = useState(24);
-
-  const db = getFirestore();
-
-  const fetchAvatars = async () => {
-    const snapshot = await getDocs(collection(db, 'construtor-pagina'));
-    const avatarMap: Record<string, string> = {};
-
-    snapshot.forEach((doc) => {
-      const data = doc.data() as Partial<Keepo>;
-      const avatar = data.profile_info?.avatar || '';
-      avatarMap[doc.id] = avatar;
-    });
-
-    return avatarMap;
-  };
-
-  const [avatarMap, setAvatarMap] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    fetchAvatars().then(setAvatarMap);
-  }, []);
 
   return (
     <>

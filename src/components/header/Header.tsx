@@ -9,13 +9,7 @@ import logo_5 from '../../assets/logo_cimatec.svg';
 
 import { NavigationMenuLink } from '../../components/ui/navigation-menu';
 
-import {
-  CircleHelp,
-  Grip,
-  LayoutDashboard,
-  LogIn,
-  UserPlus,
-} from 'lucide-react';
+import { Grip } from 'lucide-react';
 import { UserContext } from '../../context/context';
 import { Button } from '../ui/button';
 
@@ -135,14 +129,6 @@ export function Header() {
                 </a>
               </Button>
             </div>
-
-            <span className="absolute right-2 md:relative md:ml-3 md:mb-[1px]">
-              {role != '' && role != 'Visitante' && (
-                <Badge className="  " variant={'outline'}>
-                  {role}
-                </Badge>
-              )}
-            </span>
           </div>
         </div>
 
@@ -170,75 +156,8 @@ export function Header() {
             </div>
           )}
 
-          <div className="hidden md:flex gap-3 items-center">
-            {!loggedIn && (
-              <Link to={'/signIn'}>
-                <Button variant="ghost" size="sm" className="h-8 px-2">
-                  <LogIn className="h-4 w-4" />
-                  Fazer login
-                </Button>
-              </Link>
-            )}
-            {!loggedIn && (
-              <Link to={'/signUp'}>
-                <Button size="sm" className="h-8 px-2">
-                  <UserPlus className="h-4 w-4" />
-                  Criar conta
-                </Button>
-              </Link>
-            )}
-          </div>
-
-          {!loggedIn && (
-            <div className="md:hidden">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-8 w-8">
-                    <UserCircleGear className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="mr-5">
-                  <DropdownMenuItem>
-                    <Link className="flex gap-2 items-center" to={'/signIn'}>
-                      <UserPlus className="h-4 w-4" />
-                      <p>Criar conta</p>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link className="flex gap-2 items-center" to={'/signUp'}>
-                      <LogIn className="h-4 w-4" />
-                      <p>Fazer login</p>
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
-
-          <div className="hidden md:flex md:gap-2">
-            <div>
-              {loggedIn && permission.length > 0 && (
-                <Link to={'/dashboard'}>
-                  <Button variant="outline" size="sm" className="h-8 px-2">
-                    <LayoutDashboard className="h-4 w-4" />
-                    Console
-                  </Button>
-                </Link>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => onOpen('user-profile-initial')}
-                variant="outline"
-                size="icon"
-                className="h-8 w-8"
-              >
-                <CircleHelp className="h-4 w-4" />
-                <span className="sr-only">Dúvidas</span>
-              </Button>
-
-              <ModeToggle />
+          <div className="flex items-center gap-2">
+            <ModeToggle />
               {false && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -292,11 +211,10 @@ export function Header() {
               )}
             </div>
           </div>
-        </div>
-      </header>
-    </div>
-  );
-}
+        </header>
+      </div>
+    );
+  }
 
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,

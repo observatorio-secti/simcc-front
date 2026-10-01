@@ -45,8 +45,6 @@ export function Home() {
             onOpen('grupos-pesquisa')
         } else if (location.pathname == '/incites') {
             onOpen('incites')
-        } else if (location.pathname == '/departamentos') {
-            onOpen('departamentos')
         } else if (location.pathname == '/researcher') {
             onOpen('pesquisador')
         } else if (location.pathname == '/resultados-ia') {

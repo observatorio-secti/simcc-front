@@ -19,7 +19,6 @@ import { LogoConecteeWhite } from '../svg/LogoConecteeWhite';
 import { LogoConectee } from '../svg/LogoConectee';
 
 import { HomepageProgram } from './homepage-program';
-import { PainelAdminGraduate } from './painel-admin-graduate';
 import { Helmet } from 'react-helmet';
 
 interface PalavrasChaves {
@@ -316,28 +315,6 @@ export function VisualizacaoPrograma() {
                         Docentes
                       </TabsTrigger>
                     </TabsList>
-                    {has_editar_informacoes_programa && (
-                      <Sheet open={isOpenSheet} onOpenChange={setIsOpenSheet}>
-                        <SheetTrigger>
-                          <Button
-                            onClick={() => setExpand(false)}
-                            className="h-8"
-                            size={'sm'}
-                          >
-                            <LayoutDashboard size={16} />
-                            Painel administrativo
-                          </Button>
-                        </SheetTrigger>
-
-                        <SheetContent
-                          className={`p-0 dark:bg-neutral-900 dark:border-gray-600 ${expand ? 'min-w-[80vw]' : 'min-w-[50vw]'}`}
-                        >
-                          <PainelAdminGraduate
-                            graduate_program_id={props.graduate_program_id}
-                          />
-                        </SheetContent>
-                      </Sheet>
-                    )}
                   </div>
                 </div>
               </div>

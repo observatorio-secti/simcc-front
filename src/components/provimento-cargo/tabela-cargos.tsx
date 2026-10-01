@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { DataTable } from '../dashboard/data-table';
+import { DataTable } from '../ui/data-table';
 import { Dados } from './info-provimento-cargo';
 
 const intersticio_tabela = {

@@ -12,33 +12,16 @@ import {
 
 import { NavMain } from './nav-main';
 import { NavProjects } from './nav-projects';
-import { NavUser } from './nav-user';
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
   SidebarRail,
 } from './ui/sidebar';
-import { UserContext } from '../context/context';
-import { useContext } from 'react';
-import { AccountSwitcher } from './navigation/user-list';
-import { useModal } from './hooks/use-modal-store';
-// This is sample data.
 
 export function AppSidebarDocs({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const { urlGeral, user, loggedIn } = useContext(UserContext);
-  const { onOpen } = useModal();
-
   const data = {
-    user: {
-      name: user?.display_name || '',
-      email: user?.email || '',
-      avatar: user?.photo_url || '',
-    },
-
     navMain: [
       {
         title: 'API',
@@ -90,14 +73,10 @@ export function AppSidebarDocs({
 
   return (
     <Sidebar collapsible="icon" className="border-0" {...props}>
-      <SidebarHeader>
-        <AccountSwitcher />
-      </SidebarHeader>
       <SidebarContent>
         <NavProjects projects={data.projects} />
         <NavMain items={data.navMain} />
       </SidebarContent>
-      <SidebarFooter>{loggedIn && <NavUser user={data.user} />}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

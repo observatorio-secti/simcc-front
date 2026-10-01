@@ -21,7 +21,7 @@ import { ToggleGroup, ToggleGroupItem } from '../ui/toggle-group';
 
 export function RelatarBug() {
   const { onClose, isOpen, type: typeModal } = useModal();
-  const { user, loggedIn, urlGeralAdm } = useContext(UserContext);
+  const { urlGeralAdm } = useContext(UserContext);
   const isModalOpen = isOpen && typeModal === 'relatar-problema';
 
   const history = useNavigate();
@@ -35,7 +35,7 @@ export function RelatarBug() {
   };
 
   const [nome, setNome] = useState('');
-  const [email, setEmail] = useState(loggedIn ? user?.email : '');
+  const [email, setEmail] = useState('');
   const [avaliacao, setAvaliacao] = useState(0);
   const [descricao, setDescricao] = useState('');
 
@@ -236,7 +236,6 @@ export function RelatarBug() {
                   <Input
                     className="w-full"
                     value={email}
-                    defaultValue={loggedIn ? user?.email : ''}
                     onChange={(e) => setEmail(e.target.value)}
                     type="text"
                   />

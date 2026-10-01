@@ -18,7 +18,7 @@ import { GraficoLivros } from '../../popup/graficos/grafico-livros';
 import { TableReseracherBookPopup } from '../../popup/columns/table-books-popup';
 import { BlockItemGeral } from './book-home/block-item-geral';
 import { Switch } from '../../ui/switch';
-import { useQuery } from '../../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../../hooks/use-query';
 
 type Patente = {
   id: string;

@@ -3,7 +3,7 @@ import { UserContext } from '../../context/context';
 import { CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Alert } from '../ui/alert';
 import { TextSearch } from 'lucide-react';
-import { useQuery } from '../dashboard/builder-page/tabelas/tabela-artigos';
+import { useQuery } from '../hooks/use-query';
 import {
   Accordion,
   AccordionContent,
