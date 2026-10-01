@@ -13,13 +13,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../ui/tooltip';
-import { GraduationCap, Info, MapPin, OctagonAlert, User } from 'lucide-react';
+import { GraduationCap, Info, MapPin, User } from 'lucide-react';
 
 import { FilterYearIndicators } from './filter-year-indicators';
-import { GraficoIndiceArticle } from './gráficos/grafico-indice-artigo';
-import { GraficoIndiceBooksAndChapters } from './gráficos/grafico-indice-livros';
 import { PuzzlePiece } from 'phosphor-react';
-import { GraficoIndiceProdTec } from './gráficos/grafico-indice-tecnica';
 import { Skeleton } from '../ui/skeleton';
 import { TabelaQualisQuantidadeResarcher } from './gráficos/tabela-qualis-quantidade-researcher';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -56,32 +53,6 @@ type Dados = {
   B4: number;
   C: number;
   SQ: number;
-};
-
-type PesosProducao = {
-  a1: string;
-  a2: string;
-  a3: string;
-  a4: string;
-  b1: string;
-  b2: string;
-  b3: string;
-  b4: string;
-  c: string;
-  sq: string;
-  f1: string;
-  f2: string;
-  f3: string;
-  f4: string;
-  f5: string;
-  livro: string;
-  cap_livro: string;
-  software: string;
-  patent_granted: string;
-  patent_not_granted: string;
-  report: string;
-  book: string;
-  book_chapter: string;
 };
 
 type Research = {
@@ -177,32 +148,6 @@ export function ResearcherIndicators(props: Research) {
   const yearString = filters.length > 0 ? filters[0].year.join(';') : '';
 
   const { urlGeral } = useContext(UserContext);
-
-  const pesosProducao: PesosProducao = {
-    a1: '1',
-    a2: '0.875',
-    a3: '0.75',
-    a4: '0.625',
-    b1: '0.5',
-    b2: '0.375',
-    b3: '0.25',
-    b4: '0.125',
-    c: '0',
-    sq: '0',
-    f1: '2',
-    f2: '1.5',
-    f3: '1',
-    f4: '0.5',
-    f5: '0.1',
-    livro: '1',
-    cap_livro: '0.25',
-    software: 't5',
-    patent_granted: 't4',
-    patent_not_granted: 't4',
-    report: 't5',
-    book: '1',
-    book_chapter: '0.25',
-  };
 
   const urlDados = `${urlGeral}researcher/DadosGerais?researcher_id=${props.id}&year=${yearString}`;
 
@@ -315,105 +260,6 @@ export function ResearcherIndicators(props: Research) {
         </div>
       </div>
 
-      <Alert className="p-6 flex gap-3 mb-4 md:mb-8">
-        <div>
-          {' '}
-          <OctagonAlert size={24} />
-        </div>
-        <div>
-          <AlertTitle>Atenção aos índices de produção</AlertTitle>
-          <AlertDescription>
-            Os gráficos são gerados a partir da quantidade de produção por ano
-            do pesquisador e multiplicado pelo peso respectivo. Os pesos de
-            produção são gerenciado pelo administrador da plataforma com base na
-            documentação do Sucupira
-          </AlertDescription>
-
-          <div className="flex flex-wrap gap-4 mt-6">
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#34663C] rounded-md"></div> A1 - {pesosProducao.a1}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#9DC356] rounded-md"></div> A2 - {pesosProducao.a2}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#B1C38A] rounded-md"></div>A3 - {pesosProducao.a3}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#BEC4B3] rounded-md"></div> A4 - {pesosProducao.a4}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#D56438] rounded-md"></div> B1 - {pesosProducao.b1}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#DD883D] rounded-md"></div> B2 - {pesosProducao.b2}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#E3B081] rounded-md"></div> B3 - {pesosProducao.b3}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#E3AC96] rounded-md"></div> B4 - {pesosProducao.b4}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#CE3830] rounded-md"></div> C - {pesosProducao.c}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#4A1314] rounded-md"></div> Sem qualis
-              - {pesosProducao.sq}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-200 rounded-md"></div> T1 - {pesosProducao.f1}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-300 rounded-md"></div> T2 - {pesosProducao.f2}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-400 rounded-md"></div> T3 - {pesosProducao.f3}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-500 rounded-md"></div> T4 - {pesosProducao.f4}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-blue-600 rounded-md"></div> T5 - {pesosProducao.f5}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#096670] rounded-md"></div> Software -{' '}
-              {pesosProducao.software.toUpperCase()}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#662D91] rounded-md"></div> Relatório
-              Técnico - {pesosProducao.report.toUpperCase()}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#6BC26B] rounded-md"></div> Patente
-              concedida - {pesosProducao.patent_granted.toUpperCase()}
-            </div>
-
-            <div className="flex items-center gap-2 text-xs ">
-              <div className="h-4 w-4 bg-[#CE3830] rounded-md"></div> Patente
-              não concedida - {pesosProducao.patent_not_granted.toUpperCase()}
-            </div>
-          </div>
-        </div>
-      </Alert>
-
       <FilterYearIndicators onFilterUpdate={handleResearcherUpdate} />
       {loading ? (
         <div className="grid lg:grid-cols-3 gap-4 md:gap-8">
@@ -427,36 +273,6 @@ export function ResearcherIndicators(props: Research) {
           <div>
             <h2 className="text-2xl font-medium mb-8">Artigos qualificados</h2>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
-              <Alert className=" h-[400px] lg:col-span-3 ">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <div>
-                    <CardTitle className="text-sm font-medium">
-                      Índice de produção de artigos
-                    </CardTitle>
-                    <CardDescription>
-                      Multiplicação do peso pela quantidade
-                    </CardDescription>
-                  </div>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        {' '}
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Fonte: Plataforma Lattes</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </CardHeader>
-                <CardContent className="mt-4">
-                  <GraficoIndiceArticle
-                    articles={dados}
-                    pesosProducao={pesosProducao}
-                  />
-                </CardContent>
-              </Alert>
 
               <Alert className=" h-[400px] ">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -552,39 +368,8 @@ export function ResearcherIndicators(props: Research) {
             <h2 className="text-2xl font-medium my-8 ">
               Livros e capítulos de livros
             </h2>
-            <div className="flex md:grid flex-wrap lg:grid-cols-4 gap-4 md:gap-8">
-              <Alert className=" h-full lg:col-span-2 ">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <div>
-                    <CardTitle className="text-sm font-medium">
-                      Índice de livros e capítulos
-                    </CardTitle>
-                    <CardDescription>
-                      Multiplicação do peso pela quantidade
-                    </CardDescription>
-                  </div>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        {' '}
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Fonte: Plataforma Lattes</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </CardHeader>
-                <CardContent className="mt-4">
-                  <GraficoIndiceBooksAndChapters
-                    articles={dados}
-                    pesosProducao={pesosProducao}
-                  />
-                </CardContent>
-              </Alert>
-
-              <Alert className=" h-full lg:col-span-2 ">
+            <div className="grid grid-cols-1 gap-4 md:gap-8">
+              <Alert className=" h-full ">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <div>
                     <CardTitle className="text-sm font-medium">
@@ -617,40 +402,7 @@ export function ResearcherIndicators(props: Research) {
 
           <div>
             <h2 className="text-2xl font-medium my-8 ">Produção técnica</h2>
-            <div className="flex flex-wrap lg:grid lg:grid-cols-2 gap-4 md:gap-8">
-              <Alert className=" h-[400px] ">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <div>
-                    <CardTitle className="text-sm font-medium">
-                      Índice de produção técnica
-                    </CardTitle>
-                    <CardDescription>
-                      Multiplicação do peso pela quantidade
-                    </CardDescription>
-                  </div>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        {' '}
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Fonte: Plataforma Lattes</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </CardHeader>
-                <CardContent>
-                  <CardContent className="mt-4 p-0">
-                    <GraficoIndiceProdTec
-                      articles={dados}
-                      pesosProducao={pesosProducao}
-                    />
-                  </CardContent>
-                </CardContent>
-              </Alert>
-
+            <div className="grid grid-cols-1 gap-4 md:gap-8">
               <Alert className=" h-[400px] ">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <div>

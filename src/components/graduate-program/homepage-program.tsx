@@ -53,7 +53,6 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import HC_wordcloud from 'highcharts/modules/wordcloud';
 import { GraficoArtigosPorQualis } from '../graficos/grafico-qualis';
-import { GraficoIndiceProdBibli } from './grafico-indice-producao-bibliografica';
 import { AdminGraficoGraduateProgram } from './admin-graficos-graduate-program';
 
 HC_wordcloud(Highcharts);
@@ -262,32 +261,6 @@ type Dados = {
   B4: number;
   C: number;
   SQ: number;
-};
-
-type PesosProducao = {
-  a1: string;
-  a2: string;
-  a3: string;
-  a4: string;
-  b1: string;
-  b2: string;
-  b3: string;
-  b4: string;
-  c: string;
-  sq: string;
-  f1: string;
-  f2: string;
-  f3: string;
-  f4: string;
-  f5: string;
-  livro: string;
-  cap_livro: string;
-  software: string;
-  patent_granted: string;
-  patent_not_granted: string;
-  report: string;
-  book: string;
-  book_chapter: string;
 };
 
 const useQuery = () => {
@@ -563,35 +536,6 @@ export function HomepageProgram(props: Props) {
     },
   };
 
-  //
-
-  //pesos prod
-
-  const pesosProducao: PesosProducao = {
-    a1: '1',
-    a2: '0.875',
-    a3: '0.75',
-    a4: '0.625',
-    b1: '0.5',
-    b2: '0.375',
-    b3: '0.25',
-    b4: '0.125',
-    c: '0',
-    sq: '0',
-    f1: '2',
-    f2: '1.5',
-    f3: '1',
-    f4: '0.5',
-    f5: '0.1',
-    livro: '1',
-    cap_livro: '0.25',
-    software: 't5',
-    patent_granted: 't4',
-    patent_not_granted: 't4',
-    report: 't5',
-    book: '1',
-    book_chapter: '0.25',
-  };
 
   return (
     <main className="h-full w-full flex flex-col">
@@ -870,39 +814,6 @@ export function HomepageProgram(props: Props) {
             </CardContent>
           </Alert>
 
-          <div className="flex h-full gap-8 w-full">
-            <Alert className="p-0 w-full">
-              <CardHeader className="flex p-10 flex-row items-center justify-between space-y-0 pb-2">
-                <div>
-                  <CardTitle className="text-sm font-medium">
-                    Índice de produção de artigos
-                  </CardTitle>
-                  <CardDescription>
-                    Multiplicação do peso pela quantidade
-                  </CardDescription>
-                </div>
-
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      {' '}
-                      <Info className="h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Fonte: Plataforma Lattes</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </CardHeader>
-
-              <CardContent className="p-2 sm:p-6 h-full">
-                <GraficoIndiceProdBibli
-                  articles={dados}
-                  pesosProducao={pesosProducao}
-                />
-              </CardContent>
-            </Alert>
-          </div>
         </div>
 
         <div

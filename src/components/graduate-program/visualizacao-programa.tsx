@@ -90,32 +90,6 @@ type Research = {
   SQ: number;
 };
 
-type PesosProducao = {
-  a1: string;
-  a2: string;
-  a3: string;
-  a4: string;
-  b1: string;
-  b2: string;
-  b3: string;
-  b4: string;
-  c: string;
-  sq: string;
-  f1: string;
-  f2: string;
-  f3: string;
-  f4: string;
-  f5: string;
-  livro: string;
-  cap_livro: string;
-  software: string;
-  patent_granted: string;
-  patent_not_granted: string;
-  report: string;
-  book: string;
-  book_chapter: string;
-};
-
 HC_wordcloud(Highcharts);
 
 const useQuery = () => {
