@@ -62,8 +62,16 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 // Configura interceptors de injeção de token e refresh automático em uma instância Axios
 const setupAuthInterceptors = (instance: AxiosInstance) => {
-  // Request Interceptor: injeta Bearer Token se existir
+  // Request Interceptor: normaliza rota e injeta Bearer Token se existir
   instance.interceptors.request.use((config) => {
+    // Se a baseURL possuir subcaminho (ex: /simcc/admin/), remove a barra inicial relativa para não truncar o subcaminho
+    if (
+      config.url &&
+      config.url.startsWith('/') &&
+      !config.url.startsWith('//')
+    ) {
+      config.url = config.url.replace(/^\//, '');
+    }
     const token = authStorage.getToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
