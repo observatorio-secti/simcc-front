@@ -16,6 +16,10 @@ interface ProfileSummaryCardsProps {
   mapError: boolean;
   terms: { term: string }[];
   loading: boolean;
+  /** Texto antes dos termos buscados. */
+  caption?: string;
+  /** Cor dos termos buscados (a do tipo de busca). */
+  termClassName?: string;
 }
 
 function Counter({
@@ -66,6 +70,8 @@ export function ProfileSummaryCards({
   mapError,
   terms,
   loading,
+  caption = 'com o perfil relacionado a',
+  termClassName = 'bg-indigo-500 dark:bg-indigo-500',
 }: ProfileSummaryCardsProps) {
   // Facets informativos (sem filtro) do registro vão para o resumo.
   const summaryFacets = FACET_DEFINITIONS.filter(
@@ -89,13 +95,11 @@ export function ProfileSummaryCards({
         <CardContent>
           <Counter value={totalResearchers} loading={loading} />
           <div className="flex items-center gap-3 flex-wrap mt-1">
-            <p className="text-xs text-muted-foreground">
-              com o perfil relacionado a
-            </p>
+            <p className="text-xs text-muted-foreground">{caption}</p>
             {terms.map((valor, index) => (
               <div
                 key={index}
-                className="flex gap-2 items-center w-fit p-2 px-3 capitalize rounded-md text-xs bg-indigo-500 dark:bg-indigo-500 text-white"
+                className={`flex gap-2 items-center w-fit p-2 px-3 capitalize rounded-md text-xs text-white ${termClassName}`}
               >
                 {valor.term.replace(/[|;]/g, '')}
               </div>

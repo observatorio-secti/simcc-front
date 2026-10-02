@@ -445,6 +445,8 @@ export function SearchModal() {
                                     ? 'bg-pink-500 dark:bg-pink-500'
                                     : searchType == 'patent'
                                       ? 'bg-cyan-500 dark:bg-cyan-500'
+                                      : searchType == 'software'
+                                        ? 'bg-teal-600 dark:bg-teal-600'
                                       : searchType == 'name'
                                         ? 'bg-red-500 dark:bg-red-500'
                                         : searchType == 'area'
@@ -555,6 +557,7 @@ export function SearchModal() {
     ${searchType == 'speaker' && 'bg-orange-500 dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white'}
     ${searchType == 'book' && 'bg-pink-500 dark:bg-pink-500 hover:bg-pink-600 dark:hover:bg-pink-600 hover:text-white'}
     ${searchType == 'patent' && 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'}
+    ${searchType == 'software' && 'bg-teal-600 dark:bg-teal-600 hover:bg-teal-700 dark:hover:bg-teal-700 hover:text-white'}
     ${searchType == 'name' && 'bg-red-500 dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white'}
     ${searchType == 'area' && 'bg-green-500 dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 hover:text-white'}
     ${searchType == 'profile' && 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'}

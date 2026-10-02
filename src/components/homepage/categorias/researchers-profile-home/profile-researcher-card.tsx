@@ -26,6 +26,9 @@ const SOURCE_TYPE_COLORS: Record<string, string> = {
   PATENT: 'bg-cyan-500',
   ABSTRACT: 'bg-yellow-500',
   EVENT: 'bg-orange-500',
+  PARTICIPATION_EVENT: 'bg-orange-500',
+  SOFTWARE: 'bg-teal-600',
+  AREA_SPECIALTY: 'bg-green-500',
 };
 
 interface ProfileResearcherCardProps {

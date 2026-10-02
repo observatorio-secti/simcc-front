@@ -27,7 +27,7 @@ export interface SearchResearchersV2Params {
  * A API (FastAPI) espera listas como chaves repetidas (`institution_id=a&institution_id=b`),
  * e não no formato padrão do axios (`institution_id[]=a`).
  */
-const serializeParams = (params: Record<string, FilterValueV2>) => {
+export const serializeParams = (params: Record<string, FilterValueV2>) => {
   const search = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
     if (value === null || value === undefined || value === '') return;

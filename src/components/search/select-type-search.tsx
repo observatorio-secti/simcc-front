@@ -83,6 +83,15 @@ export function SelectTypeSearch() {
               Patentes
             </div>
           </SelectItem>
+          {/* Só a página de resultados (API v2) atende a busca por software. */}
+          {!posGrad && (
+            <SelectItem value="software">
+              <div className="flex gap-4 items-center mr-2">
+                <div className="bg-teal-600 flex rounded-sm h-4 w-4"></div>{' '}
+                Softwares
+              </div>
+            </SelectItem>
+          )}
           <SelectItem value="name">
             <div className="flex gap-4 items-center mr-2">
               <div className="bg-red-500 flex rounded-sm h-4 w-4"></div> Nome

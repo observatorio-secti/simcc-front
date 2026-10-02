@@ -42,6 +42,9 @@ export const SOURCE_TYPE_LABELS: Record<string, string> = {
   BRAND: 'Marcas',
   ABSTRACT: 'Resumo do Lattes',
   EVENT: 'Participação em eventos',
+  PARTICIPATION_EVENT: 'Participação em eventos',
+  AREA: 'Áreas de especialidade',
+  AREA_SPECIALTY: 'Áreas de especialidade',
 };
 
 export const formatSourceType = (value: string) =>
