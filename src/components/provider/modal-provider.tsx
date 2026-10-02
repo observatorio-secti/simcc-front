@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { SearchModal } from '../modals/search-modal';
 import { ResearcherModal } from '../modals/researcher-modal';
+import { AuthModal } from '../modals/auth-modal';
 import { useModal } from '../hooks/use-modal-store';
 
 const ModalContent = () => {
@@ -13,6 +14,8 @@ const ModalContent = () => {
       return <SearchModal />;
     case 'researcher-modal':
       return <ResearcherModal />;
+    case 'auth-modal':
+      return <AuthModal />;
     default:
       return null;
   }

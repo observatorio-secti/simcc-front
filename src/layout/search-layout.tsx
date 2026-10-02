@@ -1,5 +1,3 @@
-import { Toaster } from 'sonner';
-
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../context/context';
 
@@ -35,10 +33,7 @@ export default function SearchLayout({
   navCollapsedSize,
   children,
 }: MailProps) {
-  const {
-    isCollapsed,
-    setIsCollapsed,
-  } = useContext(UserContext);
+  const { isCollapsed, setIsCollapsed } = useContext(UserContext);
 
   const { onOpen, isOpen, type: typeModal } = useModal();
   const { onOpen: onOpenSecundary } = useModalSecundary();
@@ -121,7 +116,7 @@ export default function SearchLayout({
           <main
             className={cn(
               'h-full flex flex-col flex-1',
-              isMariaChat && 'min-h-0 overflow-hidden'
+              isMariaChat && 'min-h-0 overflow-hidden',
             )}
           >
             <div className="flex p-8 pt-8 pb-2 h-[68px] shrink-0 items-center justify-between top-0 sticky z-[3] supports-[backdrop-filter]:bg-neutral-50/60 supports-[backdrop-filter]:dark:bg-neutral-900/60 backdrop-blur ">
@@ -176,14 +171,14 @@ export default function SearchLayout({
             <div
               className={cn(
                 'h-full',
-                isMariaChat && 'flex-1 min-h-0 overflow-hidden h-[calc(100%-68px)]'
+                isMariaChat &&
+                  'flex-1 min-h-0 overflow-hidden h-[calc(100%-68px)]',
               )}
             >
               {children}
             </div>
           </main>
         </SidebarInset>
-        <Toaster />
       </SidebarProvider>
     </div>
   );

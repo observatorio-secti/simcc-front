@@ -2,6 +2,7 @@ import { ThemeProvider } from '../components/provider/theme-provider';
 import { cn } from '../lib/utils';
 import { ModalProvider } from '../components/provider/modal-provider';
 import { ModalProviderSecundary } from '../components/provider/modal-provider-secundary';
+import { Toaster } from '../components/ui/sonner';
 
 export default function DefaultLayout({
   children,
@@ -18,6 +19,7 @@ export default function DefaultLayout({
       >
         <ModalProvider />
         <ModalProviderSecundary />
+        <Toaster richColors position="top-right" />
 
         {children}
       </ThemeProvider>

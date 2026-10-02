@@ -1,5 +1,3 @@
-import { Toaster } from 'sonner';
-
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../context/context';
 
@@ -34,10 +32,7 @@ export default function DocsLayout({
   navCollapsedSize,
   children,
 }: MailProps) {
-  const {
-    isCollapsed,
-    setIsCollapsed,
-  } = useContext(UserContext);
+  const { isCollapsed, setIsCollapsed } = useContext(UserContext);
 
   const { onOpen, isOpen, type: typeModal } = useModal();
   const { onOpen: onOpenSecundary } = useModalSecundary();
@@ -146,7 +141,6 @@ export default function DocsLayout({
             <div className="h-full ">{children}</div>
           </main>
         </SidebarInset>
-        <Toaster />
       </SidebarProvider>
     </div>
   );

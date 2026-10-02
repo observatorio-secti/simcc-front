@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Home } from './pages/Home';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from 'react-router-dom';
-import { UserContext, HistoricoItem, ItemsSelecionados } from '../src/context/context';
+  UserContext,
+  HistoricoItem,
+  ItemsSelecionados,
+} from '../src/context/context';
 
 import DefaultLayout from './layout/default-layout';
 import { CookiesProvider } from 'react-cookie';
+import { AuthProvider } from './context/auth-context';
+import { AuthCallback } from './pages/AuthCallback';
 import LoadingWrapper from './components/loading';
 import { Error404 } from './components/errors/404';
 import { TermosUso } from './pages/TermosUso';
@@ -94,97 +96,99 @@ function App() {
 
   useWindowResize(() => {});
 
-
   return (
     <>
       <Router basename={import.meta.env.VITE_BASE_PATH || '/'}>
         <CookiesProvider>
-          <UserContext.Provider
-            value={{
-              navbar,
-              setNavbar,
-              user,
-              setUser,
-              searchType,
-              setSearchType,
-              urlGeral,
-              setUrlGeral,
-              urlGeral2,
-              setUrlGeral2,
-              idGraduateProgram,
-              setIdGraduateProgram,
-              valoresSelecionadosExport,
-              setValoresSelecionadosExport,
-              valorDigitadoPesquisaDireta,
-              setValorDigitadoPesquisaDireta,
-              inputMaria,
-              setInputMaria,
-              maria,
-              setMaria,
-              mapModal,
-              setMapModal,
-              messagesMaria,
-              setMessagesMaria,
-              itemsSelecionados,
-              setItensSelecionados,
-              sugestoes,
-              setSugestoes,
-              itemsSelecionadosPopUp,
-              setItensSelecionadosPopUp,
-              isCollapsed,
-              setIsCollapsed,
-              mode,
-              setMode,
-              navCollapsedSize,
-              setNavCollapsedSize,
-              defaultLayout,
-              setDefaultLayout,
-              simcc,
-              setSimcc,
-              isCollapsedRight,
-              setIsCollapsedRight,
-              test,
-              setTest,
-              historico,
-              setHistorico,
-            }}
-          >
-            <DefaultLayout>
-              <LoadingWrapper>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/resultados" element={<Home />} />
-                  <Route path={PROFILE_RESULTS_PATH} element={<Home />} />
-                  <Route path="/dicionario" element={<Home />} />
-                  <Route path="/pos-graduacao" element={<Home />} />
-                  <Route path="/grupos-pesquisa" element={<Home />} />
-                  <Route
-                    path="/instituicao/:acronym?"
-                    element={<Home />}
-                  />
-                  <Route path="/indicadores" element={<Home />} />
-                  <Route path="/incites" element={<Home />} />
-                  <Route path="/observatorio" element={<Observatorio />} />
-                  <Route path="/producoes-recentes" element={<Home />} />
-                  <Route path="/researcher" element={<Home />} />
-                  <Route path="/resultados-ia" element={<Home />} />
-                  <Route path="/paines-dados-externos" element={<Home />} />
-                  <Route path="/indice-pesquisador" element={<Home />} />
-                  <Route path="/provimento-cargo" element={<Home />} />
-                  <Route path="/listagens" element={<Home />} />
-                  <Route path="/tv" element={<Tv />} />
-                  <Route path="/termos-uso" element={<TermosUso />} />
-                  <Route path="/politica-privacidade" element={<TermosUso />} />
-                  <Route path="/api-docs" element={<TermosUso />} />
-                  <Route path="/informacoes" element={<TermosUso />} />
-                  <Route path="/dicionario-cores" element={<TermosUso />} />
-                  <Route path="/videos" element={<TermosUso />} />
-                  <Route path="/sobre" element={<AboutPage />} />
-                  <Route path="*" element={<Error404 />} />
-                </Routes>
-              </LoadingWrapper>
-            </DefaultLayout>
-          </UserContext.Provider>
+          <AuthProvider>
+            <UserContext.Provider
+              value={{
+                navbar,
+                setNavbar,
+                user,
+                setUser,
+                searchType,
+                setSearchType,
+                urlGeral,
+                setUrlGeral,
+                urlGeral2,
+                setUrlGeral2,
+                idGraduateProgram,
+                setIdGraduateProgram,
+                valoresSelecionadosExport,
+                setValoresSelecionadosExport,
+                valorDigitadoPesquisaDireta,
+                setValorDigitadoPesquisaDireta,
+                inputMaria,
+                setInputMaria,
+                maria,
+                setMaria,
+                mapModal,
+                setMapModal,
+                messagesMaria,
+                setMessagesMaria,
+                itemsSelecionados,
+                setItensSelecionados,
+                sugestoes,
+                setSugestoes,
+                itemsSelecionadosPopUp,
+                setItensSelecionadosPopUp,
+                isCollapsed,
+                setIsCollapsed,
+                mode,
+                setMode,
+                navCollapsedSize,
+                setNavCollapsedSize,
+                defaultLayout,
+                setDefaultLayout,
+                simcc,
+                setSimcc,
+                isCollapsedRight,
+                setIsCollapsedRight,
+                test,
+                setTest,
+                historico,
+                setHistorico,
+              }}
+            >
+              <DefaultLayout>
+                <LoadingWrapper>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/auth/callback" element={<AuthCallback />} />
+                    <Route path="/resultados" element={<Home />} />
+                    <Route path={PROFILE_RESULTS_PATH} element={<Home />} />
+                    <Route path="/dicionario" element={<Home />} />
+                    <Route path="/pos-graduacao" element={<Home />} />
+                    <Route path="/grupos-pesquisa" element={<Home />} />
+                    <Route path="/instituicao/:acronym?" element={<Home />} />
+                    <Route path="/indicadores" element={<Home />} />
+                    <Route path="/incites" element={<Home />} />
+                    <Route path="/observatorio" element={<Observatorio />} />
+                    <Route path="/producoes-recentes" element={<Home />} />
+                    <Route path="/researcher" element={<Home />} />
+                    <Route path="/resultados-ia" element={<Home />} />
+                    <Route path="/paines-dados-externos" element={<Home />} />
+                    <Route path="/indice-pesquisador" element={<Home />} />
+                    <Route path="/provimento-cargo" element={<Home />} />
+                    <Route path="/listagens" element={<Home />} />
+                    <Route path="/tv" element={<Tv />} />
+                    <Route path="/termos-uso" element={<TermosUso />} />
+                    <Route
+                      path="/politica-privacidade"
+                      element={<TermosUso />}
+                    />
+                    <Route path="/api-docs" element={<TermosUso />} />
+                    <Route path="/informacoes" element={<TermosUso />} />
+                    <Route path="/dicionario-cores" element={<TermosUso />} />
+                    <Route path="/videos" element={<TermosUso />} />
+                    <Route path="/sobre" element={<AboutPage />} />
+                    <Route path="*" element={<Error404 />} />
+                  </Routes>
+                </LoadingWrapper>
+              </DefaultLayout>
+            </UserContext.Provider>
+          </AuthProvider>
         </CookiesProvider>
       </Router>
     </>

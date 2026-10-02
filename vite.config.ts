@@ -13,6 +13,13 @@ export default defineConfig({
   server: {
     host: true,
     port: 8080,
+    proxy: {
+      '/admin-api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/admin-api/, ''),
+      },
+    },
   },
   esbuild: { pure: ['console.log'] },
   build: {

@@ -9,6 +9,7 @@ export type ModalType =
   | 'gratuate-program'
   | 'filters-graduate'
   | 'filters-researcher-listagens'
+  | 'auth-modal'
   | (string & {});
 
 interface ModalData {
