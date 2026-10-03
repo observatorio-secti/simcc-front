@@ -340,7 +340,7 @@ export function ResearcherPage() {
     fetchData();
   }, [urlTermPesquisadores]);
 
-  const [value, setValue] = useState('articles');
+  const [value, setValue] = useState('article');
 
   useEffect(() => {
     if (
@@ -358,8 +358,10 @@ export function ResearcherPage() {
       setValue('producao-tecnica');
     } else if (searchType == 'speaker') {
       setValue('speaker');
+    } else {
+      setValue('article');
     }
-  }, [isOpen]);
+  }, [isOpen, searchType]);
 
   //csv
   const [jsonData, setJsonData] = useState<any[]>([]);
@@ -1081,8 +1083,9 @@ export function ResearcherPage() {
                     <div className="flex gap-6 xl:flex-row flex-col-reverse">
                       <div className="w-full flex-1 flex">
                         <Tabs
-                          defaultValue="articles"
+                          defaultValue="article"
                           value={value}
+                          onValueChange={setValue}
                           className="flex-1 flex flex-col w-full"
                         >
                           {researcher.slice(0, 1).map(() => (

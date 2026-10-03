@@ -305,7 +305,7 @@ export function ResearcherModal() {
     fetchData();
   }, [urlTermPesquisadores, isOpen]);
 
-  const [value, setValue] = useState('articles');
+  const [value, setValue] = useState('article');
 
   const currentTabValue = useMemo(() => {
     if (
@@ -322,7 +322,7 @@ export function ResearcherModal() {
     } else if (searchType === 'speaker') {
       return 'speaker';
     }
-    return 'articles'; // valor padrão
+    return 'article'; // valor padrão
   }, [searchType]);
 
   useEffect(() => {
@@ -720,8 +720,9 @@ export function ResearcherModal() {
                 <div className="flex gap-6 xl:flex-row flex-col-reverse">
                   <div className="flex w-full flex-1">
                     <Tabs
-                      defaultValue="articles"
+                      defaultValue="article"
                       value={value}
+                      onValueChange={setValue}
                       className="w-[99%]"
                     >
                       {researcher.slice(0, 1).map(() => (
