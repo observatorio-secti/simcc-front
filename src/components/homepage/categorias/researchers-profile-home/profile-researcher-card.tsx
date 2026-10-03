@@ -69,7 +69,7 @@ export function ProfileResearcherCard({
               )}
 
               {matches && matches.total > 0 && (
-                <span className="ml-auto rounded-md bg-indigo-500 px-2 py-0.5 text-xs font-medium text-white">
+                <span className="ml-auto rounded-md bg-blue-700 px-2 py-0.5 text-xs font-medium text-white">
                   {matches.total.toLocaleString('pt-BR')}{' '}
                   {matches.total === 1 ? 'evidência' : 'evidências'}
                 </span>

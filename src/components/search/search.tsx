@@ -9,7 +9,12 @@ import { Input } from '../ui/input';
 import { useModal } from '../hooks/use-modal-store';
 import { UserContext } from '../../context/context';
 import { SelectTypeSearch } from './select-type-search';
-import { isProfileSearch, resultsPathFor } from '../../lib/search-types';
+import {
+  getSearchTypeBadgeColor,
+  getSearchTypeButtonColor,
+  isProfileSearch,
+  resultsPathFor,
+} from '../../lib/search-types';
 
 const useQuery = () => new URLSearchParams(useLocation().search);
 
@@ -106,21 +111,9 @@ export function Search() {
                     {itemsSelecionados.map((valor, index) => (
                       <div
                         key={index}
-                        className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs text-white border-0 ${
-                          isProfileSearch(searchType)
-                            ? 'bg-indigo-500 dark:bg-indigo-500'
-                            : searchType === 'article'
-                              ? 'bg-blue-500 dark:bg-blue-500'
-                              : searchType === 'book'
-                                ? 'bg-pink-500 dark:bg-pink-500'
-                                : searchType === 'patent'
-                                  ? 'bg-cyan-500 dark:bg-cyan-500'
-                                  : searchType === 'software'
-                                    ? 'bg-teal-600 dark:bg-teal-600'
-                                    : searchType === 'speaker'
-                                      ? 'bg-orange-500 dark:bg-orange-500'
-                                      : 'bg-indigo-500 dark:bg-indigo-500'
-                        }`}
+                        className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs text-white border-0 ${getSearchTypeBadgeColor(
+                          searchType,
+                        )}`}
                       >
                         {valor.term}
                         <X
@@ -154,21 +147,9 @@ export function Search() {
               <Button
                 onClick={handlePesquisa}
                 variant="outline"
-                className={`text-white border-0 ${
-                  isProfileSearch(searchType)
-                    ? 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'
-                    : searchType === 'article'
-                      ? 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white'
-                      : searchType === 'book'
-                        ? 'bg-pink-500 dark:bg-pink-500 hover:bg-pink-600 dark:hover:bg-pink-600 hover:text-white'
-                        : searchType === 'patent'
-                          ? 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'
-                          : searchType === 'software'
-                            ? 'bg-teal-600 dark:bg-teal-600 hover:bg-teal-700 dark:hover:bg-teal-700 hover:text-white'
-                            : searchType === 'speaker'
-                              ? 'bg-orange-500 dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white'
-                              : 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'
-                }`}
+                className={`text-white border-0 ${getSearchTypeButtonColor(
+                  searchType,
+                )}`}
                 size="icon"
               >
                 <MagnifyingGlass size={16} />

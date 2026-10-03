@@ -62,7 +62,7 @@ export function SelectTypeSearch() {
         <SelectContent className="z-[9999]">
           <SelectItem value="profile">
             <div className="flex gap-4 items-center mr-2">
-              <div className="bg-indigo-500 flex rounded-sm h-4 w-4"></div>{' '}
+              <div className="bg-blue-700 flex rounded-sm h-4 w-4"></div>{' '}
               Perfil do pesquisador
             </div>
           </SelectItem>

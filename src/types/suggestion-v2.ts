@@ -13,6 +13,8 @@ export interface SuggestionV2 {
   term: string;
   /** Quantidade de textos em que o termo aparece. */
   frequency: number;
+  /** Tipos de produções/documentos onde o termo ocorre. */
+  source_types?: SuggestionSourceTypeV2[];
 }
 
 export interface SuggestionResponseV2 {

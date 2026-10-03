@@ -42,11 +42,17 @@ import { useModalResult } from '../hooks/use-modal-result';
 import { Play, Trash } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
-import { isProfileSearch, resultsPathFor } from '../../lib/search-types';
+import {
+  getSearchTypeBadgeColor,
+  getSearchTypeButtonColor,
+  isProfileSearch,
+  resultsPathFor,
+} from '../../lib/search-types';
 import {
   listSuggestionsV2,
   suggestionSourcesFor,
 } from '../../services/suggestions-v2';
+import { SuggestionSourceTypeV2 } from '../../types/suggestion-v2';
 
 const normalizeTerm = (term: string) =>
   term
@@ -95,7 +101,56 @@ export function SearchModal() {
     setItensSelecionadosPopUp(itemsSelecionados);
   }, [itemsSelecionados]);
 
-  const [filteredItems] = useState<Csv[]>([]);
+  const [filteredItems, setFilteredItems] = useState<Csv[]>([]);
+
+  useEffect(() => {
+    const cleanInput = input.trim().replace(/[()]/g, '');
+    if (cleanInput.length < 2) {
+      setFilteredItems([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const suggestions = await listSuggestionsV2(
+          cleanInput,
+          [],
+          50,
+          controller.signal,
+        );
+
+        const mapped: Csv[] = [];
+        suggestions.forEach((s) => {
+          const norm = normalizeTerm(s.term);
+          const types =
+            s.source_types && s.source_types.length > 0
+              ? s.source_types
+              : (['ARTICLE'] as SuggestionSourceTypeV2[]);
+
+          types.forEach((st) => {
+            mapped.push({
+              great_area: '',
+              term: s.term,
+              term_normalize: norm,
+              frequency: String(s.frequency),
+              type_: st,
+            });
+          });
+        });
+        setFilteredItems(mapped);
+      } catch (err: any) {
+        if (!controller.signal.aborted) {
+          setFilteredItems([]);
+        }
+      }
+    }, 200);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [input]);
 
   const handleChangeInput = (value: string) => {
     setInput(value);
@@ -120,29 +175,22 @@ export function SearchModal() {
       newSearchType = 'patent';
     } else if (type === 'SOFTWARE') {
       newSearchType = 'software';
-    } else if (
-      type === 'NAME' ||
-      type === 'ABSTRACT' ||
-      type === 'AREA' ||
-      type === 'PROFILE'
-    ) {
+    } else if (type === 'ABSTRACT') {
+      newSearchType = 'abstract';
+    } else if (type === 'AREA') {
+      newSearchType = 'area';
+    } else if (type === 'PROFILE') {
       newSearchType = 'profile';
+    } else {
+      newSearchType = searchType || 'profile';
     }
-    // A busca por perfil cobre todas as camadas: sugestões de qualquer tipo
-    // entram como termo sem trocar o tipo de busca selecionado.
-    if (!restoreType && isProfileSearch(searchType)) {
-      newSearchType = searchType;
-    }
+
     const hasSameType = newSearchType === searchType;
 
     setItensSelecionadosPopUp((prevItems) => {
       if (hasSameType) {
-        setSearchType(newSearchType);
         return [...prevItems, { term: value + ';' }];
-      } else {
-        setSearchType(newSearchType);
       }
-
       return [{ term: value + ';' }];
     });
 
@@ -449,21 +497,9 @@ export function SearchModal() {
                           className="flex whitespace-nowrap gap-2 items-center"
                         >
                           <div
-                            className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs ${
-                              isProfileSearch(searchType)
-                                ? 'bg-indigo-500 dark:bg-indigo-500'
-                                : searchType == 'article'
-                                  ? 'bg-blue-500 dark:bg-blue-500'
-                                  : searchType == 'speaker'
-                                    ? 'bg-orange-500 dark:bg-orange-500'
-                                    : searchType == 'book'
-                                      ? 'bg-pink-500 dark:bg-pink-500'
-                                      : searchType == 'patent'
-                                        ? 'bg-cyan-500 dark:bg-cyan-500'
-                                        : searchType == 'software'
-                                          ? 'bg-teal-600 dark:bg-teal-600'
-                                          : 'bg-indigo-500 dark:bg-indigo-500'
-                            } text-white border-0`}
+                            className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs ${getSearchTypeBadgeColor(
+                              searchType,
+                            )} text-white border-0`}
                           >
                             {valor.term.replace(/[|;]/g, '')}
                             <X
@@ -562,16 +598,9 @@ export function SearchModal() {
             <Button
               onClick={() => handlePesquisaFinal()}
               variant="outline"
-              className={`
-    ${isProfileSearch(searchType) && 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'}
-    ${searchType == 'article' && 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white'}
-    ${searchType == 'speaker' && 'bg-orange-500 dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white'}
-    ${searchType == 'book' && 'bg-pink-500 dark:bg-pink-500 hover:bg-pink-600 dark:hover:bg-pink-600 hover:text-white'}
-    ${searchType == 'patent' && 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'}
-    ${searchType == 'software' && 'bg-teal-600 dark:bg-teal-600 hover:bg-teal-700 dark:hover:bg-teal-700 hover:text-white'}
-    ${searchType == '' && 'bg-blue-700 dark:bg-blue-700 hover:bg-blue-800 dark:hover:bg-blue-800 hover:text-white'}
-    text-white border-0 z-[9999]
-  `}
+              className={`${getSearchTypeButtonColor(
+                searchType,
+              )} text-white border-0 z-[9999]`}
               size={'icon'}
             >
               <MagnifyingGlass size={16} className="" />
@@ -579,7 +608,7 @@ export function SearchModal() {
           </div>
         </Alert>
 
-        {((input.length >= 3 && filteredItems.length != 0) ||
+        {((input.trim().length >= 2 && filteredItems.length != 0) ||
           historico.length > 0) && (
             <Alert className="w-full">
               {historico.length > 0 && (
@@ -595,15 +624,7 @@ export function SearchModal() {
                           handlePesquisa(props.termo, props.tipo.toUpperCase(), true);
                         }}
                         className={`
-                            ${props.tipo == 'article' && 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white'}
-      ${props.tipo == 'abstract' && 'bg-yellow-500 dark:bg-yellow-500 hover:bg-yellow-600 dark:hover:bg-yellow-600 hover:text-white'}
-      ${props.tipo == 'speaker' && 'bg-orange-500 dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white'}
-      ${props.tipo == 'book' && 'bg-pink-500 dark:bg-pink-500 hover:bg-pink-600 dark:hover:bg-pink-600 hover:text-white'}
-      ${props.tipo == 'patent' && 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'}
-      ${props.tipo == 'name' && 'bg-red-500 dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white'}
-      ${props.tipo == 'area' && 'bg-green-500 dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 hover:text-white'}
-      ${props.tipo == 'profile' && 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'}
-      ${props.tipo == '' && 'bg-blue-700 dark:bg-blue-700 hover:bg-blue-800 dark:hover:bg-blue-800 hover:text-white'}
+                          ${getSearchTypeButtonColor(props.tipo.toLowerCase())}
                           flex gap-2 h-8 capitalize cursor-pointer transition-all text-white items-center p-2 px-3 rounded-md text-xs`}
                       >
                         {props.termo}
@@ -613,12 +634,12 @@ export function SearchModal() {
                 </div>
               )}
               <div
-                className={` ${input.length >= 3 && filteredItems.length != 0 && historico.length > 0 ? 'mt-4 flex' : 'hidden'}`}
+                className={`${input.trim().length >= 2 && filteredItems.length != 0 && historico.length > 0 ? 'mt-4 flex' : 'hidden'}`}
               >
                 <Separator />
               </div>
               <div
-                className={` ${input.length >= 3 && filteredItems.length != 0 ? '' : 'hidden'} ${historico.length > 0 && 'mt-4'}`}
+                className={`${input.trim().length >= 2 && filteredItems.length != 0 ? '' : 'hidden'} ${historico.length > 0 && 'mt-4'}`}
               >
                 <ResponsiveMasonry
                   columnsCountBreakPoints={{
@@ -635,7 +656,8 @@ export function SearchModal() {
                     {filteredItems.filter((item) => item.type_ === 'ARTICLE')
                       .length != 0 && (
                         <div>
-                          <p className="uppercase font-medium text-xs mb-3">
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
                             Artigos
                           </p>
                           <div className="flex flex-wrap gap-3">
@@ -646,10 +668,7 @@ export function SearchModal() {
                                 <div
                                   key={index}
                                   onClick={() =>
-                                    handlePesquisa(
-                                      props.term_normalize,
-                                      props.type_,
-                                    )
+                                    handlePesquisa(props.term, props.type_)
                                   }
                                   className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
                                 >
@@ -663,7 +682,8 @@ export function SearchModal() {
                     {filteredItems.filter((item) => item.type_ === 'ABSTRACT')
                       .length != 0 && (
                         <div>
-                          <p className="uppercase font-medium text-xs mb-3">
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
                             Resumo do lattes
                           </p>
                           <div className="flex flex-wrap gap-3">
@@ -674,10 +694,7 @@ export function SearchModal() {
                                 <div
                                   key={index}
                                   onClick={() =>
-                                    handlePesquisa(
-                                      props.term_normalize,
-                                      props.type_,
-                                    )
+                                    handlePesquisa(props.term, props.type_)
                                   }
                                   className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
                                 >
@@ -691,8 +708,9 @@ export function SearchModal() {
                     {filteredItems.filter((item) => item.type_ === 'PATENT')
                       .length != 0 && (
                         <div>
-                          <p className="uppercase font-medium text-xs mb-3">
-                            Patente
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 inline-block"></span>
+                            Patentes
                           </p>
                           <div className="flex flex-wrap gap-3">
                             {filteredItems
@@ -702,10 +720,7 @@ export function SearchModal() {
                                 <div
                                   key={index}
                                   onClick={() =>
-                                    handlePesquisa(
-                                      props.term_normalize,
-                                      props.type_,
-                                    )
+                                    handlePesquisa(props.term, props.type_)
                                   }
                                   className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
                                 >
@@ -721,7 +736,8 @@ export function SearchModal() {
                         item.type_ === 'BOOK' || item.type_ == 'BOOK_CHAPTER',
                     ).length != 0 && (
                         <div>
-                          <p className="uppercase font-medium text-xs mb-3">
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-pink-500 inline-block"></span>
                             Livros e capítulos
                           </p>
                           <div className="flex flex-wrap gap-3">
@@ -736,10 +752,7 @@ export function SearchModal() {
                                 <div
                                   key={index}
                                   onClick={() =>
-                                    handlePesquisa(
-                                      props.term_normalize,
-                                      props.type_,
-                                    )
+                                    handlePesquisa(props.term, props.type_)
                                   }
                                   className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
                                 >
@@ -753,7 +766,8 @@ export function SearchModal() {
                     {filteredItems.filter((item) => item.type_ === 'SPEAKER')
                       .length != 0 && (
                         <div>
-                          <p className="uppercase font-medium text-xs mb-3">
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span>
                             Participação em eventos
                           </p>
                           <div className="flex flex-wrap gap-3">
@@ -764,10 +778,7 @@ export function SearchModal() {
                                 <div
                                   key={index}
                                   onClick={() =>
-                                    handlePesquisa(
-                                      props.term_normalize,
-                                      props.type_,
-                                    )
+                                    handlePesquisa(props.term, props.type_)
                                   }
                                   className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
                                 >
@@ -781,7 +792,8 @@ export function SearchModal() {
                     {filteredItems.filter((item) => item.type_ === 'AREA')
                       .length != 0 && (
                         <div>
-                          <p className="uppercase font-medium text-xs mb-3">
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
                             Área de especialidade
                           </p>
                           <div className="flex flex-wrap gap-3">
@@ -806,7 +818,10 @@ export function SearchModal() {
                     {filteredItems.filter((item) => item.type_ === 'NAME')
                       .length !== 0 && (
                         <div>
-                          <p className="uppercase font-medium text-xs mb-3">Nome</p>
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                            Nome
+                          </p>
                           <div className="flex flex-wrap gap-3">
                             {filteredItems
                               .filter((item) => item.type_ === 'NAME')

@@ -99,6 +99,65 @@ export const RESULT_TYPE_CONFIG: Record<string, ResultTypeConfig> = {
     caption: 'com resumo do Lattes relacionado a',
     color: 'bg-yellow-500 dark:bg-yellow-500',
   },
+  profile: {
+    sourceTypes: [],
+    caption: 'em todo o perfil de',
+    color: 'bg-blue-700 dark:bg-blue-700',
+  },
+};
+
+/**
+ * Retorna a classe Tailwind de cor de fundo oficial para o badge do tipo de busca.
+ */
+export const getSearchTypeBadgeColor = (searchType?: string | null): string => {
+  switch (searchType) {
+    case 'article':
+      return 'bg-blue-500 dark:bg-blue-500';
+    case 'book':
+      return 'bg-pink-500 dark:bg-pink-500';
+    case 'patent':
+      return 'bg-cyan-500 dark:bg-cyan-500';
+    case 'software':
+      return 'bg-teal-600 dark:bg-teal-600';
+    case 'speaker':
+      return 'bg-orange-500 dark:bg-orange-500';
+    case 'name':
+      return 'bg-red-500 dark:bg-red-500';
+    case 'area':
+      return 'bg-green-500 dark:bg-green-500';
+    case 'abstract':
+      return 'bg-yellow-500 dark:bg-yellow-500';
+    case 'profile':
+    default:
+      return 'bg-blue-700 dark:bg-blue-700';
+  }
+};
+
+/**
+ * Retorna as classes Tailwind para o botão de pesquisa (lupa / ação) por tipo de busca.
+ */
+export const getSearchTypeButtonColor = (searchType?: string | null): string => {
+  switch (searchType) {
+    case 'article':
+      return 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white';
+    case 'book':
+      return 'bg-pink-500 dark:bg-pink-500 hover:bg-pink-600 dark:hover:bg-pink-600 hover:text-white';
+    case 'patent':
+      return 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white';
+    case 'software':
+      return 'bg-teal-600 dark:bg-teal-600 hover:bg-teal-700 dark:hover:bg-teal-700 hover:text-white';
+    case 'speaker':
+      return 'bg-orange-500 dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white';
+    case 'name':
+      return 'bg-red-500 dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white';
+    case 'area':
+      return 'bg-green-500 dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 hover:text-white';
+    case 'abstract':
+      return 'bg-yellow-500 dark:bg-yellow-500 hover:bg-yellow-600 dark:hover:bg-yellow-600 hover:text-white';
+    case 'profile':
+    default:
+      return 'bg-blue-700 dark:bg-blue-700 hover:bg-blue-800 dark:hover:bg-blue-800 hover:text-white';
+  }
 };
 
 /**

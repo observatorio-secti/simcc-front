@@ -75,7 +75,7 @@ export function ProfileSummaryCards({
   terms,
   loading,
   caption = 'com o perfil relacionado a',
-  termClassName = 'bg-indigo-500 dark:bg-indigo-500',
+  termClassName = 'bg-blue-700 dark:bg-blue-700',
   onToggleSourceType,
   selectedSourceTypes = [],
 }: ProfileSummaryCardsProps) {
