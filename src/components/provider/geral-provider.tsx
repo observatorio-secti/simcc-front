@@ -7,7 +7,6 @@ import { ResultHome } from '../homepage/result-home';
 import { GraduateProgram } from '../graduate-program/graduate-program';
 
 import { useModalHomepage } from '../hooks/use-modal-homepage';
-import { Dicionario } from '../dicionario/dicionario';
 import { ContentIndicators } from '../indicators/content-indicators';
 import { IncitesPage } from '../incites/content-incites';
 import { NewsArticles } from '../novas-publicacoes/new-articles';
@@ -25,8 +24,6 @@ const ModalContent = () => {
   const { type } = useModalHomepage();
 
   switch (type) {
-    case 'dicionario':
-      return <Dicionario />;
     case 'initial-home':
       return <InitialHome />;
     case 'graduation-home':

@@ -181,14 +181,20 @@ export function ResultHomeV2({ config }: ResultHomeV2Props) {
     );
 
   const filters = useMemo(
-    () => ({ ...state.filters, source_type: config.sourceTypes }),
+    () => ({
+      ...state.filters,
+      source_type:
+        config.sourceTypes.length > 0
+          ? config.sourceTypes
+          : state.filters.source_type,
+    }),
     [state.filters, config.sourceTypes],
   );
 
   // O facet de tipos de produção conta todos os tipos, não só o da busca:
-  // aqui o tipo já está fixado, então ele não é pedido.
+  // quando o tipo da busca já está fixado, não precisamos pedir esse facet.
   const listFacets = facetsToRequest(state.hasQuery, 'list').filter(
-    (facet) => facet !== 'source_type',
+    (facet) => config.sourceTypes.length === 0 || facet !== 'source_type',
   );
 
   const baseParams = {
@@ -471,8 +477,9 @@ export function ResultHomeV2({ config }: ResultHomeV2Props) {
                   <div className="flex flex-col gap-4 pt-4">
                     {productionParams.hasResearcherOnlyFilters && (
                       <Alert className="p-4 text-sm text-muted-foreground">
-                        Os filtros de território e cidade valem só para os
-                        pesquisadores e não restringem esta lista.
+                        Os filtros de titulação, classificação e bolsas valem
+                        apenas para os pesquisadores e não restringem esta lista
+                        de produções.
                       </Alert>
                     )}
                     {productionTab.kinds.map((kind) => {

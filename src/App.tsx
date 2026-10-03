@@ -41,7 +41,7 @@ function App() {
   const [test, setTest] = useState(
     import.meta.env.VITE_TEST_FUNCTIONS === 'false' ? false : true,
   );
-  const [searchType, setSearchType] = useState('article');
+  const [searchType, setSearchType] = useState('profile');
   const [idGraduateProgram, setIdGraduateProgram] = useState('0');
   const [valoresSelecionadosExport, setValoresSelecionadosExport] =
     useState('');
@@ -90,7 +90,7 @@ function App() {
 
   useEffect(() => {
     if (searchType === '') {
-      setSearchType('article');
+      setSearchType('profile');
     }
   }, [searchType]);
 
@@ -158,7 +158,6 @@ function App() {
                     <Route path="/auth/callback" element={<AuthCallback />} />
                     <Route path="/resultados" element={<Home />} />
                     <Route path={PROFILE_RESULTS_PATH} element={<Home />} />
-                    <Route path="/dicionario" element={<Home />} />
                     <Route path="/pos-graduacao" element={<Home />} />
                     <Route path="/grupos-pesquisa" element={<Home />} />
                     <Route path="/instituicao/:acronym?" element={<Home />} />

@@ -28,8 +28,8 @@ export function Instrucoes() {
       />
 
       <SectionHome
-        title="Veja o dicionário de termos"
-        description={`Em caso de dúvida de qual palavra utilizar para realizar sua pesquisa, acesse o dicionário de termos com mais de 36 mil palavras disponíveis para refinar a sua busca. Você também pode pesquisar as informações das revistas (ISSN, qualis e JCR).`}
+        title="Aproveite as sugestões de termos"
+        description={`Em caso de dúvida de qual palavra utilizar para realizar sua pesquisa, comece a digitar na barra de busca: a plataforma sugere os termos mais frequentes nas produções, e você pode aceitar a sugestão com a tecla Tab. Você também pode pesquisar as informações das revistas (ISSN, qualis e JCR).`}
         image="aefaer"
         meta="Passo 4"
         orientation="left"

@@ -8,7 +8,6 @@ import {
   Home,
   Landmark,
   Link2,
-  List,
   PanelsTopLeft,
   SearchCheck,
   Sparkles,
@@ -40,11 +39,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Wrench,
         isActive: true,
         items: [
-          {
-            title: 'Dicionário',
-            url: '/dicionario',
-            icon: List,
-          },
           {
             title: 'Listagens',
             url: '/listagens',

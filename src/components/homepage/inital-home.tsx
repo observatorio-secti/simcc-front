@@ -43,6 +43,7 @@ interface GrupoPesquisa {
 }
 
 import { Link, useNavigate } from 'react-router-dom';
+import { PROFILE_RESULTS_PATH } from '../../lib/search-types';
 
 import { AreaChart, Area, LineChart, Line } from 'recharts';
 
@@ -136,7 +137,7 @@ export function InitialHome() {
   function handlePesquisaChange(term: string) {
     const cleanTerm = term.replace(/[()]/g, '').trim();
     setItensSelecionados([{ term: cleanTerm }]);
-    navigate(`/resultados?type_search=article&terms=${cleanTerm}`);
+    navigate(`${PROFILE_RESULTS_PATH}?type_search=profile&terms=${cleanTerm}`);
   }
 
   const { onOpen: onOpenResult } = useModalResult();

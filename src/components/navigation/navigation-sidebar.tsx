@@ -37,7 +37,7 @@ export function NavigationSidebar({ links, isCollapsed }: NavProps) {
               <TooltipTrigger asChild>
                 <Link
                   onClick={() => {
-                    setSearchType('article');
+                    setSearchType('profile');
                     setItensSelecionados([]);
                   }}
                   to={`${link.link}`}
@@ -70,7 +70,7 @@ export function NavigationSidebar({ links, isCollapsed }: NavProps) {
               key={index}
               to={`${link.link}`}
               onClick={() => {
-                setSearchType('article');
+                setSearchType('profile');
                 setItensSelecionados([]);
               }}
               className={cn(

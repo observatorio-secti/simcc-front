@@ -16,12 +16,6 @@ export function HomeAbout() {
         'https://aceternity.com/images/products/thumbnails/new/moonbeam.png',
     },
     {
-      title: 'Dicionário de termos',
-      link: '/dicionario',
-      thumbnail:
-        'https://aceternity.com/images/products/thumbnails/new/cursor.png',
-    },
-    {
       title: 'Grupos de pesquisa',
       link: 'https://userogue.com',
       thumbnail:

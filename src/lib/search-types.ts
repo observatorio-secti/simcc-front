@@ -7,7 +7,10 @@ export const PROFILE_RESULTS_PATH = '/resultados-perfil';
 export const LEGACY_RESULTS_PATH = '/resultados';
 
 export const isProfileSearch = (searchType?: string | null) =>
-  searchType === PROFILE_SEARCH_TYPE;
+  searchType === PROFILE_SEARCH_TYPE ||
+  searchType === 'name' ||
+  searchType === 'area' ||
+  searchType === 'abstract';
 
 /** Página de resultados correspondente ao tipo de busca. */
 export const resultsPathFor = (searchType?: string | null) =>
@@ -85,6 +88,16 @@ export const RESULT_TYPE_CONFIG: Record<string, ResultTypeConfig> = {
     sourceTypes: ['AREA_SPECIALTY'],
     caption: 'com áreas de especialidade relacionadas a',
     color: 'bg-green-500 dark:bg-green-500',
+  },
+  name: {
+    sourceTypes: [],
+    caption: 'com nome relacionado a',
+    color: 'bg-red-500 dark:bg-red-500',
+  },
+  abstract: {
+    sourceTypes: [],
+    caption: 'com resumo do Lattes relacionado a',
+    color: 'bg-yellow-500 dark:bg-yellow-500',
   },
 };
 

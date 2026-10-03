@@ -3,6 +3,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
@@ -38,7 +39,7 @@ export function SelectTypeSearch() {
     <div className="min-w-max">
       <Select
         defaultValue={searchType}
-        value={searchType}
+        value={isProfileSearch(searchType) ? 'profile' : searchType}
         onValueChange={(value) => {
           setSearchType(value);
           if (!isProfileSearch(value)) onOpen('researchers-home');
@@ -62,9 +63,10 @@ export function SelectTypeSearch() {
           <SelectItem value="profile">
             <div className="flex gap-4 items-center mr-2">
               <div className="bg-indigo-500 flex rounded-sm h-4 w-4"></div>{' '}
-              Perfil completo
+              Perfil do pesquisador
             </div>
           </SelectItem>
+          <SelectSeparator />
           <SelectItem value="article">
             <div className="flex gap-4 items-center mr-2">
               <div className="bg-blue-500 flex rounded-sm h-4 w-4"></div>{' '}
@@ -92,22 +94,6 @@ export function SelectTypeSearch() {
               </div>
             </SelectItem>
           )}
-          <SelectItem value="name">
-            <div className="flex gap-4 items-center mr-2">
-              <div className="bg-red-500 flex rounded-sm h-4 w-4"></div> Nome
-            </div>
-          </SelectItem>
-          <SelectItem value="area">
-            <div className="flex gap-4 items-center mr-2">
-              <div className="bg-green-500 flex rounded-sm h-4 w-4"></div> Áreas
-            </div>
-          </SelectItem>
-          <SelectItem value="abstract">
-            <div className="flex gap-4 items-center mr-2">
-              <div className="bg-yellow-500 flex rounded-sm h-4 w-4"></div>{' '}
-              Resumo do lattes
-            </div>
-          </SelectItem>
           <SelectItem value="speaker">
             <div className="flex gap-4 items-center mr-2">
               <div className="bg-orange-500 flex rounded-sm h-4 w-4"></div>{' '}

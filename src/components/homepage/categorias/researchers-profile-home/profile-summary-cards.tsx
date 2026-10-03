@@ -20,6 +20,10 @@ interface ProfileSummaryCardsProps {
   caption?: string;
   /** Cor dos termos buscados (a do tipo de busca). */
   termClassName?: string;
+  /** Callback para alternar filtro de tipo de produção ao clicar no badge. */
+  onToggleSourceType?: (sourceType: string) => void;
+  /** Tipos de produção atualmente selecionados no filtro. */
+  selectedSourceTypes?: string[];
 }
 
 function Counter({
@@ -72,12 +76,14 @@ export function ProfileSummaryCards({
   loading,
   caption = 'com o perfil relacionado a',
   termClassName = 'bg-indigo-500 dark:bg-indigo-500',
+  onToggleSourceType,
+  selectedSourceTypes = [],
 }: ProfileSummaryCardsProps) {
-  // Facets informativos (sem filtro) do registro vão para o resumo.
+  // Facets de produção ou informativos do registro vão para o resumo.
   const summaryFacets = FACET_DEFINITIONS.filter(
     (definition) =>
-      definition.placement === 'summary' &&
-      facets?.[definition.key]?.items.length,
+      (definition.key === 'source_type' || definition.placement === 'summary') &&
+      Boolean(facets?.[definition.key]?.items.length),
   );
 
   return (
@@ -112,17 +118,31 @@ export function ProfileSummaryCards({
                 {definition.title}
               </p>
               <div className="flex flex-wrap gap-2">
-                {facets?.[definition.key]?.items.map((item) => (
-                  <span
-                    key={item.value}
-                    className="rounded-full bg-[#719CB8]/15 px-2.5 py-0.5 text-xs text-eng-dark-blue dark:text-eng-blue"
-                  >
-                    {getFacetLabel(definition, item)}{' '}
-                    <span className="font-semibold">
-                      {item.count.toLocaleString('pt-BR')}
-                    </span>
-                  </span>
-                ))}
+                {facets?.[definition.key]?.items.map((item) => {
+                  const isSelected = selectedSourceTypes.includes(item.value);
+                  const isInteractive = Boolean(onToggleSourceType && definition.key === 'source_type');
+
+                  return (
+                    <button
+                      key={item.value}
+                      type="button"
+                      disabled={!isInteractive}
+                      onClick={() => onToggleSourceType?.(item.value)}
+                      className={`rounded-full px-2.5 py-0.5 text-xs transition-colors ${
+                        isSelected
+                          ? 'bg-eng-blue text-white shadow-sm hover:bg-eng-dark-blue'
+                          : isInteractive
+                            ? 'bg-[#719CB8]/15 text-eng-dark-blue dark:text-eng-blue hover:bg-[#719CB8]/30 cursor-pointer'
+                            : 'bg-[#719CB8]/15 text-eng-dark-blue dark:text-eng-blue cursor-default'
+                      }`}
+                    >
+                      {getFacetLabel(definition, item)}{' '}
+                      <span className={`font-semibold ${isSelected ? 'text-white' : ''}`}>
+                        {item.count.toLocaleString('pt-BR')}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}

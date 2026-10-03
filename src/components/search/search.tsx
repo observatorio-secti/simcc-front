@@ -106,26 +106,21 @@ export function Search() {
                     {itemsSelecionados.map((valor, index) => (
                       <div
                         key={index}
-                        className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs text-white border-0 ${searchType === 'article'
-                            ? 'bg-blue-500 dark:bg-blue-500'
-                            : searchType === 'profile'
-                              ? 'bg-indigo-500 dark:bg-indigo-500'
-                            : searchType === 'abstract'
-                              ? 'bg-yellow-500 dark:bg-yellow-500'
-                              : searchType === 'speaker'
-                                ? 'bg-orange-500 dark:bg-orange-500'
-                                : searchType === 'book'
-                                  ? 'bg-pink-500 dark:bg-pink-500'
-                                  : searchType === 'patent'
-                                    ? 'bg-cyan-500 dark:bg-cyan-500'
-                                    : searchType === 'software'
-                                      ? 'bg-teal-600 dark:bg-teal-600'
-                                    : searchType === 'name'
-                                      ? 'bg-red-500 dark:bg-red-500'
-                                      : searchType === 'area'
-                                        ? 'bg-green-500 dark:bg-green-500'
-                                        : 'bg-blue-700 dark:bg-blue-700'
-                          }`}
+                        className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs text-white border-0 ${
+                          isProfileSearch(searchType)
+                            ? 'bg-indigo-500 dark:bg-indigo-500'
+                            : searchType === 'article'
+                              ? 'bg-blue-500 dark:bg-blue-500'
+                              : searchType === 'book'
+                                ? 'bg-pink-500 dark:bg-pink-500'
+                                : searchType === 'patent'
+                                  ? 'bg-cyan-500 dark:bg-cyan-500'
+                                  : searchType === 'software'
+                                    ? 'bg-teal-600 dark:bg-teal-600'
+                                    : searchType === 'speaker'
+                                      ? 'bg-orange-500 dark:bg-orange-500'
+                                      : 'bg-indigo-500 dark:bg-indigo-500'
+                        }`}
                       >
                         {valor.term}
                         <X
@@ -159,26 +154,21 @@ export function Search() {
               <Button
                 onClick={handlePesquisa}
                 variant="outline"
-                className={`text-white border-0 ${searchType === 'article'
-                    ? 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white'
-                    : searchType === 'profile'
-                      ? 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'
-                    : searchType === 'abstract'
-                      ? 'bg-yellow-500 dark:bg-yellow-500 hover:bg-yellow-600 dark:hover:bg-yellow-600 hover:text-white'
-                      : searchType === 'speaker'
-                        ? 'bg-orange-500 dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white'
-                        : searchType === 'book'
-                          ? 'bg-pink-500 dark:bg-pink-500 hover:bg-pink-600 dark:hover:bg-pink-600 hover:text-white'
-                          : searchType === 'patent'
-                            ? 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'
-                            : searchType === 'software'
-                              ? 'bg-teal-600 dark:bg-teal-600 hover:bg-teal-700 dark:hover:bg-teal-700 hover:text-white'
-                            : searchType === 'name'
-                              ? 'bg-red-500 dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white'
-                              : searchType === 'area'
-                                ? 'bg-green-500 dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 hover:text-white'
-                                : 'bg-blue-700 dark:bg-blue-700 hover:bg-blue-800 dark:hover:bg-blue-800 hover:text-white'
-                  }`}
+                className={`text-white border-0 ${
+                  isProfileSearch(searchType)
+                    ? 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'
+                    : searchType === 'article'
+                      ? 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white'
+                      : searchType === 'book'
+                        ? 'bg-pink-500 dark:bg-pink-500 hover:bg-pink-600 dark:hover:bg-pink-600 hover:text-white'
+                        : searchType === 'patent'
+                          ? 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'
+                          : searchType === 'software'
+                            ? 'bg-teal-600 dark:bg-teal-600 hover:bg-teal-700 dark:hover:bg-teal-700 hover:text-white'
+                            : searchType === 'speaker'
+                              ? 'bg-orange-500 dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white'
+                              : 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'
+                }`}
                 size="icon"
               >
                 <MagnifyingGlass size={16} />

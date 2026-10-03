@@ -86,7 +86,11 @@ export type FacetKeyV2 =
   | 'year'
   | 'source_type'
   | 'identity_territory'
-  | 'city';
+  | 'city'
+  | 'area'
+  | 'modality'
+  | 'graduation'
+  | 'classification';
 
 export type FacetsV2 = Partial<Record<FacetKeyV2, FacetV2>>;
 

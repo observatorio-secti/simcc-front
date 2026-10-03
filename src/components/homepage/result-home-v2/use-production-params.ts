@@ -21,12 +21,15 @@ export const PRODUCTION_FILTER_PARAMS = [QUALIS_PARAM, OPEN_ACCESS_PARAM];
 const SHARED_FILTERS = [
   'institution_id',
   'graduate_program_id',
+  'city_id',
+  'identity_territory',
+  'area',
   'year_start',
   'year_end',
 ];
 
 /** Filtros da busca sem equivalente nas rotas de produção. */
-const RESEARCHER_ONLY_FILTERS = ['city_id', 'identity_territory'];
+const RESEARCHER_ONLY_FILTERS = ['modality', 'graduation', 'classification'];
 
 export function useProductionParams(state: ProfileSearchState) {
   const [searchParams, setSearchParams] = useSearchParams();

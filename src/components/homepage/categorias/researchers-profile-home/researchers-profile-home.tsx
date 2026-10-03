@@ -357,6 +357,8 @@ export function ResearchersProfileHome() {
                       mapError={mapError}
                       terms={itemsSelecionados}
                       loading={isLoading}
+                      onToggleSourceType={(val) => state.toggleMulti('source_type', val)}
+                      selectedSourceTypes={state.getMulti('source_type')}
                     />
 
                     <Accordion defaultValue="item-1" type="single" collapsible>

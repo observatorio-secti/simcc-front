@@ -35,8 +35,6 @@ export function Home() {
             onOpen('result-profile-home')
         } else if (location.pathname == '/pos-graduacao') {
             onOpen('graduation-home')
-        } else if (location.pathname == '/dicionario') {
-            onOpen('dicionario')
         } else if (location.pathname == '/indicadores') {
             onOpen('indicadores')
         } else if (location.pathname == '/producoes-recentes') {

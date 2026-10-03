@@ -7,7 +7,6 @@ export type ModalType =
   | 'result-profile-home'
   | 'graduation-home'
   | 'incites'
-  | 'dicionario'
   | 'indicadores'
   | 'producoes-recentes'
   | 'informacoes'

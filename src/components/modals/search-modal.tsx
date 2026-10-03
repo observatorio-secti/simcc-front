@@ -43,6 +43,17 @@ import { Play, Trash } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { Separator } from '../ui/separator';
 import { isProfileSearch, resultsPathFor } from '../../lib/search-types';
+import {
+  listSuggestionsV2,
+  suggestionSourcesFor,
+} from '../../services/suggestions-v2';
+
+const normalizeTerm = (term: string) =>
+  term
+    .normalize('NFD') // Separa acentos das letras
+    .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+    .replace(/[^\w\s]/gi, '') // Remove caracteres especiais
+    .toLowerCase(); // Converte para minúsculas
 
 // BARRA DE BUSCA DE CIMA
 export function SearchModal() {
@@ -68,7 +79,6 @@ export function SearchModal() {
     setMode,
     searchType,
     setSearchType,
-    urlGeral,
     itemsSelecionados,
     setItensSelecionados,
     setValorDigitadoPesquisaDireta,
@@ -108,11 +118,14 @@ export function SearchModal() {
       newSearchType = 'name';
     } else if (type === 'PATENT') {
       newSearchType = 'patent';
-    } else if (type === 'ABSTRACT') {
-      newSearchType = 'abstract';
-    } else if (type === 'AREA') {
-      newSearchType = 'area';
-    } else if (type === 'PROFILE') {
+    } else if (type === 'SOFTWARE') {
+      newSearchType = 'software';
+    } else if (
+      type === 'NAME' ||
+      type === 'ABSTRACT' ||
+      type === 'AREA' ||
+      type === 'PROFILE'
+    ) {
       newSearchType = 'profile';
     }
     // A busca por perfil cobre todas as camadas: sugestões de qualquer tipo
@@ -312,31 +325,41 @@ export function SearchModal() {
   console.log('fawefwef', urlOpenAlex);
   //auto complete
 
-  const urlBigrama = `${urlGeral}secondWord?term=${input}`;
-  console.log('bigrama', urlBigrama);
-  useMemo(() => {
-    const fetchData = async () => {
+  // Completa a última palavra digitada com o termo mais frequente do dicionário.
+  const lastWord = input.split(/\s+/).pop() ?? '';
+  useEffect(() => {
+    const sources = suggestionSourcesFor(searchType);
+    if (!lastWord || !sources) {
+      setBigrama([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
       try {
-        const response = await fetch(urlBigrama, {
-          mode: 'cors',
-          headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET',
-            'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600',
-            'Content-Type': 'text/plain',
-          },
-        });
-        const data = await response.json();
-        if (data) {
-          setBigrama(data);
-        }
+        const suggestions = await listSuggestionsV2(
+          lastWord,
+          sources,
+          5,
+          controller.signal,
+        );
+        setBigrama(
+          suggestions
+            .filter(
+              (item) => normalizeTerm(item.term) !== normalizeTerm(lastWord),
+            )
+            .map((item) => ({ word: item.term })),
+        );
       } catch (err) {
-        console.log(err);
+        if (!controller.signal.aborted) setBigrama([]);
       }
+    }, 200);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
     };
-    fetchData();
-  }, [urlBigrama]);
+  }, [lastWord, searchType]);
 
   const handleSuggestionClick = (suggestion: string) => {
     setInput((prevInput) => {
@@ -395,13 +418,6 @@ export function SearchModal() {
     }
   }, [isModalOpen]); // Este efeito será executado sempre que isModalOpen mudar
 
-  const normalizeTerm = (term: string) =>
-    term
-      .normalize('NFD') // Separa acentos das letras
-      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-      .replace(/[^\w\s]/gi, '') // Remove caracteres especiais
-      .toLowerCase(); // Converte para minúsculas
-
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent
@@ -433,26 +449,21 @@ export function SearchModal() {
                           className="flex whitespace-nowrap gap-2 items-center"
                         >
                           <div
-                            className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs ${searchType == 'article'
-                              ? 'bg-blue-500 dark:bg-blue-500'
-                              : searchType == 'profile'
+                            className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs ${
+                              isProfileSearch(searchType)
                                 ? 'bg-indigo-500 dark:bg-indigo-500'
-                              : searchType == 'abstract'
-                                ? 'bg-yellow-500 dark:bg-yellow-500 '
-                                : searchType == 'speaker'
-                                  ? 'bg-orange-500 dark:bg-orange-500'
-                                  : searchType == 'book'
-                                    ? 'bg-pink-500 dark:bg-pink-500'
-                                    : searchType == 'patent'
-                                      ? 'bg-cyan-500 dark:bg-cyan-500'
-                                      : searchType == 'software'
-                                        ? 'bg-teal-600 dark:bg-teal-600'
-                                      : searchType == 'name'
-                                        ? 'bg-red-500 dark:bg-red-500'
-                                        : searchType == 'area'
-                                          ? 'bg-green-500 dark:bg-green-500'
-                                          : 'bg-blue-700 dark:bg-blue-700'
-                              } text-white border-0`}
+                                : searchType == 'article'
+                                  ? 'bg-blue-500 dark:bg-blue-500'
+                                  : searchType == 'speaker'
+                                    ? 'bg-orange-500 dark:bg-orange-500'
+                                    : searchType == 'book'
+                                      ? 'bg-pink-500 dark:bg-pink-500'
+                                      : searchType == 'patent'
+                                        ? 'bg-cyan-500 dark:bg-cyan-500'
+                                        : searchType == 'software'
+                                          ? 'bg-teal-600 dark:bg-teal-600'
+                                          : 'bg-indigo-500 dark:bg-indigo-500'
+                            } text-white border-0`}
                           >
                             {valor.term.replace(/[|;]/g, '')}
                             <X
@@ -552,15 +563,12 @@ export function SearchModal() {
               onClick={() => handlePesquisaFinal()}
               variant="outline"
               className={`
+    ${isProfileSearch(searchType) && 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'}
     ${searchType == 'article' && 'bg-blue-500 dark:bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white'}
-    ${searchType == 'abstract' && 'bg-yellow-500 dark:bg-yellow-500 hover:bg-yellow-600 dark:hover:bg-yellow-600 hover:text-white'}
     ${searchType == 'speaker' && 'bg-orange-500 dark:bg-orange-500 hover:bg-orange-600 dark:hover:bg-orange-600 hover:text-white'}
     ${searchType == 'book' && 'bg-pink-500 dark:bg-pink-500 hover:bg-pink-600 dark:hover:bg-pink-600 hover:text-white'}
     ${searchType == 'patent' && 'bg-cyan-500 dark:bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-600 hover:text-white'}
     ${searchType == 'software' && 'bg-teal-600 dark:bg-teal-600 hover:bg-teal-700 dark:hover:bg-teal-700 hover:text-white'}
-    ${searchType == 'name' && 'bg-red-500 dark:bg-red-500 hover:bg-red-600 dark:hover:bg-red-600 hover:text-white'}
-    ${searchType == 'area' && 'bg-green-500 dark:bg-green-500 hover:bg-green-600 dark:hover:bg-green-600 hover:text-white'}
-    ${searchType == 'profile' && 'bg-indigo-500 dark:bg-indigo-500 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white'}
     ${searchType == '' && 'bg-blue-700 dark:bg-blue-700 hover:bg-blue-800 dark:hover:bg-blue-800 hover:text-white'}
     text-white border-0 z-[9999]
   `}
