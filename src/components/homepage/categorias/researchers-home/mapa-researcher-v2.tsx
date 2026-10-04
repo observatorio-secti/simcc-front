@@ -64,6 +64,16 @@ interface MunicipalityGroup extends TerritoryGroup {
 interface MapProps {
   researchers: ResearcherItem[];
   geoJsonUrl?: string;
+
+  onCityClick?: (cityName: string) => void;
+  onTerritoryClick?: (cityNames: string[]) => void;
+  onItemClick?: (item: ResearcherItem) => void;
+  
+  /** Rótulos usados no tooltip/popup */
+  itemSingular?: string;
+  itemPlural?: string;
+  mapBackground?: string;
+  borderless?: boolean;
 }
 
 /**
@@ -231,7 +241,15 @@ function createMarkerIcon(count: number) {
 export default function BahiaTerritoriosMap({
   researchers,
   geoJsonUrl = `${import.meta.env.BASE_URL}territorio_relacionado.json`,
+  onCityClick,
+  onTerritoryClick,
+  onItemClick,
+  itemSingular = 'pesquisador',
+  itemPlural = 'pesquisadores',
+  mapBackground = MAP_BACKGROUND,
+  borderless = false,
 }: MapProps) {
+  const clickable = Boolean(onCityClick || onTerritoryClick);
   const [geoJson, setGeoJson] = useState<TerritoryGeoJson | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -351,6 +369,25 @@ export default function BahiaTerritoriosMap({
     });
 
     return result;
+  }, [geoJson]);
+
+  //Índice território -> nomes dos municípios
+  const territoryMunicipalities = useMemo<Record<string, string[]>>(() => {
+    if (!geoJson) return {};
+
+    const map: Record<string, string[]> = Object.create(null);
+
+    geoJson.features.forEach((feature) => {
+      const territoryId = String(feature.properties.territorio_id);
+
+      if (!map[territoryId]) {
+        map[territoryId] = [];
+      }
+
+      map[territoryId].push(feature.properties.name);
+    });
+
+    return map;
   }, [geoJson]);
 
   /**
@@ -480,7 +517,9 @@ export default function BahiaTerritoriosMap({
   }
 
   return (
-    <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_260px]">
+    <div
+      className={`grid w-full grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_260px] ${clickable ? '[&_path.leaflet-interactive]:cursor-pointer' : ''}`}
+    >
       <MapContainer
         center={[-12.5, -41.7]}
         zoom={7}
@@ -488,8 +527,8 @@ export default function BahiaTerritoriosMap({
         maxZoom={11}
         boxZoom={false}
         zoomControl
-        style={{ backgroundColor: MAP_BACKGROUND }}
-        className="z-0 h-[clamp(350px,60vh,650px)] min-w-0 w-full rounded-lg border border-slate-200 dark:border-neutral-800 [&:focus:not(:focus-visible)]:outline-none [&_.leaflet-interactive:focus:not(:focus-visible)]:outline-none [&_path.leaflet-interactive:focus-visible]:outline-none [&_path.leaflet-interactive:focus-visible]:stroke-gray-900 [&_path.leaflet-interactive:focus-visible]:stroke-[2px] [&_.leaflet-marker-icon:focus-visible]:outline-none [&_.leaflet-marker-icon:focus-visible_.territory-marker]:shadow-[0_0_0_3px_#111827]"
+        style={{ backgroundColor: mapBackground }}
+        className={`z-0 h-[clamp(350px,60vh,650px)] min-w-0 w-full rounded-lg ${borderless ? 'border-0' : 'border border-slate-200 dark:border-neutral-800'} [&:focus:not(:focus-visible)]:outline-none [&_.leaflet-interactive:focus:not(:focus-visible)]:outline-none [&_path.leaflet-interactive:focus-visible]:outline-none [&_path.leaflet-interactive:focus-visible]:stroke-gray-900 [&_path.leaflet-interactive:focus-visible]:stroke-[2px] [&_.leaflet-marker-icon:focus-visible]:outline-none [&_.leaflet-marker-icon:focus-visible_.territory-marker]:shadow-[0_0_0_3px_#111827]`}
       >
         <FitBounds geoJson={geoJson} />
 
@@ -498,10 +537,20 @@ export default function BahiaTerritoriosMap({
           groupedData={groupedData}
           territoryMarkers={territoryMarkers}
           municipalityMarkers={municipalityMarkers}
+          territoryMunicipalities={territoryMunicipalities}
+          onCityClick={onCityClick}
+          onTerritoryClick={onTerritoryClick}
+          itemSingular={itemSingular}
+          itemPlural={itemPlural}
+          onItemClick={onItemClick}
         />
       </MapContainer>
 
-      <Legend geoJson={geoJson} groupedData={groupedData} />
+      <Legend
+        geoJson={geoJson}
+        groupedData={groupedData}
+        borderless={borderless}
+      />
     </div>
   );
 }
@@ -511,11 +560,23 @@ function ZoomAwareLayers({
   groupedData,
   territoryMarkers,
   municipalityMarkers,
+  territoryMunicipalities,
+  onCityClick,
+  onTerritoryClick,
+  itemSingular,
+  itemPlural,
+  onItemClick,
 }: {
   geoJson: TerritoryGeoJson;
   groupedData: Record<string, TerritoryGroup>;
   territoryMarkers: Array<TerritoryGroup & { position: L.LatLng }>;
   municipalityMarkers: Array<MunicipalityGroup & { position: L.LatLng }>;
+  territoryMunicipalities: Record<string, string[]>;
+  onCityClick?: (cityName: string) => void;
+  onTerritoryClick?: (cityNames: string[]) => void;
+  itemSingular: string;
+  itemPlural: string;
+  onItemClick?: (item: ResearcherItem) => void;
 }) {
   const [zoom, setZoom] = useState(7);
   useMapEvents({
@@ -567,6 +628,22 @@ function ZoomAwareLayers({
               },
             });
           }
+
+          if (onCityClick || onTerritoryClick) {
+            layer.on({
+              click() {
+                if (detailed) {
+                  onCityClick?.(properties.name);
+                } else {
+                  onTerritoryClick?.(
+                    territoryMunicipalities[
+                      String(properties.territorio_id)
+                    ] ?? [],
+                  );
+                }
+              },
+            });
+          }
         }}
       />
 
@@ -582,6 +659,9 @@ function ZoomAwareLayers({
         <ResearcherMarker
           key={`${detailed ? 'city' : 'territory'}-${group.id}`}
           group={group}
+          itemSingular={itemSingular}
+          itemPlural={itemPlural}
+          onItemClick={onItemClick}
         />
       ))}
     </>
@@ -590,18 +670,25 @@ function ZoomAwareLayers({
 
 function ResearcherMarker({
   group,
+  itemSingular,
+  itemPlural,
+  onItemClick,
 }: {
   group: TerritoryGroup & { position: L.LatLng };
+  itemSingular: string;
+  itemPlural: string;
+  onItemClick?: (item: ResearcherItem) => void;
 }) {
   const markerRef = useRef<L.Marker>(null);
+  const label = group.items.length !== 1 ? itemPlural : itemSingular;
 
   return (
     <Marker
       ref={markerRef}
       position={group.position}
       icon={createMarkerIcon(group.items.length)}
-      title={`Ver ${group.items.length} pesquisadores em ${group.name}`}
-      alt={`Pesquisadores em ${group.name}`}
+      title={`Ver ${group.items.length} ${label} em ${group.name}`}
+      alt={`${label} em ${group.name}`}
     >
       <Tooltip
         direction="top"
@@ -611,8 +698,7 @@ function ResearcherMarker({
       >
         <strong>{group.name}</strong>
         <br />
-        {group.items.length} pesquisador
-        {group.items.length !== 1 ? 'es' : ''}
+        {group.items.length} {label}
       </Tooltip>
 
       <Popup
@@ -620,25 +706,37 @@ function ResearcherMarker({
         minWidth={280}
         className="[&_.leaflet-popup-content-wrapper]:rounded-md [&_.leaflet-popup-content-wrapper]:border [&_.leaflet-popup-content-wrapper]:border-slate-200 [&_.leaflet-popup-content-wrapper]:bg-white [&_.leaflet-popup-content-wrapper]:text-slate-900 [&_.leaflet-popup-content]:m-4 [&_.leaflet-popup-content_h3]:m-0 dark:[&_.leaflet-popup-content-wrapper]:border-neutral-800 dark:[&_.leaflet-popup-content-wrapper]:bg-neutral-900 dark:[&_.leaflet-popup-content-wrapper]:text-slate-50 dark:[&_.leaflet-popup-tip]:border-neutral-800 dark:[&_.leaflet-popup-tip]:bg-neutral-900"
       >
-        <ResearcherPopup group={group} />
+        <ResearcherPopup
+          group={group}
+          itemPlural={itemPlural}
+          onItemClick={onItemClick}
+        />
       </Popup>
     </Marker>
   );
 }
 
-function ResearcherPopup({ group }: { group: TerritoryGroup }) {
+function ResearcherPopup({
+  group,
+  itemPlural,
+  onItemClick,
+}: {
+  group: TerritoryGroup;
+  itemPlural: string;
+  onItemClick?: (item: ResearcherItem) => void;
+}) {
   const { urlGeral } = useContext(UserContext);
   const { onOpen } = useModal();
 
   return (
     <div>
       <h3 className="text-lg font-semibold">{group.name}</h3>
-      <div className="text-sm text-gray-600 mb-4 dark:text-gray-300">
-        Pesquisadores: {group.items.length}
+      <div className="text-sm text-gray-600 mb-4 capitalize dark:text-gray-300">
+        {itemPlural}: {group.items.length}
       </div>
       <ul
         className="m-0 flex max-h-64 list-none flex-col gap-3 overflow-y-auto p-0 text-sm"
-        aria-label={`Pesquisadores de ${group.name}`}
+        aria-label={`${itemPlural} de ${group.name}`}
         tabIndex={0}
       >
         {group.items.map((item, index) => (
@@ -646,20 +744,39 @@ function ResearcherPopup({ group }: { group: TerritoryGroup }) {
             <button
               type="button"
               className="flex h-10 w-full cursor-pointer items-center gap-3 rounded-md p-2 text-left transition-colors hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-eng-blue dark:hover:bg-neutral-800"
-              onClick={() =>
-                item.name && onOpen('researcher-modal', { name: item.name })
-              }
+              onClick={() => {
+                if (!item.name) return;
+                if (onItemClick) {
+                  onItemClick(item);
+                } else {
+                  onOpen('researcher-modal', { name: item.name });
+                }
+              }}
               disabled={!item.name}
             >
-              <Avatar className="h-6 w-6 rounded-md">
-                <AvatarImage
-                  className="h-6 w-6 rounded-md"
-                  src={`${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item.name ?? '')}`}
-                />
-                <AvatarFallback>
-                  <User size={16} />
-                </AvatarFallback>
-              </Avatar>
+              {onItemClick ? (
+                <span
+                  aria-hidden
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-muted text-[10px] font-semibold text-muted-foreground"
+                >
+                  {(item.name ?? '')
+                    .split(' ')
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((w) => w[0]?.toUpperCase())
+                    .join('')}
+                </span>
+              ) : (
+                <Avatar className="h-6 w-6 rounded-md">
+                  <AvatarImage
+                    className="h-6 w-6 rounded-md"
+                    src={`${urlGeral}ResearcherData/Image?name=${encodeURIComponent(item.name ?? '')}`}
+                  />
+                  <AvatarFallback>
+                    <User size={16} />
+                  </AvatarFallback>
+                </Avatar>
+              )}
               <span>{item.name || `Pesquisador ${index + 1}`}</span>
             </button>
           </li>
@@ -672,9 +789,11 @@ function ResearcherPopup({ group }: { group: TerritoryGroup }) {
 function Legend({
   geoJson,
   groupedData,
+  borderless = false,
 }: {
   geoJson: TerritoryGeoJson;
   groupedData: Record<string, TerritoryGroup>;
+  borderless?: boolean;
 }) {
   const territories = useMemo(() => {
     const map: Record<string, string> = Object.create(null);
@@ -691,8 +810,12 @@ function Legend({
   }, [geoJson]);
 
   return (
-    <div className="flex min-h-0 flex-col rounded-lg border border-slate-200 bg-white text-sm dark:border-neutral-800 dark:bg-neutral-900 md:max-h-[clamp(350px,60vh,650px)]">
-      <div className="border-b border-slate-200 px-3 py-2.5 font-semibold dark:border-neutral-800">
+    <div
+      className={`flex min-h-0 flex-col rounded-lg text-sm dark:bg-neutral-900 md:max-h-[clamp(350px,60vh,650px)] ${borderless ? 'border-0 bg-transparent' : 'border border-slate-200 bg-white dark:border-neutral-800'}`}
+    >
+      <div
+        className={`px-3 py-2.5 font-semibold ${borderless ? '' : 'border-b border-slate-200 dark:border-neutral-800'}`}
+      >
         Territórios de Identidade
       </div>
 

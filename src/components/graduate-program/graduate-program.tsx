@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useState, useRef, useMemo } from 'react';
 
 import { UserContext } from '../../context/context';
 import { useModalHomepage } from '../hooks/use-modal-homepage';
@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 
 import { Helmet } from 'react-helmet';
-import BahiaMap from './bahia-map';
+import BahiaTerritoriosMap from '../homepage/categorias/researchers-home/mapa-researcher-v2';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 import {
@@ -696,6 +696,7 @@ export function GraduateProgram() {
   const { isOpen, type } = useModalHomepage();
   const { onOpen } = useModal();
   const queryUrl = useQuery();
+  const navigate = useNavigate();
 
   const type_search = queryUrl.get('graduate_program_id');
 
@@ -847,6 +848,49 @@ export function GraduateProgram() {
     }, 100);
   };
 
+  const normalizeCityName = (str: string): string =>
+    str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .toUpperCase();
+
+  // Base completa (sem filtros) para o mapa, como fazia o mapa anterior.
+  const mapItems = useMemo(
+    () =>
+      originalGraduatePrograms
+        .filter((p) => p.visible === true)
+        .map((p) => ({
+          id: p.graduate_program_id,
+          name: p.name,
+          city: p.city,
+        })),
+    [originalGraduatePrograms],
+  );
+
+  const handleMapCityClick = (city: string) => {
+    const normalized = normalizeCityName(city);
+    handleSetSelectedCities((prev) =>
+      prev.includes(normalized) ? prev : [...prev, normalized],
+    );
+  };
+
+  const handleMapTerritoryClick = (cities: string[]) => {
+    const normalized = cities.map(normalizeCityName);
+    handleSetSelectedCities((prev) => [
+      ...prev,
+      ...normalized.filter((c) => c && !prev.includes(c)),
+    ]);
+  };
+
+  const handleMapItemClick = (item: { id?: string | number }) => {
+    if (item.id == null || item.id === '') return;
+    navigate({
+      pathname: '/pos-graduacao',
+      search: `graduate_program_id=${item.id}`,
+    });
+  };
+
   const normalizeArea = (area: string): string =>
     area
       .toUpperCase()
@@ -875,15 +919,10 @@ export function GraduateProgram() {
       <>
         {programSelecionado.length == 0 ? (
           <div>
-            {simcc && (
-              <div className="w-full hidden xl:flex h-[calc(100vh-68px)] overflow-hidden items-center absolute   ">
-                <BahiaMap setSelectedCities={handleSetSelectedCities} />
-              </div>
-            )}
             <main className="z-[2]  gap-4 md:gap-8 flex flex-col  pt-0 md:pt-0 w-full">
               {simcc && (
-                <div className="bg-cover w-fit pl-8 bg-bottom bg-no-repeat">
-                  <div className="justify-center h-[calc(100vh-124px)] z-[9] m w-full  flex max-w-[980px] flex-col items-center lg:items-start  gap-2 py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-20">
+                <div className="hidden xl:grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-8 items-center px-8 h-[calc(100vh-68px)]">
+                  <div className="justify-center z-[9] w-full flex max-w-[980px] flex-col items-start gap-2 py-8">
                     <Link
                       to={'/informacoes'}
                       className="inline-flex z-[2] lg:w-fit  w-fit items-center rounded-lg  bg-neutral-100 dark:bg-neutral-700  gap-2  px-3 py-1 text-sm font-medium"
@@ -902,8 +941,22 @@ export function GraduateProgram() {
                     </h1>
 
                     <p>
-                      Arraste para baixo para explorar os programas disponíveis.
+                      Arraste para baixo para explorar os programas
+                      disponíveis ou clique numa região do mapa para filtrar
+                      por cidade.
                     </p>
+                  </div>
+                  <div className="min-w-0 w-full">
+                    <BahiaTerritoriosMap
+                      researchers={mapItems}
+                      onCityClick={handleMapCityClick}
+                      onTerritoryClick={handleMapTerritoryClick}
+                      onItemClick={handleMapItemClick}
+                      itemSingular="programa"
+                      itemPlural="programas"
+                      mapBackground="transparent"
+                      borderless
+                    />
                   </div>
                   <div
                     ref={filtrosAplicadosRef}
