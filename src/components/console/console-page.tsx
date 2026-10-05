@@ -8,7 +8,6 @@ import {
   Eye,
   Globe2,
   MousePointerClick,
-  RefreshCw,
   Server,
   TrendingUp,
   UserPlus,
@@ -59,8 +58,7 @@ function CustomChartTooltip({ active, payload, label }: any) {
 }
 
 export function ConsolePage() {
-  const { data, isLoading, isError, error, isFetching, refetch } =
-    useAnalyticsMetrics();
+  const { data, isLoading, isError, error, refetch } = useAnalyticsMetrics();
 
   const gaPropertyId = import.meta.env.VITE_GA4_PROPERTY_ID || '376604622';
   const siteDomain = import.meta.env.VITE_URL_SITE
@@ -105,21 +103,6 @@ export function ConsolePage() {
                 Últimos 30 dias
               </span>
             </p>
-          </div>
-
-          <div className="flex items-center gap-2 self-start md:self-auto">
-            <Button
-              onClick={() => refetch()}
-              disabled={isFetching}
-              variant="outline"
-              size="sm"
-              className="h-8 gap-2 border-neutral-300 dark:border-neutral-700 text-xs font-medium"
-            >
-              <RefreshCw
-                className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`}
-              />
-              Atualizar dados
-            </Button>
           </div>
         </div>
 
