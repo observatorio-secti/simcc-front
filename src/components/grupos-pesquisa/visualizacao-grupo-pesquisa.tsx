@@ -6,7 +6,9 @@ import {
   Building2,
   Calendar,
   ChevronLeft,
+  ChevronRight,
   FileText,
+  Fingerprint,
   Globe,
   Mail,
   MapPin,
@@ -27,7 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../ui/card';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { UserContext } from '../../context/context';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import {
@@ -52,7 +54,8 @@ import {
   normalizeOdaGrupo,
 } from '../../services/grupos-pesquisa';
 
-import { InfiniteMovingResearchers } from '../ui/infinite-moving-researcher';
+// DESATIVADO: carrossel de pesquisadores substituído pela lista paginada.
+// import { InfiniteMovingResearchers } from '../ui/infinite-moving-researcher';
 import { HeaderResultTypeHome } from '../homepage/categorias/header-result-type-home';
 
 const useQuery = () => {
@@ -326,6 +329,7 @@ export function VisualizacaoGrupo() {
           }
           if (all.length > 0) {
             setAllResearchers(all);
+            setLoadingAllResearchers(false);
             return;
           }
           throw new Error('ODA empty');
@@ -361,15 +365,69 @@ export function VisualizacaoGrupo() {
     fetchAllResearchers();
   }, [type_search, urlGeral, urlGeral2]);
 
-  // Filtrar pesquisadores do carrossel para excluir os líderes
-  const filteredResearchers = allResearchers.filter((researcher) => {
-    if (graduatePrograms.length === 0) return true;
+  // DESATIVADO: filtro do carrossel
+  // const filteredResearchers = allResearchers.filter((researcher) => {
+  //   if (graduatePrograms.length === 0) return true;
+  //
+  //   const { first_leader, second_leader } = graduatePrograms[0];
+  //   return (
+  //     researcher.name !== first_leader && researcher.name !== second_leader
+  //   );
+  // });
 
-    const { first_leader, second_leader } = graduatePrograms[0];
-    return (
-      researcher.name !== first_leader && researcher.name !== second_leader
-    );
-  });
+  const membersPerPage = 7;
+  const [membersPage, setMembersPage] = useState(1);
+
+  useEffect(() => {
+    setMembersPage(1);
+  }, [type_search]);
+
+  const membersTotalPages = Math.max(
+    1,
+    Math.ceil(allResearchers.length / membersPerPage),
+  );
+  const membersSafePage = Math.min(membersPage, membersTotalPages);
+
+  const pagedMembers = useMemo(() => {
+    const startIndex = (membersSafePage - 1) * membersPerPage;
+    return allResearchers.slice(startIndex, startIndex + membersPerPage);
+  }, [allResearchers, membersSafePage]);
+
+  // Números de página com reticências (1 … 4 5 6 … N).
+  const getMembersPageNumbers = (current: number, totalP: number) => {
+    if (totalP <= 7) {
+      return Array.from({ length: totalP }, (_, i) => i + 1);
+    }
+    if (current <= 4) {
+      return [1, 2, 3, 4, 5, '...', totalP];
+    }
+    if (current >= totalP - 3) {
+      return [
+        1,
+        '...',
+        totalP - 4,
+        totalP - 3,
+        totalP - 2,
+        totalP - 1,
+        totalP,
+      ];
+    }
+    return [1, '...', current - 1, current, current + 1, '...', totalP];
+  };
+
+  const getInitials = (name?: string | null) =>
+    (name || '')
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase())
+      .join('') || '?';
+
+  const getOrcidUrl = (orcid?: string | null) => {
+    const id = (orcid || '').trim();
+    if (!id) return null;
+    return /^https?:\/\//i.test(id) ? id : `https://orcid.org/${id}`;
+  };
 
   useEffect(() => {
     const fetchResearchers = async () => {
@@ -845,8 +903,12 @@ export function VisualizacaoGrupo() {
               title="Pesquisadores"
               icon={<Users size={24} className="text-gray-400" />}
             />
+            <p className="text-sm text-muted-foreground mt-1">
+              Pesquisadores e estudantes vinculados ao grupo
+            </p>
           </div>
 
+          {/* DESATIVADO: carrossel substituído pela lista paginada abaixo.
           <InfiniteMovingResearchers
             items={filteredResearchers}
             direction="right"
@@ -854,6 +916,181 @@ export function VisualizacaoGrupo() {
             pauseOnHover={true}
             className="custom-class"
           />
+          */}
+
+          {loadingAllResearchers ? (
+            <div className="flex flex-col gap-2">
+              {Array.from({ length: membersPerPage }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full rounded-md" />
+              ))}
+            </div>
+          ) : pagedMembers.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nenhum pesquisador encontrado para este grupo.
+            </p>
+          ) : (
+            <>
+              <Alert className="p-0 overflow-hidden">
+                <CardContent className="flex flex-col gap-1 p-2">
+                  <div className="flex items-center justify-end gap-3 px-2 pt-1">
+                    <span className="w-10 text-center text-xs text-muted-foreground">
+                      ORCID
+                    </span>
+                    <span className="w-10 text-center text-xs text-muted-foreground">
+                      Lattes
+                    </span>
+                  </div>
+                  {pagedMembers.map((m) => (
+                    <div
+                      key={m.id || m.name}
+                      className="flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-accent"
+                    >
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
+                        {getInitials(m.name)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onOpen('researcher-modal', { name: m.name })
+                          }
+                          className="block w-full truncate text-left font-medium hover:underline"
+                        >
+                          {m.name}
+                        </button>
+                        {(m.graduation || m.university) && (
+                          <p className="truncate text-xs text-muted-foreground">
+                            {[m.graduation, m.university]
+                              .filter(Boolean)
+                              .join(' • ')}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <div className="flex w-10 justify-center">
+                          {getOrcidUrl(m.orcid) && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Abrir ORCID"
+                              onClick={() =>
+                                window.open(
+                                  getOrcidUrl(m.orcid) as string,
+                                  '_blank',
+                                )
+                              }
+                            >
+                              <Fingerprint size={16} />
+                            </Button>
+                          )}
+                        </div>
+                        <div className="flex w-10 justify-center">
+                          {m.lattes_id && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Abrir Lattes"
+                              onClick={() =>
+                                window.open(
+                                  `https://lattes.cnpq.br/${m.lattes_id}`,
+                                  '_blank',
+                                )
+                              }
+                            >
+                              <SquareArrowOutUpRight size={16} />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Alert>
+
+              {membersTotalPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-neutral-200 dark:border-neutral-800 mt-2">
+                  <div className="text-sm text-muted-foreground order-2 sm:order-1">
+                    Mostrando{' '}
+                    <span className="font-medium text-foreground">
+                      {(membersSafePage - 1) * membersPerPage + 1}
+                    </span>{' '}
+                    a{' '}
+                    <span className="font-medium text-foreground">
+                      {Math.min(
+                        membersSafePage * membersPerPage,
+                        allResearchers.length,
+                      )}
+                    </span>{' '}
+                    de{' '}
+                    <span className="font-medium text-foreground">
+                      {allResearchers.length}
+                    </span>{' '}
+                    pesquisadores
+                  </div>
+
+                  <div className="flex items-center gap-1 order-1 sm:order-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setMembersPage((prev) => Math.max(prev - 1, 1));
+                      }}
+                      disabled={membersSafePage === 1}
+                      className="h-8 gap-1"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      <span className="hidden sm:inline">Anterior</span>
+                    </Button>
+
+                    <div className="flex items-center gap-1 mx-1">
+                      {getMembersPageNumbers(
+                        membersSafePage,
+                        membersTotalPages,
+                      ).map((pageNum, idx) =>
+                        pageNum === '...' ? (
+                          <span
+                            key={`dots-${idx}`}
+                            className="px-2 text-muted-foreground text-xs"
+                          >
+                            ...
+                          </span>
+                        ) : (
+                          <Button
+                            key={pageNum}
+                            variant={
+                              membersSafePage === pageNum
+                                ? 'default'
+                                : 'outline'
+                            }
+                            size="sm"
+                            onClick={() => setMembersPage(Number(pageNum))}
+                            className="h-8 w-8 p-0 text-xs"
+                          >
+                            {pageNum}
+                          </Button>
+                        ),
+                      )}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setMembersPage((prev) =>
+                          Math.min(prev + 1, membersTotalPages),
+                        );
+                      }}
+                      disabled={membersSafePage === membersTotalPages}
+                      className="h-8 gap-1"
+                    >
+                      <span className="hidden sm:inline">Próximo</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {isOdaActive &&
