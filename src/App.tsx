@@ -53,6 +53,18 @@ const IndicePesquisador = lazyNamed(() => import('./components/indice-pesquisado
 const ProvimentoCargo = lazyNamed(() => import('./components/provimento-cargo/provimento-cargo'), 'ProvimentoCargo');
 const TodosPesquisadores = lazyNamed(() => import('./components/listagens/todos-pesquisadores'), 'TodosPesquisadores');
 const ConsolePage = lazyNamed(() => import('./components/console/console-page'), 'ConsolePage');
+const InstitutionsPage = lazyNamed(
+  () => import('./components/console/institutions-page'),
+  'InstitutionsPage',
+);
+const InstitutionDetailPage = lazyNamed(
+  () => import('./components/console/institution-detail-page'),
+  'InstitutionDetailPage',
+);
+const ResearchersPage = lazyNamed(
+  () => import('./components/console/researchers-page'),
+  'ResearchersPage',
+);
 
 // Páginas de documentação (DocsLayout)
 const TermosUso = lazyNamed(() => import('./components/docs-api/termos-uso'), 'TermosUso');
@@ -207,6 +219,9 @@ function App() {
                 <Route element={<ProtectedRoute />}>
                   <Route element={<SearchLayout />}>
                     <Route path="/console" element={<ConsolePage />} />
+                    <Route path="/console/instituicoes" element={<InstitutionsPage />} />
+                    <Route path="/console/instituicoes/:id" element={<InstitutionDetailPage />} />
+                    <Route path="/console/pesquisadores" element={<ResearchersPage />} />
                   </Route>
                 </Route>
 

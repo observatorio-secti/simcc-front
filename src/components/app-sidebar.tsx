@@ -32,11 +32,14 @@ import {
 } from './ui/sidebar';
 import { DotsThree } from 'phosphor-react';
 
+import { useAuth } from '../hooks/use-auth';
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
   const isConsole = location.pathname.startsWith('/console');
+  const { isAdmin } = useAuth();
 
-  // Navegação enxuta da área do Console (Administrativo)
+  // Navegação da área do Console (Administrativo)
   const consoleData = {
     projects: [
       {
@@ -50,7 +53,43 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: ArrowLeft,
       },
     ],
-    navMain: [],
+    navMain: [
+      {
+        title: 'Plataforma',
+        url: '/console/instituicoes',
+        icon: Landmark,
+        isActive: true,
+        items: [
+          {
+            title: 'Instituições',
+            url: '/console/instituicoes',
+            icon: Building2,
+          },
+          {
+            title: 'Pesquisadores',
+            url: '/console/pesquisadores',
+            icon: Users,
+          },
+        ],
+      },
+      ...(isAdmin
+        ? [
+            {
+              title: 'Administração',
+              url: '/console/usuarios',
+              icon: ShieldCheck,
+              isActive: false,
+              items: [
+                {
+                  title: 'Usuários',
+                  url: '/console/usuarios',
+                  icon: Users,
+                },
+              ],
+            },
+          ]
+        : []),
+    ],
   };
 
   // Navegação da área pública (Observatório Simcc)
