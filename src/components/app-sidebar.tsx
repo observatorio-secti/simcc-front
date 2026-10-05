@@ -36,58 +36,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
   const isConsole = location.pathname.startsWith('/console');
 
-  // Navegação da área do Console (Administrativo)
+  // Navegação enxuta da área do Console (Administrativo)
   const consoleData = {
     projects: [
       {
-        name: 'Início do Console',
+        name: 'Métricas de Acesso',
         url: '/console',
-        icon: LayoutDashboard,
+        icon: BarChart3,
       },
       {
-        name: 'Plataforma Pública',
+        name: 'Voltar ao Observatório',
         url: '/',
         icon: ArrowLeft,
       },
     ],
-    navMain: [
-      {
-        title: 'Módulos',
-        url: '/console',
-        icon: Layers,
-        isActive: true,
-        items: [
-          {
-            title: 'Visão Geral',
-            url: '/console',
-            icon: LayoutDashboard,
-          },
-          {
-            title: 'Extensões & Integrações',
-            url: '/console',
-            icon: Database,
-          },
-        ],
-      },
-      {
-        title: 'Gerenciamento',
-        url: '/console',
-        icon: Wrench,
-        isActive: true,
-        items: [
-          {
-            title: 'Configurações Globais',
-            url: '/console',
-            icon: Settings,
-          },
-          {
-            title: 'Permissões & Acesso',
-            url: '/console',
-            icon: ShieldCheck,
-          },
-        ],
-      },
-    ],
+    navMain: [],
   };
 
   // Navegação da área pública (Observatório Simcc)
