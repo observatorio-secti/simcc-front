@@ -17,6 +17,7 @@ import { AboutPage } from './pages/About';
 import useWindowResize from './components/use-windows-resize';
 import { Tv } from './pages/Tv';
 import { Observatorio } from './components/observatorio/observatorio';
+import { ProtectedRoute } from './components/routes/protected-route';
 import { PROFILE_RESULTS_PATH } from './lib/search-types';
 import { initGA, trackPageView } from './lib/analytics';
 
@@ -51,6 +52,7 @@ const PaineisDadosExternos = lazyNamed(() => import('./components/homepage/paine
 const IndicePesquisador = lazyNamed(() => import('./components/indice-pesquisador/indice-pesquisador'), 'IndicePesquisador');
 const ProvimentoCargo = lazyNamed(() => import('./components/provimento-cargo/provimento-cargo'), 'ProvimentoCargo');
 const TodosPesquisadores = lazyNamed(() => import('./components/listagens/todos-pesquisadores'), 'TodosPesquisadores');
+const ConsolePage = lazyNamed(() => import('./components/console/console-page'), 'ConsolePage');
 
 // Páginas de documentação (DocsLayout)
 const TermosUso = lazyNamed(() => import('./components/docs-api/termos-uso'), 'TermosUso');
@@ -199,6 +201,13 @@ function App() {
                   <Route path="/indice-pesquisador" element={<IndicePesquisador />} />
                   <Route path="/provimento-cargo" element={<ProvimentoCargo />} />
                   <Route path="/listagens" element={<TodosPesquisadores />} />
+                </Route>
+
+                {/* Rotas Protegidas (Console / Gestão) */}
+                <Route element={<ProtectedRoute />}>
+                  <Route element={<SearchLayout />}>
+                    <Route path="/console" element={<ConsolePage />} />
+                  </Route>
                 </Route>
 
                 {/* Rotas de documentação (DocsLayout) */}

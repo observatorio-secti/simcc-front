@@ -9,7 +9,7 @@ import logo_5 from '../../assets/logo_cimatec.svg';
 
 import { NavigationMenuLink } from '../../components/ui/navigation-menu';
 
-import { Grip, LogIn, LogOut } from 'lucide-react';
+import { Grip, LogIn, LogOut, SlidersHorizontal } from 'lucide-react';
 import { UserContext } from '../../context/context';
 import { Button } from '../ui/button';
 import { Avatar, AvatarFallback } from '../ui/avatar';
@@ -146,6 +146,18 @@ export function Header() {
           )}
 
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="h-8 px-2.5 gap-1.5 rounded-md border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-xs font-medium"
+            >
+              <Link to="/console">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-eng-blue dark:text-blue-400" />
+                <span className="hidden sm:inline-block">Console</span>
+              </Link>
+            </Button>
+
             <ModeToggle />
 
             {isAuthenticated && authUser ? (

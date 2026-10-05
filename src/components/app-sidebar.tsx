@@ -1,15 +1,22 @@
 import * as React from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   AArrowUp,
+  ArrowLeft,
   BarChart3,
   Building2,
+  Database,
   Download,
   GraduationCap,
   Home,
   Landmark,
+  Layers,
+  LayoutDashboard,
   Link2,
   PanelsTopLeft,
   SearchCheck,
+  Settings,
+  ShieldCheck,
   Sparkles,
   SquarePlay,
   Users,
@@ -23,15 +30,85 @@ import {
   SidebarContent,
   SidebarRail,
 } from './ui/sidebar';
-import { UserContext } from '../context/context';
-import { useContext } from 'react';
 import { DotsThree } from 'phosphor-react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { urlGeral } = useContext(UserContext);
+  const location = useLocation();
+  const isConsole = location.pathname.startsWith('/console');
 
-  const data = {
+  // Navegação da área do Console (Administrativo)
+  const consoleData = {
+    projects: [
+      {
+        name: 'Início do Console',
+        url: '/console',
+        icon: LayoutDashboard,
+      },
+      {
+        name: 'Plataforma Pública',
+        url: '/',
+        icon: ArrowLeft,
+      },
+    ],
+    navMain: [
+      {
+        title: 'Módulos',
+        url: '/console',
+        icon: Layers,
+        isActive: true,
+        items: [
+          {
+            title: 'Visão Geral',
+            url: '/console',
+            icon: LayoutDashboard,
+          },
+          {
+            title: 'Extensões & Integrações',
+            url: '/console',
+            icon: Database,
+          },
+        ],
+      },
+      {
+        title: 'Gerenciamento',
+        url: '/console',
+        icon: Wrench,
+        isActive: true,
+        items: [
+          {
+            title: 'Configurações Globais',
+            url: '/console',
+            icon: Settings,
+          },
+          {
+            title: 'Permissões & Acesso',
+            url: '/console',
+            icon: ShieldCheck,
+          },
+        ],
+      },
+    ],
+  };
 
+  // Navegação da área pública (Observatório Simcc)
+  const platformData = {
+    projects: [
+      {
+        name: 'Página Inicial',
+        url: '/',
+        icon: Home,
+      },
+      {
+        name: 'Pesquisar',
+        url: '/resultados',
+        icon: SearchCheck,
+      },
+      {
+        name: 'Pesquisar com IA',
+        url: '/resultados-ia',
+        icon: Sparkles,
+      },
+    ],
     navMain: [
       {
         title: 'Ferramentas',
@@ -103,24 +180,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
       },
     ],
-    projects: [
-      {
-        name: 'Página Inicial',
-        url: '/',
-        icon: Home,
-      },
-      {
-        name: 'Pesquisar',
-        url: '/resultados',
-        icon: SearchCheck,
-      },
-      {
-        name: 'Pesquisar com IA',
-        url: '/resultados-ia',
-        icon: Sparkles,
-      },
-    ],
   };
+
+  const data = isConsole ? consoleData : platformData;
 
   return (
     <Sidebar collapsible="icon" className="border-0" {...props}>
