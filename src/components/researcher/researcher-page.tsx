@@ -22,6 +22,7 @@ import html2pdf from 'html2pdf.js';
 import { DrawerHeader } from '../../components/ui/drawer';
 import { Button } from '../ui/button';
 import { useEffect, useMemo, useState } from 'react';
+import { useAuth } from '../../hooks/use-auth';
 import { Sheet, SheetContent, SheetTrigger } from '../../components/ui/sheet';
 
 import { InformationResearcher } from '../popup/information-researcher';
@@ -181,9 +182,9 @@ const useQuery = () => {
 };
 
 export function ResearcherPage() {
+  const { user } = useAuth();
   const {
     urlGeral,
-    user,
     itemsSelecionados,
     setSearchType,
     setValoresSelecionadosExport,
@@ -599,7 +600,7 @@ export function ResearcherPage() {
                     Indicadores de produção
                   </TabsTrigger>
                   {researcher.length > 0 &&
-                    user?.display_name == researcher[0].name && (
+                    ((user as any)?.display_name == researcher[0].name || user?.username == researcher[0].name) && (
                       <TabsTrigger
                         value="indicators"
                         onClick={() => setTab('provimento')}
@@ -961,7 +962,7 @@ export function ResearcherPage() {
                       );
                     })}
 
-                    {user?.lattes_id == researcher[0].lattes_id && (
+                    {(user as any)?.lattes_id == researcher[0].lattes_id && (
                       <div className="bg-red-50 mb-6 flex gap-3 dark:bg-red-200/20 w-full p-8 rounded-md">
                         <div>
                           {' '}

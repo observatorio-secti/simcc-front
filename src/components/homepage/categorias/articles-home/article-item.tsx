@@ -131,7 +131,7 @@ const highlightText = (
 };
 
 export function ArticleItem(props: Articles) {
-  const { urlGeral, itemsSelecionados, user } =
+  const { urlGeral, itemsSelecionados } =
     useContext(UserContext);
 
   const qualisColor = {

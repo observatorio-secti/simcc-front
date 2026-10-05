@@ -1,5 +1,4 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useModalHomepage } from "../hooks/use-modal-homepage";
 import { ModalType, useModalResult } from "../hooks/use-modal-result";
 import { ResultProvider } from "../provider/result-provider";
 
@@ -24,7 +23,6 @@ const useQuery = () => new URLSearchParams(useLocation().search);
 // Página de resultados antiga: atende só os tipos de busca que ainda não têm
 // equivalente na API v2 (ver `resultConfigFor` em lib/search-types).
 export function ResultHomeLegacy() {
-    const { isOpen, type } = useModalHomepage();
     const { onOpen, type: typeResult } = useModalResult();
     const { itemsSelecionados, searchType, simcc, urlGeral, valoresSelecionadosExport } = useContext(UserContext);
     const { onOpen: onOpenModal } = useModal();

@@ -53,7 +53,6 @@ export interface Dados {
 export function InfoPavimentoCargo(props: Props) {
   const {
     urlGeral,
-    user,
     itemsSelecionados,
     setSearchType,
     setValoresSelecionadosExport,

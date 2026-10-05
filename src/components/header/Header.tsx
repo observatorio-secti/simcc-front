@@ -42,7 +42,7 @@ import { Separator } from '../ui/separator';
 import { PROFILE_RESULTS_PATH } from '../../lib/search-types';
 
 export function Header() {
-  const { setItensSelecionados, searchType, maria } = useContext(UserContext);
+  const { setItensSelecionados, searchType } = useContext(UserContext);
 
   const { user: authUser, isAuthenticated, isAdmin, logout } = useAuth();
 
@@ -56,6 +56,8 @@ export function Header() {
   };
 
   const location = useLocation();
+  const isMaria =
+    location.pathname === '/resultados-ia' || location.pathname === '/marIA';
   const isVisible =
     location.pathname != '/' &&
     location.pathname != '/resultados' &&
@@ -135,7 +137,7 @@ export function Header() {
               </p>
               <Button
                 variant="outline"
-                className={` h-6 w-6 ${searchType == 'article' && 'bg-blue-500 dark:bg-blue-500'} ${searchType == 'abstract' && 'bg-yellow-500 dark:bg-yellow-500'} ${maria && 'bg-eng-blue   dark:bg-eng-blue  '} ${searchType == 'speaker' && 'bg-orange-500 dark:bg-orange-500'} ${searchType == 'book' && 'bg-pink-500 dark:bg-pink-500'} ${searchType == 'patent' && 'bg-cyan-500 dark:bg-cyan-500'} ${searchType == 'name' && 'bg-red-500 dark:bg-red-500'} ${searchType == 'area' && 'bg-green-500 dark:bg-green-500'} ${searchType == '' && 'bg-blue-700 dark:bg-blue-700'} text-white border-0 `}
+                className={` h-6 w-6 ${searchType == 'article' && 'bg-blue-500 dark:bg-blue-500'} ${searchType == 'abstract' && 'bg-yellow-500 dark:bg-yellow-500'} ${isMaria && 'bg-eng-blue   dark:bg-eng-blue  '} ${searchType == 'speaker' && 'bg-orange-500 dark:bg-orange-500'} ${searchType == 'book' && 'bg-pink-500 dark:bg-pink-500'} ${searchType == 'patent' && 'bg-cyan-500 dark:bg-cyan-500'} ${searchType == 'name' && 'bg-red-500 dark:bg-red-500'} ${searchType == 'area' && 'bg-green-500 dark:bg-green-500'} ${searchType == '' && 'bg-blue-700 dark:bg-blue-700'} text-white border-0 `}
                 size={'icon'}
               >
                 <Funnel size={10} className="" />

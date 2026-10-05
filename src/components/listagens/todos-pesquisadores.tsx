@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { StripeLogo, Student } from 'phosphor-react';
 import {
@@ -74,9 +74,15 @@ const TABS = [
 
 export function TodosPesquisadores() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [isOn] = useState(true);
   const [value, setValue] = useState('bolsistas');
+
+  const handleTabChange = (id: string) => {
+    setValue(id);
+    navigate({ search: `?tab=${id}` }, { replace: true });
+  };
 
   // Consulta otimizada com React Query e Axios com cache de 5 minutos por aba
   const {
@@ -194,7 +200,7 @@ export function TodosPesquisadores() {
                                     ? 'border-b-[#719CB8]'
                                     : 'border-b-transparent'
                                 }`}
-                                onClick={() => setValue(id)}
+                                onClick={() => handleTabChange(id)}
                               >
                                 <Button variant="ghost" className="m-0">
                                   <Icon size={16} />

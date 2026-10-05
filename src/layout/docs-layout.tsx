@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, Suspense } from 'react';
 import { UserContext } from '../context/context';
 
 import { useModal } from '../components/hooks/use-modal-store';
 
-import { useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useModalSecundary } from '../components/hooks/use-modal-store-secundary';
 import {
   SidebarInset,
@@ -19,19 +19,20 @@ import {
   BreadcrumbSeparator,
 } from '../components/ui/breadcrumb';
 import { AppSidebarDocs } from '../components/app-sidebar-docs';
+import { ErrorBoundary } from '../components/errors/error-boundary';
 
-interface MailProps {
-  defaultLayout: number[] | undefined;
-  defaultCollapsed?: boolean;
-  navCollapsedSize: number;
-  children: React.ReactNode;
+function PageFallback() {
+  return (
+    <div className="flex h-[calc(100vh-120px)] w-full items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#006699] border-t-transparent" />
+    </div>
+  );
 }
-export default function DocsLayout({
-  defaultLayout = [265, 440, 655],
-  defaultCollapsed = true,
-  navCollapsedSize,
-  children,
-}: MailProps) {
+
+interface DocsLayoutProps {
+  children?: React.ReactNode;
+}
+export default function DocsLayout({ children }: DocsLayoutProps = {}) {
   const { isCollapsed, setIsCollapsed } = useContext(UserContext);
 
   const { onOpen, isOpen, type: typeModal } = useModal();
@@ -138,7 +139,13 @@ export default function DocsLayout({
               <div className="flex items-center gap-2"></div>
             </div>
 
-            <div className="h-full ">{children}</div>
+            <div className="h-full">
+              <ErrorBoundary>
+                <Suspense fallback={<PageFallback />}>
+                  {children ?? <Outlet />}
+                </Suspense>
+              </ErrorBoundary>
+            </div>
           </main>
         </SidebarInset>
       </SidebarProvider>

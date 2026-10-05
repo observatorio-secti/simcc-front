@@ -13,22 +13,13 @@ export interface UserContextType {
   test: boolean;
   setTest: React.Dispatch<React.SetStateAction<boolean>>;
   navbar: boolean;
-  mapModal: boolean;
-  setMapModal: React.Dispatch<React.SetStateAction<boolean>>;
   setNavbar: React.Dispatch<React.SetStateAction<boolean>>;
-  maria: boolean;
-  setMaria: React.Dispatch<React.SetStateAction<boolean>>;
-  user: any;
-  setUser: React.Dispatch<React.SetStateAction<any>>;
 
   historico: HistoricoItem[];
   setHistorico: React.Dispatch<React.SetStateAction<HistoricoItem[]>>;
 
   valoresSelecionadosExport: string;
   setValoresSelecionadosExport: React.Dispatch<React.SetStateAction<string>>;
-
-  messagesMaria: any[];
-  setMessagesMaria: React.Dispatch<React.SetStateAction<any[]>>;
 
   itemsSelecionados: ItemsSelecionados[];
   setItensSelecionados: React.Dispatch<
@@ -46,14 +37,13 @@ export interface UserContextType {
   valorDigitadoPesquisaDireta: string;
   setValorDigitadoPesquisaDireta: React.Dispatch<React.SetStateAction<string>>;
 
-  inputMaria: string;
-  setInputMaria: React.Dispatch<React.SetStateAction<string>>;
-
+  /** @deprecated Configuração estática de API */
   urlGeral: string;
-  setUrlGeral: React.Dispatch<React.SetStateAction<string>>;
+  setUrlGeral?: React.Dispatch<React.SetStateAction<string>>;
 
+  /** @deprecated Configuração estática de API */
   urlGeral2: string;
-  setUrlGeral2: React.Dispatch<React.SetStateAction<string>>;
+  setUrlGeral2?: React.Dispatch<React.SetStateAction<string>>;
 
   idGraduateProgram: string;
   setIdGraduateProgram: React.Dispatch<React.SetStateAction<string>>;
@@ -72,25 +62,13 @@ export interface UserContextType {
 
   mode: string;
   setMode: React.Dispatch<React.SetStateAction<string>>;
-
-  navCollapsedSize: number;
-  setNavCollapsedSize: React.Dispatch<React.SetStateAction<number>>;
-
-  defaultLayout: number[];
-  setDefaultLayout: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 export const UserContext = createContext<UserContextType>({
   test: false,
   setTest: () => {},
-  mapModal: false,
-  setMapModal: () => {},
   navbar: false,
   setNavbar: () => {},
-  maria: false,
-  setMaria: () => {},
-  user: null,
-  setUser: () => {},
 
   historico: [],
   setHistorico: () => {},
@@ -107,14 +85,8 @@ export const UserContext = createContext<UserContextType>({
   sugestoes: [],
   setSugestoes: () => {},
 
-  messagesMaria: [],
-  setMessagesMaria: () => {},
-
   valorDigitadoPesquisaDireta: '',
   setValorDigitadoPesquisaDireta: () => {},
-
-  inputMaria: '',
-  setInputMaria: () => {},
 
   urlGeral: '',
   setUrlGeral: () => {},
@@ -125,9 +97,6 @@ export const UserContext = createContext<UserContextType>({
   searchType: '',
   setSearchType: () => {},
 
-  navCollapsedSize: 0,
-  setNavCollapsedSize: () => {},
-
   isCollapsed: false,
   setIsCollapsed: () => {},
 
@@ -136,9 +105,6 @@ export const UserContext = createContext<UserContextType>({
 
   simcc: false,
   setSimcc: () => {},
-
-  defaultLayout: [],
-  setDefaultLayout: () => {},
 
   mode: '',
   setMode: () => {},

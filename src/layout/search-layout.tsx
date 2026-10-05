@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState, Suspense } from 'react';
 import { UserContext } from '../context/context';
 
 import { useModal } from '../components/hooks/use-modal-store';
 
-import { useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useModalSecundary } from '../components/hooks/use-modal-store-secundary';
 import {
   SidebarInset,
@@ -20,19 +20,21 @@ import {
   BreadcrumbSeparator,
 } from '../components/ui/breadcrumb';
 import { cn } from '../lib';
+import { ErrorBoundary } from '../components/errors/error-boundary';
+import { PROFILE_RESULTS_PATH } from '../lib/search-types';
 
-interface MailProps {
-  defaultLayout: number[] | undefined;
-  defaultCollapsed?: boolean;
-  navCollapsedSize: number;
-  children: React.ReactNode;
+function PageFallback() {
+  return (
+    <div className="flex h-[calc(100vh-120px)] w-full items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#006699] border-t-transparent" />
+    </div>
+  );
 }
-export default function SearchLayout({
-  defaultLayout = [265, 440, 655],
-  defaultCollapsed = true,
-  navCollapsedSize,
-  children,
-}: MailProps) {
+
+interface SearchLayoutProps {
+  children?: React.ReactNode;
+}
+export default function SearchLayout({ children }: SearchLayoutProps = {}) {
   const { isCollapsed, setIsCollapsed } = useContext(UserContext);
 
   const { onOpen, isOpen, type: typeModal } = useModal();
@@ -101,6 +103,24 @@ export default function SearchLayout({
 
   const isMariaChat =
     router.pathname === '/resultados-ia' || router.pathname === '/marIA';
+
+  // Contrai o menu lateral apenas ao transicionar vindo de uma rota normal para resultados ou IA
+  const prevPathnameRef = useRef(router.pathname);
+  useEffect(() => {
+    const isCollapseRoute = (path: string) =>
+      path === '/resultados' ||
+      path === PROFILE_RESULTS_PATH ||
+      path === '/resultados-ia' ||
+      path === '/marIA';
+
+    const wasCollapse = isCollapseRoute(prevPathnameRef.current);
+    const nowCollapse = isCollapseRoute(router.pathname);
+
+    if (!wasCollapse && nowCollapse) {
+      setIsCollapsed(false);
+    }
+    prevPathnameRef.current = router.pathname;
+  }, [router.pathname, setIsCollapsed]);
 
   return (
     <div>
@@ -175,7 +195,11 @@ export default function SearchLayout({
                   'flex-1 min-h-0 overflow-hidden h-[calc(100%-68px)]',
               )}
             >
-              {children}
+              <ErrorBoundary>
+                <Suspense fallback={<PageFallback />}>
+                  {children ?? <Outlet />}
+                </Suspense>
+              </ErrorBoundary>
             </div>
           </main>
         </SidebarInset>

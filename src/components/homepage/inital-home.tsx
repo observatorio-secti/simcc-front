@@ -10,7 +10,6 @@ import {
   Info,
   List,
 } from 'lucide-react';
-import { useModalHomepage } from '../hooks/use-modal-homepage';
 
 interface VisaoPrograma {
   article: number;

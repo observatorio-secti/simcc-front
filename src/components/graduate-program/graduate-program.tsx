@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 
 import { UserContext } from '../../context/context';
-import { useModalHomepage } from '../hooks/use-modal-homepage';
 import bg_user from '../../assets/user.png';
 
 import { areasComCores, ProgramItem } from './program-item';
@@ -693,13 +692,10 @@ export function FiltersModal({
 
 export function GraduateProgram() {
   const { urlGeral } = useContext(UserContext);
-  const { isOpen, type } = useModalHomepage();
   const { onOpen } = useModal();
   const queryUrl = useQuery();
 
   const type_search = queryUrl.get('graduate_program_id');
-
-  const isModalOpen = isOpen && type === 'graduation-home';
 
   const [cidade, setCidade] = useState('');
   const [graduatePrograms, setGraduatePrograms] = useState<GraduateProgram[]>(

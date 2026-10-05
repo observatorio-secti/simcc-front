@@ -34,6 +34,7 @@ import { useTheme } from 'next-themes';
 import { SymbolEE } from '../svg/SymbolEE';
 import { SymbolEEWhite } from '../svg/SymbolEEWhite';
 import { UserContext } from '../../context/context';
+import { useAuth } from '../../hooks/use-auth';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useModal } from '../hooks/use-modal-store';
 import { Helmet } from 'react-helmet';
@@ -1000,7 +1001,8 @@ function MariaResultsColumn({
 
 // --- Componente Principal da MarIA ---
 export function Maria() {
-  const { urlGeral, user, setIsCollapsed } = useContext(UserContext);
+  const { urlGeral, setIsCollapsed } = useContext(UserContext);
+  const { user } = useAuth();
   const { theme } = useTheme();
   const { onOpen } = useModal();
 
@@ -1026,8 +1028,8 @@ export function Maria() {
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const userName = user?.display_name || 'Você';
-  const userPhoto = user?.photo_url;
+  const userName = user?.username || 'Você';
+  const userPhoto = undefined;
 
   // Session ID persistente
   const sessionId = useMemo(() => {
