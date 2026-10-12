@@ -68,3 +68,36 @@ export const useResearcherMapFacets = (
     retry: false,
   });
 };
+
+/** Quantidade de pesquisadores na nuvem de palavras. */
+export const CLOUD_SIZE = 10;
+
+/**
+ * Pesquisadores com mais obras que casam com a busca (`sort_by=matches`),
+ * para a nuvem de palavras. Consulta própria, independente da ordenação da
+ * listagem; `matches.total` traz a contagem usada na ordenação.
+ */
+export const useResearcherCloud = (
+  params: Pick<SearchResearchersV2Params, 'q' | 'filters'>,
+  enabled: boolean = true,
+) => {
+  return useQuery({
+    queryKey: ['researcher-profile-cloud', params],
+    queryFn: async () =>
+      (
+        await searchResearchersV2({
+          ...params,
+          page: 1,
+          perPage: CLOUD_SIZE,
+          sortBy: 'matches',
+          sortOrder: 'desc',
+          includeMatches: true,
+          matchesLimit: 1,
+        })
+      ).data,
+    placeholderData: keepPreviousData,
+    enabled: enabled && Boolean(params.q?.trim()),
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
+};

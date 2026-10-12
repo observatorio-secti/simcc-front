@@ -33,6 +33,7 @@ import { UserContext } from '../../../context/context';
 import { useIsMobile } from '../../../hooks/use-mobile';
 import {
   PROFILE_PAGE_SIZE,
+  useResearcherCloud,
   useResearcherMapFacets,
   useResearcherProfileSearch,
 } from '../../../hooks/use-researcher-profile-search';
@@ -77,6 +78,7 @@ import {
 } from '../categorias/researchers-profile-home/hooks/use-profile-search-state';
 import { ProfileResearcherCard } from '../categorias/researchers-profile-home/profile-researcher-card';
 import { ProfileSummaryCards } from '../categorias/researchers-profile-home/profile-summary-cards';
+import { ResearchersCloud } from '../categorias/researchers-profile-home/researchers-cloud';
 import { MariaHome } from '../maria-home';
 import {
   ResultFiltersSheet,
@@ -252,6 +254,16 @@ export function ResultHomeV2({ config }: ResultHomeV2Props) {
       facetLimit: EXPANDED_FACET_LIMIT,
     },
     hasTerms && tab === INSTITUTIONS_TAB,
+  );
+
+  // A nuvem acompanha a aba de pesquisadores, a única que a exibe.
+  const {
+    data: cloudResearchers,
+    isLoading: cloudLoading,
+    isError: cloudError,
+  } = useResearcherCloud(
+    { q: state.q, filters },
+    hasTerms && tab === RESEARCHERS_TAB,
   );
 
   const { toggleMulti } = state;
@@ -544,6 +556,13 @@ export function ResultHomeV2({ config }: ResultHomeV2Props) {
                     />
 
                     {mode !== '' && <MariaHome />}
+
+                    <ResearchersCloud
+                      researchers={cloudResearchers}
+                      loading={cloudLoading}
+                      error={cloudError}
+                      className={config.color}
+                    />
 
                     <Accordion defaultValue="item-1" type="single" collapsible>
                       <AccordionItem value="item-1">

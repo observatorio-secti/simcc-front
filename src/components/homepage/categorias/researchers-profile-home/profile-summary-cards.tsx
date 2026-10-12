@@ -7,6 +7,9 @@ import { Skeleton } from '../../../ui/skeleton';
 import { FacetsV2 } from '../../../../types/researcher-v2';
 import { FACET_DEFINITIONS, getFacetLabel } from './facets/facet-registry';
 
+/** Cor dos termos na busca por perfil, que não tem um tipo de busca próprio. */
+export const PROFILE_TERM_CLASS = 'bg-blue-700 dark:bg-blue-700';
+
 interface ProfileSummaryCardsProps {
   totalResearchers: number | undefined;
   facets: FacetsV2 | null | undefined;
@@ -75,7 +78,7 @@ export function ProfileSummaryCards({
   terms,
   loading,
   caption = 'com o perfil relacionado a',
-  termClassName = 'bg-blue-700 dark:bg-blue-700',
+  termClassName = PROFILE_TERM_CLASS,
   onToggleSourceType,
   selectedSourceTypes = [],
 }: ProfileSummaryCardsProps) {

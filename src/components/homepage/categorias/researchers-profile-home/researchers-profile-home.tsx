@@ -26,6 +26,7 @@ import { UserContext } from '../../../../context/context';
 import { useIsMobile } from '../../../../hooks/use-mobile';
 import { useModal } from '../../../hooks/use-modal-store';
 import {
+  useResearcherCloud,
   useResearcherMapFacets,
   useResearcherProfileSearch,
   PROFILE_PAGE_SIZE,
@@ -68,6 +69,7 @@ import {
 } from './hooks/use-profile-search-state';
 import { ProfileResearcherCard } from './profile-researcher-card';
 import { ProfileSummaryCards } from './profile-summary-cards';
+import { ResearchersCloud } from './researchers-cloud';
 import { exportProfileSearchCsv } from './export-profile-csv';
 
 // Leaflet e GeoJSON só são carregados quando a página de perfil é aberta.
@@ -144,6 +146,16 @@ export function ResearchersProfileHome() {
       facetLimit: EXPANDED_FACET_LIMIT,
     },
     hasTerms,
+  );
+
+  // A nuvem acompanha a visão de pesquisadores, a única que a exibe.
+  const {
+    data: cloudResearchers,
+    isLoading: cloudLoading,
+    isError: cloudError,
+  } = useResearcherCloud(
+    { q: state.q, filters: state.filters },
+    hasTerms && view === 'pesquisadores',
   );
 
   const { toggleMulti } = state;
@@ -359,6 +371,12 @@ export function ResearchersProfileHome() {
                       loading={isLoading}
                       onToggleSourceType={(val) => state.toggleMulti('source_type', val)}
                       selectedSourceTypes={state.getMulti('source_type')}
+                    />
+
+                    <ResearchersCloud
+                      researchers={cloudResearchers}
+                      loading={cloudLoading}
+                      error={cloudError}
                     />
 
                     <Accordion defaultValue="item-1" type="single" collapsible>

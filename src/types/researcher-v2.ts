@@ -94,7 +94,8 @@ export type FacetKeyV2 =
 
 export type FacetsV2 = Partial<Record<FacetKeyV2, FacetV2>>;
 
-export type SortByV2 = 'name' | 'id' | 'relevance';
+/** `matches`: obras que casam com `q`, o mesmo valor de `matches.total`. */
+export type SortByV2 = 'name' | 'id' | 'relevance' | 'matches';
 export type SortOrderV2 = 'asc' | 'desc';
 
 export interface ResearcherSearchResponseV2 {
