@@ -73,7 +73,6 @@ export const PRODUCTION_DEFINITIONS: Record<
         item.has_open_access_pdf && 'Acesso aberto',
       ]),
     details: (item) => [
-      { label: 'Resumo', value: item.abstract },
       { label: 'Palavras-chave', value: item.keywords },
       { label: 'Revista', value: item.magazine?.name },
       { label: 'ISSN', value: item.magazine?.issn },

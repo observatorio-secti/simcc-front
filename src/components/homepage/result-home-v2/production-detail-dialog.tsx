@@ -10,7 +10,8 @@ import {
 import { Skeleton } from '../../ui/skeleton';
 import { plainSnippet } from './highlighted-text';
 import { PlatformAuthors } from './production-card';
-import { ProductionDefinition } from './production-registry';
+import { ProductionDefinition, doiUrl } from './production-registry';
+import { useOpenAlexAbstract } from './use-openalex-abstract';
 
 interface ProductionDetailDialogProps {
   definition: ProductionDefinition;
@@ -27,6 +28,29 @@ export function ProductionDetailDialog({
   const { data, isLoading, isError } = useProductionDetail(
     definition.kind,
     item?.id,
+  );
+
+  // Resumo do artigo em 3 níveis (opções A + B + E):
+  // 1. `abstract` da API da plataforma;
+  // 2. resumo do OpenAlex pelo DOI (busca sob demanda, com cache de sessão);
+  // 3. mensagem de indisponível + link "Ler resumo na editora".
+  const isArticle = definition.kind === 'article';
+  const detailFields = (data ?? null) as unknown as {
+    abstract?: string | null;
+    doi?: string | null;
+  } | null;
+  const rawAbstract = detailFields?.abstract ?? null;
+  const rawDoi = detailFields?.doi ?? null;
+  const hasApiAbstract =
+    typeof rawAbstract === 'string' &&
+    rawAbstract.trim() !== '' &&
+    rawAbstract.trim().toLowerCase() !== 'null';
+  const {
+    data: openAlexAbstract,
+    isLoading: isLoadingOpenAlexAbstract,
+  } = useOpenAlexAbstract(
+    rawDoi,
+    isArticle && !isLoading && !isError && !hasApiAbstract,
   );
 
   const rows = data
@@ -75,7 +99,52 @@ export function ProductionDetailDialog({
                 instantes.
               </p>
             ) : (
-              <dl className="flex flex-col gap-3">
+              <>
+                {isArticle && (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Resumo
+                    </p>
+                    {hasApiAbstract ? (
+                      <p className="break-words text-sm">
+                        {plainSnippet(rawAbstract as string)}
+                      </p>
+                    ) : isLoadingOpenAlexAbstract ? (
+                      <div className="flex flex-col gap-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-[90%]" />
+                        <Skeleton className="h-4 w-2/3" />
+                      </div>
+                    ) : openAlexAbstract ? (
+                      <div className="flex flex-col gap-2">
+                        <p className="break-words text-sm">
+                          {plainSnippet(openAlexAbstract)}
+                        </p>
+                        <span className="w-fit shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium dark:bg-neutral-800">
+                          via OpenAlex
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        <p className="text-sm text-muted-foreground">
+                          Resumo indisponível para este artigo.
+                        </p>
+                        {rawDoi && (
+                          <a
+                            href={doiUrl(rawDoi)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex w-fit items-center gap-1 text-sm text-eng-blue hover:underline"
+                          >
+                            Ler resumo na editora
+                            <ArrowUpRight size={12} className="shrink-0" />
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <dl className="flex flex-col gap-3">
                 {rows.map((row) => (
                   <div key={row.label}>
                     <dt className="text-xs font-medium text-muted-foreground">
@@ -100,7 +169,8 @@ export function ProductionDetailDialog({
                     </dd>
                   </div>
                 ))}
-              </dl>
+                </dl>
+              </>
             )}
           </>
         )}
