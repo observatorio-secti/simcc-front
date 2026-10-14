@@ -15,7 +15,13 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../ui/card';
 import { Progress } from '../ui/progress';
 import { Skeleton } from '../ui/skeleton';
 import { useAnalyticsMetrics } from '../../hooks/use-analytics';
@@ -96,7 +102,12 @@ export function ConsolePage() {
               Métricas de Acesso da Plataforma
             </h1>
             <p className="text-xs md:text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
-              <span>Domínio: <strong className="font-mono text-neutral-700 dark:text-neutral-300">{siteDomain}</strong></span>
+              <span>
+                Domínio:{' '}
+                <strong className="font-mono text-neutral-700 dark:text-neutral-300">
+                  {siteDomain}
+                </strong>
+              </span>
               <span>•</span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" />
@@ -116,7 +127,7 @@ export function ConsolePage() {
                 </h3>
                 <p className="text-xs text-red-700 dark:text-red-400">
                   {error?.message ||
-                    'Certifique-se de que o servidor local está ativo em http://localhost:3000.'}
+                    'Certifique-se de que a API geral (simcc-back) está ativa e configurada com as credenciais do Google Analytics.'}
                 </p>
               </div>
               <Button
@@ -136,7 +147,10 @@ export function ConsolePage() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <Card key={i} className="border-neutral-200 dark:border-neutral-800">
+                <Card
+                  key={i}
+                  className="border-neutral-200 dark:border-neutral-800"
+                >
                   <CardContent className="p-5 space-y-3">
                     <Skeleton className="h-4 w-28" />
                     <Skeleton className="h-8 w-36" />
@@ -260,7 +274,8 @@ export function ConsolePage() {
                     Evolução Diária de Tráfego
                   </CardTitle>
                   <CardDescription className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Comparativo diário entre visualizações de páginas e sessões de usuários.
+                    Comparativo diário entre visualizações de páginas e sessões
+                    de usuários.
                   </CardDescription>
                 </div>
                 <div className="flex items-center gap-4 text-xs">
@@ -282,13 +297,41 @@ export function ConsolePage() {
                       margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
                     >
                       <defs>
-                        <linearGradient id="colorPageViews" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#07677e" stopOpacity={0.4} />
-                          <stop offset="95%" stopColor="#07677e" stopOpacity={0.0} />
+                        <linearGradient
+                          id="colorPageViews"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#07677e"
+                            stopOpacity={0.4}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#07677e"
+                            stopOpacity={0.0}
+                          />
                         </linearGradient>
-                        <linearGradient id="colorSessions" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#719CB8" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#719CB8" stopOpacity={0.0} />
+                        <linearGradient
+                          id="colorSessions"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#719CB8"
+                            stopOpacity={0.3}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#719CB8"
+                            stopOpacity={0.0}
+                          />
                         </linearGradient>
                       </defs>
                       <CartesianGrid
@@ -309,7 +352,9 @@ export function ConsolePage() {
                         fontSize={11}
                         className="text-neutral-500 dark:text-neutral-400 font-mono"
                         tickFormatter={(value) =>
-                          value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value
+                          value >= 1000
+                            ? `${(value / 1000).toFixed(0)}k`
+                            : value
                         }
                       />
                       <Tooltip content={<CustomChartTooltip />} />
@@ -363,7 +408,9 @@ export function ConsolePage() {
                           {item.country}
                         </span>
                         <span className="font-mono text-neutral-600 dark:text-neutral-400 flex items-center gap-2">
-                          <strong>{item.pageViews.toLocaleString('pt-BR')}</strong>
+                          <strong>
+                            {item.pageViews.toLocaleString('pt-BR')}
+                          </strong>
                           <span className="text-neutral-400 text-[10px]">
                             ({item.percentage.toFixed(1)}%)
                           </span>
