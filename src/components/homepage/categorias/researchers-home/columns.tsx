@@ -15,6 +15,8 @@ import { useContext } from 'react';
 import { UserContext } from '../../../../context/context';
 import { useModal } from '../../../hooks/use-modal-store';
 import { toast } from 'sonner';
+import { FileText } from 'lucide-react';
+import { generateResearcherReportPdf } from '../../../researcher/researcher-report';
 //import { UserContext } from "../../../../context/context"
 
 export type Research = {
@@ -155,6 +157,45 @@ export const columns: ColumnDef<Research>[] = [
               >
                 <Copy className="h-4 w-4" />
                 Copiar Lattes ID
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                className="flex items-center gap-3"
+                onClick={async () => {
+                  try {
+                    const response = await fetch(
+                      `${urlGeral}researcherName?name=${encodeURIComponent(
+                        payment.name.split(' ').join(';'),
+                      )}`,
+                      {
+                        mode: 'cors',
+                        headers: {
+                          'Content-Type': 'text/plain',
+                        },
+                      },
+                    );
+                    const data = await response.json();
+                    if (data.length > 0) {
+                      await generateResearcherReportPdf(data[0], urlGeral);
+                      toast('Relatório gerado', {
+                        description: 'Download do PDF iniciado.',
+                      });
+                    } else {
+                      toast('Dados não encontrados', {
+                        description:
+                          'Não foi possível obter os dados do pesquisador.',
+                      });
+                    }
+                  } catch {
+                    toast('Erro ao gerar relatório', {
+                      description:
+                        'Não foi possível gerar o PDF. Tente novamente.',
+                    });
+                  }
+                }}
+              >
+                <FileText className="h-4 w-4" />
+                Baixar relatório (PDF)
               </DropdownMenuItem>
 
               <DropdownMenuItem
