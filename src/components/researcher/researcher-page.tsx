@@ -74,10 +74,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { Copy, MoreHorizontal } from 'lucide-react';
+import { Copy, MoreHorizontal, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { TimeLineResearcher } from './timeline-researcher';
+import { generateResearcherReportPdf } from './researcher-report';
 import { DialogHeader } from '../ui/dialog';
 import { FilterYearTimeLine } from '../popup/filters-year-timeline';
 import { Skeleton } from '../ui/skeleton';
@@ -555,6 +556,22 @@ export function ResearcherPage() {
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
+  const handleDownloadReport = async () => {
+    const target = researcher[0];
+    if (!target) return;
+
+    try {
+      await generateResearcherReportPdf(target, urlGeral);
+      toast('Relatório gerado', {
+        description: 'Download do PDF iniciado.',
+      });
+    } catch {
+      toast('Erro ao gerar relatório', {
+        description: 'Não foi possível gerar o PDF. Tente novamente.',
+      });
+    }
+  };
+
   useEffect(() => {
     const fetchImage = async () => {
       const url = await getInstitutionImage(researcher[0].institution_id);
@@ -834,6 +851,14 @@ export function ResearcherPage() {
                           >
                             <FileCsv className="h-4 w-4" />
                             CSV dos artigos
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            className="flex items-center gap-3"
+                            onClick={() => handleDownloadReport()}
+                          >
+                            <FileText className="h-4 w-4" />
+                            Baixar relatório (PDF)
                           </DropdownMenuItem>
 
                           <DropdownMenuItem

@@ -103,6 +103,7 @@ import {
   CaretDown,
   File,
   FileCsv,
+  FileText,
   Files,
   ShareNetwork,
   Stamp,
@@ -169,6 +170,7 @@ import { TextoRevista } from '../popup/texto-revista';
 import { CargosFuncoes } from '../popup/cargos-funcoes';
 import { Coautores } from '../popup/coautores';
 import { getInstitutionImage } from '../homepage/categorias/institutions-home/institution-image';
+import { generateResearcherReportPdf } from '../researcher/researcher-report';
 
 export function ResearcherModal() {
   const { onClose, isOpen, type: typeModal, data } = useModal();
@@ -395,6 +397,22 @@ export function ResearcherModal() {
     }
   };
 
+  const handleDownloadReport = async () => {
+    const target = researcher[0];
+    if (!target) return;
+
+    try {
+      await generateResearcherReportPdf(target, urlGeral);
+      toast('Relatório gerado', {
+        description: 'Download do PDF iniciado.',
+      });
+    } catch {
+      toast('Erro ao gerar relatório', {
+        description: 'Não foi possível gerar o PDF. Tente novamente.',
+      });
+    }
+  };
+
   const currentUrl = window.location.origin;
 
   function generateNameVariations(name: string): string[] {
@@ -606,6 +624,14 @@ export function ResearcherModal() {
                         >
                           <FileCsv className="h-4 w-4" />
                           CSV dos artigos
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          className="flex items-center gap-3"
+                          onClick={() => handleDownloadReport()}
+                        >
+                          <FileText className="h-4 w-4" />
+                          Baixar relatório (PDF)
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
