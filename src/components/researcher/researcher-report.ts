@@ -136,33 +136,13 @@ const drawKeyValue = (ctx: PdfCursor, label: string, value: string) => {
 
 /**
  * Gera e baixa o PDF do relatório de um pesquisador direto pela API do jsPDF:
- * texto vetorial selecionável + foto embutida, sem depender de captura de DOM.
+ * texto vetorial selecionável, sem depender de captura de DOM.
  */
 export async function generateResearcherReportPdf(
   researcher: ReportData,
-  urlGeral: string,
 ): Promise<void> {
   const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
   const ctx: PdfCursor = { doc, y: MARGIN };
-
-  // Foto: busca e embute como JPEG (fallback: caixa com iniciais)
-  let photoDataUrl: string | null = null;
-  try {
-    const response = await fetch(
-      `${urlGeral}ResearcherData/Image?researcher_id=${researcher.id ?? ''}`,
-    );
-    if (response.ok) {
-      const blob = await response.blob();
-      photoDataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-  } catch {
-    photoDataUrl = null;
-  }
 
   // Cabeçalho
   doc.setFont('helvetica', 'bold');
@@ -186,49 +166,23 @@ export async function generateResearcherReportPdf(
   doc.line(MARGIN, ctx.y, PAGE_WIDTH - MARGIN, ctx.y);
   ctx.y += 8;
 
-  // Foto + identificação
-  const photoSize = 26;
-  if (photoDataUrl) {
-    try {
-      doc.addImage(photoDataUrl, 'JPEG', MARGIN, ctx.y, photoSize, photoSize);
-    } catch {
-      photoDataUrl = null;
-    }
-  }
-  if (!photoDataUrl) {
-    doc.setDrawColor(...MUTED);
-    doc.setLineWidth(0.3);
-    doc.rect(MARGIN, ctx.y, photoSize, photoSize);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(...MUTED);
-    const initials = (researcher.name ?? '??')
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? '')
-      .join('');
-    doc.text(initials || '?', MARGIN + photoSize / 2, ctx.y + photoSize / 2 + 1.5, {
-      align: 'center',
-    });
-  }
-
-  const identityX = MARGIN + photoSize + 6;
+  // Identificação
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(16);
   doc.setTextColor(...TEXT);
-  doc.text(doc.splitTextToSize(researcher.name ?? '-', CONTENT_WIDTH - photoSize - 6), identityX, ctx.y + 4);
+  doc.text(doc.splitTextToSize(researcher.name ?? '-', CONTENT_WIDTH), MARGIN, ctx.y);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(...MUTED);
-  doc.text(researcher.university ?? '', identityX, ctx.y + 11);
+  doc.text(researcher.university ?? '', MARGIN, ctx.y + 7);
   doc.setFontSize(9);
   const subtitle = [researcher.area, researcher.city, researcher.graduation]
     .filter(Boolean)
     .join(' · ');
-  doc.text(subtitle, identityX, ctx.y + 16);
+  doc.text(subtitle, MARGIN, ctx.y + 12);
 
-  ctx.y += photoSize + 10;
+  ctx.y += 16;
 
   // Resumo do currículo
   drawSectionTitle(ctx, 'Resumo do currículo');
