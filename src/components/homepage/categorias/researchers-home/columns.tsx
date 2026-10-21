@@ -176,7 +176,7 @@ export const columns: ColumnDef<Research>[] = [
                     );
                     const data = await response.json();
                     if (data.length > 0) {
-                      await generateResearcherReportPdf(data[0], urlGeral);
+                      await generateResearcherReportPdf(data[0]);
                       toast('Relatório gerado', {
                         description: 'Download do PDF iniciado.',
                       });

@@ -561,7 +561,7 @@ export function ResearcherPage() {
     if (!target) return;
 
     try {
-      await generateResearcherReportPdf(target, urlGeral);
+      await generateResearcherReportPdf(target);
       toast('Relatório gerado', {
         description: 'Download do PDF iniciado.',
       });
