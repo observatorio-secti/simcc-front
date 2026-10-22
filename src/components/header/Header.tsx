@@ -5,7 +5,7 @@ import { useContext } from 'react';
 import { cn } from '../../lib';
 import * as React from 'react';
 
-import logo_5 from '../../assets/logo_cimatec.svg';
+import logo_5 from '../../assets/governo-bahia-secti.png';
 
 import { NavigationMenuLink } from '../../components/ui/navigation-menu';
 
@@ -89,8 +89,8 @@ export function Header() {
               >
                 <img
                   src={logo_5}
-                  alt=""
-                  className="whitespace-nowrap flex flex-1 h-[50px]"
+                  alt="Governo da Bahia — Secretaria de Ciência, Tecnologia e Inovação"
+                  className="whitespace-nowrap flex flex-1 h-[50px] w-auto object-contain"
                 />
               </Link>
             </div>
