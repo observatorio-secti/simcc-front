@@ -1,22 +1,20 @@
 import React, { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/use-auth';
-import { useModal } from '../hooks/use-modal-store';
 
 interface ProtectedRouteProps {
   children?: React.ReactNode;
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
-  const { onOpen } = useModal();
+  const { isAuthenticated, isLoading, login } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      onOpen('auth-modal');
+      login();
     }
-  }, [isLoading, isAuthenticated, onOpen]);
+  }, [isLoading, isAuthenticated, login]);
 
   if (isLoading) {
     return (

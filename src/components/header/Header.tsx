@@ -44,7 +44,7 @@ import { PROFILE_RESULTS_PATH } from '../../lib/search-types';
 export function Header() {
   const { setItensSelecionados, searchType } = useContext(UserContext);
 
-  const { user: authUser, isAuthenticated, isAdmin, logout } = useAuth();
+  const { user: authUser, isAuthenticated, isAdmin, logout, login } = useAuth();
 
   const { theme } = useTheme();
 
@@ -215,12 +215,7 @@ export function Header() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  authStorage.saveRedirectUrl(
-                    location.pathname + location.search,
-                  );
-                  onOpen('auth-modal');
-                }}
+                onClick={() => login()}
                 className="h-8 px-2.5 text-xs font-medium gap-1.5 border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-200"
               >
                 <LogIn className="h-3.5 w-3.5 text-[#559FB8]" />

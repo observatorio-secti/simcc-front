@@ -1,9 +1,7 @@
 import { createContext } from 'react';
 import {
-  LoginCredentials,
   OAuthProvider,
   UserPublic,
-  UserSchema,
 } from '../types/auth';
 
 export interface AuthContextType {
@@ -12,9 +10,12 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (data: UserSchema) => Promise<void>;
+  login: (provider?: OAuthProvider) => void;
   loginWithOAuth: (provider: OAuthProvider) => void;
+  handleAuthCallback: (params: {
+    code?: string | null;
+    token?: string | null;
+  }) => Promise<string>;
   handleOAuthCallback: (token: string) => Promise<string>;
   logout: () => void;
 }

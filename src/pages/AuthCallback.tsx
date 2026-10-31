@@ -10,7 +10,7 @@ import { useTheme } from 'next-themes';
 export const AuthCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { handleOAuthCallback } = useAuth();
+  const { handleAuthCallback } = useAuth();
   const { theme } = useTheme();
 
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
@@ -19,6 +19,7 @@ export const AuthCallback: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    const code = searchParams.get('code');
     const token = searchParams.get('token');
     const error = searchParams.get('error');
 
@@ -31,10 +32,10 @@ export const AuthCallback: React.FC = () => {
       return;
     }
 
-    if (!token) {
+    if (!code && !token) {
       setStatus('error');
       setErrorMessage(
-        'Nenhum token de autenticação foi identificado no retorno do provedor.',
+        'Nenhum código ou token de autorização foi identificado no retorno do provedor.',
       );
       return;
     }
@@ -43,7 +44,7 @@ export const AuthCallback: React.FC = () => {
 
     const processLogin = async () => {
       try {
-        const redirectUrl = await handleOAuthCallback(token);
+        const redirectUrl = await handleAuthCallback({ code, token });
         if (isMounted) {
           setStatus('success');
           // Pequena transição para o usuário perceber o sucesso
@@ -68,7 +69,7 @@ export const AuthCallback: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [searchParams, handleOAuthCallback, navigate]);
+  }, [searchParams, handleAuthCallback, navigate]);
 
   return (
     <div className="min-h-[80vh] w-full flex flex-col items-center justify-center p-4 bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-100">

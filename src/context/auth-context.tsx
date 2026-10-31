@@ -4,10 +4,8 @@ import { toast } from 'sonner';
 import { authStorage } from '../lib/auth-storage';
 import { authService } from '../services/auth';
 import {
-  LoginCredentials,
   OAuthProvider,
   UserPublic,
-  UserSchema,
 } from '../types/auth';
 import { AuthContext } from './auth-context-def';
 
@@ -40,58 +38,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     retry: false,
   });
 
-  // Login tradicional
-  const login = useCallback(
-    async (credentials: LoginCredentials) => {
-      const data = await authService.login(credentials);
-      authStorage.setToken(data.access_token);
-      setToken(data.access_token);
-      try {
-        await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
-        await refetch();
-      } catch (profileErr) {
-        console.warn('Aviso: Perfil será carregado em background:', profileErr);
-      }
-      toast.success('Login realizado com sucesso! Bem-vindo(a).');
-    },
-    [queryClient, refetch],
-  );
-
-  // Cadastro com autologin (conforme decisão Q1)
-  const register = useCallback(
-    async (data: UserSchema) => {
-      await authService.register(data);
-      // Autologin imediato após o cadastro
-      const tokenData = await authService.login({
-        username: data.username,
-        password: data.password,
-      });
-      authStorage.setToken(tokenData.access_token);
-      setToken(tokenData.access_token);
-      try {
-        await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
-        await refetch();
-      } catch (profileErr) {
-        console.warn('Aviso: Perfil será carregado em background:', profileErr);
-      }
-      toast.success('Conta criada e autenticada com sucesso!');
-    },
-    [queryClient, refetch],
-  );
-
-  // Inicia fluxo OAuth salvando a rota atual (conforme decisão Q2)
-  const loginWithOAuth = useCallback((provider: OAuthProvider) => {
-    authStorage.saveRedirectUrl(
-      window.location.pathname + window.location.search,
-    );
-    window.location.href = authService.getOAuthLoginUrl(provider);
+  // Inicia fluxo de login centralizado via Observatório IdP com PKCE
+  const login = useCallback((provider?: OAuthProvider) => {
+    authService.redirectToLogin(provider);
   }, []);
 
-  // Processa token recebido via callback OAuth
-  const handleOAuthCallback = useCallback(
-    async (newToken: string): Promise<string> => {
-      authStorage.setToken(newToken);
-      setToken(newToken);
+  const loginWithOAuth = useCallback((provider: OAuthProvider) => {
+    authService.redirectToLogin(provider);
+  }, []);
+
+  // Processa retorno da autenticação (code PKCE ou token direto)
+  const handleAuthCallback = useCallback(
+    async ({
+      code,
+      token: directToken,
+    }: {
+      code?: string | null;
+      token?: string | null;
+    }): Promise<string> => {
+      let activeAccessToken = directToken;
+
+      if (code) {
+        const verifier = authStorage.consumePkceVerifier();
+        if (!verifier) {
+          throw new Error(
+            'Sessão de autorização inválida ou expirada (código PKCE ausente).',
+          );
+        }
+        const tokenResponse = await authService.exchangeCodeForToken(
+          code,
+          verifier,
+        );
+        activeAccessToken = tokenResponse.access_token;
+        if (tokenResponse.refresh_token) {
+          authStorage.setRefreshToken(tokenResponse.refresh_token);
+        }
+      }
+
+      if (!activeAccessToken) {
+        throw new Error('Nenhum código ou token de autorização fornecido.');
+      }
+
+      authStorage.setToken(activeAccessToken);
+      setToken(activeAccessToken);
       await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
       await refetch();
       const redirectUrl = authStorage.consumeRedirectUrl('/');
@@ -101,9 +90,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     [queryClient, refetch],
   );
 
+  // Compatibilidade com chamada passando apenas string
+  const handleOAuthCallback = useCallback(
+    async (codeOrToken: string): Promise<string> => {
+      return handleAuthCallback({ token: codeOrToken });
+    },
+    [handleAuthCallback],
+  );
+
   // Encerramento de sessão
   const logout = useCallback(() => {
     authStorage.removeToken();
+    authStorage.removeRefreshToken();
     setToken(null);
     queryClient.setQueryData(['auth', 'me'], null);
     toast.info('Sessão encerrada.');
@@ -134,8 +132,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isAdmin,
         isLoading: isUserLoading,
         login,
-        register,
         loginWithOAuth,
+        handleAuthCallback,
         handleOAuthCallback,
         logout,
       }}

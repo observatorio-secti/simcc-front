@@ -17,12 +17,20 @@ export const baseURL2 = rawBase2
     : `${rawBase2}/`
   : '';
 
-// API Administrativa e Autenticação (Porta 8000)
-const rawBaseAdmin = import.meta.env.VITE_URL_ADMIN || 'http://localhost:8000/';
+// API Administrativa (Porta 8009)
+const rawBaseAdmin = import.meta.env.VITE_URL_ADMIN || 'http://localhost:8009/';
 export const baseURLAdmin = rawBaseAdmin
   ? rawBaseAdmin.endsWith('/')
     ? rawBaseAdmin
     : `${rawBaseAdmin}/`
+  : 'http://localhost:8009/';
+
+// Observatório IdP (Porta 8000)
+const rawBaseIdp = import.meta.env.VITE_URL_IDP || 'http://localhost:8000/';
+export const baseURLIdp = rawBaseIdp
+  ? rawBaseIdp.endsWith('/')
+    ? rawBaseIdp
+    : `${rawBaseIdp}/`
   : 'http://localhost:8000/';
 
 export const api = axios.create({
@@ -111,18 +119,30 @@ const setupAuthInterceptors = (instance: AxiosInstance) => {
         isRefreshing = true;
 
         try {
+          const refreshToken = authStorage.getRefreshToken();
+          if (!refreshToken) {
+            throw new Error('Sem refresh token disponível');
+          }
+
           const { data } = await axios.post(
-            `${baseURLAdmin}auth/refresh_token`,
-            {},
+            `${baseURLIdp}token`,
+            {
+              grant_type: 'refresh_token',
+              client_id: 'simcc',
+              refresh_token: refreshToken,
+            },
             {
               headers: {
-                Authorization: `Bearer ${currentToken}`,
+                'Content-Type': 'application/json',
               },
             },
           );
 
           const newToken = data.access_token;
           authStorage.setToken(newToken);
+          if (data.refresh_token) {
+            authStorage.setRefreshToken(data.refresh_token);
+          }
           processQueue(null, newToken);
 
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
