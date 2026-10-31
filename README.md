@@ -88,7 +88,8 @@ Principais variáveis de ambiente lidas via `import.meta.env`:
 | Variável | Descrição | Exemplo (Dev Local) |
 | :--- | :--- | :--- |
 | `VITE_URL_GERAL` | URL base da API pública de consultas acadêmicas (`simcc-back`) | `http://localhost:8000/` |
-| `VITE_URL_ADMIN` | URL base da API administrativa e de autenticação (`simcc-admin`) | `http://localhost:8009/` |
+| `VITE_URL_ADMIN` | URL base da API administrativa acadêmica (`simcc-admin`) | `http://localhost:8009/` |
+| `VITE_URL_IDP` | URL base do provedor central de identidade (`observatorio-idp`) para SSO via OAuth 2.0 PKCE | `https://observatoriocti.secti.ba.gov.br/idp/` |
 | `VITE_URL_GERAL2` | URL base da API secundária ODA (opcional) | `""` |
 | `VITE_GA4_PROPERTY_ID` | ID da propriedade Google Analytics 4 (opcional) | `""` |
 | `VITE_URL_SITE` | URL canônica do site (opcional) | `http://localhost:5173` |
