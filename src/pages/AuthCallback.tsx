@@ -51,12 +51,10 @@ export const AuthCallback: React.FC = () => {
         const redirectUrl = await handleAuthCallback({ code, token });
         if (isMounted) {
           setStatus('success');
-          // Pequena transição para o usuário perceber o sucesso
-          setTimeout(() => {
-            navigate(redirectUrl, { replace: true });
-          }, 600);
+          navigate(redirectUrl || '/', { replace: true });
         }
       } catch (err: any) {
+        console.error('Erro no callback de autenticação:', err);
         if (isMounted) {
           setStatus('error');
           setErrorMessage(

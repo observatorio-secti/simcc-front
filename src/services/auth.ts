@@ -124,8 +124,8 @@ export const authService = {
   /**
    * Consulta os dados cadastrais e o papel do usuário no endpoint /me do IdP.
    */
-  async getCurrentUser(): Promise<UserPublic> {
-    const token = authStorage.getToken();
+  async getCurrentUser(explicitToken?: string): Promise<UserPublic> {
+    const token = explicitToken || authStorage.getToken();
     if (!token) {
       throw new Error('Usuário não autenticado');
     }
