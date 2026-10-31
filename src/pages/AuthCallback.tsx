@@ -44,33 +44,25 @@ export const AuthCallback: React.FC = () => {
       return;
     }
 
-    let isMounted = true;
-
     const processLogin = async () => {
       try {
         const redirectUrl = await handleAuthCallback({ code, token });
-        if (isMounted) {
-          setStatus('success');
-          navigate(redirectUrl || '/', { replace: true });
-        }
+        setStatus('success');
+        const target = redirectUrl && !redirectUrl.includes('/auth/callback') ? redirectUrl : '/';
+        // Redireciona com substituição no histórico
+        window.location.replace(target);
       } catch (err: any) {
         console.error('Erro no callback de autenticação:', err);
-        if (isMounted) {
-          setStatus('error');
-          setErrorMessage(
-            err?.response?.data?.detail ||
-              err?.message ||
-              'Não foi possível validar o token de acesso recebido.',
-          );
-        }
+        setStatus('error');
+        setErrorMessage(
+          err?.response?.data?.detail ||
+            err?.message ||
+            'Não foi possível validar o token de acesso recebido.',
+        );
       }
     };
 
     processLogin();
-
-    return () => {
-      isMounted = false;
-    };
   }, [searchParams, handleAuthCallback, navigate]);
 
   return (
