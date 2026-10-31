@@ -12,6 +12,7 @@ export const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const { handleAuthCallback } = useAuth();
   const { theme } = useTheme();
+  const processedRef = React.useRef(false);
 
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
     'loading',
@@ -19,6 +20,9 @@ export const AuthCallback: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (processedRef.current) return;
+    processedRef.current = true;
+
     const code = searchParams.get('code');
     const token = searchParams.get('token');
     const error = searchParams.get('error');
