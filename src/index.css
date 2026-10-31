@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .elementPesquisador::-webkit-scrollbar {
     height: 10px; 
     width: 0;              /* width of the entire scrollbar */

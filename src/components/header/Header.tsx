@@ -68,12 +68,12 @@ export function Header() {
   const { onOpen } = useModal();
 
   return (
-    <div className={'top-0 w-full'}>
+    <div className="top-0 w-full min-w-0 overflow-x-hidden">
       <header
-        className={`h-[40px] px-4 md:mb-2 flex justify-between bg-neutral-50 dark:bg-neutral-900 md:bg-neutral-100 md:dark:bg-black  gap-2 items-center w-full relative`}
+        className={`h-[40px] px-2 sm:px-4 md:mb-2 flex justify-between bg-neutral-50 dark:bg-neutral-900 md:bg-neutral-100 md:dark:bg-black gap-2 items-center w-full min-w-0 relative`}
       >
-        <div className="flex gap-2">
-          <div className="flex w-full md:gap-3 gap-1 items-center md:h-full md:justify-center">
+        <div className="flex min-w-0 flex-1 gap-2">
+          <div className="flex min-w-0 md:gap-3 gap-1 items-center md:h-full md:justify-center">
             <Link to={'/'} className="h-[18px]" onClick={() => handleClick()}>
               {theme == 'dark' ? <LogoIaposWhite /> : <LogoIapos />}
             </Link>
@@ -81,7 +81,7 @@ export function Header() {
               orientation="vertical"
               className="mx-2 md:mx-0 h-6 bg-slate-300"
             />
-            <div className="min-w-max">
+            <div className="min-w-0 shrink-0">
               <Link
                 to={'https://www.ba.gov.br/secti/'}
                 target="_blank"
@@ -90,7 +90,7 @@ export function Header() {
                 <img
                   src={logo_5}
                   alt="Governo da Bahia — Secretaria de Ciência, Tecnologia e Inovação"
-                  className="whitespace-nowrap flex flex-1 h-[50px] w-auto object-contain"
+                  className="whitespace-nowrap flex h-9 sm:h-[50px] w-auto max-w-[92px] sm:max-w-none object-contain"
                 />
               </Link>
             </div>
@@ -100,7 +100,7 @@ export function Header() {
               className="mx-2 md:mx-0 h-6 bg-slate-300"
             />
 
-            <div className="min-w-max">
+            <div className="min-w-0 shrink-0">
               <Button
                 asChild
                 variant="outline"
@@ -114,14 +114,14 @@ export function Header() {
                   className="whitespace-nowrap text-sm font-medium"
                 >
                   <LogoObservatorio className="h-4 w-4" />
-                  Observatório
+                  <span className="hidden sm:inline">Observatório</span>
                 </a>
               </Button>
             </div>
           </div>
         </div>
 
-        <div className="w-full flex items-center justify-end md:justify-end gap-1">
+        <div className="flex shrink-0 items-center justify-end gap-1">
           {isVisible && (
             <div
               onClick={() => onOpen('search')}
