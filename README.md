@@ -14,7 +14,7 @@ Permite a busca avançada e facetada (V2) de pesquisadores, produções bibliogr
 - **Tailwind CSS 3** + **Radix UI** (`@radix-ui/*`) + `class-variance-authority` para componentes acessíveis
 - **TanStack React Query 5** + **Zustand** + **React Context** (`auth-context`) para gerenciamento de estado servidor e cliente
 - **Axios** ([`src/lib/api.ts`](src/lib/api.ts)) com 3 clientes dedicados (`api`, `apiAdmin`, `apiOda`), injeção automática de JWT e fila concorrente de *refresh token*
-- **Cliente da MarIA** ([`src/services/maria.ts`](src/services/maria.ts)): `fetch` + leitura de SSE contra a API independente `observatorio-maria` (`VITE_URL_MARIA`). Cria conversas (`POST /conversations`), envia perguntas por `POST /conversations/{id}/messages/stream` e renderiza os blocos `text`, `chart` (Recharts), `table`, `researchers`, `productions` e `suggestions`; tipos desconhecidos são ignorados. A conversa ativa é retomada pelo `localStorage`
+- **Cliente da MarIA** ([`src/services/maria.ts`](src/services/maria.ts)): `fetch` + leitura de SSE contra a API independente `observatorio-maria` (`VITE_URL_MARIA`). Cria conversas (`POST /conversations`), envia perguntas por `POST /conversations/{id}/messages/stream` e renderiza os blocos `text` (Markdown GFM com `marked` + `DOMPurify`: tabelas, listas, links, código), `chart` (Recharts), `table`, `researchers`, `productions` e `suggestions`; tipos desconhecidos são ignorados. A conversa ativa é retomada pelo `localStorage`
 - **Highcharts**, **Recharts**, **Leaflet / Mapbox GL** para gráficos científicos e mapas georreferenciados
 
 ---

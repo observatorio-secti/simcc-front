@@ -47,6 +47,8 @@ import { useAuth } from '../../hooks/use-auth';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useModal } from '../hooks/use-modal-store';
 import { Helmet } from 'react-helmet';
+import { Marked } from 'marked';
+import DOMPurify from 'dompurify';
 import {
   MariaApiError,
   createConversation,
@@ -274,134 +276,44 @@ function getRandomRecommendations(count = 6): MariaPromptRecommendation[] {
   return shuffled.slice(0, count);
 }
 
-// --- Parser de Markdown Otimizado ---
-function parseMarkdownToHtml(markdown: string): string {
-  if (!markdown) return '';
+// --- Markdown (GFM) do bloco `text` ---
+// Mesmo pipeline da demo da Maria: marked (tabelas, listas aninhadas, links,
+// código) e DOMPurify, porque o texto do modelo pode citar dados de terceiros.
+const markdown = new Marked({ gfm: true, breaks: false });
 
-  let text = markdown
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  // Blocos de código
-  text = text.replace(
-    /```([\s\S]*?)```/g,
-    '<pre class="p-3 my-2 bg-slate-900 text-slate-100 rounded-lg overflow-x-auto font-mono text-xs"><code>$1</code></pre>',
-  );
-
-  // Código inline
-  text = text.replace(
-    /`([^`\n]+)`/g,
-    '<code class="px-1.5 py-0.5 bg-slate-100 dark:bg-neutral-800 text-[#07677e] dark:text-[#559FB8] rounded font-mono text-xs font-medium">$1</code>',
-  );
-
-  // Cabeçalhos
-  text = text.replace(
-    /^### (.*$)/gim,
-    '<h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mt-3 mb-1 font-lexend">$1</h3>',
-  );
-  text = text.replace(
-    /^## (.*$)/gim,
-    '<h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 mt-3.5 mb-1.5 font-lexend border-b border-slate-200 dark:border-neutral-800 pb-1">$1</h2>',
-  );
-  text = text.replace(
-    /^# (.*$)/gim,
-    '<h1 class="text-lg font-bold text-slate-900 dark:text-slate-100 mt-4 mb-2 font-lexend">$1</h1>',
-  );
-
-  // Citações
-  text = text.replace(
-    /^> (.*$)/gim,
-    '<blockquote class="border-l-4 border-[#719CB8] pl-3 py-1 my-2 bg-slate-50 dark:bg-neutral-800/50 text-slate-700 dark:text-slate-300 italic text-sm rounded-r">$1</blockquote>',
-  );
-
-  // Negrito e Itálico
-  text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
-  text = text.replace(
-    /\*\*(.*?)\*\*/g,
-    '<strong class="font-semibold text-slate-900 dark:text-slate-100">$1</strong>',
-  );
-  text = text.replace(
-    /\*(.*?)\*/g,
-    '<em class="italic text-slate-800 dark:text-slate-200">$1</em>',
-  );
-
-  // Links
-  text = text.replace(
-    /\[(.*?)\]\((https?:\/\/[^\s]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#07677e] dark:text-[#559FB8] hover:underline font-medium inline-flex items-center gap-0.5">$1</a>',
-  );
-
-  // Listas agrupadas compactas
-  const lines = text.split('\n');
-  const resultLines: string[] = [];
-  let inUnorderedList = false;
-  let inOrderedList = false;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const isUnordered = /^\s*[-*]\s+(.*)$/.test(line);
-    const isOrdered = /^\s*\d+\.\s+(.*)$/.test(line);
-
-    if (isUnordered) {
-      if (inOrderedList) {
-        resultLines.push('</ol>');
-        inOrderedList = false;
-      }
-      if (!inUnorderedList) {
-        resultLines.push('<ul class="my-1 pl-4 list-disc space-y-0.5">');
-        inUnorderedList = true;
-      }
-      const itemContent = line.replace(/^\s*[-*]\s+/, '');
-      resultLines.push(
-        `<li class="my-0.5 leading-normal text-slate-700 dark:text-slate-300">${itemContent}</li>`,
-      );
-    } else if (isOrdered) {
-      if (inUnorderedList) {
-        resultLines.push('</ul>');
-        inUnorderedList = false;
-      }
-      if (!inOrderedList) {
-        resultLines.push('<ol class="my-1 pl-4 list-decimal space-y-0.5">');
-        inOrderedList = true;
-      }
-      const itemContent = line.replace(/^\s*\d+\.\s+/, '');
-      resultLines.push(
-        `<li class="my-0.5 leading-normal text-slate-700 dark:text-slate-300">${itemContent}</li>`,
-      );
-    } else {
-      if (inUnorderedList) {
-        resultLines.push('</ul>');
-        inUnorderedList = false;
-      }
-      if (inOrderedList) {
-        resultLines.push('</ol>');
-        inOrderedList = false;
-      }
-
-      if (line.trim() === '') {
-        resultLines.push('<div class="h-1.5"></div>');
-      } else if (
-        line.startsWith('<h1') ||
-        line.startsWith('<h2') ||
-        line.startsWith('<h3') ||
-        line.startsWith('<blockquote') ||
-        line.startsWith('<pre')
-      ) {
-        resultLines.push(line);
-      } else {
-        resultLines.push(
-          `<p class="my-1 leading-relaxed text-slate-800 dark:text-slate-200">${line}</p>`,
-        );
-      }
-    }
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node.tagName === 'A') {
+    node.setAttribute('target', '_blank');
+    node.setAttribute('rel', 'noopener noreferrer');
   }
+});
 
-  if (inUnorderedList) resultLines.push('</ul>');
-  if (inOrderedList) resultLines.push('</ol>');
-
-  return resultLines.join('\n');
+function parseMarkdownToHtml(text: string): string {
+  if (!text) return '';
+  const html = markdown.parse(text, { async: false }) as string;
+  // Tabelas largas rolam na horizontal sem estourar o balão.
+  // Sem imagens: o texto não deve carregar recursos externos.
+  return DOMPurify.sanitize(html, { FORBID_TAGS: ['img'] })
+    .replaceAll('<table>', '<div class="md-table"><table>')
+    .replaceAll('</table>', '</table></div>');
 }
+
+const MARKDOWN_CLASSES = [
+  'markdown-container text-sm leading-relaxed text-slate-800 dark:text-slate-200 font-lexend',
+  '[&_p]:my-1.5 [&_p]:leading-relaxed [&>*:first-child]:mt-0 [&>*:last-child]:mb-0',
+  '[&_strong]:font-semibold [&_strong]:text-slate-900 dark:[&_strong]:text-slate-100 [&_em]:italic',
+  '[&_ul]:my-1 [&_ul]:pl-5 [&_ul]:list-disc [&_ol]:my-1 [&_ol]:pl-5 [&_ol]:list-decimal [&_li]:my-0.5 [&_li]:leading-normal [&_li>p]:my-0',
+  '[&_h1]:text-lg [&_h1]:font-bold [&_h1]:mt-4 [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:mt-3.5 [&_h2]:mb-1.5 [&_h2]:pb-1 [&_h2]:border-b [&_h2]:border-slate-200 dark:[&_h2]:border-neutral-800 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-3 [&_h3]:mb-1 [&_h4]:text-sm [&_h4]:font-semibold [&_h4]:mt-2',
+  '[&_a]:text-[#07677e] dark:[&_a]:text-[#559FB8] [&_a]:font-medium hover:[&_a]:underline',
+  '[&_blockquote]:border-l-4 [&_blockquote]:border-[#719CB8] [&_blockquote]:pl-3 [&_blockquote]:py-1 [&_blockquote]:my-2 [&_blockquote]:bg-slate-50 dark:[&_blockquote]:bg-neutral-800/50 [&_blockquote]:italic [&_blockquote]:rounded-r',
+  '[&_code]:px-1.5 [&_code]:py-0.5 [&_code]:bg-slate-100 dark:[&_code]:bg-neutral-800 [&_code]:text-[#07677e] dark:[&_code]:text-[#559FB8] [&_code]:rounded [&_code]:font-mono [&_code]:text-xs',
+  '[&_pre]:p-3 [&_pre]:my-2 [&_pre]:bg-slate-900 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-slate-100',
+  '[&_hr]:my-3 [&_hr]:border-slate-200 dark:[&_hr]:border-neutral-800',
+  '[&_.md-table]:my-2 [&_.md-table]:overflow-x-auto [&_.md-table]:rounded-md [&_.md-table]:border [&_.md-table]:border-slate-100 dark:[&_.md-table]:border-neutral-900',
+  '[&_table]:w-full [&_table]:text-xs [&_thead]:bg-slate-50 dark:[&_thead]:bg-neutral-900 [&_th]:px-2.5 [&_th]:py-1.5 [&_th]:font-semibold [&_th]:text-slate-600 dark:[&_th]:text-slate-300 [&_th]:whitespace-nowrap [&_th]:text-left',
+  '[&_td]:px-2.5 [&_td]:py-1.5 [&_td]:text-slate-700 dark:[&_td]:text-slate-300 [&_td]:tabular-nums [&_tbody_tr]:border-t [&_tbody_tr]:border-slate-100 dark:[&_tbody_tr]:border-neutral-900',
+  "[&_th[align='right']]:text-right [&_td[align='right']]:text-right [&_th[align='center']]:text-center [&_td[align='center']]:text-center",
+].join(' ');
 
 // --- Componente de Renderização Markdown ---
 function SimpleMarkdownRenderer({
@@ -414,8 +326,8 @@ function SimpleMarkdownRenderer({
   const renderedHtml = useMemo(() => parseMarkdownToHtml(content), [content]);
 
   return (
-    <div className="markdown-container text-sm leading-relaxed text-slate-800 dark:text-slate-200 font-lexend [&_ul]:my-1 [&_ul]:pl-4 [&_ul]:list-disc [&_ol]:my-1 [&_ol]:pl-4 [&_ol]:list-decimal [&_li]:my-0.5 [&_li]:leading-normal [&_li>p]:my-0 [&_li>p]:inline [&_p]:my-1 [&_p]:leading-relaxed">
-      <span dangerouslySetInnerHTML={{ __html: renderedHtml }} />
+    <div className={MARKDOWN_CLASSES}>
+      <div dangerouslySetInnerHTML={{ __html: renderedHtml }} />
       {isStreaming && (
         <span className="inline-block w-1.5 h-4 ml-1 bg-[#07677e] dark:bg-[#559FB8] animate-pulse align-middle rounded-xs" />
       )}
