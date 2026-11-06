@@ -14,6 +14,7 @@ Permite a busca avançada e facetada (V2) de pesquisadores, produções bibliogr
 - **Tailwind CSS 3** + **Radix UI** (`@radix-ui/*`) + `class-variance-authority` para componentes acessíveis
 - **TanStack React Query 5** + **Zustand** + **React Context** (`auth-context`) para gerenciamento de estado servidor e cliente
 - **Axios** ([`src/lib/api.ts`](src/lib/api.ts)) com 3 clientes dedicados (`api`, `apiAdmin`, `apiOda`), injeção automática de JWT e fila concorrente de *refresh token*
+- **Cliente da MarIA** ([`src/services/maria.ts`](src/services/maria.ts)): `fetch` + leitura de SSE contra a API independente `observatorio-maria` (`VITE_URL_MARIA`). Cria conversas (`POST /conversations`), envia perguntas por `POST /conversations/{id}/messages/stream` e renderiza os blocos `text`, `chart` (Recharts), `table`, `researchers`, `productions` e `suggestions`; tipos desconhecidos são ignorados. A conversa ativa é retomada pelo `localStorage`
 - **Highcharts**, **Recharts**, **Leaflet / Mapbox GL** para gráficos científicos e mapas georreferenciados
 
 ---
@@ -36,7 +37,7 @@ simcc-front/
 │   │   ├── indicators/            # Dashboards de indicadores estaduais e institucionais
 │   │   ├── indice-pesquisador/    # Cálculo e exibição de IndProd
 │   │   ├── institution/           # Perfis de ICTs e universidades
-│   │   ├── maria/                 # Interface de chat integrada com a agente de IA Maria
+│   │   ├── maria/                 # Chat da MarIA (maria.tsx), blocos chart/table (maria-blocks.tsx) e CSV/origem (maria-utils.ts)
 │   │   ├── modals/                # Modais de perfil de pesquisador, barema e exportação PDF/XLSX
 │   │   ├── researcher/            # Página e dossiê completo do pesquisador
 │   │   ├── search/                # Barra de busca inteligente, sugestões V2 e facetas
@@ -46,8 +47,8 @@ simcc-front/
 │   ├── layout/                    # Layouts base (default-layout, search-layout, docs-layout)
 │   ├── lib/                       # Instâncias Axios (api.ts), storage de auth e utilitários
 │   ├── pages/                     # Páginas de rota (About, AuthCallback, Tv)
-│   ├── services/                  # Clientes de domínio (researchers-v2.ts, productions-v2.ts, suggestions-v2.ts, auth.ts, academic.ts)
-│   ├── types/                     # Contratos TypeScript (researcher-v2.ts, production-v2.ts, academic.ts, auth.ts)
+│   ├── services/                  # Clientes de domínio (researchers-v2.ts, productions-v2.ts, suggestions-v2.ts, auth.ts, academic.ts, maria.ts)
+│   ├── types/                     # Contratos TypeScript (researcher-v2.ts, production-v2.ts, academic.ts, auth.ts, maria.ts)
 │   ├── App.tsx                    # Configuração de rotas e provedores
 │   └── main.tsx                   # Ponto de entrada da aplicação
 ├── DESIGN.md                      # Especificação do Design System
@@ -90,6 +91,7 @@ Principais variáveis de ambiente lidas via `import.meta.env`:
 | `VITE_URL_GERAL` | URL base da API pública de consultas acadêmicas (`simcc-back`) | `http://localhost:8000/` |
 | `VITE_URL_ADMIN` | URL base da API administrativa acadêmica (`simcc-admin`) | `http://localhost:8009/` |
 | `VITE_URL_IDP` | URL base do provedor central de identidade (`observatorio-idp`) para SSO via OAuth 2.0 PKCE | `https://observatoriocti.secti.ba.gov.br/idp/` |
+| `VITE_URL_MARIA` | URL base da API independente da MarIA (`observatorio-maria`). A origem do front precisa estar em `CORS_ORIGINS` da Maria quando estiverem em domínios/portas diferentes | `http://127.0.0.1:9002/` |
 | `VITE_URL_GERAL2` | URL base da API secundária ODA (opcional) | `""` |
 | `VITE_GA4_PROPERTY_ID` | ID da propriedade Google Analytics 4 (opcional) | `""` |
 | `VITE_URL_SITE` | URL canônica do site (opcional) | `http://localhost:5173` |
