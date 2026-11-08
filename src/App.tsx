@@ -66,6 +66,10 @@ const ResearchersPage = lazyNamed(
   () => import('./components/console/researchers-page'),
   'ResearchersPage',
 );
+const EtlPage = lazyNamed(
+  () => import('./components/console/etl/etl-page'),
+  'EtlPage',
+);
 
 // Páginas de documentação (DocsLayout)
 const TermosUso = lazyNamed(() => import('./components/docs-api/termos-uso'), 'TermosUso');
@@ -221,6 +225,8 @@ function App() {
                     <Route path="/console/instituicoes" element={<InstitutionsPage />} />
                     <Route path="/console/instituicoes/:id" element={<InstitutionDetailPage />} />
                     <Route path="/console/pesquisadores" element={<ResearchersPage />} />
+                    <Route path="/console/etl" element={<EtlPage />} />
+                    <Route path="/console/etl/:runId" element={<EtlPage />} />
                   </Route>
                 </Route>
 

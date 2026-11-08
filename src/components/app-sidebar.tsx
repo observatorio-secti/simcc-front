@@ -19,7 +19,9 @@ import {
   ShieldCheck,
   Sparkles,
   SquarePlay,
+  Terminal,
   Users,
+  Workflow,
   Wrench,
 } from 'lucide-react';
 
@@ -76,10 +78,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ? [
             {
               title: 'Administração',
-              url: '/console/usuarios',
+              url: '/console/etl',
               icon: ShieldCheck,
-              isActive: false,
+              isActive: true,
               items: [
+                {
+                  title: 'Pipeline ETL',
+                  url: '/console/etl',
+                  icon: Terminal,
+                },
                 {
                   title: 'Usuários',
                   url: '/console/usuarios',
