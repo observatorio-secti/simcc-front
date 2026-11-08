@@ -44,8 +44,9 @@ export function EtlPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Histórico Recente de Execuções como tela inicial padrão
+  // Histórico Recente de Execuções como tela inicial padrão SEMPRE
   const [activeTab, setActiveTab] = useState<string>('history');
+  const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [triggerModalOpen, setTriggerModalOpen] = useState<boolean>(false);
   const [technicalSheetOpen, setTechnicalSheetOpen] = useState<boolean>(false);
 
@@ -59,16 +60,17 @@ export function EtlPage() {
   } = useEtlRunsHistory(20);
   const triggerMutation = useTriggerEtlRun();
 
-  // Se a rota trouxer runId, abre direto no monitor
+  // Limpa qualquer ID na rota para garantir que o reload permaneça sempre no Histórico
   useEffect(() => {
     if (routeRunId) {
-      setActiveTab('monitor');
+      setSelectedRunId(routeRunId);
+      navigate('/console/etl', { replace: true });
     }
-  }, [routeRunId]);
+  }, [routeRunId, navigate]);
 
   // Define qual run inspecionar
   const queryRunId = searchParams.get('runId');
-  const activeRunId = routeRunId || queryRunId || historyRuns[0]?.id || null;
+  const activeRunId = selectedRunId || queryRunId || historyRuns[0]?.id || null;
 
   const {
     run: activeRunDetail,
@@ -79,9 +81,9 @@ export function EtlPage() {
     refetchNow,
   } = useEtlRunMonitor(activeRunId);
 
-  // Seleciona run no histórico e navega para o monitor
+  // Seleciona run no histórico e alterna para o monitor mantendo rota limpa
   const handleSelectRun = (runId: string) => {
-    navigate(`/console/etl/${runId}`);
+    setSelectedRunId(runId);
     setActiveTab('monitor');
   };
 
@@ -89,7 +91,7 @@ export function EtlPage() {
   const handleTriggerPipeline = async (payload: TriggerRunPayload) => {
     const res = await triggerMutation.mutateAsync(payload);
     if (res?.run_id) {
-      navigate(`/console/etl/${res.run_id}`);
+      setSelectedRunId(res.run_id);
       setActiveTab('monitor');
     }
   };
