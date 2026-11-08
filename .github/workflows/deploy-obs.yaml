@@ -16,6 +16,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -euo pipefail
-            cd /opt/apps/prod/observatorio/observatorio-front
+            cd /opt/simcc/simcc-front
             git pull origin main --ff-only
             docker build --build-arg VITE_BASE_PATH=/simcc/ --build-arg VITE_URL_GERAL2=https://observatoriocti.secti.ba.gov.br/oda/v1/ --output type=local,dest=./dist .
