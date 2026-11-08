@@ -24,6 +24,7 @@ import { Label } from '../../ui/label';
 import { Checkbox } from '../../ui/checkbox';
 import { RoutineCatalogItem, TriggerRunPayload } from '../../../types/etl';
 import { useAuth } from '../../../hooks/use-auth';
+import { getRoutineMetadata } from '../../../lib/etl-routines-catalog';
 
 interface EtlTriggerDialogProps {
   open: boolean;
@@ -48,7 +49,6 @@ export function EtlTriggerDialog({
     user?.email || user?.username || 'admin',
   );
 
-  // Sincroniza operador quando usuário carrega
   React.useEffect(() => {
     if (user?.email || user?.username) {
       setTriggeredBy(user.email || user.username);
@@ -72,7 +72,6 @@ export function EtlTriggerDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Processa lista de Lattes IDs (dividido por vírgula, ponto-e-vírgula ou nova linha)
     const lattesIds = lattesIdsRaw
       .split(/[\n,;]+/)
       .map((id) => id.trim())
@@ -101,38 +100,37 @@ export function EtlTriggerDialog({
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-xl font-bold flex items-center gap-2 text-neutral-900 dark:text-neutral-100">
               <Play className="w-5 h-5 text-emerald-500 fill-emerald-500" />
-              Iniciar Pipeline de Rotinas ETL
+              Iniciar Pipeline de Atualização
             </DialogTitle>
             <DialogDescription className="text-xs text-neutral-500 dark:text-neutral-400">
-              Dispara o pipeline assíncrono de coleta, saneamento, orquestração e
-              indexação de dados do SimCC.
+              Dispara as rotinas de sincronização, higienização e indexação de dados
+              acadêmicos da plataforma SimCC.
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4 space-y-5">
-            {/* Aviso de Lock Concorrente */}
+            {/* Aviso Amigável de Bloqueio Concorrente */}
             <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
               <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">PostgreSQL Advisory Lock:</p>
+                <p className="font-semibold">Execução em segundo plano:</p>
                 <p className="text-[11px] text-amber-700 dark:text-amber-400 mt-0.5">
-                  Apenas 1 pipeline pode ser executado por vez. Se outro processo
-                  estiver ativo, a solicitação entrará em estado de conflito até a
-                  liberação.
+                  Apenas um ciclo de atualização pode ocorrer simultaneamente para
+                  preservar a integridade dos dados acadêmicos.
                 </p>
               </div>
             </div>
 
-            {/* Modo de Seleção: Todas vs Personalizado */}
+            {/* Modo de Execução */}
             <div className="space-y-2.5">
               <Label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                Escopo de Rotinas
+                Seleção de Rotinas
               </Label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setMode('all')}
-                  className={`p-3 rounded-lg border text-left transition ${
+                  className={`p-3.5 rounded-xl border text-left transition ${
                     mode === 'all'
                       ? 'border-[#559FB8] bg-[#559FB8]/10 text-neutral-900 dark:text-white font-medium ring-1 ring-[#559FB8]'
                       : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800'
@@ -140,14 +138,14 @@ export function EtlTriggerDialog({
                 >
                   <p className="text-xs font-semibold">Todas as Rotinas Padrão</p>
                   <p className="text-[11px] text-neutral-500 mt-0.5">
-                    Executa o pipeline completo recomendado em ordem de dependência.
+                    Executa o pipeline completo (coleta, saneamento, produções e indicadores).
                   </p>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setMode('custom')}
-                  className={`p-3 rounded-lg border text-left transition ${
+                  className={`p-3.5 rounded-xl border text-left transition ${
                     mode === 'custom'
                       ? 'border-[#559FB8] bg-[#559FB8]/10 text-neutral-900 dark:text-white font-medium ring-1 ring-[#559FB8]'
                       : 'border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800'
@@ -155,15 +153,15 @@ export function EtlTriggerDialog({
                 >
                   <p className="text-xs font-semibold">Seleção Personalizada</p>
                   <p className="text-[11px] text-neutral-500 mt-0.5">
-                    Escolha etapas específicas (ex: apenas saneamento ou cálculo).
+                    Escolha etapas específicas para rodar isoladamente.
                   </p>
                 </button>
               </div>
             </div>
 
-            {/* Seleção de Rotinas se Custom */}
+            {/* Checklist Traduzido */}
             {mode === 'custom' && (
-              <div className="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded-lg p-3 bg-neutral-50/50 dark:bg-neutral-900/50">
+              <div className="space-y-2 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3 bg-neutral-50/50 dark:bg-neutral-900/50">
                 <div className="flex items-center justify-between pb-1 border-b border-neutral-200 dark:border-neutral-800">
                   <span className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
                     Rotinas Disponíveis ({selectedRoutines.length} selecionadas)
@@ -176,7 +174,7 @@ export function EtlTriggerDialog({
                       onClick={handleSelectAllRoutines}
                       className="h-6 text-[11px] text-[#559FB8] px-1.5"
                     >
-                      Selecionar todas
+                      Marcar todas
                     </Button>
                     <Button
                       type="button"
@@ -190,21 +188,37 @@ export function EtlTriggerDialog({
                   </div>
                 </div>
 
-                <div className="max-h-44 overflow-y-auto space-y-1.5 pt-1">
+                <div className="max-h-52 overflow-y-auto space-y-2 pt-1">
                   {routines.map((routine) => {
                     const isChecked = selectedRoutines.includes(routine.id);
+                    const meta = getRoutineMetadata(routine.id);
+                    const Icon = meta.icon;
+
                     return (
                       <label
                         key={routine.id}
-                        className="flex items-center gap-2.5 p-1.5 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer text-xs"
+                        className={`flex items-start gap-3 p-2.5 rounded-lg border cursor-pointer transition ${
+                          isChecked
+                            ? 'border-blue-300 dark:border-blue-800 bg-blue-50/40 dark:bg-blue-950/20'
+                            : 'border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                        }`}
                       >
                         <Checkbox
                           checked={isChecked}
                           onCheckedChange={() => handleToggleRoutine(routine.id)}
+                          className="mt-0.5"
                         />
-                        <span className="font-mono text-neutral-800 dark:text-neutral-200">
-                          {routine.name || routine.id}
-                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <Icon className="w-3.5 h-3.5 text-[#559FB8] shrink-0" />
+                            <span className="text-xs font-semibold text-neutral-900 dark:text-neutral-100">
+                              {meta.title}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-neutral-500 mt-0.5 line-clamp-1">
+                            {meta.shortDescription}
+                          </p>
+                        </div>
                       </label>
                     );
                   })}
@@ -212,33 +226,33 @@ export function EtlTriggerDialog({
               </div>
             )}
 
-            {/* Filtro Opcional de Pesquisadores (Lattes IDs) */}
+            {/* Filtro Opcional de Pesquisadores */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 flex items-center justify-between">
-                <span>Filtro por IDs Lattes (Opcional)</span>
+                <span>Filtrar por IDs Lattes Específicos (Opcional)</span>
                 <span className="text-[11px] text-neutral-400 font-normal">
-                  Vazio = todos os pesquisadores
+                  Deixe em branco para processar toda a base
                 </span>
               </Label>
               <Textarea
                 value={lattesIdsRaw}
                 onChange={(e) => setLattesIdsRaw(e.target.value)}
-                placeholder="Ex: 1234567890123456, 9876543210987654 (um por linha ou separados por vírgula)"
+                placeholder="Ex: 1234567890123456, 9876543210987654"
                 rows={2}
-                className="text-xs font-mono bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800"
+                className="text-xs font-mono bg-white dark:bg-neutral-950"
               />
             </div>
 
-            {/* Identificação do Operador */}
+            {/* Operador */}
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
-                Operador Responsável (`triggered_by`)
+                Operador Solicitante
               </Label>
               <Input
                 value={triggeredBy}
                 onChange={(e) => setTriggeredBy(e.target.value)}
                 placeholder="Ex: admin@dominio.com"
-                className="text-xs bg-white dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800"
+                className="text-xs bg-white dark:bg-neutral-950"
               />
             </div>
           </div>
@@ -263,7 +277,7 @@ export function EtlTriggerDialog({
               {isLoading ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Iniciando pipeline...
+                  Iniciando...
                 </>
               ) : (
                 <>
