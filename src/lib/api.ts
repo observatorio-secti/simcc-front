@@ -10,7 +10,9 @@ export const baseURL = rawBase
   : '';
 
 // API Secundária (ODA)
-const rawBase2 = import.meta.env.VITE_URL_GERAL2 || '';
+export const ODA_BASE_URL =
+  'https://observatoriocti.secti.ba.gov.br/oda/v1/';
+const rawBase2 = import.meta.env.VITE_URL_GERAL2 || ODA_BASE_URL;
 export const baseURL2 = rawBase2
   ? rawBase2.endsWith('/')
     ? rawBase2

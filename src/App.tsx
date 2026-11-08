@@ -20,6 +20,7 @@ import { Observatorio } from './components/observatorio/observatorio';
 import { ProtectedRoute } from './components/routes/protected-route';
 import { PROFILE_RESULTS_PATH } from './lib/search-types';
 import { initGA, trackPageView } from './lib/analytics';
+import { baseURL2 } from './lib/api';
 
 // Helper para importação sob demanda de componentes com named export (Code Splitting)
 function lazyNamed<T, K extends keyof T>(
@@ -81,9 +82,7 @@ function App() {
     import.meta.env.VITE_URL_GERAL || '',
   );
 
-  const [urlGeral2, setUrlGeral2] = useState(
-    import.meta.env.VITE_URL_GERAL2 || '',
-  );
+  const [urlGeral2, setUrlGeral2] = useState(baseURL2);
 
   const [simcc, setSimcc] = useState(
     import.meta.env.VITE_SIMCC === 'false' ? false : true,
