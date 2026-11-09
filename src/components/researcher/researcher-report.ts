@@ -624,7 +624,8 @@ const drawEvolutionTable = (ctx: PdfCursor, rows: EvolutionEntry[]) => {
 
   ensureSpace(ctx, TABLE_ROW_HEIGHT * 3);
   drawHeader();
-  rows.forEach((row, index) => drawRow(row, index));
+  // Tabela do ano mais recente para o mais antigo; o gráfico segue cronológico.
+  [...rows].reverse().forEach((row, index) => drawRow(row, index));
 
   const totals = rows.reduce(
     (accumulator, row) => ({
