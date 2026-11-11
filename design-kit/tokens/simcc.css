@@ -1,0 +1,77 @@
+/* Simcc — Sistema de Mapeamento de Competências Científicas
+   tokens + base + componentes mínimos (prefixo sm-). Caminhos relativos: tokens/simcc.css → ../assets/... */
+
+@font-face{font-family:"Lexend";font-weight:300;font-display:swap;src:url("../assets/fonts/lexend-latin-300-normal.woff2") format("woff2");}
+@font-face{font-family:"Lexend";font-weight:400;font-display:swap;src:url("../assets/fonts/lexend-latin-400-normal.woff2") format("woff2");}
+@font-face{font-family:"Lexend";font-weight:500;font-display:swap;src:url("../assets/fonts/lexend-latin-500-normal.woff2") format("woff2");}
+@font-face{font-family:"Lexend";font-weight:600;font-display:swap;src:url("../assets/fonts/lexend-latin-600-normal.woff2") format("woff2");}
+@font-face{font-family:"Lexend";font-weight:700;font-display:swap;src:url("../assets/fonts/lexend-latin-700-normal.woff2") format("woff2");}
+@font-face{font-family:"Lexend";font-weight:800;font-display:swap;src:url("../assets/fonts/lexend-latin-800-normal.woff2") format("woff2");}
+
+:root{
+  /* Marca [extraído] */
+  --sm-navy:#2B2D74; --sm-sky:#5B9BDD; --sm-red:#D43441;
+  /* Fundo e ondas [extraído da página 2] */
+  --sm-canvas:#FAFAFA; --sm-wash:#EFF1F4;
+  --sm-wave-blue:#D1DEE6; --sm-wave-gray:#DEE0E3; --sm-wave-faint:#EDEEEF;
+  /* Derivados [proposto] */
+  --sm-white:#FFFFFF; --sm-navy-900:#1B1D4D; --sm-navy-600:#4A4C8F;
+  --sm-sky-600:#3F7FC4; --sm-sky-100:#E1EDF9; --sm-red-700:#B52633; --sm-red-100:#F9E3E4;
+
+  --sm-bg:var(--sm-canvas); --sm-surface:var(--sm-white); --sm-text:var(--sm-navy);
+  --sm-text-muted:var(--sm-navy-600); --sm-line:var(--sm-wave-gray); --sm-focus:var(--sm-sky-600);
+  --sm-font:"Lexend",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --sm-radius-sm:4px; --sm-radius-md:8px; --sm-radius-lg:12px;
+  --sm-gutter:clamp(20px,4vw,64px); --sm-max:1200px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--sm-bg);color:var(--sm-text);font-family:var(--sm-font);font-weight:300;line-height:1.6}
+h1,h2,h3{font-weight:800;line-height:1.1;letter-spacing:-.01em;margin:0 0 .5em;color:var(--sm-navy)}
+h1{font-size:clamp(2.25rem,5vw,3.75rem)} h2{font-size:clamp(1.75rem,3.2vw,2.5rem)} h3{font-size:1.25rem;line-height:1.25}
+p{margin:0 0 1em} strong,b{font-weight:800}
+a{color:var(--sm-navy);text-underline-offset:.2em;text-decoration-thickness:2px} a:hover{color:var(--sm-red-700)}
+:focus-visible{outline:3px solid var(--sm-focus);outline-offset:2px}
+
+/* Assinatura: caixa-alta Light + termos-chave ExtraBold, ALINHADA À DIREITA no lockup */
+.sm-eyebrow{text-transform:uppercase;font-weight:300;letter-spacing:.03em;font-size:.9375rem}
+.sm-eyebrow b{font-weight:800}
+
+.sm-container{max-width:var(--sm-max);margin:0 auto;padding-inline:var(--sm-gutter)}
+.sm-section{padding-block:clamp(48px,8vw,112px)}
+
+/* Fundo com ondas: use SOMENTE como pano de fundo de hero/capa; texto fica em área de baixo contraste */
+.sm-waves{position:relative;background:var(--sm-canvas) url("../assets/waves/waves.svg") no-repeat center bottom/cover}
+.sm-hero{position:relative;overflow:hidden;text-align:center;min-height:min(70vh,560px);display:grid;place-items:center;
+  background:var(--sm-canvas) url("../assets/waves/waves.svg") no-repeat center 60%/max(100%,1400px) auto}
+
+/* Botões */
+.sm-btn{display:inline-flex;align-items:center;gap:.5em;font:800 1rem/1 var(--sm-font);padding:.9em 1.4em;border-radius:var(--sm-radius-sm);border:2px solid var(--sm-navy);background:var(--sm-navy);color:#fff;text-decoration:none;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.sm-btn:hover{background:var(--sm-navy-900);border-color:var(--sm-navy-900);color:#fff}
+.sm-btn--ghost{background:transparent;color:var(--sm-navy)} .sm-btn--ghost:hover{background:var(--sm-navy);color:#fff}
+
+/* Busca (ação central do Simcc) */
+.sm-search{display:flex;gap:0;max-width:640px;width:100%;margin-inline:auto;background:#fff;border:2px solid var(--sm-navy);border-radius:var(--sm-radius-md);overflow:hidden}
+.sm-search input{flex:1;min-width:0;border:0;padding:1em 1.1em;font:400 1rem var(--sm-font);color:var(--sm-navy);background:transparent;outline-offset:-3px}
+.sm-search input::placeholder{color:var(--sm-navy-600)}
+.sm-search button{border:0;background:var(--sm-navy);color:#fff;font:800 1rem var(--sm-font);padding:0 1.5em;cursor:pointer}
+.sm-search button:hover{background:var(--sm-navy-900)}
+
+/* Card, tag, tabela */
+.sm-card{background:#fff;border:1px solid var(--sm-line);border-radius:var(--sm-radius-md);padding:24px}
+.sm-card--accent{border-top:4px solid var(--sm-red)}
+.sm-tag{display:inline-block;font:600 .75rem/1 var(--sm-font);text-transform:uppercase;letter-spacing:.05em;padding:.5em .8em;border-radius:999px;background:var(--sm-sky-100);color:var(--sm-navy)}
+.sm-tag--strong{background:var(--sm-navy);color:#fff}
+.sm-kpi{font-weight:800;font-size:clamp(2rem,4vw,3rem);line-height:1;color:var(--sm-navy)}
+.sm-table{width:100%;border-collapse:collapse;font-size:.9375rem}
+.sm-table th{font-weight:800;text-align:left;border-bottom:2px solid var(--sm-navy);padding:.75em}
+.sm-table td{padding:.75em;border-bottom:1px solid var(--sm-line)}
+
+/* Cabeçalho */
+.sm-header{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px var(--sm-gutter);background:#fff;border-bottom:1px solid var(--sm-line)}
+.sm-header img{height:36px;width:auto;display:block}
+.sm-nav{display:flex;gap:28px;font-weight:600;font-size:.9375rem;overflow-x:auto;white-space:nowrap;min-width:0}
+.sm-nav a{text-decoration:none;padding-block:6px;border-bottom:3px solid transparent}
+.sm-nav a[aria-current="page"],.sm-nav a:hover{border-bottom-color:var(--sm-red)}
+
+:root{--sm-chart-1:var(--sm-navy);--sm-chart-2:var(--sm-sky);--sm-chart-3:var(--sm-red);--sm-chart-4:var(--sm-navy-600);--sm-chart-5:var(--sm-sky-600);--sm-chart-6:var(--sm-red-700)}
