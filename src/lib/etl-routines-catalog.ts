@@ -22,67 +22,158 @@ export interface RoutineMetadata {
 
 export const ROUTINE_METADATA_MAP: Record<string, Omit<RoutineMetadata, 'id'>> = {
   soap_lattes: {
-    title: 'Coleta de Currículos Lattes (SOAP)',
+    title: 'Coleta de Currículos Lattes',
     shortDescription:
-      'Conecta ao serviço oficial do CNPq para baixar e atualizar os currículos XML dos pesquisadores cadastrados. Garante que as informações acadêmicas estejam sincronizadas com a fonte primária.',
+      'Sincroniza os currículos oficiais do CNPq com a base de dados.',
     category: 'Coleta',
     icon: CloudDownload,
   },
-  sanitize_lattes_data: {
-    title: 'Saneamento e Limpeza de Dados',
+  hop_seed: {
+    title: 'Carga Inicial de Dados',
     shortDescription:
-      'Padroniza e higieniza os dados brutos extraídos dos currículos Lattes. Remove duplicidades, corrige inconsistências cadastrais e normaliza caracteres especiais.',
+      'Prepara o ambiente inicial de extração de dados.',
+    category: 'Coleta',
+    icon: Database,
+  },
+  hop_index: {
+    title: 'Extração Estruturada dos Currículos',
+    shortDescription:
+      'Processa os arquivos Lattes e organiza produções, vínculos e artigos.',
+    category: 'Tratamento',
+    icon: Workflow,
+  },
+  import_capes_programs: {
+    title: 'Programas de Pós-Graduação',
+    shortDescription:
+      'Atualiza informações e áreas dos programas de pós-graduação.',
+    category: 'Coleta',
+    icon: Building2,
+  },
+  import_capes_ratings: {
+    title: 'Conceitos CAPES',
+    shortDescription:
+      'Atualiza notas e avaliações dos programas de pós-graduação.',
+    category: 'Indicadores',
+    icon: BarChart3,
+  },
+  import_capes_researchers: {
+    title: 'Docentes da Pós-Graduação',
+    shortDescription:
+      'Mapeia os pesquisadores vinculados a programas de pós-graduação.',
+    category: 'Consolidação',
+    icon: Building2,
+  },
+  sanitize_lattes_data: {
+    title: 'Padronização e Limpeza',
+    shortDescription:
+      'Higieniza dados, normaliza caracteres e remove duplicidades.',
     category: 'Tratamento',
     icon: Sparkles,
   },
   aggregate_researcher_production: {
-    title: 'Consolidação de Produções Acadêmicas',
+    title: 'Consolidação de Produções',
     shortDescription:
-      'Organiza e unifica todas as publicações bibliográficas, técnicas e artísticas de cada docente. Estrutura os vínculos entre pesquisadores, departamentos e programas.',
+      'Unifica produções bibliográficas, técnicas e artísticas por autor.',
     category: 'Consolidação',
     icon: Database,
   },
-  index_productions: {
-    title: 'Indexação para Busca Rápida',
+  calculate_researcher_indprod: {
+    title: 'Produtividade de Pesquisadores',
     shortDescription:
-      'Atualiza os índices de pesquisa em tempo real do Observatório. Permite que as novas publicações e termos-chave fiquem instantaneamente pesquisáveis na plataforma.',
-    category: 'Consolidação',
-    icon: Search,
-  },
-  index_search: {
-    title: 'Indexação dos Perfis e Publicações',
-    shortDescription:
-      'Gera os índices otimizados para busca textual rápida. Facilita a recuperação instantânea de pesquisadores, produções e áreas de conhecimento.',
-    category: 'Consolidação',
-    icon: Search,
-  },
-  calculate_indicators: {
-    title: 'Cálculo de Indicadores Bibliométricos',
-    shortDescription:
-      'Processa as métricas quantitativas e índices de produtividade acadêmica da instituição. Alimenta os gráficos, relatórios e painéis analíticos do portal.',
+      'Calcula índices de produtividade individuais.',
     category: 'Indicadores',
     icon: BarChart3,
   },
-  hop_orchestration: {
-    title: 'Orquestração e Pipelines Hop',
+  calculate_graduate_program_indprod: {
+    title: 'Produtividade de Programas',
     shortDescription:
-      'Executa as rotinas de transformação analítica automatizadas no Apache Hop. Enriquece as informações cruzando múltiplas bases acadêmicas.',
-    category: 'Integração',
-    icon: Workflow,
+      'Calcula índices agregados dos programas de pós-graduação.',
+    category: 'Indicadores',
+    icon: BarChart3,
   },
-  sync_institution_data: {
-    title: 'Sincronização de Vínculos Institucionais',
+  calculate_research_group_indprod: {
+    title: 'Produtividade de Grupos',
     shortDescription:
-      'Mapeia a lotação dos docentes em centros, departamentos e programas de pós-graduação. Mantém a hierarquia acadêmica atualizada.',
+      'Calcula índices dos grupos de pesquisa cadastrados.',
+    category: 'Indicadores',
+    icon: BarChart3,
+  },
+  calculate_production_index: {
+    title: 'Cálculo de Indicadores',
+    shortDescription:
+      'Consolida os indicadores de produção científica de toda a plataforma.',
+    category: 'Indicadores',
+    icon: BarChart3,
+  },
+  indprod: {
+    title: 'Cálculo de Indicadores',
+    shortDescription:
+      'Consolida os indicadores de produção científica.',
+    category: 'Indicadores',
+    icon: BarChart3,
+  },
+  classify_researchers: {
+    title: 'Classificação de Especialidades',
+    shortDescription:
+      'Identifica áreas e especialidades predominantes de cada pesquisador.',
+    category: 'Consolidação',
+    icon: Sparkles,
+  },
+  build_search_dictionary: {
+    title: 'Dicionário de Termos e Busca',
+    shortDescription:
+      'Otimiza o vocabulário para buscas instantâneas na plataforma.',
+    category: 'Consolidação',
+    icon: Search,
+  },
+  resolve_cnpq_lattes_id: {
+    title: 'Resolução de Identificadores',
+    shortDescription:
+      'Confirma identificadores Lattes junto às bases de referência.',
+    category: 'Tratamento',
+    icon: Sparkles,
+  },
+  enrich_from_openalex: {
+    title: 'Enriquecimento com OpenAlex',
+    shortDescription:
+      'Cruza dados com a base global OpenAlex para ampliar métricas e citações.',
+    category: 'Integração',
+    icon: CloudDownload,
+  },
+  import_program_research_lines: {
+    title: 'Linhas de Pesquisa',
+    shortDescription:
+      'Importa as linhas de pesquisa associadas a cada programa.',
     category: 'Consolidação',
     icon: Building2,
   },
-  update_foments: {
-    title: 'Atualização de Fomento e Bolsas',
+  export_oda_research_groups: {
+    title: 'Sincronização com ODA',
     shortDescription:
-      'Atualiza dados de bolsas de produtividade e projetos de fomento das agências financiadoras. Vincula os auxílios diretamente aos pesquisadores contemplados.',
-    category: 'Indicadores',
-    icon: Coins,
+      'Atualiza grupos de pesquisa e dados de interoperabilidade do observatório.',
+    category: 'Integração',
+    icon: Workflow,
+  },
+  classify_article_themes: {
+    title: 'Classificação Temática',
+    shortDescription:
+      'Categoriza publicações conforme áreas temáticas e de inovação.',
+    category: 'Consolidação',
+    icon: Sparkles,
+  },
+  publish_to_read_db: {
+    title: 'Publicação na Base de Consulta',
+    shortDescription:
+      'Publica os dados atualizados para acesso dos usuários na plataforma.',
+    category: 'Consolidação',
+    icon: Database,
+  },
+  refresh_search_views: {
+    title: 'Atualização de Visualizações',
+    shortDescription:
+      'Atualiza tabelas e visualizações otimizadas de consulta.',
+    category: 'Consolidação',
+    icon: Search,
   },
 };
 

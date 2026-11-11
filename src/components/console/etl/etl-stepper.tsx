@@ -4,15 +4,10 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
-  Clock,
   Hourglass,
-  Layers,
   Loader2,
-  Workflow,
 } from 'lucide-react';
 import { StepMetric } from '../../../types/etl';
-import { Badge } from '../../ui/badge';
-import { Card, CardContent } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { getRoutineMetadata } from '../../../lib/etl-routines-catalog';
 
@@ -36,45 +31,10 @@ export function EtlStepper({ routines, steps, currentRoutine }: EtlStepperProps)
     if (!ms && ms !== 0) return null;
     if (ms < 1000) return `${ms}ms`;
     const sec = ms / 1000;
-    if (sec < 60) return `${sec.toFixed(1)} segundos`;
+    if (sec < 60) return `${sec.toFixed(1)}s`;
     const min = Math.floor(sec / 60);
     const remSec = Math.round(sec % 60);
-    return `${min} min e ${remSec} seg`;
-  };
-
-  const renderStatusBadge = (status: StepMetric['status'], isCurrent: boolean) => {
-    if (isCurrent || status === 'RUNNING') {
-      return (
-        <Badge className="bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 text-xs font-medium py-0.5 animate-pulse">
-          <Loader2 className="w-3 h-3 animate-spin mr-1 text-blue-500" />
-          Processando...
-        </Badge>
-      );
-    }
-    switch (status) {
-      case 'SUCCEEDED':
-        return (
-          <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 text-xs font-medium py-0.5">
-            <CheckCircle2 className="w-3 h-3 mr-1 text-emerald-500" />
-            Concluído
-          </Badge>
-        );
-      case 'FAILED':
-        return (
-          <Badge className="bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 text-xs font-medium py-0.5">
-            <AlertCircle className="w-3 h-3 mr-1 text-rose-500" />
-            Falhou
-          </Badge>
-        );
-      case 'PENDING':
-      default:
-        return (
-          <Badge variant="outline" className="text-neutral-500 text-xs font-normal py-0.5">
-            <Hourglass className="w-3 h-3 mr-1 text-neutral-400" />
-            Aguardando
-          </Badge>
-        );
-    }
+    return `${min}m ${remSec}s`;
   };
 
   const activeRoutines =
@@ -82,29 +42,25 @@ export function EtlStepper({ routines, steps, currentRoutine }: EtlStepperProps)
 
   if (activeRoutines.length === 0) {
     return (
-      <Card className="border-neutral-200 dark:border-neutral-800 p-6 text-center text-xs text-neutral-500">
-        Nenhuma etapa programada para esta execução.
-      </Card>
+      <div className="sm-card p-4 text-center text-xs text-sm-navy-600">
+        Nenhuma etapa registrada.
+      </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-          <Workflow className="w-4 h-4 text-[#559FB8]" />
-          Sequência de Etapas ({activeRoutines.length})
-        </h3>
-      </div>
+    <div className="sm-card p-5 space-y-3">
+      <h3 className="text-xs font-extrabold uppercase tracking-wider text-sm-navy border-b border-sm-wave-gray pb-2">
+        Etapas da Atualização ({activeRoutines.length})
+      </h3>
 
-      <div className="space-y-2.5">
+      <div className="space-y-1.5 max-h-[360px] overflow-y-auto pr-1">
         {activeRoutines.map((routineName, idx) => {
           const stepData = steps?.[routineName] || {
             status: routineName === currentRoutine ? 'RUNNING' : 'PENDING',
           };
           const isCurrent = routineName === currentRoutine;
           const meta = getRoutineMetadata(routineName);
-          const Icon = meta.icon;
           const isExpanded = Boolean(expandedSteps[routineName]);
           const duration = formatDurationHuman(stepData.duration_ms);
 
@@ -118,110 +74,96 @@ export function EtlStepper({ routines, steps, currentRoutine }: EtlStepperProps)
           return (
             <div
               key={routineName}
-              className={`p-4 rounded-xl border transition-all ${
+              className={`p-2.5 rounded border transition-colors ${
                 isCurrent
-                  ? 'border-blue-300 dark:border-blue-700 bg-blue-50/30 dark:bg-blue-950/20 shadow-sm'
+                  ? 'border-sm-navy bg-sm-wash/70'
                   : stepData.status === 'SUCCEEDED'
-                  ? 'border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900'
+                  ? 'border-sm-wave-gray bg-white'
                   : stepData.status === 'FAILED'
-                  ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50/20'
-                  : 'border-neutral-200 dark:border-neutral-800/80 bg-neutral-50/40 opacity-70'
+                  ? 'border-sm-red-100 bg-sm-red-100/20'
+                  : 'border-sm-wave-gray bg-white opacity-60'
               }`}
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                {/* Ícone, Nome em Português e Categoria */}
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                      isCurrent
-                        ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/60 dark:text-blue-300'
-                        : stepData.status === 'SUCCEEDED'
-                        ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400'
-                        : stepData.status === 'FAILED'
-                        ? 'bg-rose-100 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400'
-                        : 'bg-neutral-100 text-neutral-400 dark:bg-neutral-800'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-semibold text-neutral-400">
-                        Etapa {idx + 1}
-                      </span>
-                      <h4 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                        {meta.title}
-                      </h4>
-                    </div>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5 line-clamp-1">
-                      {meta.shortDescription}
-                    </p>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="font-mono text-[11px] text-sm-navy-600 w-5">
+                    #{idx + 1}
+                  </span>
+                  <div className="truncate">
+                    <span className="text-xs font-extrabold text-sm-navy block truncate">
+                      {meta.title}
+                    </span>
                   </div>
                 </div>
 
-                {/* Status e Ação de Expansão */}
-                <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
-                  {renderStatusBadge(stepData.status, isCurrent)}
+                <div className="flex items-center gap-2 shrink-0">
+                  {isCurrent || stepData.status === 'RUNNING' ? (
+                    <span className="sm-tag text-[10px] py-0.5 px-1.5 bg-sm-wash text-sm-navy flex items-center gap-1">
+                      <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                      Executando
+                    </span>
+                  ) : stepData.status === 'SUCCEEDED' ? (
+                    <span className="sm-tag text-[10px] py-0.5 px-1.5 flex items-center gap-1">
+                      <CheckCircle2 className="w-2.5 h-2.5 text-sm-navy" />
+                      Pronto
+                    </span>
+                  ) : stepData.status === 'FAILED' ? (
+                    <span className="sm-tag text-[10px] py-0.5 px-1.5 bg-sm-red-100 text-sm-red-700 flex items-center gap-1">
+                      <AlertCircle className="w-2.5 h-2.5 text-sm-red-700" />
+                      Falhou
+                    </span>
+                  ) : (
+                    <span className="sm-tag text-[10px] py-0.5 px-1.5 bg-sm-wash text-sm-navy-600 flex items-center gap-1">
+                      <Hourglass className="w-2.5 h-2.5 text-sm-navy-600" />
+                      Fila
+                    </span>
+                  )}
 
                   {hasTechnicalData && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleStepDetails(routineName)}
-                      className="h-7 px-2 text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+                      className="h-6 w-6 p-0 text-sm-navy-600 hover:text-sm-navy"
                     >
                       {isExpanded ? (
-                        <>
-                          Menos <ChevronUp className="w-3 h-3 ml-1" />
-                        </>
+                        <ChevronUp className="w-3 h-3" />
                       ) : (
-                        <>
-                          Detalhes <ChevronDown className="w-3 h-3 ml-1" />
-                        </>
+                        <ChevronDown className="w-3 h-3" />
                       )}
                     </Button>
                   )}
                 </div>
               </div>
 
-              {/* Detalhes Técnicos Expandíveis (Progressive Disclosure) */}
               {isExpanded && (
-                <div className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                <div className="mt-2 pt-2 border-t border-sm-wave-gray grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   {duration && (
-                    <div className="p-2 rounded bg-neutral-50 dark:bg-neutral-800/60">
-                      <span className="text-[11px] text-neutral-400 block">Duração</span>
-                      <span className="font-medium text-neutral-800 dark:text-neutral-200">
-                        {duration}
-                      </span>
+                    <div className="p-1.5 rounded bg-sm-wash">
+                      <span className="text-[10px] text-sm-navy-600 block">Duração</span>
+                      <span className="font-mono text-sm-navy font-semibold">{duration}</span>
                     </div>
                   )}
-
                   {stepData.found !== undefined && (
-                    <div className="p-2 rounded bg-neutral-50 dark:bg-neutral-800/60">
-                      <span className="text-[11px] text-neutral-400 block">Itens Localizados</span>
-                      <span className="font-semibold text-neutral-800 dark:text-neutral-200">
-                        {stepData.found}
-                      </span>
+                    <div className="p-1.5 rounded bg-sm-wash">
+                      <span className="text-[10px] text-sm-navy-600 block">Itens</span>
+                      <span className="font-mono text-sm-navy font-semibold">{stepData.found}</span>
                     </div>
                   )}
-
                   {stepData.succeeded !== undefined && (
-                    <div className="p-2 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300">
-                      <span className="text-[11px] block">Processados com Sucesso</span>
-                      <span className="font-semibold">{stepData.succeeded}</span>
+                    <div className="p-1.5 rounded bg-sm-wash">
+                      <span className="text-[10px] text-sm-navy-600 block">Processados</span>
+                      <span className="font-mono text-sm-navy font-semibold">{stepData.succeeded}</span>
                     </div>
                   )}
-
                   {stepData.failed !== undefined && stepData.failed > 0 && (
-                    <div className="p-2 rounded bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300">
-                      <span className="text-[11px] block">Inconformidades</span>
-                      <span className="font-semibold">{stepData.failed}</span>
+                    <div className="p-1.5 rounded bg-sm-red-100/30 text-sm-red-700">
+                      <span className="text-[10px] block">Erros</span>
+                      <span className="font-mono font-semibold">{stepData.failed}</span>
                     </div>
                   )}
-
                   {stepData.error && (
-                    <div className="col-span-full mt-1 p-2.5 rounded bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-200 font-mono text-xs break-all">
+                    <div className="col-span-full p-2 rounded bg-sm-red-100/40 text-sm-red-700 font-mono text-[11px] break-all">
                       {stepData.error}
                     </div>
                   )}

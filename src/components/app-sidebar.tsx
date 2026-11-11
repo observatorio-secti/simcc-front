@@ -57,40 +57,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
     navMain: [
       {
-        title: 'Plataforma',
-        url: '/console/instituicoes',
+        title: 'Cadastro Acadêmico',
+        url: '/console/pesquisadores',
         icon: Landmark,
         isActive: true,
         items: [
+          {
+            title: 'Pesquisadores',
+            url: '/console/pesquisadores',
+            icon: Users,
+          },
           {
             title: 'Instituições',
             url: '/console/instituicoes',
             icon: Building2,
           },
           {
-            title: 'Pesquisadores',
-            url: '/console/pesquisadores',
-            icon: Users,
+            title: 'Coleções',
+            url: '/console/colecoes',
+            icon: Layers,
           },
         ],
       },
       ...(isAdmin
         ? [
             {
-              title: 'Administração',
+              title: 'Operação',
               url: '/console/etl',
               icon: ShieldCheck,
               isActive: true,
               items: [
                 {
-                  title: 'Pipeline ETL',
+                  title: 'Sincronização',
                   url: '/console/etl',
-                  icon: Terminal,
-                },
-                {
-                  title: 'Usuários',
-                  url: '/console/usuarios',
-                  icon: Users,
+                  icon: Workflow,
                 },
               ],
             },

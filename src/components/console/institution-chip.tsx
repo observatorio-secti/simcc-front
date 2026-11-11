@@ -1,11 +1,4 @@
 import React from 'react';
-import { Badge } from '../ui/badge';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../ui/tooltip';
 import { Affiliation } from '../../types/academic';
 
 interface InstitutionChipProps {
@@ -17,35 +10,18 @@ interface InstitutionChipProps {
 
 export function InstitutionChip({
   acronym,
-  name,
   size = 'default',
   onClick,
 }: InstitutionChipProps) {
-  const chip = (
-    <Badge
-      variant="outline"
+  return (
+    <span
       onClick={onClick}
-      className={`rounded-full font-mono font-medium transition-colors ${
-        size === 'sm' ? 'px-2 py-0 text-[10px]' : 'px-2.5 py-0.5 text-xs'
-      } border-neutral-200 dark:border-neutral-800 bg-neutral-100/80 dark:bg-neutral-800/80 text-neutral-800 dark:text-neutral-200 hover:border-[#559FB8] hover:text-[#07677e] dark:hover:text-[#559FB8] ${
-        onClick ? 'cursor-pointer' : ''
-      }`}
+      className={`sm-tag font-mono transition-colors ${
+        size === 'sm' ? 'text-[10px] py-0.5 px-2' : 'text-xs'
+      } ${onClick ? 'cursor-pointer hover:bg-sm-navy hover:text-white' : ''}`}
     >
       {acronym}
-    </Badge>
-  );
-
-  if (!name) return chip;
-
-  return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>{chip}</TooltipTrigger>
-        <TooltipContent className="text-xs font-sans max-w-xs bg-neutral-900 dark:bg-neutral-800 text-white border-none shadow-md">
-          {name}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    </span>
   );
 }
 
@@ -62,7 +38,7 @@ export function AffiliationChipsGroup({
 }: AffiliationChipsGroupProps) {
   if (!affiliations || affiliations.length === 0) {
     return (
-      <span className="text-xs text-neutral-400 dark:text-neutral-500 italic">
+      <span className="text-xs text-sm-navy-600 italic">
         Sem afiliação
       </span>
     );
@@ -91,31 +67,12 @@ export function AffiliationChipsGroup({
       ))}
 
       {remaining.length > 0 && (
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge
-                variant="outline"
-                className="rounded-full px-1.5 py-0 text-[10px] font-mono border-dashed border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 bg-neutral-50 dark:bg-neutral-800/40 cursor-default"
-              >
-                +{remaining.length}
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent className="text-xs font-sans space-y-1 bg-neutral-900 dark:bg-neutral-800 text-white border-none shadow-md">
-              <p className="font-semibold text-neutral-300 pb-1 border-b border-neutral-700">
-                Outras afiliações:
-              </p>
-              {remaining.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-[#559FB8]">
-                    {item.institution.acronym}
-                  </span>
-                  <span>- {item.institution.name}</span>
-                </div>
-              ))}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <span
+          className="sm-tag font-mono text-[10px] py-0.5 px-1.5 bg-sm-wash text-sm-navy-600"
+          title={remaining.map((r) => r.institution.acronym).join(', ')}
+        >
+          +{remaining.length}
+        </span>
       )}
     </div>
   );

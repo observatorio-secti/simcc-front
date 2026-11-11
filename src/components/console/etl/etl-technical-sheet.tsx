@@ -3,11 +3,7 @@ import {
   Check,
   Copy,
   Download,
-  Filter,
   Search,
-  Terminal,
-  Trash2,
-  X,
 } from 'lucide-react';
 import {
   Sheet,
@@ -18,11 +14,9 @@ import {
 } from '../../ui/sheet';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
-import { Badge } from '../../ui/badge';
 import { LogLine } from '../../../types/etl';
 import { etlService } from '../../../services/etl';
 import { toast } from 'sonner';
-import { formatShortRunId } from '../../../lib/etl-routines-catalog';
 
 interface EtlTechnicalSheetProps {
   open: boolean;
@@ -37,13 +31,10 @@ export function EtlTechnicalSheet({
   onOpenChange,
   runId,
   logs,
-  onClearLogs,
 }: EtlTechnicalSheetProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [levelFilter, setLevelFilter] = useState<'all' | 'info' | 'warning' | 'error'>('all');
   const [copied, setCopied] = useState(false);
-
-  const shortId = formatShortRunId(runId);
 
   const filteredLogs = useMemo(() => {
     return logs.filter((line) => {
@@ -98,82 +89,47 @@ export function EtlTechnicalSheet({
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        fractionalSecondDigits: 3,
       });
     } catch {
       return ts;
     }
   };
 
-  const renderLevelBadge = (level?: string) => {
-    const lvl = (level || 'info').toLowerCase();
-    if (lvl.includes('error')) {
-      return (
-        <span className="text-rose-700 bg-rose-100 dark:bg-rose-950/80 dark:text-rose-300 font-semibold px-1 rounded text-[10px]">
-          [ERROR]
-        </span>
-      );
-    }
-    if (lvl.includes('warn')) {
-      return (
-        <span className="text-amber-700 bg-amber-100 dark:bg-amber-950/80 dark:text-amber-300 font-semibold px-1 rounded text-[10px]">
-          [WARN]
-        </span>
-      );
-    }
-    return (
-      <span className="text-blue-700 bg-blue-100 dark:bg-blue-950/80 dark:text-blue-300 font-semibold px-1 rounded text-[10px]">
-        [INFO]
-      </span>
-    );
-  };
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-2xl lg:max-w-3xl flex flex-col p-0 bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800"
+        className="w-full sm:max-w-2xl lg:max-w-3xl flex flex-col p-0 bg-white border-l border-sm-wave-gray shadow-none"
       >
-        {/* Cabeçalho da Gaveta */}
-        <div className="p-5 border-b border-neutral-200 dark:border-neutral-800 space-y-2 bg-neutral-50/50 dark:bg-neutral-900/50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-[#559FB8]" />
-              <SheetTitle className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-                Auditoria e Logs Técnicos
-              </SheetTitle>
-              <Badge variant="outline" className="font-mono text-xs">
-                {shortId}
-              </Badge>
-            </div>
-          </div>
-          <SheetDescription className="text-xs text-neutral-500 dark:text-neutral-400">
-            Visualização detalhada para administradores técnicos. Registros brutos
-            e eventos gerados pelo serviço de ETL.
+        <div className="p-5 border-b border-sm-wave-gray space-y-2 bg-sm-canvas/50">
+          <p className="sm-eyebrow">AUDITORIA · <b>LOGS TÉCNICOS</b></p>
+          <SheetTitle className="text-base font-extrabold text-sm-navy">
+            Registros de Execução
+          </SheetTitle>
+          <SheetDescription className="text-xs text-sm-navy-600">
+            Eventos brutos e detalhes gerados pelo processamento de atualização.
           </SheetDescription>
 
-          {/* Barra de Ações: Filtro e Download */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
             <div className="flex items-center gap-2 flex-1 min-w-[200px]">
               <div className="relative flex-1">
-                <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-neutral-400" />
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-sm-navy-600" />
                 <Input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Pesquisar nos logs..."
-                  className="h-8 pl-8 text-xs bg-white dark:bg-neutral-950"
+                  placeholder="Pesquisar registros..."
+                  className="h-8 pl-8 text-xs border-sm-wave-gray rounded-sm bg-white"
                 />
               </div>
 
-              {/* Filtro por nível */}
-              <div className="flex items-center border border-neutral-200 dark:border-neutral-800 rounded p-0.5 text-[11px] bg-white dark:bg-neutral-950">
+              <div className="flex items-center border border-sm-wave-gray rounded-sm p-0.5 text-[11px] bg-white">
                 <button
                   type="button"
                   onClick={() => setLevelFilter('all')}
-                  className={`px-2 py-0.5 rounded transition ${
+                  className={`px-2 py-0.5 rounded-sm transition ${
                     levelFilter === 'all'
-                      ? 'bg-neutral-200 dark:bg-neutral-800 font-semibold text-neutral-900 dark:text-white'
-                      : 'text-neutral-500'
+                      ? 'bg-sm-navy font-semibold text-white'
+                      : 'text-sm-navy-600'
                   }`}
                 >
                   Todos
@@ -181,10 +137,10 @@ export function EtlTechnicalSheet({
                 <button
                   type="button"
                   onClick={() => setLevelFilter('error')}
-                  className={`px-2 py-0.5 rounded transition ${
+                  className={`px-2 py-0.5 rounded-sm transition ${
                     levelFilter === 'error'
-                      ? 'bg-rose-100 text-rose-800 font-semibold'
-                      : 'text-neutral-500'
+                      ? 'bg-sm-red-100 text-sm-red-700 font-semibold'
+                      : 'text-sm-navy-600'
                   }`}
                 >
                   Erros
@@ -192,10 +148,10 @@ export function EtlTechnicalSheet({
                 <button
                   type="button"
                   onClick={() => setLevelFilter('warning')}
-                  className={`px-2 py-0.5 rounded transition ${
+                  className={`px-2 py-0.5 rounded-sm transition ${
                     levelFilter === 'warning'
-                      ? 'bg-amber-100 text-amber-800 font-semibold'
-                      : 'text-neutral-500'
+                      ? 'bg-sm-wash text-sm-navy font-semibold'
+                      : 'text-sm-navy-600'
                   }`}
                 >
                   Avisos
@@ -208,10 +164,10 @@ export function EtlTechnicalSheet({
                 variant="outline"
                 size="sm"
                 onClick={handleCopy}
-                className="h-8 text-xs gap-1"
+                className="h-8 text-xs gap-1 border-sm-wave-gray text-sm-navy"
               >
                 {copied ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <Check className="w-3.5 h-3.5 text-sm-navy" />
                 ) : (
                   <Copy className="w-3.5 h-3.5" />
                 )}
@@ -222,7 +178,7 @@ export function EtlTechnicalSheet({
                 variant="outline"
                 size="sm"
                 onClick={handleDownloadJsonl}
-                className="h-8 text-xs gap-1 text-[#07677e] dark:text-[#559FB8]"
+                className="h-8 text-xs gap-1 border-sm-wave-gray text-sm-navy"
               >
                 <Download className="w-3.5 h-3.5" />
                 .jsonl
@@ -231,39 +187,48 @@ export function EtlTechnicalSheet({
           </div>
         </div>
 
-        {/* Lista de Linhas de Log */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-1.5 font-mono text-xs leading-relaxed bg-neutral-50/30 dark:bg-neutral-950/40 select-text">
+        <div className="flex-1 overflow-y-auto p-4 space-y-1 font-mono text-xs leading-relaxed bg-sm-canvas select-text">
           {filteredLogs.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-neutral-400 italic text-xs">
+            <div className="h-full flex items-center justify-center text-sm-navy-600 italic text-xs">
               {logs.length === 0
                 ? 'Nenhum log registrado para esta execução.'
                 : 'Nenhum registro corresponde aos filtros.'}
             </div>
           ) : (
-            filteredLogs.map((log, index) => (
-              <div
-                key={index}
-                className="p-1.5 rounded hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60 transition-colors flex items-start gap-2 border-b border-neutral-100 dark:border-neutral-800/40 break-all"
-              >
-                <span className="text-neutral-400 shrink-0 text-[11px]">
-                  {formatTimestamp(log.timestamp)}
-                </span>
-                <span className="shrink-0">{renderLevelBadge(log.level)}</span>
-                {log.routine && (
-                  <span className="text-neutral-600 dark:text-neutral-400 font-semibold shrink-0">
-                    [{log.routine}]
+            filteredLogs.map((log, index) => {
+              const isError = (log.level || '').toLowerCase().includes('error');
+              const isWarn = (log.level || '').toLowerCase().includes('warn');
+
+              return (
+                <div
+                  key={index}
+                  className={`p-1.5 rounded transition-colors flex items-start gap-2 border-b border-sm-wave-gray/60 ${
+                    isError
+                      ? 'bg-sm-red-100/30 text-sm-red-700'
+                      : isWarn
+                      ? 'bg-sm-wash text-sm-navy'
+                      : 'bg-white text-sm-navy'
+                  }`}
+                >
+                  <span className="text-sm-navy-600 shrink-0 text-[11px]">
+                    {formatTimestamp(log.timestamp)}
                   </span>
-                )}
-                <span className="text-neutral-800 dark:text-neutral-200">
-                  {log.event}
-                </span>
-                {log.duration_ms !== undefined && (
-                  <span className="text-neutral-400 text-[10px] bg-neutral-200/60 dark:bg-neutral-800 px-1 rounded shrink-0">
-                    +{log.duration_ms}ms
+                  {log.routine && (
+                    <span className="font-extrabold shrink-0">
+                      [{log.routine}]
+                    </span>
+                  )}
+                  <span className="flex-1 break-all">
+                    {log.event}
                   </span>
-                )}
-              </div>
-            ))
+                  {log.duration_ms !== undefined && (
+                    <span className="text-sm-navy-600 text-[10px] shrink-0 font-mono">
+                      +{log.duration_ms}ms
+                    </span>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       </SheetContent>

@@ -48,6 +48,39 @@ body,
 
   @layer base {
     :root {
+      /* Tokens Simcc Design Kit */
+      --sm-navy: #2B2D74;
+      --sm-sky: #5B9BDD;
+      --sm-red: #D43441;
+      --sm-canvas: #FAFAFA;
+      --sm-wash: #EFF1F4;
+      --sm-wave-blue: #D1DEE6;
+      --sm-wave-gray: #DEE0E3;
+      --sm-wave-faint: #EDEEEF;
+      --sm-white: #FFFFFF;
+      --sm-navy-900: #1B1D4D;
+      --sm-navy-600: #4A4C8F;
+      --sm-sky-600: #3F7FC4;
+      --sm-sky-100: #E1EDF9;
+      --sm-red-700: #B52633;
+      --sm-red-100: #F9E3E4;
+      --sm-bg: var(--sm-canvas);
+      --sm-surface: var(--sm-white);
+      --sm-text: var(--sm-navy);
+      --sm-text-muted: var(--sm-navy-600);
+      --sm-line: var(--sm-wave-gray);
+      --sm-focus: var(--sm-sky-600);
+      --sm-font: "Lexend", system-ui, -apple-system, sans-serif;
+      --sm-radius-sm: 4px;
+      --sm-radius-md: 8px;
+      --sm-radius-lg: 12px;
+      --sm-chart-1: var(--sm-navy);
+      --sm-chart-2: var(--sm-sky);
+      --sm-chart-3: var(--sm-red);
+      --sm-chart-4: var(--sm-navy-600);
+      --sm-chart-5: var(--sm-sky-600);
+      --sm-chart-6: var(--sm-red-700);
+
       --background: 0 0% 100%;
       --foreground: 222.2 84% 4.9%;
       --card: 0 0% 100%;
@@ -128,4 +161,106 @@ body,
   * {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
+}
+
+/* Utilitários Simcc Design Kit (sm-*) */
+.sm-eyebrow {
+  text-transform: uppercase;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  font-size: 0.8125rem;
+  color: var(--sm-navy-600);
+}
+.sm-eyebrow b {
+  font-weight: 800;
+  color: var(--sm-navy);
+}
+
+.sm-card {
+  background: var(--sm-surface);
+  border: 1px solid var(--sm-line);
+  border-radius: var(--sm-radius-md);
+  box-shadow: none !important;
+}
+.sm-card--accent {
+  border-top: 4px solid var(--sm-red);
+}
+
+.sm-tag {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.4em 0.7em;
+  border-radius: 9999px;
+  background: var(--sm-sky-100);
+  color: var(--sm-navy);
+}
+.sm-tag--strong {
+  background: var(--sm-navy);
+  color: #fff;
+}
+
+.sm-kpi {
+  font-weight: 800;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--sm-navy);
+}
+
+.sm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.sm-table th {
+  font-weight: 800;
+  text-align: left;
+  border-bottom: 2px solid var(--sm-navy);
+  color: var(--sm-navy);
+  padding: 0.75rem;
+}
+.sm-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--sm-line);
+  color: var(--sm-navy);
+}
+
+.sm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  font-weight: 800;
+  font-size: 0.875rem;
+  line-height: 1;
+  padding: 0.75em 1.25em;
+  border-radius: var(--sm-radius-sm);
+  border: 2px solid var(--sm-navy);
+  background: var(--sm-navy);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+}
+.sm-btn:hover:not(:disabled) {
+  background: var(--sm-navy-900);
+  border-color: var(--sm-navy-900);
+  color: #fff;
+}
+.sm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.sm-btn--ghost {
+  background: transparent;
+  color: var(--sm-navy);
+}
+.sm-btn--ghost:hover:not(:disabled) {
+  background: var(--sm-navy);
+  color: #fff;
 }

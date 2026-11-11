@@ -62,6 +62,22 @@ module.exports = {
           'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
       },
       colors: {
+        sm: {
+          navy: '#2B2D74',
+          sky: '#5B9BDD',
+          red: '#D43441',
+          canvas: '#FAFAFA',
+          wash: '#EFF1F4',
+          'wave-blue': '#D1DEE6',
+          'wave-gray': '#DEE0E3',
+          'wave-faint': '#EDEEEF',
+          'navy-900': '#1B1D4D',
+          'navy-600': '#4A4C8F',
+          'sky-600': '#3F7FC4',
+          'sky-100': '#E1EDF9',
+          'red-700': '#B52633',
+          'red-100': '#F9E3E4',
+        },
         'eng-blue': '#559FB8',
         'eng-dark-blue': '#024A60',
         sidebar: {

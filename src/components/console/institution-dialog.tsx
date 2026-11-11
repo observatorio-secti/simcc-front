@@ -10,7 +10,6 @@ import {
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Landmark } from 'lucide-react';
 import { InstitutionPublic } from '../../types/academic';
 import {
   useCreateInstitution,
@@ -20,7 +19,7 @@ import {
 interface InstitutionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  institution?: InstitutionPublic | null; // Se fornecido, é modo de edição
+  institution?: InstitutionPublic | null;
 }
 
 export function InstitutionDialog({
@@ -76,55 +75,51 @@ export function InstitutionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-lg shadow-xl">
-        <DialogHeader className="space-y-2">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-[#559FB8]/10 text-[#07677e] dark:text-[#559FB8]">
-              <Landmark className="w-5 h-5" />
-            </div>
-            <DialogTitle className="text-lg font-bold font-sans text-neutral-900 dark:text-neutral-100">
-              {isEditing ? 'Editar Instituição' : 'Nova Instituição'}
-            </DialogTitle>
-          </div>
-          <DialogDescription className="text-xs text-neutral-500 dark:text-neutral-400 font-sans">
+      <DialogContent className="max-w-md border-sm-wave-gray bg-white rounded-md p-6">
+        <DialogHeader className="space-y-1">
+          <p className="sm-eyebrow">CADASTRO ACADÊMICO · <b>INSTITUIÇÕES</b></p>
+          <DialogTitle className="text-xl font-extrabold text-sm-navy">
+            {isEditing ? 'Editar Instituição' : 'Nova Instituição'}
+          </DialogTitle>
+          <DialogDescription className="text-xs text-sm-navy-600">
             {isEditing
               ? 'Atualize os dados institucionais cadastrados.'
               : 'Cadastre uma nova universidade, faculdade ou instituto de pesquisa.'}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="inst-acronym" className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-              Sigla <span className="text-red-500">*</span>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          <div className="space-y-1">
+            <Label htmlFor="inst-acronym" className="text-xs font-extrabold text-sm-navy">
+              Sigla <span className="text-sm-red">*</span>
             </Label>
             <Input
               id="inst-acronym"
               value={acronym}
               onChange={(e) => setAcronym(e.target.value.toUpperCase())}
               placeholder="Ex: UFBA, UESC, SENAI CIMATEC"
-              className="h-10 font-mono text-sm border-neutral-300 dark:border-neutral-700 uppercase"
+              className="h-9 font-mono text-xs border-sm-wave-gray focus:border-sm-sky-600 rounded-sm uppercase"
               maxLength={20}
               autoFocus
             />
             {errors.acronym && (
-              <p className="text-[11px] text-red-500 font-sans">{errors.acronym}</p>
+              <p className="text-[11px] text-sm-red-700">{errors.acronym}</p>
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="inst-name" className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-              Nome Completo <span className="text-red-500">*</span>
+          <div className="space-y-1">
+            <Label htmlFor="inst-name" className="text-xs font-extrabold text-sm-navy">
+              Nome Completo <span className="text-sm-red">*</span>
             </Label>
             <Input
               id="inst-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: Universidade Federal da Bahia"
-              className="h-10 text-sm border-neutral-300 dark:border-neutral-700"
+              className="h-9 text-xs border-sm-wave-gray focus:border-sm-sky-600 rounded-sm"
             />
             {errors.name && (
-              <p className="text-[11px] text-red-500 font-sans">{errors.name}</p>
+              <p className="text-[11px] text-sm-red-700">{errors.name}</p>
             )}
           </div>
 
@@ -135,22 +130,21 @@ export function InstitutionDialog({
               size="sm"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
-              className="text-xs border-neutral-300 dark:border-neutral-700"
+              className="h-9 text-xs border-sm-wave-gray text-sm-navy rounded-sm"
             >
               Cancelar
             </Button>
-            <Button
+            <button
               type="submit"
-              size="sm"
               disabled={isSubmitting}
-              className="text-xs bg-[#559FB8] hover:bg-[#024A60] text-white font-medium"
+              className="sm-btn text-xs py-2 px-4"
             >
               {isSubmitting
                 ? 'Salvando...'
                 : isEditing
                 ? 'Salvar Alterações'
                 : 'Cadastrar Instituição'}
-            </Button>
+            </button>
           </DialogFooter>
         </form>
       </DialogContent>

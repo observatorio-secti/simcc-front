@@ -1,6 +1,11 @@
 import { apiAdmin } from '../lib/api';
 import {
   Affiliation,
+  CollectionCreate,
+  CollectionMembership,
+  CollectionPublic,
+  CollectionsQueryParams,
+  CollectionUpdate,
   GenericEnvelope,
   InstitutionCreate,
   InstitutionPublic,
@@ -57,6 +62,69 @@ export const academicService = {
     await apiAdmin.delete(`academic/institutions/${id}`);
   },
 
+  // ===================== COLEÇÕES =====================
+
+  async getCollections(
+    params: CollectionsQueryParams = {},
+  ): Promise<GenericEnvelope<CollectionPublic>> {
+    const { data } = await apiAdmin.get<GenericEnvelope<CollectionPublic>>(
+      'academic/collections',
+      { params },
+    );
+    return data;
+  },
+
+  async getCollection(id: string): Promise<CollectionPublic> {
+    const { data } = await apiAdmin.get<CollectionPublic>(
+      `academic/collections/${id}`,
+    );
+    return data;
+  },
+
+  async createCollection(payload: CollectionCreate): Promise<CollectionPublic> {
+    const { data } = await apiAdmin.post<CollectionPublic>(
+      'academic/collections',
+      payload,
+    );
+    return data;
+  },
+
+  async updateCollection(
+    id: string,
+    payload: CollectionUpdate,
+  ): Promise<CollectionPublic> {
+    const { data } = await apiAdmin.put<CollectionPublic>(
+      `academic/collections/${id}`,
+      payload,
+    );
+    return data;
+  },
+
+  async deleteCollection(id: string): Promise<void> {
+    await apiAdmin.delete(`academic/collections/${id}`);
+  },
+
+  async addResearcherToCollection(
+    researcherId: string,
+    collectionId: string,
+    attributes: Record<string, unknown> = {},
+  ): Promise<CollectionMembership> {
+    const { data } = await apiAdmin.post<CollectionMembership>(
+      `academic/researchers/${researcherId}/collections/${collectionId}`,
+      { attributes },
+    );
+    return data;
+  },
+
+  async removeResearcherFromCollection(
+    researcherId: string,
+    collectionId: string,
+  ): Promise<void> {
+    await apiAdmin.delete(
+      `academic/researchers/${researcherId}/collections/${collectionId}`,
+    );
+  },
+
   // ===================== PESQUISADORES =====================
 
   async getResearchers(
@@ -65,6 +133,7 @@ export const academicService = {
     const cleanParams: Record<string, unknown> = {};
     if (params.q) cleanParams.q = params.q;
     if (params.institution_id) cleanParams.institution_id = params.institution_id;
+    if (params.collection_id) cleanParams.collection_id = params.collection_id;
     if (params.page !== undefined) cleanParams.page = params.page;
     if (params.per_page !== undefined) cleanParams.per_page = params.per_page;
     if (params.sort_by) cleanParams.sort_by = params.sort_by;
