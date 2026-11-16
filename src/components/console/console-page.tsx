@@ -25,6 +25,7 @@ import {
 import { Progress } from '../ui/progress';
 import { Skeleton } from '../ui/skeleton';
 import { useAnalyticsMetrics } from '../../hooks/use-analytics';
+import { PageViewsCard } from './page-views-card';
 import {
   AreaChart,
   Area,
@@ -464,6 +465,7 @@ export function ConsolePage() {
             </div>
           </>
         )}
+        <PageViewsCard />
       </div>
     </>
   );

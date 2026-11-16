@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import {
   UserContext,
   HistoricoItem,
@@ -19,7 +19,7 @@ import { Tv } from './pages/Tv';
 import { Observatorio } from './components/observatorio/observatorio';
 import { ProtectedRoute } from './components/routes/protected-route';
 import { PROFILE_RESULTS_PATH } from './lib/search-types';
-import { initGA, trackPageView } from './lib/analytics';
+import { trackPageView } from './lib/analytics';
 
 // Helper para importação sob demanda de componentes com named export (Code Splitting)
 function lazyNamed<T, K extends keyof T>(
@@ -74,6 +74,16 @@ const Info = lazyNamed(() => import('./components/info/info'), 'Info');
 const DicionarioCores = lazyNamed(() => import('./components/docs-api/dicionario-cores'), 'DicionarioCores');
 const Videos = lazyNamed(() => import('./components/docs-api/videos'), 'Videos');
 
+function AnalyticsPageView() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    trackPageView(pathname);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   const [navbar, setNavbar] = useState(false);
 
@@ -111,12 +121,6 @@ function App() {
   );
 
   const [mode, setMode] = useState('');
-
-  // Inicializa Google Analytics nativo
-  useEffect(() => {
-    initGA();
-    trackPageView(window.location.href);
-  }, []);
 
   useEffect(() => {
     localStorage.setItem('isCollapsed', JSON.stringify(isCollapsed));
@@ -191,6 +195,7 @@ function App() {
 
   return (
     <Router basename={import.meta.env.VITE_BASE_PATH || '/'}>
+      <AnalyticsPageView />
       <CookiesProvider>
         <AuthProvider>
           <UserContext.Provider value={userContextValue}>
