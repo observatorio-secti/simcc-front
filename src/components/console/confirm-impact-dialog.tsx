@@ -38,36 +38,36 @@ export function ConfirmImpactDialog({
 }: ConfirmImpactDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-md border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-lg">
+      <AlertDialogContent className="max-w-md border-sm-wave-gray bg-white rounded-md p-6">
         <AlertDialogHeader className="space-y-3">
           <div className="flex items-center gap-3">
             <div
-              className={`p-2.5 rounded-full ${
+              className={`p-2 rounded-full ${
                 destructive
-                  ? 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400'
-                  : 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400'
+                  ? 'bg-sm-red-100 text-sm-red-700'
+                  : 'bg-sm-wash text-sm-navy'
               }`}
             >
               <AlertTriangle className="w-5 h-5" />
             </div>
-            <AlertDialogTitle className="text-lg font-bold font-sans text-neutral-900 dark:text-neutral-100">
+            <AlertDialogTitle className="text-lg font-extrabold font-sans text-sm-navy">
               {title}
             </AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="text-sm text-neutral-600 dark:text-neutral-400 font-sans leading-relaxed">
+          <AlertDialogDescription className="text-xs text-sm-navy-600 font-sans leading-relaxed">
             {description}
           </AlertDialogDescription>
 
           {impactMessage && (
-            <div className="p-3 rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 text-xs text-amber-800 dark:text-amber-300 font-sans">
-              <strong>Impacto:</strong> {impactMessage}
+            <div className="p-3 rounded border border-sm-wave-gray bg-sm-wash text-xs text-sm-navy font-sans">
+              <b>Impacto:</b> {impactMessage}
             </div>
           )}
         </AlertDialogHeader>
         <AlertDialogFooter className="mt-4 gap-2">
           <AlertDialogCancel
             disabled={isLoading}
-            className="text-xs font-medium border-neutral-200 dark:border-neutral-800"
+            className="text-xs font-semibold border-sm-wave-gray text-sm-navy rounded-sm h-9"
           >
             {cancelLabel}
           </AlertDialogCancel>
@@ -77,10 +77,10 @@ export function ConfirmImpactDialog({
               onConfirm();
             }}
             disabled={isLoading}
-            className={`text-xs font-semibold ${
+            className={`text-xs font-extrabold rounded-sm h-9 px-4 ${
               destructive
-                ? 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-600'
-                : 'bg-[#559FB8] hover:bg-[#024A60] text-white'
+                ? 'bg-sm-red-700 hover:bg-sm-red text-white'
+                : 'sm-btn'
             }`}
           >
             {isLoading ? 'Processando...' : confirmLabel}

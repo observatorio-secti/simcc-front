@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 import {
@@ -33,11 +32,10 @@ export function InstitutionDetailPage() {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
 
-  const { data: institution, isLoading, isError } = useInstitution(id);
+  const { data: institution, isLoading } = useInstitution(id);
   const deleteMutation = useDeleteInstitution();
   const removeAffiliationMutation = useRemoveAffiliation();
 
-  // Modais de edição e exclusão da instituição
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -71,12 +69,12 @@ export function InstitutionDetailPage() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
-      <div className="flex-1 w-full p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
-        {/* Breadcrumb de Navegação */}
+      <div className="flex-1 w-full p-6 md:p-8 space-y-6 max-w-[1200px] mx-auto bg-sm-canvas min-h-screen">
+        {/* Breadcrumb */}
         <Breadcrumb>
-          <BreadcrumbList className="text-xs font-sans">
+          <BreadcrumbList className="text-xs font-sans text-sm-navy-600">
             <BreadcrumbItem>
-              <BreadcrumbLink to="/">Página Inicial</BreadcrumbLink>
+              <BreadcrumbLink to="/">Início</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -88,7 +86,7 @@ export function InstitutionDetailPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage className="font-semibold text-neutral-900 dark:text-neutral-100 font-mono">
+              <BreadcrumbPage className="font-extrabold text-sm-navy font-mono">
                 {institution ? institution.acronym : 'Detalhes'}
               </BreadcrumbPage>
             </BreadcrumbItem>
@@ -96,36 +94,27 @@ export function InstitutionDetailPage() {
         </Breadcrumb>
 
         {/* Header da Instituição */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-sm-wave-gray pb-5">
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/console/instituicoes')}
-                className="h-7 px-2 text-xs gap-1 text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Voltar à lista
-              </Button>
-              <span className="text-neutral-300 dark:text-neutral-700">|</span>
-              <span className="text-xs text-neutral-500 font-mono">
-                ID: {id?.slice(0, 8)}...
-              </span>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/console/instituicoes')}
+              className="h-7 px-2 text-xs gap-1 text-sm-navy-600 hover:text-sm-navy"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Voltar à lista
+            </Button>
 
             <div className="flex items-center gap-3">
               {isLoading ? (
-                <Skeleton className="h-8 w-24 rounded-full" />
+                <Skeleton className="h-6 w-16 rounded-full" />
               ) : (
-                <Badge
-                  variant="outline"
-                  className="font-mono text-sm px-3 py-1 border-[#559FB8] bg-[#559FB8]/10 text-[#07677e] dark:text-[#559FB8] font-bold"
-                >
+                <span className="sm-tag font-mono text-xs">
                   {institution?.acronym}
-                </Badge>
+                </span>
               )}
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 font-sans">
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-sm-navy font-sans">
                 {isLoading ? (
                   <Skeleton className="h-8 w-64" />
                 ) : (
@@ -133,9 +122,8 @@ export function InstitutionDetailPage() {
                 )}
               </h1>
             </div>
-            <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              Gerencie o corpo docente e os pesquisadores vinculados a esta
-              instituição.
+            <p className="text-xs text-sm-navy-600">
+              Corpo docente e pesquisadores vinculados a esta instituição.
             </p>
           </div>
 
@@ -146,7 +134,7 @@ export function InstitutionDetailPage() {
               variant="outline"
               size="sm"
               onClick={() => setIsEditDialogOpen(true)}
-              className="h-9 gap-1.5 border-neutral-300 dark:border-neutral-700 text-xs font-medium"
+              className="h-8 gap-1.5 border-sm-wave-gray text-xs font-semibold text-sm-navy rounded-sm"
             >
               <Edit2 className="w-3.5 h-3.5" />
               Editar Instituição
@@ -158,7 +146,7 @@ export function InstitutionDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsDeleteDialogOpen(true)}
-                className="h-9 gap-1.5 border-red-300 dark:border-red-900 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs font-medium"
+                className="h-8 gap-1.5 border-sm-wave-gray text-sm-red-700 hover:bg-sm-red-100/50 text-xs font-semibold rounded-sm"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Excluir
@@ -169,18 +157,15 @@ export function InstitutionDetailPage() {
 
         {/* Bloco de Pesquisadores da Instituição */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold font-sans text-neutral-900 dark:text-neutral-100">
-                Pesquisadores Vinculados
-              </h2>
-              <p className="text-xs text-neutral-500">
-                Lista de pesquisadores com afiliação ativa em {institution?.acronym}.
-              </p>
-            </div>
+          <div>
+            <h2 className="text-lg font-extrabold font-sans text-sm-navy">
+              Pesquisadores Vinculados
+            </h2>
+            <p className="text-xs text-sm-navy-600">
+              Pesquisadores com afiliação cadastrada em {institution?.acronym}.
+            </p>
           </div>
 
-          {/* Reuso canônico da tabela de pesquisadores com filtro fixo */}
           {id && (
             <ResearcherListTable
               fixedInstitutionId={id}

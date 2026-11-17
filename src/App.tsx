@@ -65,6 +65,14 @@ const ResearchersPage = lazyNamed(
   () => import('./components/console/researchers-page'),
   'ResearchersPage',
 );
+const CollectionsPage = lazyNamed(
+  () => import('./components/console/collections-page'),
+  'CollectionsPage',
+);
+const EtlPage = lazyNamed(
+  () => import('./components/console/etl/etl-page'),
+  'EtlPage',
+);
 
 // Páginas de documentação (DocsLayout)
 const TermosUso = lazyNamed(() => import('./components/docs-api/termos-uso'), 'TermosUso');
@@ -91,9 +99,7 @@ function App() {
     import.meta.env.VITE_URL_GERAL || '',
   );
 
-  const [urlGeral2, setUrlGeral2] = useState(
-    import.meta.env.VITE_URL_GERAL2 || '',
-  );
+  const [urlGeral2, setUrlGeral2] = useState(baseURL2);
 
   const [simcc, setSimcc] = useState(
     import.meta.env.VITE_SIMCC === 'false' ? false : true,
@@ -227,6 +233,9 @@ function App() {
                     <Route path="/console/instituicoes" element={<InstitutionsPage />} />
                     <Route path="/console/instituicoes/:id" element={<InstitutionDetailPage />} />
                     <Route path="/console/pesquisadores" element={<ResearchersPage />} />
+                    <Route path="/console/colecoes" element={<CollectionsPage />} />
+                    <Route path="/console/etl" element={<EtlPage />} />
+                    <Route path="/console/etl/:runId" element={<EtlPage />} />
                   </Route>
                 </Route>
 

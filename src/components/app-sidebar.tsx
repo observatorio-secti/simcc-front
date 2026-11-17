@@ -19,7 +19,9 @@ import {
   ShieldCheck,
   Sparkles,
   SquarePlay,
+  Terminal,
   Users,
+  Workflow,
   Wrench,
 } from 'lucide-react';
 
@@ -55,35 +57,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
     navMain: [
       {
-        title: 'Plataforma',
-        url: '/console/instituicoes',
+        title: 'Cadastro Acadêmico',
+        url: '/console/pesquisadores',
         icon: Landmark,
         isActive: true,
         items: [
+          {
+            title: 'Pesquisadores',
+            url: '/console/pesquisadores',
+            icon: Users,
+          },
           {
             title: 'Instituições',
             url: '/console/instituicoes',
             icon: Building2,
           },
           {
-            title: 'Pesquisadores',
-            url: '/console/pesquisadores',
-            icon: Users,
+            title: 'Coleções',
+            url: '/console/colecoes',
+            icon: Layers,
           },
         ],
       },
       ...(isAdmin
         ? [
             {
-              title: 'Administração',
-              url: '/console/usuarios',
+              title: 'Operação',
+              url: '/console/etl',
               icon: ShieldCheck,
-              isActive: false,
+              isActive: true,
               items: [
                 {
-                  title: 'Usuários',
-                  url: '/console/usuarios',
-                  icon: Users,
+                  title: 'Sincronização',
+                  url: '/console/etl',
+                  icon: Workflow,
                 },
               ],
             },

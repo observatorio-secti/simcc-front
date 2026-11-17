@@ -10,7 +10,9 @@ export const baseURL = rawBase
   : '';
 
 // API Secundária (ODA)
-const rawBase2 = import.meta.env.VITE_URL_GERAL2 || '';
+export const ODA_BASE_URL =
+  'https://observatoriocti.secti.ba.gov.br/oda/v1/';
+const rawBase2 = import.meta.env.VITE_URL_GERAL2 || ODA_BASE_URL;
 export const baseURL2 = rawBase2
   ? rawBase2.endsWith('/')
     ? rawBase2
@@ -33,6 +35,14 @@ export const baseURLIdp = rawBaseIdp
     : `${rawBaseIdp}/`
   : 'http://localhost:8000/';
 
+// API SimCC ETL (Porta 9099 / Background Pipeline)
+const rawBaseEtl = import.meta.env.VITE_URL_ETL || 'http://127.0.0.1:9099/';
+export const baseURLEtl = rawBaseEtl
+  ? rawBaseEtl.endsWith('/')
+    ? rawBaseEtl
+    : `${rawBaseEtl}/`
+  : 'http://127.0.0.1:9099/';
+
 export const api = axios.create({
   baseURL,
   timeout: 15000,
@@ -46,6 +56,19 @@ export const apiOda = axios.create({
 export const apiAdmin = axios.create({
   baseURL: baseURLAdmin,
   timeout: 15000,
+});
+
+export const apiEtl = axios.create({
+  baseURL: baseURLEtl,
+  timeout: 30000,
+});
+
+apiEtl.interceptors.request.use((config) => {
+  const apiKey = import.meta.env.VITE_ETL_API_KEY;
+  if (apiKey) {
+    config.headers['X-ETL-API-Key'] = apiKey;
+  }
+  return config;
 });
 
 export const hasOdaBase = () => Boolean(baseURL2);
