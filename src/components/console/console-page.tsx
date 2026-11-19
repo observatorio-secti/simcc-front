@@ -6,6 +6,7 @@ import {
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 import { useAnalyticsMetrics } from '../../hooks/use-analytics';
+import { PageViewsCard } from './page-views-card';
 import {
   LineChart,
   Line,
@@ -320,6 +321,7 @@ export function ConsolePage() {
             </div>
           </>
         )}
+        <PageViewsCard />
       </div>
     </>
   );
