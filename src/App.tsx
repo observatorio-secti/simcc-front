@@ -19,6 +19,7 @@ import { Tv } from './pages/Tv';
 import { Observatorio } from './components/observatorio/observatorio';
 import { ProtectedRoute } from './components/routes/protected-route';
 import { PROFILE_RESULTS_PATH } from './lib/search-types';
+import { baseURL2 } from './lib/api';
 import { trackPageView } from './lib/analytics';
 
 // Helper para importação sob demanda de componentes com named export (Code Splitting)
