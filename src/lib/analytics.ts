@@ -1,38 +1,66 @@
-// Utilitário de rastreamento Google Analytics 4 (GA4) nativo via gtag
 declare global {
   interface Window {
-    dataLayer: any[];
-    gtag: (...args: any[]) => void;
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+    [key: `ga-disable-${string}`]: boolean | undefined;
   }
 }
 
-const MEASUREMENT_ID = import.meta.env.VITE_MEASUREMENTID || '';
+const measurementId = import.meta.env.VITE_MEASUREMENTID;
+let previousLocation = '';
+let pausedForAuth = false;
 
-export function initGA() {
-  if (typeof window === 'undefined' || !MEASUREMENT_ID) return;
+export function trackPageView(pathname: string) {
+  if (typeof window === 'undefined' || !measurementId) return;
 
-  // Se já foi injetado o script, não injeta novamente
-  if (document.getElementById('google-analytics-script')) return;
+  const analytics = window;
+  const disableKey = `ga-disable-${measurementId}` as const;
 
-  const script = document.createElement('script');
-  script.id = 'google-analytics-script';
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
-  document.head.appendChild(script);
+  if (/^\/auth\/callback\/?$/i.test(pathname)) {
+    if (!analytics[disableKey]) {
+      analytics[disableKey] = true;
+      pausedForAuth = true;
+    }
+    previousLocation = '';
+    return;
+  }
+  if (pausedForAuth) {
+    delete analytics[disableKey];
+    pausedForAuth = false;
+  }
+  if (analytics[disableKey]) return;
 
-  window.dataLayer = window.dataLayer || [];
-  window.gtag = function () {
-    window.dataLayer.push(arguments);
+  const pageLocation = window.location.origin + window.location.pathname;
+  if (pageLocation === previousLocation) return;
+
+  const page = {
+    page_location: pageLocation,
+    page_referrer:
+      previousLocation ||
+      (document.referrer ? new URL(document.referrer).origin : ''),
+    page_title: document.title,
   };
-  window.gtag('js', new Date());
-  window.gtag('config', MEASUREMENT_ID);
-}
+  analytics.dataLayer ??= [];
+  const gtag = (analytics.gtag ??= function () {
+    // eslint-disable-next-line prefer-rest-params -- Formato da fila do gtag.
+    analytics.dataLayer?.push(arguments);
+  });
+  gtag('set', page);
 
-export function trackPageView(url: string, title?: string) {
-  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-    window.gtag('event', 'page_view', {
-      page_location: url,
-      page_title: title || document.title,
-    });
+  if (!document.getElementById('google-analytics-script')) {
+    gtag('js', new Date());
+    gtag('config', measurementId, { send_page_view: false });
+
+    const script = document.createElement('script');
+    script.id = 'google-analytics-script';
+    script.async = true;
+    script.referrerPolicy = 'origin';
+    script.src =
+      'https://www.googletagmanager.com/gtag/js?id=' +
+      encodeURIComponent(measurementId);
+    document.head.appendChild(script);
   }
+
+  gtag('event', 'page_view', { ...page, send_to: measurementId });
+  previousLocation = pageLocation;
 }

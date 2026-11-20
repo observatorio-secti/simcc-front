@@ -50,6 +50,24 @@ export interface AnalyticsQueryParams {
   host_name?: string;
 }
 
+export type AnalyticsSystem = 'simcc' | 'ictite' | 'licuri';
+
+export interface AnalyticsPagesResponse {
+  data: { page_path: string; page_views: number }[];
+  total: number;
+}
+
+export async function getAnalyticsPages(
+  system: AnalyticsSystem,
+  limit: number,
+  offset: number,
+) {
+  const { data } = await api.get<AnalyticsPagesResponse>('v2/analytics/pages', {
+    params: { system: system === 'simcc' ? undefined : system, limit, offset },
+  });
+  return data;
+}
+
 export interface DailyMetric {
   dateRaw: string;
   dateFormatted: string;
