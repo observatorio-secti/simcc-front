@@ -19,5 +19,5 @@ O backend (`simcc-back`) informou na resposta ao pedido de contrato ([backend/re
 
 ## Consequências
 
-- Telas que dependem de rotas ainda não migradas (indicadores, MarIA, produções recentes) ficam marcadas como **bloqueadas** no roadmap, com a fase do backend correspondente.
+- Telas que dependem de rotas ainda não migradas (hoje, a MarIA e os indicadores que não são de produção) ficam marcadas como **bloqueadas** no roadmap, com a fase do backend correspondente.
 - O grupo de pesquisa é a única entidade cujo modelo não vem dos tipos gerados.

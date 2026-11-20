@@ -2,6 +2,8 @@
 
 _Atualizado em 2026-11-20_
 
+> **Status (2026-11-20):** as fases 0, 1 e 2 estão prontas na branch `feat/v2-contrato` do backend, ainda não publicada; falta a virada. `technical` saiu e entrou `report`; o `{ data, meta }` nos detalhes já entrou na fase 0. As mudanças que quebram o front atual estão em `simcc-back:docs/changelog-v2.md`. O estado atualizado fica no [roadmap](../roadmap.md#estado-do-backend).
+
 > Documento do time do `simcc-back`, registrado aqui como recebido. A seção 9 chegou truncada no fim: a terceira pergunta ao front terminava em "Os caminhos com hífen (`/v2/graduate-program`) servem". As respostas do front estão em [Respostas do front](#respostas-do-front), no fim do arquivo.
 
 A maior parte dos pedidos é viável e alinhada com o rumo da V2; vários já existem e o documento do front está desatualizado nesses pontos. O que exige cuidado são as renomeações de campos e o novo formato de detalhe, que quebram o front atual e precisam de transição. Autenticação, IdP, ETL e grupos de pesquisa não são responsabilidade deste repositório.

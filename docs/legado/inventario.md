@@ -40,47 +40,47 @@ DefaultLayout
 
 ## Destino de cada tela
 
-| Rota antiga                            | Rota nova (proposta)                             | Tarefa                                       | Status    |
-| -------------------------------------- | ------------------------------------------------ | -------------------------------------------- | --------- |
-| `/`                                    | `/`                                              | T1                                           | a fazer   |
-| `/resultados`, `/resultados-perfil`    | `/busca` (tipo e termos nos search params)       | T2                                           | a fazer   |
-| `/resultados-ia`                       | `/maria`                                         | T10                                          | bloqueada |
-| `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca) | T3                                           | a fazer   |
-| `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`           | T5                                           | a fazer   |
-| `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`       | T6                                           | a fazer   |
-| `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4                                           | a fazer   |
-| `/indicadores`                         | `/indicadores`                                   | T7                                           | bloqueada |
-| `/incites`                             | —                                                | D1                                           | a decidir |
-| `/producoes-recentes`                  | —                                                | D1 (depende de "recentes" no backend fase 3) | a decidir |
-| `/paines-dados-externos`               | —                                                | D1                                           | a decidir |
-| `/indice-pesquisador`                  | —                                                | D1                                           | a decidir |
-| `/provimento-cargo`                    | —                                                | D1                                           | a decidir |
-| `/listagens`                           | —                                                | D1                                           | a decidir |
-| `/console`, `/console/*`               | `/console/*`                                     | T12                                          | a fazer   |
-| `/termos-uso`, `/politica-privacidade` | mesmas                                           | T8                                           | a fazer   |
-| `/api-docs`, `/informacoes`            | mesmas                                           | T8                                           | a fazer   |
-| `/dicionario-cores`                    | mesma (lendo `tokens.json`)                      | T8                                           | a fazer   |
-| `/videos`                              | mesma                                            | T9                                           | a fazer   |
-| `/auth/callback`                       | `/auth/callback`                                 | F1.4                                         | a fazer   |
-| `/observatorio`, `/tv`, `/sobre`       | mesmas                                           | T11                                          | a fazer   |
-| `*`                                    | `*`                                              | F1.3                                         | a fazer   |
+| Rota antiga                            | Rota nova (proposta)                             | Tarefa           | Status        |
+| -------------------------------------- | ------------------------------------------------ | ---------------- | ------------- |
+| `/`                                    | `/`                                              | T1               | a fazer       |
+| `/resultados`, `/resultados-perfil`    | `/busca` (tipo e termos nos search params)       | T2               | a fazer       |
+| `/resultados-ia`                       | `/maria`                                         | T10              | bloqueada     |
+| `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca) | T3               | a fazer       |
+| `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`           | T5               | a fazer       |
+| `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`       | T6               | a fazer       |
+| `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4               | a fazer       |
+| `/indicadores`                         | `/indicadores`                                   | T7               | a fazer       |
+| `/incites`                             | `/incites`                                       | D1.1             | a fazer       |
+| `/producoes-recentes`                  | —                                                | —                | descontinuada |
+| `/paines-dados-externos`               | `/paineis-dados-externos`                        | D1.2             | a fazer       |
+| `/indice-pesquisador`                  | `/indice-pesquisador`                            | D1.3             | a fazer       |
+| `/provimento-cargo`                    | —                                                | —                | descontinuada |
+| `/listagens`                           | `/listagens` (aba nos search params)             | D1.4             | a fazer       |
+| `/console`, `/console/*`               | a definir na proposta                            | T12 (reimaginar) | a fazer       |
+| `/termos-uso`, `/politica-privacidade` | —                                                | —                | descontinuada |
+| `/api-docs`, `/informacoes`            | —                                                | —                | descontinuada |
+| `/dicionario-cores`                    | —                                                | —                | descontinuada |
+| `/videos`                              | —                                                | —                | descontinuada |
+| `/auth/callback`                       | `/auth/callback`                                 | F1.4             | a fazer       |
+| `/observatorio`, `/tv`, `/sobre`       | —                                                | —                | descontinuada |
+| `*`                                    | `*`                                              | F1.3             | a fazer       |
 
 ## Funcionalidades descontinuadas
 
-| O quê                                                | Motivo                                                                                                 |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Exportação CSV ("Baixar resultado")                  | [ADR 0006](../decisoes/0006-sem-exportacao-csv.md)                                                     |
-| Dados da UFMG (`ufmg/researcher`, `ufmg/technician`) | Descontinuados no backend ([ADR 0007](../decisoes/0007-escopo-de-dados.md))                            |
-| Chave de API do ETL no front                         | Exposta publicamente; o ETL passa a usar o token do IdP ([ADR 0008](../decisoes/0008-autenticacao.md)) |
+| O quê                                                                                                                                                       | Motivo                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Exportação CSV ("Baixar resultado")                                                                                                                         | [ADR 0006](../decisoes/0006-sem-exportacao-csv.md)                                                     |
+| Dados da UFMG (`ufmg/researcher`, `ufmg/technician`)                                                                                                        | Descontinuados no backend ([ADR 0007](../decisoes/0007-escopo-de-dados.md))                            |
+| Páginas de documento (termos, privacidade, API, informações, dicionário de cores), vídeos, sobre, observatório, TV, provimento de cargo, produções recentes | Fora do escopo do front novo (decisão de 2026-11-20)                                                   |
+| Técnicos nas listagens                                                                                                                                      | Dados da UFMG ([ADR 0007](../decisoes/0007-escopo-de-dados.md))                                        |
+| Chave de API do ETL no front                                                                                                                                | Exposta publicamente; o ETL passa a usar o token do IdP ([ADR 0008](../decisoes/0008-autenticacao.md)) |
 
 ## Onde está a mídia do legado
 
 | Conteúdo                    | Caminho na tag                       | Usado por |
 | --------------------------- | ------------------------------------ | --------- |
-| Vídeos tutoriais (144 MB)   | `public/vid/`                        | T9        |
 | GeoJSON dos territórios     | `public/territorio_relacionado.json` | T5        |
-| Prints dos painéis Power BI | `public/powerbi/`                    | T7 / D1   |
-| Imagens do Observatório     | `assets/observatorio/`               | T11       |
+| Prints dos painéis Power BI | `public/powerbi/`                    | T7        |
 | Logos de instituições       | `src/assets/logo_*.png`              | E3        |
 
 Para recuperar um arquivo:
