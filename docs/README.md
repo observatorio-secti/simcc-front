@@ -9,6 +9,7 @@ O front está sendo reescrito do zero sobre a API v2 e o Simcc Design Kit. Esta 
 | [arquitetura.md](arquitetura.md)                   | Princípios, camadas, regras que o lint garante e convenções. Leia antes de escrever código |
 | [roadmap.md](roadmap.md)                           | Fases, tarefas, dependências e status. É aqui que se escolhe o que fazer                   |
 | [decisoes/](decisoes/)                             | Registros de decisão (ADRs): o porquê de cada escolha de arquitetura                       |
+| [propostas/](propostas/)                           | Propostas em revisão antes de virar código (ex.: [console, T12](propostas/t12-console.md)) |
 | [backend/](backend/)                               | Contrato da v2 negociado com o time do backend (pedido e resposta)                         |
 | [legado/inventario.md](legado/inventario.md)       | Telas da plataforma anterior e o destino de cada uma (checklist de paridade)               |
 | [../design-kit/DESIGN.md](../design-kit/DESIGN.md) | Regras visuais: cores, tipografia, layout e componentes                                    |
