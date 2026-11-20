@@ -90,7 +90,10 @@ O tema do design kit (`design-kit/tokens/tailwind.css`) é importado em `src/app
 
 - Vitest + Testing Library, ambiente jsdom.
 - Lógica pura (mapeamentos, schemas de busca, adaptadores) tem teste unitário.
-- Telas são testadas com a API simulada (MSW, tarefa F1.6), renderizando a rota de verdade.
+- Telas são testadas com a API simulada (MSW), renderizando a rota de verdade: `renderRoute('/caminho')` em `src/test/render.tsx` monta o `routeTree` da app num router em memória com um `QueryClient` de teste (sem nova tentativa). Componentes soltos usam `renderWithQueryClient`. Exemplo em `src/test/render.test.tsx`.
+- O MSW é ligado em `src/test/setup.ts` e recusa requisição sem handler. Os handlers padrão (`src/test/msw/simcc.ts`) respondem todo GET da v2 com o exemplo gerado do OpenAPI em `src/test/msw/examples.gen.ts`; para mudar a resposta num teste, `server.use(mockGet(caminho, corpo))` ou `mockGetError(caminho, status)`, com `fixture(caminho)` como ponto de partida. Os corpos são tipados pelo contrato.
+- Nos testes, `VITE_SIMCC_API_URL` é `http://api.test/` (definida no setup); não depende de `.env` nem do backend.
+- Quando o contrato mudar, rode `npm run api:types` e `npm run test:fixtures` juntos: o typecheck acusa exemplo fora do contrato.
 
 ## Consultar o legado
 
