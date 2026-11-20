@@ -3,6 +3,18 @@ import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import { DictionariesShowcase } from './dictionaries';
 import { KitComponentsShowcase } from './kit-components';
 import { PrimitivesShowcase } from './primitives';
+import type { VitrineSection } from './showcase';
+
+// Seções extras (entidades, motor de listagem…): um arquivo por seção em
+// ./sections/, descoberto aqui. Assim tarefas paralelas não editam este
+// arquivo. Ordem alfabética pelo rótulo.
+const EXTRA_SECTIONS = Object.values(
+  import.meta.glob<{ section: VitrineSection }>('./sections/*.tsx', {
+    eager: true,
+  }),
+)
+  .map((module) => module.section)
+  .sort((a, b) => a.label.localeCompare(b.label, 'pt-BR'));
 
 const SECTIONS = [
   ['botao', 'Botão'],
@@ -20,7 +32,12 @@ const SECTIONS = [
   ['result-toolbar', 'ResultToolbar'],
   ['estados', 'Estados'],
   ['dicionarios', 'Dicionários'],
-] as const;
+] as const satisfies readonly (readonly [string, string])[];
+
+const NAV: readonly (readonly [string, string])[] = [
+  ...SECTIONS,
+  ...EXTRA_SECTIONS.map(({ id, label }) => [id, label] as const),
+];
 
 /** Vitrine do kit (só em desenvolvimento). Ver src/routes/dev/vitrine.tsx. */
 export function VitrinePage() {
@@ -46,7 +63,7 @@ export function VitrinePage() {
           </div>
           <nav aria-label="Seções da vitrine">
             <ul className="flex flex-wrap gap-2">
-              {SECTIONS.map(([id, label]) => (
+              {NAV.map(([id, label]) => (
                 <li key={id}>
                   <a
                     href={`#${id}`}
@@ -63,6 +80,9 @@ export function VitrinePage() {
         <PrimitivesShowcase />
         <KitComponentsShowcase />
         <DictionariesShowcase />
+        {EXTRA_SECTIONS.map(({ id, Component }) => (
+          <Component key={id} />
+        ))}
       </main>
       <Toaster />
     </div>

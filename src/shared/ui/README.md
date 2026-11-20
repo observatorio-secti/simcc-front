@@ -2,7 +2,7 @@
 
 Primitivos de interface do Simcc Design Kit: componentes shadcn (Radix + Tailwind 4) adaptados às regras de `design-kit/DESIGN.md` e às receitas de `design-kit/reference/components.md`. Não conhecem nenhuma entidade de domínio. Podem importar só `shared/` e `config/`.
 
-A vitrine de todos eles fica em `/dev/vitrine` (só no `npm run dev`; ver `src/routes/dev/vitrine.tsx`).
+A vitrine de todos eles fica em `/dev/vitrine` (só no `npm run dev`; ver `src/routes/dev/vitrine.tsx`). Componente novo ganha uma seção num arquivo próprio em `src/routes/dev/-vitrine/sections/`, que a vitrine descobre sozinha (ver `VitrineSection` em `showcase.tsx`).
 
 ## O que há aqui
 
@@ -15,6 +15,7 @@ A vitrine de todos eles fica em `/dev/vitrine` (só no `npm run dev`; ver `src/r
 | `tabs.tsx`, `accordion.tsx`, `table.tsx`, `scroll-area.tsx`, `separator.tsx`, `skeleton.tsx`                                                | navegação interna, dados e carregamento                                                              |
 | `dialog.tsx`, `sheet.tsx`, `dropdown-menu.tsx`, `popover.tsx`, `tooltip.tsx`, `sonner.tsx`                                                  | sobreposições (estado local de quem abre; entidade com identidade é rota, ADR 0004)                  |
 | `pill-link.tsx`, `stat-card.tsx`, `section-header.tsx`, `result-toolbar.tsx`, `loading-block.tsx`, `empty-state.tsx`, `collapse-button.tsx` | componentes do kit                                                                                   |
+| `entity-card.tsx`                                                                                                                           | `EntityCard` (`sc-entity`): instituição, programa, grupo, sem conhecer a entidade                    |
 | `*-variants.ts`, `focus-ring.ts`                                                                                                            | variantes `cva` e o anel de foco, fora dos `.tsx` para eles exportarem só componentes (Fast Refresh) |
 
 Cor por dado (área, Qualis, tipo de produção…) não é decidida aqui: vem de `src/shared/lib/design-tokens.ts` e entra por `className`.

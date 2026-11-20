@@ -1,6 +1,18 @@
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { cn } from '@/shared/lib/cn';
 import { Card, CardContent } from '@/shared/ui/card';
+
+/**
+ * Seção extra da vitrine. Cada arquivo em `./sections/*.tsx` exporta uma
+ * `section` com este formato, e a vitrine monta todas sozinha: adicionar uma
+ * seção não exige mexer em `vitrine-page.tsx`. `Component` renderiza um
+ * `<Showcase id={id}>`.
+ */
+export interface VitrineSection {
+  id: string;
+  label: string;
+  Component: ComponentType;
+}
 
 /** Bloco da vitrine: título, descrição curta e um card com os exemplos. */
 export function Showcase({
