@@ -22,7 +22,6 @@ const schema = z.object({
   VITE_ODA_API_URL: optional(baseUrl),
   VITE_ADMIN_API_URL: optional(baseUrl),
   VITE_IDP_URL: optional(baseUrl),
-  VITE_ETL_API_URL: optional(baseUrl),
   VITE_MARIA_API_URL: optional(baseUrl),
   VITE_GA_MEASUREMENT_ID: optional(z.string()),
 });
@@ -40,7 +39,6 @@ export function parseEnv(raw: Record<string, unknown>) {
     odaApiUrl: values.VITE_ODA_API_URL,
     adminApiUrl: values.VITE_ADMIN_API_URL,
     idpUrl: values.VITE_IDP_URL,
-    etlApiUrl: values.VITE_ETL_API_URL,
     mariaApiUrl: values.VITE_MARIA_API_URL,
     gaMeasurementId: values.VITE_GA_MEASUREMENT_ID,
   };
