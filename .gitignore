@@ -28,3 +28,4 @@ coverage
 chave.json
 
 tsconfig.tsbuildinfo
+.claude/worktrees/

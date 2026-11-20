@@ -89,6 +89,8 @@ A v2 cobre hoje busca de pesquisadores, produções, sugestões e analytics. O f
 
 ## 6. Autenticação e sessão
 
+> **Superado (2026-11-20):** o IdP só autentica; permissões do Simcc ficam na API de admin e o front não chama o ETL. Ver [ADR 0008](../decisoes/0008-autenticacao.md).
+
 O fluxo PKCE com o IdP funciona e será mantido. O problema é onde os tokens ficam: hoje o access token e o refresh token estão no `localStorage`, e qualquer XSS rouba a sessão.
 
 - **Refresh token em cookie `httpOnly`, `Secure`, `SameSite=Strict`**, emitido pelo IdP. Front (`/simcc/`) e IdP (`/idp/`) já estão no mesmo domínio, então o cookie funciona sem configuração entre origens. O front guarda só o access token, em memória.
