@@ -1,9 +1,14 @@
 import { createRouter } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
 import { routeTree } from '@/routeTree.gen';
+import type { Analytics } from '@/shared/lib/analytics';
+import { getAppAnalytics, trackPageViews } from './analytics';
 
-export function createAppRouter(queryClient: QueryClient) {
-  return createRouter({
+export function createAppRouter(
+  queryClient: QueryClient,
+  analytics: Analytics = getAppAnalytics(),
+) {
+  const router = createRouter({
     routeTree,
     context: { queryClient },
     // VITE_BASE_PATH (ex.: /simcc/) chega aqui como BASE_URL.
@@ -13,6 +18,9 @@ export function createAppRouter(queryClient: QueryClient) {
     defaultPreloadStaleTime: 0,
     scrollRestoration: true,
   });
+  // A assinatura vive enquanto o router vive (o da app nunca é descartado).
+  trackPageViews(router, analytics);
+  return router;
 }
 
 declare module '@tanstack/react-router' {

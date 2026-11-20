@@ -58,13 +58,13 @@ graph LR
 | ID    | Tarefa                                            | Depende de       | Bloqueio externo                                            | Status     | Responsável |
 | ----- | ------------------------------------------------- | ---------------- | ----------------------------------------------------------- | ---------- | ----------- |
 | F0    | Setup inicial                                     | —                | —                                                           | feito      | —           |
-| F1.1  | Cliente e tipos da API v2                         | F0               | —                                                           | a fazer    |             |
-| F1.2  | Primitivos do kit e `design-tokens.ts`            | F0               | —                                                           | a fazer    |             |
+| F1.1  | Cliente e tipos da API v2                         | F0               | —                                                           | em revisão |             |
+| F1.2  | Primitivos do kit e `design-tokens.ts`            | F0               | —                                                           | em revisão |             |
 | F1.3  | Moldura e navegação                               | F1.2             | —                                                           | a fazer    |             |
 | F1.4  | Sessão e autenticação                             | F1.1             | IdP: cookie `httpOnly`, `/me` com escopos                   | a fazer    |             |
 | F1.5  | Motor de listagem                                 | F1.1, F1.2       | —                                                           | a fazer    |             |
 | F1.6  | Infraestrutura de testes (MSW)                    | F1.1             | —                                                           | a fazer    |             |
-| F1.7  | Analytics (GA4)                                   | F0               | —                                                           | a fazer    |             |
+| F1.7  | Analytics (GA4)                                   | F0               | —                                                           | em revisão |             |
 | K1    | Gerar tema e CSS do kit a partir de `tokens.json` | F0               | —                                                           | em revisão |             |
 | E1    | Entidade pesquisador                              | F1.1, F1.2       | —                                                           | a fazer    |             |
 | E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | —                                                           | a fazer    |             |
