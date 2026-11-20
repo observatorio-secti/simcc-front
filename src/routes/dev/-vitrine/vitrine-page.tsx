@@ -3,6 +3,7 @@ import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import { DictionariesShowcase } from './dictionaries';
 import { KitComponentsShowcase } from './kit-components';
 import { PrimitivesShowcase } from './primitives';
+import { ResearchGroupShowcase } from './research-group';
 
 const SECTIONS = [
   ['botao', 'Botão'],
@@ -20,6 +21,7 @@ const SECTIONS = [
   ['result-toolbar', 'ResultToolbar'],
   ['estados', 'Estados'],
   ['dicionarios', 'Dicionários'],
+  ['grupo-pesquisa', 'Grupo de pesquisa'],
 ] as const;
 
 /** Vitrine do kit (só em desenvolvimento). Ver src/routes/dev/vitrine.tsx. */
@@ -63,6 +65,7 @@ export function VitrinePage() {
         <PrimitivesShowcase />
         <KitComponentsShowcase />
         <DictionariesShowcase />
+        <ResearchGroupShowcase />
       </main>
       <Toaster />
     </div>
