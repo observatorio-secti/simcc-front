@@ -55,37 +55,37 @@ graph LR
 
 ## Quadro de tarefas
 
-| ID    | Tarefa                                            | Depende de       | Bloqueio externo                                            | Status    | Responsável |
-| ----- | ------------------------------------------------- | ---------------- | ----------------------------------------------------------- | --------- | ----------- |
-| F0    | Setup inicial                                     | —                | —                                                           | feito     | —           |
-| F1.1  | Cliente e tipos da API v2                         | F0               | —                                                           | feito     |             |
-| F1.2  | Primitivos do kit e `design-tokens.ts`            | F0               | —                                                           | feito     |             |
-| F1.3  | Moldura e navegação                               | F1.2             | —                                                           | a fazer   |             |
-| F1.4  | Sessão e autenticação                             | F1.1             | —                                                           | a fazer   |             |
-| F1.5  | Motor de listagem                                 | F1.1, F1.2       | —                                                           | a fazer   |             |
-| F1.6  | Infraestrutura de testes (MSW)                    | F1.1             | —                                                           | a fazer   |             |
-| F1.7  | Analytics (GA4)                                   | F0               | —                                                           | feito     |             |
-| K1    | Gerar tema e CSS do kit a partir de `tokens.json` | F0               | —                                                           | feito     |             |
-| E1    | Entidade pesquisador                              | F1.1, F1.2       | —                                                           | a fazer   |             |
-| E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | —                                                           | a fazer   |             |
-| E3    | Entidade instituição                              | F1.1, F1.2       | —                                                           | a fazer   |             |
-| E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | a fazer   |             |
-| E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                           | a fazer   |             |
-| E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | a fazer   |             |
-| T1    | Busca: home e barra de busca                      | F1.3             | —                                                           | a fazer   |             |
-| T2    | Busca: resultados                                 | T1, F1.5, E1, E2 | —                                                           | a fazer   |             |
-| T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | a fazer   |             |
-| T4    | Instituições (lista e detalhe)                    | F1.3, F1.5, E3   | —                                                           | a fazer   |             |
-| T5    | Pós-graduação (landing, lista e detalhe)          | F1.3, F1.5, E4   | —                                                           | a fazer   |             |
-| T6    | Grupos de pesquisa                                | F1.3, F1.5, E5   | —                                                           | a fazer   |             |
-| T7    | Indicadores                                       | F1.3             | Indicadores além de produção ainda sem rota `/v2/metrics/*` | a fazer   |             |
-| T10   | MarIA                                             | F1.3, E1, E2     | Virada do backend                                           | bloqueada |             |
-| T12   | Console (a reimaginar)                            | F1.4, F1.2       | —                                                           | a fazer   |             |
-| D1.1  | InCites                                           | F1.3             | —                                                           | a fazer   |             |
-| D1.2  | Painéis de dados externos                         | F1.3             | —                                                           | a fazer   |             |
-| D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                                                           | a fazer   |             |
-| D1.4  | Listagens                                         | F1.5, E1, E2, E6 | —                                                           | a fazer   |             |
-| V1–V5 | Virada (ver fase 4)                               | fase 3           | Virada do backend                                           | a fazer   |             |
+| ID    | Tarefa                                            | Depende de       | Bloqueio externo                                            | Status     | Responsável |
+| ----- | ------------------------------------------------- | ---------------- | ----------------------------------------------------------- | ---------- | ----------- |
+| F0    | Setup inicial                                     | —                | —                                                           | feito      | —           |
+| F1.1  | Cliente e tipos da API v2                         | F0               | —                                                           | feito      |             |
+| F1.2  | Primitivos do kit e `design-tokens.ts`            | F0               | —                                                           | feito      |             |
+| F1.3  | Moldura e navegação                               | F1.2             | —                                                           | a fazer    |             |
+| F1.4  | Sessão e autenticação                             | F1.1             | —                                                           | a fazer    |             |
+| F1.5  | Motor de listagem                                 | F1.1, F1.2       | —                                                           | em revisão |             |
+| F1.6  | Infraestrutura de testes (MSW)                    | F1.1             | —                                                           | a fazer    |             |
+| F1.7  | Analytics (GA4)                                   | F0               | —                                                           | feito      |             |
+| K1    | Gerar tema e CSS do kit a partir de `tokens.json` | F0               | —                                                           | feito      |             |
+| E1    | Entidade pesquisador                              | F1.1, F1.2       | —                                                           | a fazer    |             |
+| E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | —                                                           | a fazer    |             |
+| E3    | Entidade instituição                              | F1.1, F1.2       | —                                                           | a fazer    |             |
+| E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | a fazer    |             |
+| E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                           | a fazer    |             |
+| E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | a fazer    |             |
+| T1    | Busca: home e barra de busca                      | F1.3             | —                                                           | a fazer    |             |
+| T2    | Busca: resultados                                 | T1, F1.5, E1, E2 | —                                                           | a fazer    |             |
+| T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | a fazer    |             |
+| T4    | Instituições (lista e detalhe)                    | F1.3, F1.5, E3   | —                                                           | a fazer    |             |
+| T5    | Pós-graduação (landing, lista e detalhe)          | F1.3, F1.5, E4   | —                                                           | a fazer    |             |
+| T6    | Grupos de pesquisa                                | F1.3, F1.5, E5   | —                                                           | a fazer    |             |
+| T7    | Indicadores                                       | F1.3             | Indicadores além de produção ainda sem rota `/v2/metrics/*` | a fazer    |             |
+| T10   | MarIA                                             | F1.3, E1, E2     | Virada do backend                                           | bloqueada  |             |
+| T12   | Console (a reimaginar)                            | F1.4, F1.2       | —                                                           | a fazer    |             |
+| D1.1  | InCites                                           | F1.3             | —                                                           | a fazer    |             |
+| D1.2  | Painéis de dados externos                         | F1.3             | —                                                           | a fazer    |             |
+| D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                                                           | a fazer    |             |
+| D1.4  | Listagens                                         | F1.5, E1, E2, E6 | —                                                           | a fazer    |             |
+| V1–V5 | Virada (ver fase 4)                               | fase 3           | Virada do backend                                           | a fazer    |             |
 
 ## Fase 1: fundação
 
