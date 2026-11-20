@@ -1,15 +1,19 @@
-FROM node:22-alpine AS builder
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# As variáveis VITE_* são lidas do .env copiado com o código.
 ARG VITE_BASE_PATH=/
+ARG VITE_URL_GERAL2=https://observatoriocti.secti.ba.gov.br/oda/v1/
 ENV VITE_BASE_PATH=$VITE_BASE_PATH
+ENV VITE_URL_GERAL2=$VITE_URL_GERAL2
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 COPY package*.json ./
-RUN npm ci
+
+RUN npm install --legacy-peer-deps --force
 
 COPY . .
+
 RUN npm run build
 
 # Stage de exportação: copia apenas a pasta dist para a saída

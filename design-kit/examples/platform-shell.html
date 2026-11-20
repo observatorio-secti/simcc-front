@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exemplo de plataforma — Simcc</title>
+<link rel="stylesheet" href="../tokens/simcc.css">
+<style>
+ .hero-inner{padding:64px var(--sm-gutter) 96px;max-width:860px}
+ .hero-inner .sm-eyebrow{margin-bottom:1.2em}
+ .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+ .grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+ .person{display:flex;flex-direction:column;gap:10px}
+ .person h3{margin:0}
+ .meta{font-size:.875rem;color:var(--sm-navy-600)}
+ .tags{display:flex;gap:6px;flex-wrap:wrap}
+ .bars{display:grid;gap:10px;margin-top:16px}
+ .bar{display:grid;grid-template-columns:150px 1fr 40px;gap:12px;align-items:center;font-size:.9375rem}
+ .bar i{display:block;height:14px;border-radius:2px}
+ footer{background:var(--sm-navy);color:#fff;padding:40px var(--sm-gutter)} footer img{height:84px}
+</style></head>
+<body>
+<header class="sm-header">
+  <img src="../assets/logo/logo-compact.svg" alt="Simcc">
+  <nav class="sm-nav"><a href="#" aria-current="page">Buscar</a><a href="#">Competências</a><a href="#">Instituições</a><a href="#">Sobre</a></nav>
+</header>
+
+<section class="sm-hero">
+  <div class="hero-inner">
+    <p class="sm-eyebrow">Sistema de mapeamento de <b>competências científicas</b></p>
+    <h1>Encontre quem sabe, em toda a Bahia.</h1>
+    <form class="sm-search" role="search" onsubmit="return false"><input type="search" placeholder="Busque por competência, área ou pessoa" aria-label="Buscar"><button type="submit">Buscar</button></form>
+    <div class="chips"><span class="sm-tag">Bioinformática</span><span class="sm-tag">Energias renováveis</span><span class="sm-tag">Aprendizado de máquina</span></div>
+  </div>
+</section>
+
+<section class="sm-section"><div class="sm-container">
+  <h2>Resultados</h2>
+  <div class="grid">
+    <article class="sm-card sm-card--accent person"><h3>Pessoa Exemplo A</h3><span class="meta">Instituição X · Ciência da Computação</span><div class="tags"><span class="sm-tag sm-tag--strong">Dados</span><span class="sm-tag">IA</span><span class="sm-tag">Saúde</span></div></article>
+    <article class="sm-card sm-card--accent person"><h3>Pessoa Exemplo B</h3><span class="meta">Instituição Y · Engenharia Elétrica</span><div class="tags"><span class="sm-tag sm-tag--strong">Energia</span><span class="sm-tag">Redes</span></div></article>
+    <article class="sm-card sm-card--accent person"><h3>Pessoa Exemplo C</h3><span class="meta">Instituição Z · Biologia</span><div class="tags"><span class="sm-tag sm-tag--strong">Genômica</span><span class="sm-tag">Ecologia</span></div></article>
+  </div>
+  <div class="sm-card" style="margin-top:24px">
+    <h3>Competências mais frequentes <span class="sm-tag">dados de exemplo</span></h3>
+    <div class="bars" role="img" aria-label="Gráfico de barras de exemplo">
+      <div class="bar"><span>Dados</span><i style="width:90%;background:var(--sm-chart-1)"></i><b>412</b></div>
+      <div class="bar"><span>Energia</span><i style="width:64%;background:var(--sm-chart-2)"></i><b>293</b></div>
+      <div class="bar"><span>Genômica</span><i style="width:41%;background:var(--sm-chart-3)"></i><b>187</b></div>
+    </div>
+  </div>
+</div></section>
+<footer><img src="../assets/logo/logo-on-navy.svg" alt="Simcc – Sistema de Mapeamento de Competências Científicas"></footer>
+</body></html>

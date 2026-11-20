@@ -1,272 +1,150 @@
-# Simcc Design Kit: área pública
+# DESIGN.md — Simcc · Sistema de Mapeamento de Competências Científicas
 
-Guia de referência para a reestruturação das telas públicas do Simcc (Observatório de CT&I da Bahia).
-O objetivo é **manter a estética que já existe** (moldura neutra, azul `eng-blue`, tipografia Lexend, cards brancos sem sombra, cores semânticas fortes) e torná-la **uniforme entre telas**.
-
-> Escopo: rotas do `SearchLayout` e do `DocsLayout` (home, resultados, pesquisador, instituições, pós-graduação, grupos, indicadores, institutos, listagens, docs…).
-> Fora do escopo: o Console administrativo (`/console/*`). No legado ele usava tokens próprios `sm-*` (navy/sky/red); o console novo é uma tarefa do roadmap (`docs/roadmap.md`), que decide se adota este kit. O kit público usa `--sc-*` / classes `sc-*` / cores `brand`, `search`, `area`, `prod`, `qualis`…
-
-## Conteúdo do kit
-
-```
-design-kit/
-├── DESIGN.md                ← este guia (regras)
-├── AGENT_PROMPT.md          ← prompt pronto para agentes que forem refatorar telas
-├── index.html               ← vitrine: links para as páginas de exemplo
-├── tokens/
-│   ├── simcc.css            ← tokens CSS (--sc-*) + classes de componente (sc-*)
-│   ├── tokens.json          ← os mesmos tokens em formato W3C Design Tokens
-│   └── tailwind.css         ← tema Tailwind 4 (@theme) com os dicionários semânticos
-├── assets/
-│   ├── logo/                ← simcc.svg, simcc-white.svg, simbolo.svg, observatorio.svg, governo-bahia-secti.png
-│   ├── backgrounds/         ← ilustrações de fundo (home, graduate, indicadores, researcher)
-│   ├── icons/lucide-sprite.svg ← sprite com os ícones lucide usados na plataforma
-│   └── fonts/README.md
-├── reference/
-│   ├── components.md        ← anatomia + receita Tailwind de cada componente
-│   ├── icons.md             ← mapa de ícones (conceito → lucide) e migração phosphor → lucide
-│   ├── packages.md          ← pacotes essenciais × substituíveis
-│   ├── screens.md           ← inventário de telas públicas → template de página
-│   └── build-assets.mjs     ← regenera logos e o sprite de ícones
-└── examples/                ← 3 páginas estáticas construídas só com o kit
-    ├── home.html  ├── resultados.html  ├── pesquisador.html  └── kit.js
-```
-
-Para ver as páginas:
-
-```bash
-python3 -m http.server 8765 -d design-kit
-```
-
-Depois abra `http://localhost:8765/`.
-
-### Uso no app (Tailwind 4)
-
-O app importa o tema em `src/app/styles.css`:
-
-```css
-@import 'tailwindcss';
-@import '../../design-kit/tokens/tailwind.css';
-```
-
-O mesmo arquivo faz a ponte entre as variáveis do shadcn (`--primary`, `--border`, `--background`…) e os papéis da §2.1. Para importar arquivos do kit em TypeScript, use o alias `@kit/` (ex.: `@kit/assets/logo/simcc.svg`, `@kit/tokens/tokens.json`).
-
-Algumas receitas deste guia e de `reference/components.md` foram escritas com nomes do Tailwind 3. Ao aplicar, traduza:
-
-| Tailwind 3 | Tailwind 4 |
-|---|---|
-| `shadow-sm` / `shadow` | `shadow-xs` / `shadow-sm` |
-| `rounded-sm` / `rounded` | `rounded-xs` / `rounded-sm` |
-| `ring` (3px) | `ring-3` (`ring` agora tem 1px) |
-| `outline-none` | `outline-hidden` |
-| `bg-opacity-50`, `text-opacity-*` | `bg-black/50`, `text-white/80` |
-| borda padrão `gray-200` | borda padrão `currentColor`: o app define `border-border` na camada base |
-
-`rounded-md`, `rounded-lg`, `rounded-xl` e as cores do kit não mudam.
+Guia de design para agentes/LLMs que geram interfaces, slides ou materiais do **Simcc**.
+Fonte: **página 2** do PDF `observatorio_logos.pdf` (capa do Simcc). Este kit é irmão do kit do **Observatório** (página 1): mesma família visual, outro nome, outro fundo.
+**[extraído]** = medido no PDF · **[proposto]** = extrapolação coerente, não é regra oficial. Em conflito, vale a capa (`reference/page-2.png`).
 
 ---
 
-## 1. Princípios
+## 1. Essência visual (leia primeiro)
 
-1. **Moldura neutra, conteúdo em branco.** Topbar e sidebar ficam sobre `neutral-100`; o conteúdo vive num painel `neutral-50` arredondado (12px) com borda; os blocos são cards brancos com borda `neutral-200`. **Sem sombras** em cards: a profundidade vem do contraste entre os três níveis de cinza.
-2. **Um azul para agir.** `eng-blue #559FB8` é a única cor de ação genérica: botão primário, item de menu ativo, tab de visão ativa, destaque de hero. Hover sempre `eng-dark-blue #024A60`.
-3. **A cor carrega significado.** Fora o azul de ação, toda cor saturada vem de um dicionário: tipo de busca, grande área, tipo de produção, Qualis, orientação, status, bolsa. Não invente cor; consulte `tokens.json`.
-4. **Lexend em tudo.** Pesos 300 (lead), 400 (corpo), 500 (rótulos/títulos de card), 600 (títulos de página e seção), 700 (KPIs, hero, badges).
-5. **Densidade de painel de dados.** Corpo de UI em 14px, metadados em 12px, controles de 32–40px de altura.
-6. **Mesma tela, mesma ordem.** Toda página de listagem segue: cabeçalho, busca, toolbar, KPIs, seções colapsáveis (ver §6).
+1. **Fundo off-white `#FAFAFA`**, não branco puro, com uma **paisagem de ondas suaves** atrás do logo: três linhas finas e um preenchimento translúcido que forma uma "colina" de topo plano no centro.
+2. **Cor saturada só no logo.** O fundo é quase monocromático (cinza-azulado claro). Navy, vermelho e azul-céu aparecem concentrados no símbolo e no nome.
+3. **Logo centralizado**, ~30% da largura da página, com texto descritivo **alinhado à direita**.
+4. **Lexend** com contraste Light (300) × ExtraBold (800), em caixa-alta no descritivo.
+5. Tom: calmo, técnico, de "mapa" e "relevo". Menos festivo que o Observatório (que usa faixas saturadas).
 
-## 2. Cor
+### Observatório × Simcc (o que muda e o que não muda)
 
-### 2.1 Papéis (tema claro / escuro)
-
-| Papel | Token CSS | Tailwind (claro) | Claro | Escuro |
-|---|---|---|---|---|
-| Moldura (topbar, sidebar) | `--sc-frame` | `bg-neutral-100` | `#F5F5F5` | `#000000` |
-| Painel de conteúdo | `--sc-panel` | `bg-neutral-50` | `#FAFAFA` | `#171717` |
-| Superfície (card, input) | `--sc-surface` | `bg-white` | `#FFFFFF` | `#0A0A0A` |
-| Superfície suave (tabs, chips, pill) | `--sc-surface-muted` | `bg-neutral-100` | `#F5F5F5` | `#262626` |
-| Hover de item | `--sc-surface-hover` | `hover:bg-neutral-200` | `#E5E5E5` | `#262626` |
-| Borda | `--sc-border` | `border-neutral-200` | `#E5E5E5` | `#262626` |
-| Texto | `--sc-text` | `text-neutral-900` | `#171717` | `#FAFAFA` |
-| Texto secundário | `--sc-text-muted` | `text-neutral-500` | `#737373` | `#A3A3A3` |
-| Título do hero central | `--sc-text-strong` | `text-slate-800` | `#1E293B` | `#FAFAFA` |
-| Bloco de carregamento | `--sc-loading` | `bg-slate-300` | `#CBD5E1` | `#404040` |
-
-O tema escuro é aplicado pela classe `.dark` no `<html>` (no app, por `src/shared/lib/theme.ts`; preferência claro/escuro/sistema salva no navegador).
-
-### 2.2 Marca
-
-| Token | Hex | Uso |
+| | Observatório (pág. 1) | Simcc (pág. 2) |
 |---|---|---|
-| `brand` / `eng-blue` | `#559FB8` | ação primária, nav ativa, `sc-mark` no hero, avatar fallback |
-| `brand-strong` / `eng-dark-blue` | `#024A60` | hover/pressed |
-| `brand-soft` | `#E3F0F4` | fundo de `sc-tag` (contadores) |
-| `brand-teal` | `#00757A` | sublinhado do hero da home (`sc-underline`) |
-| `brand-wine` | `#9C1F2E` | ênfase final do hero da home (`sc-emphasis`) |
-| `deco` / `deco-soft` | `#C8D7E1` / `#E1EAF0` | formas dos fundos ilustrados |
-| logo | `#174EA6`, `#1A73E8`, `#ED1C24` | apenas dentro dos SVGs de logo |
+| Fundo | Branco `#FFFFFF` | Off-white `#FAFAFA` |
+| Decoração | Faixas saturadas (vermelho/azul) sangrando nas bordas | Ondas finas de baixo contraste, sangrando nas laterais |
+| Quem tem cor | O fundo e o logo | Só o logo |
+| Lockup | Nome grande + descritivo | Símbolo + "Simcc" + descritivo à direita |
+| **Iguais** | Paleta navy/vermelho/azul-céu, Lexend 300/800, logo centralizado, muito espaço vazio | |
 
-### 2.3 Dicionários semânticos (não alterar valores)
+Se a tela é do Simcc, **não use as faixas do Observatório** e vice-versa.
 
-Todos estão em `tokens.json`, como variável `--sc-*` e como cor Tailwind no tema (`tokens/tailwind.css`).
+## 2. Cores
 
-**Tipo de busca** (`search-*`, `--sc-type-*`): swatch do seletor, chip de termo, botão de buscar, ranking, badge de evidências.
+| Token | Hex | Papel | Origem |
+|---|---|---|---|
+| `navy` | `#2B2D74` | Texto, "Simcc", botão primário | [extraído] |
+| `red` | `#D43441` | Acento, barra superior do símbolo | [extraído] |
+| `sky` | `#5B9BDD` | Triângulo do símbolo, último "c", dados secundários | [extraído] |
+| `canvas` | `#FAFAFA` | Fundo padrão | [extraído] |
+| `wash` | `#EFF1F4` | Preenchimento da colina (topo), superfícies suaves | [extraído] |
+| `wave-blue` | `#D1DEE6` | Linha principal da onda, bordas leves | [extraído] |
+| `wave-gray` | `#DEE0E3` | Segunda linha, `--sm-line` (bordas) | [extraído] |
+| `wave-faint` | `#EDEEEF` | Terceira linha, quase invisível | [extraído] |
+| `white` | `#FFFFFF` | Cards sobre o canvas | [proposto] |
+| `navy-900` | `#1B1D4D` | Hover do primário | [proposto] |
+| `navy-600` | `#4A4C8F` | Texto secundário | [proposto] |
+| `sky-600` | `#3F7FC4` | Foco, ícones | [proposto] |
+| `sky-100` | `#E1EDF9` | Tags, fundo informativo | [proposto] |
+| `red-700` | `#B52633` | Vermelho em texto pequeno | [proposto] |
 
-| profile | article | book | patent | software | speaker | area | name | abstract | maria |
-|---|---|---|---|---|---|---|---|---|---|
-| `#1D4ED8` | `#3B82F6` | `#EC4899` | `#06B6D4` | `#0D9488` | `#F97316` | `#22C55E` | `#EF4444` | `#EAB308` | `#559FB8` |
+**Contraste sobre `#FAFAFA`:** navy 11,6:1 ✅ · navy-600 7,4:1 ✅ · red-700 6,1:1 ✅ · red 4,6:1 ✅ (AA) · sky-600 4,0:1 (só texto grande) · **sky 2,8:1 ❌** (nunca para texto).
 
-**Grande área** (`area-*`): Agrárias `#F87171` · Exatas e da Terra `#4ADE80` · Saúde `#20BDBE` · Humanas `#F5831F` · Biológicas `#EB008B` · Engenharias `#FCB712` · Sociais Aplicadas `#009245` · Linguística, Letras e Artes `#A67C52` · Outros `#1B1464`.
-
-**Produção** (`prod-*`): Artigo `#5F82ED` · Livro+capítulo `#D15697` · Livro `#792F4C` · Capítulo `#DBAFD0` · Patente `#66B4D0` · Software `#096670` · Marca `#1B1464` · Relatório técnico `#662D91` · Congresso/Evento `#FF5800` · Simpósio `#D53A2C` · Seminário `#FFBD7B` · Oficina `#FCEE21`.
-
-**Qualis** (`qualis-*`): A1 `#34663C` · A2 `#9DC356` · A3 `#B1C38A` · A4 `#BEC4B3` · B1 `#D56438` · B2 `#DD883D` · B3 `#E3B081` · B4 `#E3AC96` · C `#CE3830` · SQ `#4A1314`.
-
-**Orientação** (`orient-*`): IC `#8BFBD3` · Mestrado `#67A896` · Doutorado `#425450` · TCC `#77D2B6` · Outra natureza `#577E74` · Monografia `#2F7F7C` · Pós-doc `#46724B`.
-
-**Status**: Concluída `#6BC26B` · Em andamento `#DBB540`. **Bolsas**: PQ `#00D000` · DT `#183EFF`. **Gênero**: F `#D15697` · M `#5F82ED`. **Escala neutra para gráficos**: `#213E59 → #98A8BA` (6 passos).
-
-A página `/dicionario-cores` é a documentação pública desses dicionários. Ela deve ler de `tokens.json`, e não manter uma cópia própria.
-
-### 2.4 Regras de cor
-
-- Texto sobre cor de dicionário é **branco e bold** (badge sólido). Para cores claras (`area-exatas`, `qualis-A3/A4`, `prod-capitulo`, `orient-ic`, `prod-oficina`) prefira usá-las como **marcador** (`sc-dot`, borda esquerda, barra) e não como fundo de texto.
-- Não use hex literal em componente (`bg-[#20BDBE]`). Use a classe do tema (`bg-area-saude`) ou uma função de mapeamento única (ver `reference/components.md` §Mapeamentos).
-- Gráficos: série única usa a cor do dicionário correspondente; série sem semântica usa `chart-neutral-1…6`; nunca a paleta padrão do Recharts/Highcharts.
+Regras:
+- Texto corrido: navy sobre canvas ou branco. Secundário: navy-600.
+- As cores das ondas **não são para texto nem ícones**: só decoração e bordas.
+- **Gradiente e transparência**: permitidos **somente** no fundo de ondas (preenchimento da colina). Nunca em botões, cards, logo ou gráficos.
+- Fundo escuro: navy com `logo-on-navy`. [proposto]
 
 ## 3. Tipografia
 
-Família única: **Lexend** (Google Fonts, `wght 100..900`). Remover o carregamento de **Ubuntu** do `index.html`, que não é usado pelo Tailwind (`fontFamily.sans = Lexend`).
+Igual ao Observatório: **Lexend** (`assets/fonts`, licença OFL). Light e ExtraBold [extraídos]; 400–700 [propostos].
 
-| Papel | Tamanho | Peso | Extra | Tailwind |
-|---|---|---|---|---|
-| Hero de página | 30 → 48px | 700 | `leading-[1.1] tracking-tighter` | `text-3xl md:text-5xl font-bold` |
-| Hero central (home) | 30 → 42px | 500 | `leading-[1.5] tracking-tight` | `text-3xl md:text-[2.6rem] font-medium text-slate-800` |
-| Lead do hero | 18px | 300 | — | `text-lg font-light` |
-| Nome no perfil | 30px | 600 | `tracking-tight` | `text-3xl font-semibold` |
-| Título de página | 20px | 600 | `tracking-tight` | `text-xl font-semibold` |
-| Título de coluna lateral | 24px | 600 | — | `text-2xl font-semibold` |
-| Título de seção | 16px | 500 | ícone 20px à esquerda | `text-base font-medium` |
-| Título de card / rótulo | 14px | 500 | — | `text-sm font-medium` |
-| KPI | 24px | 700 | — | `text-2xl font-bold` |
-| Corpo de UI | 14px | 400 | — | `text-sm` |
-| Metadado / legenda | 12px | 400 | `text-neutral-500` | `text-xs text-muted-foreground` |
-| Badge | 12px | 700 | `uppercase` p/ áreas | `text-xs font-bold` |
-| Micro (kbd, eyebrow) | 10px | 500 | `uppercase tracking-wider` p/ eyebrow | `text-[10px]` |
+**Assinatura do descritivo [extraído]**, caixa-alta, **alinhado à direita**, em duas linhas:
 
-Título de produção (artigo etc.) fica **em caixa alta** (`uppercase`), como nos dados do Lattes; o veículo (periódico) fica acima, em `font-semibold`.
+> SISTEMA DE MAPEAMENTO
+> DE **COMPETÊNCIAS CIENTÍFICAS**
 
-## 4. Espaço, raio, elevação, movimento
+Light nas palavras de ligação, ExtraBold nas palavras-chave. Replique o padrão em eyebrows e rodapés (`.sm-eyebrow` + `<b>`). A linha 2 é mais longa que a 1 e define a largura do descritivo; a borda direita das duas coincide com a borda direita do "Simcc".
 
-- **Espaço**: base 4px. Gaps usuais: 8 (dentro de controles), 12–16 (entre cards), 24 (entre seções), 32 (gutter lateral da página; 16 no mobile).
-- **Raio**: `rounded-md` 6px em **todos os controles** (botão, input, chip, badge, tab de visão, item de menu). `rounded-lg` 8px em cards. `rounded-xl` 12px só no painel de conteúdo. `rounded-full` só em `sc-tag` contador, dots e avatar pequeno.
-- **Elevação**: plana. Sombra apenas em tab segmentada ativa (`shadow-xs`), avatar de perfil (`shadow-md`) e sobreposições (popover, dropdown, dialog: `shadow-lg`).
-- **Movimento**: `transition-colors` 150ms `ease`. Acordeões usam as animações `accordion-down/up` já existentes. Hover de foto de pesquisador: `scale(1.04)` 300ms. Respeitar `prefers-reduced-motion`.
+Escala [proposta]: H1 clamp(2.25–3.75rem)/800/1.1 · H2 clamp(1.75–2.5rem)/800 · H3 1.25rem/800 · Corpo 1rem/300 (use 400 em texto longo) · Eyebrow 0.9375rem caixa-alta · Botão 1rem/800.
 
-## 5. Ícones
+## 4. Logo
 
-- **Biblioteca única: `lucide-react`** (já é a mais usada, 155 arquivos). Tamanho padrão **16px** (`h-4 w-4`), 12px em metadados, 20px em cabeçalho de seção, `stroke-width` 2 padrão.
-- Ícone de cabeçalho de card/KPI: canto superior direito, `text-muted-foreground`.
-- Ícone sempre **antes** do texto no botão (exceto `ArrowRight`/`ChevronDown`, que vão depois).
-- Botão só com ícone exige `aria-label`.
-- O mapa conceito → ícone está em [`reference/icons.md`](reference/icons.md). **Um conceito, um ícone**: “Instituição” é sempre `Building2`, “Pós-graduação” sempre `GraduationCap`, “Baixar” sempre `Download`, e assim por diante.
-- `phosphor-react` (114 arquivos), `@phosphor-icons/react` (1) e `@tabler/icons-react` (1) devem migrar para lucide; a tabela de equivalência também está em `icons.md`.
+Em `assets/logo/` (SVG e PNG; versões sobre claro e sobre navy):
 
-## 6. Layout
-
-### 6.1 Moldura (`SearchLayout` / `DocsLayout`)
-
-```
-┌──────────────┬───────────────────────────────────────────────────────┐
-│ Sidebar 16rem│ Topbar 40px: logo │ Gov BA │ [Observatório]   [☀][Entrar] │
-│ bg-neutral-100├───────────────────────────────────────────────────────┤
-│              │ ╭ Painel bg-neutral-50, border, rounded-xl ──────────╮ │
-│ Acesso rápido│ │ Crumbbar 68px sticky, blur: [▣] │ Início > Página   │ │
-│ Plataforma   │ │                                                     │ │
-│  ▸ grupos    │ │   conteúdo (padding 32px)                           │ │
-│              │ ╰─────────────────────────────────────────────────────╯ │
-└──────────────┴───────────────────────────────────────────────────────┘
-```
-
-- Sidebar colapsável para ícones (3rem) e oculta no mobile (sheet).
-- Item ativo: `bg-eng-blue text-white hover:bg-eng-dark-blue`. Inativo: `hover:bg-neutral-200`.
-- Crumbbar: `sticky top-0 z-[3] backdrop-blur bg-neutral-50/60`, com o `SidebarTrigger`, um separador vertical e o breadcrumb. Os segmentos exibidos devem usar o **nome legível** da página (“Pós-graduação”, não “Pos-Graduacao”).
-
-### 6.2 Templates de página
-
-| Template | Ordem dos blocos | Telas |
-|---|---|---|
-| **A. Hero de busca** | pill “Saiba como…”, hero central, barra de busca, palavras sugeridas, (opcional) panorama | Home |
-| **B. Landing de seção** | hero à esquerda com `sc-mark` + fundo ilustrado à direita, lead, atalhos em card | Indicadores, Pós-graduação (mapa à direita), Institutos |
-| **C. Listagem** | page header (voltar + título), campo de busca, toolbar (Baixar resultado · Filtros · colapsar), card de total, seções colapsáveis com grade/lista | Instituições, Grupos, Pós-graduação (lista), Listagens |
-| **D. Resultados** | coluna de filtros 260px + coluna principal: busca fixa, tabs de visão, toolbar, card total (com fundo ilustrado), 3 KPIs, ranking, grade de pesquisadores | /resultados, /resultados-perfil |
-| **E. Perfil** | card de cabeçalho com avatar sobreposto, badges, resumo; tabs de produção + filtros + gráfico + cards de produção; coluna lateral 320px com informações gerais | Pesquisador, Instituição/Programa (detalhe) |
-| **F. Documento** | título, card de introdução, conteúdo em cards | Termos, Privacidade, API, Dicionário de cores, Vídeos |
-
-Larguras: o conteúdo ocupa toda a largura do painel; hero e home limitam o texto a `max-w-[800px]` e a busca a `~860px`; perfis usam grade `1fr 320px`.
-
-### 6.3 Responsivo
-
-Breakpoints do projeto: `sm 640 · md 768 · lg 1024 · xl 1280 · 2xl 1920`.
-- `< lg`: sidebar só com ícones; colunas laterais (filtros, coluna do perfil) passam para cima ou para baixo do conteúdo; o fundo ilustrado do hero fica atrás do texto com opacidade reduzida.
-- `< md`: sidebar vira sheet, painel sem raio, gutter 16px, Gov BA some da topbar, a busca quebra em duas linhas (tipo + botão / input).
-- Sem rolagem horizontal da página; tabs longas rolam dentro do próprio container.
-
-## 7. Componentes
-
-Resumo do catálogo (a anatomia e as receitas Tailwind estão em [`reference/components.md`](reference/components.md); a classe CSS equivalente está em `tokens/simcc.css`):
-
-| Componente | Classe kit | Base React |
-|---|---|---|
-| Botão (primary, outline, secondary, ghost, danger; sm/default/lg/icon) | `sc-btn` | `ui/button.tsx` |
-| Botão de tipo de busca | `sc-btn--type` | `Button` + `getSearchTypeButtonColor` |
-| Barra de busca | `sc-searchbar` | `search/search.tsx` |
-| Campo de busca de lista | `sc-search-field` | `Input` + `Search` icon |
-| Chip de termo | `sc-chip` | badge do termo selecionado |
-| Palavra sugerida | `sc-word` | home |
-| Link-pílula “Saiba como…” | `sc-pill-link` | home, indicadores, pós |
-| Destaques de hero | `sc-mark`, `sc-underline`, `sc-emphasis` | — |
-| Card / KPI | `sc-card`, `sc-stat__*` | `ui/card.tsx` |
-| Seção colapsável | `sc-section` | `Accordion`/estado local |
-| Toolbar de resultado | `sc-toolbar` | — |
-| Badge sólido / tag suave / dot | `sc-badge`, `sc-tag`, `sc-dot` | `ui/badge.tsx` |
-| Ranking de ocorrências | `sc-rank` | — |
-| Tabs segmentadas | `sc-tabs` | `ui/tabs.tsx` |
-| Tabs de visão | `sc-viewtabs` | — |
-| Alternância grade/lista | `sc-toggle` | `ToggleGroup` |
-| Filtros (acordeão + checkbox) | `sc-filters`, `sc-accordion__*`, `sc-option` | `Accordion` + `Checkbox` |
-| Card de pesquisador (foto) | `sc-person` | `researchers-home` |
-| Card de produção | `sc-prod` | `articles-home` |
-| Card de entidade | `sc-entity` | instituições, programas, grupos |
-| Avatar | `sc-avatar` | `ui/avatar.tsx` |
-| Tabela | `sc-table` | `ui/table.tsx` + `data-table.tsx` |
-| Barras / colunas simples | `sc-bars`, `sc-columns` | Recharts |
-| Carregamento | `sc-loading`, `sc-skeleton`, `sc-spinner` | `ui/skeleton.tsx` |
-| Vazio / alerta | `sc-empty`, `sc-alert` | `ui/alert.tsx` |
-
-## 8. Conteúdo e microcopy
-
-- Português do Brasil, frases curtas, sentence case (“Baixar resultado”, “Pesquisadores com mais ocorrências”). Caixa alta só em badges de grande área e eyebrows.
-- Legenda de KPI sempre explica o recorte: “com pesquisadores no resultado”, “encontrados na busca”.
-- Carregamento: título “Processando sua solicitação...” e legenda “Buscando resultados, aguarde um instante”.
-- Números com separador de milhar (`toLocaleString('pt-BR')`).
-
-## 9. Acessibilidade
-
-- Contraste: texto `neutral-500` sobre `neutral-50` só para metadados ≥12px; corpo usa `neutral-900`.
-- Foco visível: anel 2px `eng-blue` (`focus-visible:ring-2 ring-eng-blue`).
-- Toda cor de dicionário vem acompanhada de texto (rótulo, legenda ou tooltip); nunca só cor.
-- Ícone sozinho tem `aria-label`; ícone decorativo tem `aria-hidden`.
-- Tabs com `role="tab"`/`aria-selected`; toggles com `aria-pressed`; breadcrumb com `aria-current="page"`.
-
-## 10. Do / Don’t
-
-| Faça | Evite |
+| Arquivo | Uso |
 |---|---|
-| `bg-eng-blue hover:bg-eng-dark-blue` para ação | `bg-blue-500`, `#006699`, `#07677E` como cor de ação |
-| `rounded-md` em controles, `rounded-lg` em cards | misturar `rounded`, `rounded-sm`, `rounded-xl` em controles |
-| Card com `border` e sem sombra | `shadow-sm`/`shadow-md` em cards de conteúdo |
-| `bg-area-saude` / `areaColor(area)` | cadeias de ternário com hex inline |
-| Ícone lucide do mapa | ícone phosphor/tabler, ou ícone diferente para o mesmo conceito |
-| `text-neutral-*` | misturar `gray-*`, `slate-*`, `zinc-*` para o mesmo papel |
-| Spinner `border-eng-blue` | spinner `#006699` (fallback atual dos layouts) |
+| `logo-primary` | Capas, login, slides, rodapés grandes. Com descritivo. |
+| `logo-compact` | Cabeçalho do app e tamanhos pequenos (símbolo + "Simcc", sem descritivo). |
+| `symbol` | Favicon, avatar, ícone de app. Só as barras e o triângulo. |
+| `*-on-navy` | Versões para fundo navy (texto/barra azul-marinho viram branco). |
+
+Anatomia [extraído]:
+- **Símbolo**: duas barras horizontais de cantos arredondados, uma **vermelha** (em cima) e uma **navy** (embaixo, deslocada para a esquerda), cortadas na diagonal à direita, e um **triângulo azul-céu** (pico) que invade o "S". O triângulo é "mordido" pelo contorno do S, com um respiro de ~8px.
+- **Nome**: "Simcc" em geométrica pesada e arredondada. **"Simc" em navy e o último "c" em azul-céu.** Nunca recolorir.
+- Na capa, o conjunto fica **centralizado exatamente** na página (centro ≈ 960×537 em 1920×1080), ocupando ≈ **30% da largura**.
+- Área de respeito [proposto]: pelo menos a altura do "S" em todos os lados.
+- Mínimos [propostos]: lockup 200px de largura · compacto 110px · símbolo 24px.
+- Nunca: girar, esticar, recolorir, adicionar sombra/contorno, separar o último "c", trocar a fonte, colocar sobre fotos ou sobre linhas de onda de alto contraste. O logo pode ficar sobre o fundo de ondas (como na capa), pois elas têm contraste muito baixo.
+
+## 5. O fundo de ondas
+
+Arquivos em `assets/waves/`:
+- `waves-cover.svg`: página inteira 1920×1080, com o fundo `#FAFAFA` incluso. Vetorização fiel da capa.
+- `waves.svg`: as mesmas ondas, **transparentes**, proporção 1822×710, para usar como `background` de hero ou seção sobre `#FAFAFA`.
+- `waves-cover.png`: render do fundo original (referência de fidelidade).
+
+Anatomia [extraído]:
+- **Três linhas** de ~7px (a 1822px de largura) que atravessam a página de ponta a ponta: azul-acinzentada `#D1DEE6` (a principal), cinza `#DEE0E3` e uma quase invisível `#EDEEEF`.
+- A linha azul desenha uma **colina com topo plano** no centro-direita; as outras cruzam por dentro dela com curvas diferentes. Nada tem cantos: tudo é curva suave.
+- **Preenchimento**: abaixo da linha azul há um véu `#EFF1F4` que **se dissolve em `#FAFAFA` para baixo**. É o único gradiente da marca.
+- Ocupa uma **faixa horizontal no meio da página** (~30% a ~80% da altura). Topo e base ficam lisos.
+- **Sangra pelas laterais**, nunca termina dentro da página.
+
+Uso:
+- Capa, hero, login, estados vazios, divisores de seção grandes.
+- Telas densas (tabelas, formulários, dashboards): **fundo liso** `#FAFAFA` ou branco, sem ondas.
+- Não recolorir, não aumentar contraste/espessura, não animar com movimento rápido. Se animar, deslocamento horizontal muito lento (≥ 60s) [proposto].
+- Não misturar com as faixas saturadas do Observatório na mesma tela.
+
+## 6. Composição
+
+- Canvas off-white + **um bloco centralizado** (logo, ou título + busca) + ondas ao fundo.
+- A capa é **simétrica** (centrada). Diferente do Observatório, aqui centralizar é correto.
+- Muito espaço em branco; uma ideia por tela; um CTA primário por seção.
+- Container máx. 1200px; gutters `clamp(20px,4vw,64px)`; seções com `padding-block: clamp(48px,8vw,112px)`.
+
+## 7. Componentes [propostos, derivados da capa]
+
+Em `tokens/simcc.css` (prefixo `sm-`). Veja `examples/platform-shell.html`.
+
+- **Busca** (ação central de um sistema de mapeamento): campo branco, borda navy 2px, botão navy ExtraBold à direita (`.sm-search`).
+- **Botão**: primário navy; secundário contorno navy. Raio 4px.
+- **Card**: branco sobre canvas, borda `wave-gray` 1px, raio 8px, **sem sombra**. Variante com **filete vermelho de 4px no topo** (`.sm-card--accent`), eco da barra vermelha do símbolo.
+- **Tag/competência**: pílula `sky-100` com texto navy em caixa-alta; versão forte navy/branco para a competência principal.
+- **Cabeçalho**: branco, `logo-compact` (≈36px de altura), navegação 600, item ativo com sublinhado vermelho 3px.
+- **Tabela**: cabeçalho ExtraBold com linha navy 2px, linhas com borda `wave-gray`.
+- **Foco**: contorno 3px `sky-600`.
+- **Sombra**: nenhuma. Separe por borda ou por contraste canvas/branco.
+
+## 8. Dados e gráficos [propostos]
+
+Ordem das séries: `navy → sky → red → navy-600 → sky-600 → red-700`. Chapados, sem borda; ≤ 6 séries; rótulos diretos; grade em `wave-gray`. Para grafos/redes de competências, nós em navy/sky/red e arestas em `wave-blue`.
+
+## 9. Faça / não faça
+
+**Faça**: canvas `#FAFAFA` · logo centralizado e grande na capa · ondas só em hero/capa · cor concentrada no logo · caixa-alta Light + ExtraBold · descritivo alinhado à direita · muito ar.
+
+**Não faça**: faixas saturadas do Observatório · gradientes em UI · sombras · ondas atrás de tabelas/formulários · texto sky · recolorir o logo · separar o último "c" · fundo branco puro na capa · ilustrações genéricas de "IA/cérebro/circuitos".
+
+## 10. Checklist antes de entregar
+
+- [ ] É Simcc? Então fundo `#FAFAFA` e ondas (não faixas).
+- [ ] Logo de `assets/logo`, com "c" azul e área de respeito?
+- [ ] Ondas só de `assets/waves`, só em hero/capa?
+- [ ] Gradiente só no fundo de ondas?
+- [ ] Lexend 300/800 carregada?
+- [ ] Texto ≥ 4,5:1 (navy / navy-600 / red-700)?
+- [ ] Sem sombras? Um CTA primário por seção?
+
+## 11. O que esta página **não** define
+
+Espaçamento, componentes, estados, modo escuro, gráficos, ícones, movimento, fotos e voz. Foram propostos aqui a partir da capa. Um manual de marca completo, se existir, prevalece sobre o que está marcado [proposto]. As ondas foram vetorizadas por traçado a partir de uma imagem raster embutida no PDF; são equivalentes visualmente (conferido por sobreposição), não o desenho original do designer.

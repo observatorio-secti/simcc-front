@@ -1,0 +1,861 @@
+import { Dialog, DialogContent } from '../ui/dialog';
+
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+
+import { toast } from 'sonner';
+import { useModal } from '../hooks/use-modal-store';
+import { SelectTypeSearch } from '../search/select-type-search';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { UserContext } from '../../context/context';
+import { Alert } from '../ui/alert';
+import { MagnifyingGlass, Plus, X } from 'phosphor-react';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+
+interface Csv {
+  great_area: string;
+  term: string;
+  frequency: string;
+  type_: string;
+  term_normalize: string;
+}
+
+interface ItemsSelecionados {
+  term: string;
+}
+
+interface Bigrama {
+  word: string;
+}
+
+interface ResearchOpenAlex {
+  term: string;
+  type: string;
+}
+
+const useQuery = () => {
+  return new URLSearchParams(useLocation().search);
+};
+
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useModalResult } from '../hooks/use-modal-result';
+import { Play, Trash } from 'lucide-react';
+import { ScrollArea, ScrollBar } from '../ui/scroll-area';
+import { Separator } from '../ui/separator';
+import {
+  getSearchTypeBadgeColor,
+  getSearchTypeButtonColor,
+  isProfileSearch,
+  resultsPathFor,
+} from '../../lib/search-types';
+import {
+  listSuggestionsV2,
+  suggestionSourcesFor,
+} from '../../services/suggestions-v2';
+import { SuggestionSourceTypeV2 } from '../../types/suggestion-v2';
+
+const normalizeTerm = (term: string) =>
+  term
+    .normalize('NFD') // Separa acentos das letras
+    .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+    .replace(/[^\w\s]/gi, '') // Remove caracteres especiais
+    .toLowerCase(); // Converte para minúsculas
+
+// BARRA DE BUSCA DE CIMA
+export function SearchModal() {
+  //retorna url
+  const queryUrl = useQuery();
+  const navigate = useNavigate();
+  const type_search = queryUrl.get('type_search');
+  const terms = queryUrl.get('terms');
+
+  const { onClose, isOpen, type } = useModal();
+
+  const [itemsBigrama, setBigrama] = useState<Bigrama[]>([]);
+  const [itemsSelecionadosPopUp, setItensSelecionadosPopUp] = useState<
+    ItemsSelecionados[]
+  >([]);
+  const [researcherOpenAlex, setResearcherOpenAlex] = useState<
+    ResearchOpenAlex[]
+  >([]);
+  const [showInput, setShowInput] = useState(true);
+  const isModalOpen = isOpen && type === 'search';
+  const {
+    setValoresSelecionadosExport,
+    setMode,
+    searchType,
+    setSearchType,
+    itemsSelecionados,
+    setItensSelecionados,
+    setValorDigitadoPesquisaDireta,
+    historico,
+  } = useContext(UserContext);
+  const [input, setInput] = useState('');
+
+  const handleClickTermos = (type: string, value: string) => {
+    setValoresSelecionadosExport(value);
+    setSearchType(type);
+  };
+
+  useEffect(() => {
+    setItensSelecionadosPopUp(itemsSelecionados);
+  }, [itemsSelecionados]);
+
+  const [filteredItems, setFilteredItems] = useState<Csv[]>([]);
+
+  useEffect(() => {
+    const cleanInput = input.trim().replace(/[()]/g, '');
+    if (cleanInput.length < 2) {
+      setFilteredItems([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const suggestions = await listSuggestionsV2(
+          cleanInput,
+          [],
+          50,
+          controller.signal,
+        );
+
+        const mapped: Csv[] = [];
+        suggestions.forEach((s) => {
+          const norm = normalizeTerm(s.term);
+          const types =
+            s.source_types && s.source_types.length > 0
+              ? s.source_types
+              : (['ARTICLE'] as SuggestionSourceTypeV2[]);
+
+          types.forEach((st) => {
+            mapped.push({
+              great_area: '',
+              term: s.term,
+              term_normalize: norm,
+              frequency: String(s.frequency),
+              type_: st,
+            });
+          });
+        });
+        setFilteredItems(mapped);
+      } catch (err: any) {
+        if (!controller.signal.aborted) {
+          setFilteredItems([]);
+        }
+      }
+    }, 200);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [input]);
+
+  const handleChangeInput = (value: string) => {
+    setInput(value);
+  };
+
+  const handlePesquisa = (value: string, type: string, restoreType = false) => {
+    setInput('');
+    setShowInput(false);
+    setBigrama([]);
+
+    // Determine the searchType based on the provided type
+    let newSearchType = '';
+    if (type === 'ARTICLE') {
+      newSearchType = 'article';
+    } else if (type === 'SPEAKER') {
+      newSearchType = 'speaker';
+    } else if (type === 'BOOK_CHAPTER' || type === 'BOOK') {
+      newSearchType = 'book';
+    } else if (type === 'NAME') {
+      newSearchType = 'name';
+    } else if (type === 'PATENT') {
+      newSearchType = 'patent';
+    } else if (type === 'SOFTWARE') {
+      newSearchType = 'software';
+    } else if (type === 'ABSTRACT') {
+      newSearchType = 'abstract';
+    } else if (type === 'AREA') {
+      newSearchType = 'area';
+    } else if (type === 'PROFILE') {
+      newSearchType = 'profile';
+    } else {
+      newSearchType = searchType || 'profile';
+    }
+
+    const hasSameType = newSearchType === searchType;
+
+    setItensSelecionadosPopUp((prevItems) => {
+      if (hasSameType) {
+        return [...prevItems, { term: value + ';' }];
+      }
+      return [{ term: value + ';' }];
+    });
+
+    setSearchType(newSearchType);
+  };
+
+  const [isOpenAlex, setIsOpenAlex] = useState(false);
+
+  const handlePesquisaOpenAlex = (value: string) => {
+    setInput('');
+    setShowInput(false);
+    setBigrama([]);
+    setIsOpenAlex(true);
+
+    setItensSelecionadosPopUp([{ term: value }]);
+
+    setSearchType('name');
+  };
+
+  const { onOpen: onOpenResult } = useModalResult();
+
+  function formatTerms(valores: { term: string }[]): string {
+    let result = '';
+    let tempTerms: string[] = [];
+    let lastConnector = '';
+
+    valores.forEach((item) => {
+      let term = item.term.trim().replace(/[()]/g, '');
+      const connector = term.slice(-1);
+
+      if (connector === ';' || connector === '|') {
+        term = term.slice(0, -1);
+      }
+
+      if (connector === ';') {
+        tempTerms.push(term);
+        lastConnector = ';';
+      } else if (connector === '|') {
+        tempTerms.push(term);
+        result += tempTerms.join(';') + '|';
+        tempTerms = [];
+        lastConnector = '|';
+      } else {
+        if (tempTerms.length > 0) {
+          result += tempTerms.join(';') + '|';
+          tempTerms = [];
+        }
+        result += term + '|';
+        lastConnector = '|';
+      }
+    });
+
+    if (tempTerms.length > 0) {
+      result += tempTerms.join(';');
+    } else if (result.endsWith('|')) {
+      result = result.slice(0, -1);
+    }
+
+    return result.replace(/[()]/g, '').trim();
+  }
+
+  const [termosformatados, setTermosformatados] = useState(
+    formatTerms(itemsSelecionadosPopUp),
+  );
+
+  useEffect(() => {
+    setTermosformatados(formatTerms(itemsSelecionadosPopUp));
+  }, [itemsSelecionadosPopUp, itemsSelecionados]);
+
+  console.log(termosformatados);
+  let TypeSearch = type_search ?? '';
+  let Terms = terms ?? '';
+
+  const location = useLocation();
+
+  const posGrad = location.pathname == '/pos-graduacao';
+
+  const handlePesquisaFinal = () => {
+    if (itemsSelecionadosPopUp.length == 0 && input.length == 0) {
+      toast('Tente novamente', {
+        description: 'Selecione ou digite um termo para pesquisa',
+        action: {
+          label: 'Fechar',
+          onClick: () => console.log('Fechar'),
+        },
+      });
+      return;
+    }
+
+    const targetPath =
+      posGrad && !isProfileSearch(searchType)
+        ? '/pos-graduacao'
+        : resultsPathFor(searchType);
+    const openLegacyResult = () => {
+      if (!isProfileSearch(searchType)) onOpenResult('researchers-home');
+    };
+
+    if (itemsSelecionadosPopUp.length > 0) {
+      const cleanTerms = formatTerms(itemsSelecionadosPopUp);
+      TypeSearch = searchType;
+      Terms = cleanTerms;
+      setInput('');
+
+      queryUrl.set('type_search', searchType);
+      queryUrl.set('terms', cleanTerms);
+      setItensSelecionados(
+        itemsSelecionadosPopUp.map((item) => ({
+          term: item.term.replace(/[()]/g, '').replace(/[|;]$/, '').trim(),
+        }))
+      );
+      setValoresSelecionadosExport(cleanTerms);
+
+      navigate({
+        pathname: targetPath,
+        search: queryUrl.toString(),
+      });
+
+      openLegacyResult();
+      onClose();
+    } else if (itemsSelecionadosPopUp.length == 0 && input.length > 0) {
+      const cleanInput = input.trim().replace(/[()]/g, '');
+      const newItems = [{ term: cleanInput }];
+      setItensSelecionadosPopUp(newItems);
+      setItensSelecionados(newItems);
+      setValoresSelecionadosExport(cleanInput);
+      TypeSearch = searchType;
+      Terms = cleanInput;
+
+      queryUrl.set('type_search', searchType);
+      queryUrl.set('terms', cleanInput);
+
+      navigate({
+        pathname: targetPath,
+        search: queryUrl.toString(),
+      });
+
+      openLegacyResult();
+      setMode('');
+      setInput('');
+      onClose();
+    }
+  };
+
+  ///open alex
+  const urlOpenAlex = `https://api.openalex.org/authors?filter=display_name.search:${input}`;
+
+  useMemo(() => {
+    const fetchData = async () => {
+      if (filteredItems.filter((item) => item.type_ === 'NAME').length == 0) {
+        try {
+          const response = await fetch(urlOpenAlex, {
+            mode: 'cors',
+            headers: {
+              // Adicione quaisquer headers necessários aqui
+            },
+          });
+          const data = await response.json();
+          if (data.results && data.results.length > 0) {
+            const firstResults = data.results.slice(0, 15);
+            const extractedData = firstResults.map((result) => ({
+              term: result.display_name,
+              type: 'name-openalex',
+            }));
+            setResearcherOpenAlex(extractedData);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        // Faça outra coisa, já que não há mais de um item com tipo 'NAME'
+      }
+    };
+
+    if (input) {
+      fetchData();
+    }
+  }, [input, urlOpenAlex]);
+
+  console.log('fawefwef', researcherOpenAlex);
+  console.log('fawefwef', urlOpenAlex);
+  //auto complete
+
+  // Completa a última palavra digitada com o termo mais frequente do dicionário.
+  const lastWord = input.split(/\s+/).pop() ?? '';
+  useEffect(() => {
+    const sources = suggestionSourcesFor(searchType);
+    if (!lastWord || !sources) {
+      setBigrama([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      try {
+        const suggestions = await listSuggestionsV2(
+          lastWord,
+          sources,
+          5,
+          controller.signal,
+        );
+        setBigrama(
+          suggestions
+            .filter(
+              (item) => normalizeTerm(item.term) !== normalizeTerm(lastWord),
+            )
+            .map((item) => ({ word: item.term })),
+        );
+      } catch (err) {
+        if (!controller.signal.aborted) setBigrama([]);
+      }
+    }, 200);
+
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [lastWord, searchType]);
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setInput((prevInput) => {
+      const words = prevInput.trim().split(/\s+/); // Divide corretamente em palavras
+      if (words.length > 0) {
+        words[words.length - 1] = suggestion; // Substitui a última palavra
+      } else {
+        words.push(suggestion); // Caso esteja vazio, adiciona a sugestão
+      }
+      return words.join(' ') + ' '; // Garante um espaço no final
+    });
+  };
+
+  // Função para lidar com a pressão da tecla Tab
+  const handleTabPress = (event: any) => {
+    if (event.key === 'Tab' && itemsBigrama.length > 0) {
+      event.preventDefault(); // Impedir que a tecla Tab mova o foco para o próximo elemento
+      handleSuggestionClick(itemsBigrama[0].word); // Selecionar a primeira sugestão
+    }
+  };
+
+  const handleEnterPress = (event: any) => {
+    if (event.key === 'Enter') {
+      console.log('oi oi oi');
+      handlePesquisaFinal();
+    }
+  };
+  //////////q
+  console.log(itemsSelecionadosPopUp);
+
+  //itens selecionados
+  const handleRemoveItem = (index: number) => {
+    const newItems = [...itemsSelecionadosPopUp];
+    newItems.splice(index, 1);
+    setItensSelecionadosPopUp(newItems);
+  };
+
+  //conectores
+  const handleConnectorChange = (index: number, connector: string) => {
+    const newItems = [...itemsSelecionadosPopUp];
+    let term = newItems[index].term.trim().replace(/[()]/g, '');
+
+    // Remove qualquer conector existente no final
+    term = term.replace(/[|;]$/, '');
+    term += connector;
+
+    newItems[index].term = term;
+    setItensSelecionadosPopUp(newItems);
+  };
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isModalOpen && inputRef.current) {
+      inputRef.current.focus(); // Foca no input quando o modal for aberto
+    }
+  }, [isModalOpen]); // Este efeito será executado sempre que isModalOpen mudar
+
+  return (
+    <Dialog open={isModalOpen} onOpenChange={onClose}>
+      <DialogContent
+        tabIndex={0}
+        onKeyDown={handleEnterPress}
+        className=" p-0 border-none min-w-[63vw] px-4 mx-auto md:px-0 bg-transparent dark:bg-transparent"
+      >
+        <Alert
+          tabIndex={0}
+          onKeyDown={handleEnterPress}
+          className="h-14 bg-white p-2 min-w-[40%] flex items-center gap-3 justify-between"
+        >
+          <div className="flex items-center gap-2 w-full flex-1">
+            <Play
+              size={16}
+              className="hidden md:block whitespace-nowrap w-10"
+            />
+
+            <div className="flex gap-2 w-full items-center">
+              <div className="flex gap-2 items-center w-full">
+                <SelectTypeSearch />
+
+                <div className="flex flex-1 w-full">
+                  <ScrollArea className="max-h-[40px] w-full">
+                    <div className="flex whitespace-nowrap gap-2 items-center">
+                      {itemsSelecionadosPopUp.map((valor, index) => (
+                        <div
+                          key={index}
+                          className="flex whitespace-nowrap gap-2 items-center"
+                        >
+                          <div
+                            className={`flex gap-2 items-center h-10 p-2 px-4 capitalize rounded-md text-xs ${getSearchTypeBadgeColor(
+                              searchType,
+                            )} text-white border-0`}
+                          >
+                            {valor.term.replace(/[|;]/g, '')}
+                            <X
+                              size={12}
+                              onClick={() => handleRemoveItem(index)}
+                              className="cursor-pointer"
+                            />
+                          </div>
+
+                          {index < itemsSelecionadosPopUp.length - 1 && (
+                            <button
+                              className="rounded-full cursor-pointer flex items-center justify-center whitespace-nowrap h-8 w-8 bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 transition-all text-xs outline-none"
+                              onClick={() => {
+                                const connector = itemsSelecionadosPopUp[
+                                  index
+                                ].term.endsWith('|')
+                                  ? ';'
+                                  : '|';
+                                handleConnectorChange(index, connector);
+                              }}
+                            >
+                              {itemsSelecionadosPopUp[index].term.endsWith(';')
+                                ? 'e'
+                                : 'ou'}
+                            </button>
+                          )}
+                        </div>
+                      ))}
+
+                      {itemsSelecionadosPopUp.length >= 1 && !showInput && (
+                        <div
+                          className="rounded-full cursor-pointer flex items-center justify-center whitespace-nowrap h-8 w-8 bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 transition-all"
+                          onClick={() => setShowInput(true)}
+                        >
+                          <Plus size={16} className="" />
+                        </div>
+                      )}
+
+                      {(showInput || itemsSelecionadosPopUp.length == 0) && (
+                        <Input
+                          autoFocus={true}
+                          onChange={(e) => handleChangeInput(e.target.value)}
+                          type="text"
+                          ref={inputRef}
+                          value={input}
+                          className="border-0 w-full bg-transparent max-h-[40px] h-[40px]  flex-1 p-0  inline-block"
+                          onKeyDown={handleTabPress}
+                        />
+                      )}
+
+                      <span className="hidden md:block">
+                        {(showInput || itemsSelecionadosPopUp.length == 0) && (
+                          <p>
+                            {itemsBigrama.slice(0, 1).map((item, index) => (
+                              <div
+                                className="text-neutral-500 text-sm w-full"
+                                key={index}
+                                onClick={() => handleSuggestionClick(item.word)}
+                              >
+                                {item.word}
+                              </div>
+                            ))}
+                          </p>
+                        )}
+                      </span>
+
+                      <span className="hidden lg:block">
+                        {(showInput || itemsSelecionadosPopUp.length == 0) &&
+                          itemsBigrama.length != 0 && (
+                            <div className=" text-xs text-neutral-500 whitespace-nowrap px-2 ml-3  border border-neutral-500 p-1 rounded-md">
+                              Tab ↹
+                            </div>
+                          )}
+                      </span>
+                    </div>
+
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-fit flex gap-2">
+            {itemsSelecionadosPopUp.length > 0 && (
+              <Button
+                size={'icon'}
+                variant={'ghost'}
+                onClick={() => {
+                  setItensSelecionadosPopUp([]);
+                }}
+              >
+                <Trash size={16} />
+              </Button>
+            )}
+            <Button
+              onClick={() => handlePesquisaFinal()}
+              variant="outline"
+              className={`${getSearchTypeButtonColor(
+                searchType,
+              )} text-white border-0 z-[9999]`}
+              size={'icon'}
+            >
+              <MagnifyingGlass size={16} className="" />
+            </Button>
+          </div>
+        </Alert>
+
+        {((input.trim().length >= 2 && filteredItems.length != 0) ||
+          historico.length > 0) && (
+            <Alert className="w-full">
+              {historico.length > 0 && (
+                <div>
+                  <p className="uppercase font-medium text-xs mb-3">
+                    Pesquisas recentes
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {historico.map((props, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          handlePesquisa(props.termo, props.tipo.toUpperCase(), true);
+                        }}
+                        className={`
+                          ${getSearchTypeButtonColor(props.tipo.toLowerCase())}
+                          flex gap-2 h-8 capitalize cursor-pointer transition-all text-white items-center p-2 px-3 rounded-md text-xs`}
+                      >
+                        {props.termo}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div
+                className={`${input.trim().length >= 2 && filteredItems.length != 0 && historico.length > 0 ? 'mt-4 flex' : 'hidden'}`}
+              >
+                <Separator />
+              </div>
+              <div
+                className={`${input.trim().length >= 2 && filteredItems.length != 0 ? '' : 'hidden'} ${historico.length > 0 && 'mt-4'}`}
+              >
+                <ResponsiveMasonry
+                  columnsCountBreakPoints={{
+                    350: 1,
+                    750: 2,
+                    900: 2,
+                    1200: 2,
+                  }}
+                >
+                  <Masonry
+                    className="max-h-[80vh] md:overflow-y-auto overflow-y-scroll"
+                    gutter="20px"
+                  >
+                    {filteredItems.filter((item) => item.type_ === 'ARTICLE')
+                      .length != 0 && (
+                        <div>
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
+                            Artigos
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {filteredItems
+                              .filter((item) => item.type_ === 'ARTICLE')
+                              .slice(0, 15)
+                              .map((props, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() =>
+                                    handlePesquisa(props.term, props.type_)
+                                  }
+                                  className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
+                                >
+                                  {props.term}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {filteredItems.filter((item) => item.type_ === 'ABSTRACT')
+                      .length != 0 && (
+                        <div>
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
+                            Resumo do lattes
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {filteredItems
+                              .filter((item) => item.type_ === 'ABSTRACT')
+                              .slice(0, 15)
+                              .map((props, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() =>
+                                    handlePesquisa(props.term, props.type_)
+                                  }
+                                  className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
+                                >
+                                  {props.term}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {filteredItems.filter((item) => item.type_ === 'PATENT')
+                      .length != 0 && (
+                        <div>
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 inline-block"></span>
+                            Patentes
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {filteredItems
+                              .filter((item) => item.type_ === 'PATENT')
+                              .slice(0, 15)
+                              .map((props, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() =>
+                                    handlePesquisa(props.term, props.type_)
+                                  }
+                                  className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
+                                >
+                                  {props.term}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {filteredItems.filter(
+                      (item) =>
+                        item.type_ === 'BOOK' || item.type_ == 'BOOK_CHAPTER',
+                    ).length != 0 && (
+                        <div>
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-pink-500 inline-block"></span>
+                            Livros e capítulos
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {filteredItems
+                              .filter(
+                                (item) =>
+                                  item.type_ === 'BOOK' ||
+                                  item.type_ === 'BOOK_CHAPTER',
+                              )
+                              .slice(0, 15)
+                              .map((props, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() =>
+                                    handlePesquisa(props.term, props.type_)
+                                  }
+                                  className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
+                                >
+                                  {props.term}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {filteredItems.filter((item) => item.type_ === 'SPEAKER')
+                      .length != 0 && (
+                        <div>
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span>
+                            Participação em eventos
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {filteredItems
+                              .filter((item) => item.type_ === 'SPEAKER')
+                              .slice(0, 15)
+                              .map((props, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() =>
+                                    handlePesquisa(props.term, props.type_)
+                                  }
+                                  className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
+                                >
+                                  {props.term}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {filteredItems.filter((item) => item.type_ === 'AREA')
+                      .length != 0 && (
+                        <div>
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                            Área de especialidade
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {filteredItems
+                              .filter((item) => item.type_ === 'AREA')
+                              .slice(0, 15)
+                              .map((props, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() =>
+                                    handlePesquisa(props.term, props.type_)
+                                  }
+                                  className={`flex gap-2 h-8 capitalize cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs`}
+                                >
+                                  {props.term} | {props.great_area}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {filteredItems.filter((item) => item.type_ === 'NAME')
+                      .length !== 0 && (
+                        <div>
+                          <p className="uppercase font-medium text-xs mb-3 flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                            Nome
+                          </p>
+                          <div className="flex flex-wrap gap-3">
+                            {filteredItems
+                              .filter((item) => item.type_ === 'NAME')
+                              // Remove duplicatas baseadas no 'term' normalizado
+                              .filter(
+                                (value, index, self) =>
+                                  index ===
+                                  self.findIndex(
+                                    (t) =>
+                                      normalizeTerm(t.term) ===
+                                      normalizeTerm(value.term),
+                                  ),
+                              )
+                              .slice(0, 15)
+                              .map((props, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() =>
+                                    handlePesquisa(props.term, props.type_)
+                                  }
+                                  className="flex gap-2 capitalize h-8 cursor-pointer transition-all bg-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-900 dark:bg-neutral-800 items-center p-2 px-3 rounded-md text-xs"
+                                >
+                                  {props.term}
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+                  </Masonry>
+                </ResponsiveMasonry>
+              </div>
+            </Alert>
+          )}
+      </DialogContent>
+    </Dialog>
+  );
+}

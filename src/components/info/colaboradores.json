@@ -1,0 +1,75 @@
+[
+    {
+      "id": 1,
+      "name": "Victor Hugo de Jesus Oliveira",
+      "inst": "Universidade Federal de Minas Gerais",
+      "img": "../col_3.png",
+      "mail": "victorhugodejesusoliveira@gmail.com",
+      "lattes": "http://lattes.cnpq.br/1470200752478382"
+    },
+    {
+      "id": 2,
+      "name": "Matheus Souza dos Santos",
+      "inst": "Universidade do Estado da Bahia",
+      "img": "../col_4.png",
+      "mail": "",
+      "lattes": ""
+    },
+    {
+      "id": 3,
+      "name": "Eduardo Manuel de Freitas Jorge",
+      "inst": "Universidade do Estado da Bahia",
+      "img": "../col_2.png",
+      "mail": "ejorge@uneb.br",
+      "lattes": ""
+    },
+    {
+      "id": 4,
+      "name": "Gesil Sampaio Amarante Segundo",
+      "inst": "Universidade Estadual de Santa Cruz",
+      "img": "../col_5.png",
+      "mail": "",
+      "lattes": "http://lattes.cnpq.br/2560106052820991"
+    },
+    {
+      "id": 4,
+      "name": "Henrique Resende Martins",
+      "inst": "Universidade Federal de Minas Gerais",
+      "img": "../col_5.png",
+      "mail": "",
+      "lattes": "https://lattes.cnpq.br/3365695090552840"
+    },
+    {
+      "id": 5,
+      "name": "João Vítor Café dos Reis Batista",
+      "inst": "Universidade do Estado da Bahia",
+      "img": "../col_5.png",
+      "mail": "",
+      "lattes": "http://lattes.cnpq.br/7152891480658222"
+    },
+    {
+      "id": 6,
+      "name": "Leandro Brito Santos",
+      "inst": "Universidade Federal do Recôncavo da Bahia",
+      "img": "../col_5.png",
+      "mail": "",
+      "lattes": "http://lattes.cnpq.br/2077575537959894"
+    },
+    {
+      "id": 7,
+      "name": "Alex Álisson Bandeira Santos",
+      "inst": "SECTI-BA",
+      "img": "../col_5.png",
+      "mail": "",
+      "lattes": "http://lattes.cnpq.br/1594166432902815"
+    },
+    {
+      "id": 8,
+      "name": "Gleidson de Meireles Costa",
+      "inst": "Universidade Federal do Recôncavo da Bahia",
+      "img": "../col_1.png",
+      "mail": "",
+      "lattes": "http://lattes.cnpq.br/5353943042144087"
+    }
+  ]
+  
