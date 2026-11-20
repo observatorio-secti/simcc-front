@@ -1,13 +1,12 @@
 /* ==========================================================================
    Simcc Design Kit — tema Tailwind 4 (área pública)
 
+   ARQUIVO GERADO por scripts/tokens.mjs a partir de tokens.json. Não edite:
+   mude tokens.json e rode `npm run tokens` (a CI roda `npm run tokens:check`).
+
    Uso no CSS de entrada do app:
      @import 'tailwindcss';
      @import '<caminho>/design-kit/tokens/tailwind.css';
-
-   Substitui o antigo `tailwind.preset.js` (Tailwind 3) com os mesmos valores.
-   A fonte de verdade dos valores é `tokens.json`; ao mudar um token, mude aqui,
-   em `tokens.json` e em `simcc.css`.
 
      bg-eng-blue            → ação primária
      bg-search-article      → cor do tipo de busca "article"
@@ -24,7 +23,7 @@
   --font-sans: 'Lexend', ui-sans-serif, system-ui, sans-serif;
 
   /* Breakpoints do projeto (sm, md, lg e xl são os padrões do Tailwind) */
-  --breakpoint-2xl: 120rem; /* 1920px */
+  --breakpoint-2xl: 120rem;
 
   /* Marca */
   --color-eng-blue: #559fb8;

@@ -14,9 +14,9 @@ design-kit/
 ├── AGENT_PROMPT.md          ← prompt pronto para agentes que forem refatorar telas
 ├── index.html               ← vitrine: links para as páginas de exemplo
 ├── tokens/
-│   ├── simcc.css            ← tokens CSS (--sc-*) + classes de componente (sc-*)
-│   ├── tokens.json          ← os mesmos tokens em formato W3C Design Tokens
-│   └── tailwind.css         ← tema Tailwind 4 (@theme) com os dicionários semânticos
+│   ├── tokens.json          ← fonte de verdade dos tokens (formato W3C Design Tokens)
+│   ├── simcc.css            ← tokens CSS (--sc-*, gerados) + classes de componente (sc-*)
+│   └── tailwind.css         ← tema Tailwind 4 (@theme) com os dicionários semânticos (gerado)
 ├── assets/
 │   ├── logo/                ← simcc.svg, simcc-white.svg, simbolo.svg, observatorio.svg, governo-bahia-secti.png
 │   ├── backgrounds/         ← ilustrações de fundo (home, graduate, indicadores, researcher)
@@ -39,6 +39,17 @@ python3 -m http.server 8765 -d design-kit
 ```
 
 Depois abra `http://localhost:8765/`.
+
+### Mudar um token
+
+Edite só `tokens/tokens.json` e rode:
+
+```bash
+npm run tokens         # regenera tokens/tailwind.css e o bloco :root/.dark de tokens/simcc.css
+npm run tokens:check   # falha se os arquivos gerados não batem com tokens.json (roda na CI)
+```
+
+O script (`scripts/tokens.mjs`) reescreve `tailwind.css` inteiro e, em `simcc.css`, só o trecho entre `/* @tokens:inicio */` e `/* @tokens:fim */`; as classes `sc-*` continuam escritas à mão. Os nomes das variáveis (`--color-*`, `--sc-*`) ficam no script: um token novo num dicionário existente (área, produção, Qualis…) entra sozinho nos dois arquivos; um grupo novo precisa ser listado lá.
 
 ### Uso no app (Tailwind 4)
 

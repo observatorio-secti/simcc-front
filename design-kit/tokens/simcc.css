@@ -1,6 +1,7 @@
 /* ==========================================================================
    Simcc Design Kit — simcc.css
-   Fonte única de tokens + classes de componente (prefixo sc-) da área pública.
+   Tokens (--sc-*, gerados de tokens.json) + classes de componente (prefixo
+   sc-) da área pública.
    Espelha a estética atual da plataforma (Tailwind neutral + eng-blue + Lexend).
    As receitas Tailwind equivalentes estão em DESIGN.md e reference/components.md.
    ========================================================================== */
@@ -9,14 +10,17 @@
 
 /* --------------------------------------------------------------------------
    1. TOKENS
+   Gerado por scripts/tokens.mjs a partir de tokens.json (npm run tokens).
+   Não edite entre @tokens:inicio e @tokens:fim: mude tokens.json.
    -------------------------------------------------------------------------- */
+/* @tokens:inicio */
 :root {
   /* Marca */
-  --sc-brand: #559fb8;          /* eng-blue — ação primária, item ativo, destaque */
-  --sc-brand-strong: #024a60;   /* eng-dark-blue — hover/pressed */
-  --sc-brand-soft: #e3f0f4;     /* fundo suave derivado */
-  --sc-accent-teal: #00757a;    /* destaque tipográfico (hero da home) */
-  --sc-accent-wine: #9c1f2e;    /* ênfase pontual (hero da home) */
+  --sc-brand: #559fb8;
+  --sc-brand-strong: #024a60;
+  --sc-brand-soft: #e3f0f4;
+  --sc-accent-teal: #00757a;
+  --sc-accent-wine: #9c1f2e;
   --sc-logo-blue: #174ea6;
   --sc-logo-blue-2: #1a73e8;
   --sc-logo-red: #ed1c24;
@@ -40,14 +44,14 @@
   --sc-deco-soft: #e1eaf0;
 
   /* Papéis semânticos — tema claro */
-  --sc-frame: var(--sc-n-100);       /* moldura: topbar + sidebar */
-  --sc-panel: var(--sc-n-50);        /* painel de conteúdo arredondado */
-  --sc-surface: var(--sc-n-0);       /* cards, inputs, popovers */
+  --sc-frame: var(--sc-n-100);
+  --sc-panel: var(--sc-n-50);
+  --sc-surface: var(--sc-n-0);
   --sc-surface-muted: var(--sc-n-100);
   --sc-surface-hover: var(--sc-n-200);
-  --sc-loading: #cbd5e1;             /* slate-300 — bloco "Processando" */
+  --sc-loading: #cbd5e1;
   --sc-text: var(--sc-n-900);
-  --sc-text-strong: #1e293b;         /* slate-800 — títulos de hero */
+  --sc-text-strong: #1e293b;
   --sc-text-muted: var(--sc-n-500);
   --sc-text-subtle: var(--sc-n-400);
   --sc-border: var(--sc-n-200);
@@ -62,16 +66,16 @@
   --sc-info: var(--sc-brand);
 
   /* Tipografia */
-  --sc-font: "Lexend", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --sc-text-2xs: 0.625rem;   /* 10px — kbd, micro rótulos */
-  --sc-text-xs: 0.75rem;     /* 12px */
-  --sc-text-sm: 0.875rem;    /* 14px — corpo de UI */
+  --sc-font: 'Lexend', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --sc-text-2xs: 0.625rem;
+  --sc-text-xs: 0.75rem;
+  --sc-text-sm: 0.875rem;
   --sc-text-base: 1rem;
   --sc-text-lg: 1.125rem;
-  --sc-text-xl: 1.25rem;     /* título de página */
-  --sc-text-2xl: 1.5rem;     /* KPI */
+  --sc-text-xl: 1.25rem;
+  --sc-text-2xl: 1.5rem;
   --sc-text-3xl: 1.875rem;
-  --sc-text-hero: clamp(1.875rem, 1.2rem + 2.6vw, 3rem); /* 30→48px */
+  --sc-text-hero: clamp(1.875rem, 1.2rem + 2.6vw, 3rem);
 
   /* Espaço (base 4px) */
   --sc-space-1: 4px;
@@ -85,16 +89,18 @@
   --sc-space-12: 48px;
 
   /* Raios */
-  --sc-radius-sm: 4px;   /* rounded-sm — tabs internas */
-  --sc-radius-md: 6px;   /* rounded-md — padrão de botões, chips, inputs */
-  --sc-radius-lg: 8px;   /* rounded-lg — cards */
-  --sc-radius-xl: 12px;  /* rounded-xl — painel de conteúdo */
+  --sc-radius-sm: 4px;
+  --sc-radius-md: 6px;
+  --sc-radius-lg: 8px;
+  --sc-radius-xl: 12px;
   --sc-radius-full: 9999px;
 
   /* Sombras (a plataforma é plana; sombra só em sobreposições) */
   --sc-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --sc-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --sc-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --sc-shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --sc-shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* Dimensões de layout */
   --sc-topbar-h: 40px;
@@ -109,15 +115,15 @@
   --sc-dur: 150ms;
 
   /* Cores de tipo de busca (search type) — não alterar */
-  --sc-type-profile: #1d4ed8;   /* blue-700 */
-  --sc-type-article: #3b82f6;   /* blue-500 */
-  --sc-type-book: #ec4899;      /* pink-500 */
-  --sc-type-patent: #06b6d4;    /* cyan-500 */
-  --sc-type-software: #0d9488;  /* teal-600 */
-  --sc-type-speaker: #f97316;   /* orange-500 */
-  --sc-type-area: #22c55e;      /* green-500 */
-  --sc-type-name: #ef4444;      /* red-500 */
-  --sc-type-abstract: #eab308;  /* yellow-500 */
+  --sc-type-profile: #1d4ed8;
+  --sc-type-article: #3b82f6;
+  --sc-type-book: #ec4899;
+  --sc-type-patent: #06b6d4;
+  --sc-type-software: #0d9488;
+  --sc-type-speaker: #f97316;
+  --sc-type-area: #22c55e;
+  --sc-type-name: #ef4444;
+  --sc-type-abstract: #eab308;
   --sc-type-maria: var(--sc-brand);
 
   /* Grandes áreas do conhecimento (CNPq) */
@@ -184,6 +190,7 @@
   --sc-deco: #1f2b33;
   --sc-deco-soft: #182128;
 }
+/* @tokens:fim */
 
 /* --------------------------------------------------------------------------
    2. BASE
