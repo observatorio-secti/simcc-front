@@ -49,7 +49,8 @@ export function parseEnv(raw: Record<string, unknown>) {
 export type Env = ReturnType<typeof parseEnv>;
 
 /**
- * Avaliado na primeira importação. Na Fase 0 nada importa este módulo ainda;
- * o cliente da API (tarefa F1.1) será o primeiro.
+ * Avaliado na primeira importação (hoje, pelo cliente da v2 em
+ * `src/api/simcc.ts`). Testes que importam quem usa `env` precisam de
+ * `vi.stubEnv` antes do import, porque a CI não tem .env.
  */
 export const env: Env = parseEnv(import.meta.env);
