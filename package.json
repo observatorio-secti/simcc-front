@@ -16,7 +16,9 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "api:types": "node scripts/api-types.mjs"
+    "api:types": "node scripts/api-types.mjs",
+    "tokens": "node scripts/tokens.mjs",
+    "tokens:check": "node scripts/tokens.mjs --check"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.108.1",
