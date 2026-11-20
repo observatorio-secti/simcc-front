@@ -1,5 +1,7 @@
 # Inventário de telas públicas
 
+> **Levantamento do legado.** Este arquivo descreve a plataforma anterior, preservada na tag `legado-v1` (consulte com `git show legado-v1:<caminho>`). Os caminhos `src/...` citados aqui não existem na versão nova; o destino de cada tela está em `docs/legado/inventario.md`.
+
 Mapa das rotas atuais (`src/App.tsx`) para os templates do `DESIGN.md` §6.2, com o que cada tela precisa ajustar para entrar no padrão. Levantado navegando a plataforma em execução (nov/2026).
 
 | Rota | Componente | Template | Ajustes para o padrão |

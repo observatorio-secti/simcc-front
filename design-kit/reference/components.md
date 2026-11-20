@@ -1,6 +1,6 @@
 # Componentes: anatomia e receitas
 
-Cada componente lista: **quando usar**, **anatomia**, a **receita Tailwind** para o código React e a **classe do kit** (`tokens/simcc.css`) usada nas páginas de exemplo. As receitas partem dos primitivos shadcn em `src/components/ui/` e mudam apenas o necessário.
+Cada componente lista: **quando usar**, **anatomia**, a **receita Tailwind** para o código React e a **classe do kit** (`tokens/simcc.css`) usada nas páginas de exemplo. As receitas partem dos primitivos shadcn em `src/shared/ui/` e mudam apenas o necessário. Elas usam nomes do Tailwind 3 em alguns pontos; veja a tabela de tradução em `DESIGN.md` (Uso no app).
 
 Convenções: `muted` = `text-neutral-500 dark:text-neutral-400`; `border` = `border-neutral-200 dark:border-neutral-800`.
 
@@ -58,7 +58,7 @@ Fundo por contexto: `bg_indicadores` (indicadores), `bg_graduate` (pós-graduaç
 
 ### Hero central (template A)
 `text-center text-3xl md:text-[2.6rem] font-medium text-slate-800 leading-snug lg:leading-[1.5] tracking-tight`.
-Destaques: `sc-underline` = `text-[#00757a] font-semibold border-b-2 border-[#00757a] pb-1` (preset: `text-brand-teal border-brand-teal`); `sc-emphasis` = `text-brand-wine font-semibold`.
+Destaques: `sc-underline` = `text-[#00757a] font-semibold border-b-2 border-[#00757a] pb-1` (tema: `text-brand-teal border-brand-teal`); `sc-emphasis` = `text-brand-wine font-semibold`.
 
 ### Link-pílula: `sc-pill-link`
 `inline-flex items-center gap-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 px-3 py-1 text-sm font-medium`, com `Info` 12px, divisor `h-full w-px bg-neutral-200` e `ArrowRight` 12px. Extrair para `components/ui/pill-link.tsx`: hoje está duplicado em várias páginas.
@@ -105,7 +105,7 @@ Anatomia: `[■ Perfil do pesquisador ⌄] [chip termo ×] [Buscar...        ] [
 ## Superfícies
 
 ### Card: `sc-card`
-`rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950`. **Remover `shadow-sm` do `ui/card.tsx`**: todas as telas atuais anulam ou ignoram a sombra.
+`rounded-lg border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950`. **O `shared/ui/card.tsx` não tem sombra**: no legado, todas as telas anulavam ou ignoravam a do shadcn.
 
 ### KPI: `sc-card` + `sc-stat__*`
 ```tsx
@@ -154,7 +154,7 @@ Chips `rounded-md px-4 py-1.5 font-semibold text-white bg-search-{type}` com `fo
 ## Navegação interna
 
 ### Tabs segmentadas: `sc-tabs` (`ui/tabs.tsx`)
-Lista `h-10 rounded-md bg-slate-100 p-1`, trigger `rounded-sm px-3 py-1.5 text-sm font-medium` e ativo `bg-white shadow-sm`. Usar para alternar **conteúdo do mesmo objeto** (tipos de produção do pesquisador). Ícone 14px antes do rótulo. Padronizar em `neutral-*` (hoje `slate-*`).
+Lista `h-10 rounded-md bg-slate-100 p-1`, trigger `rounded-sm px-3 py-1.5 text-sm font-medium` e ativo `bg-white shadow-xs`. Usar para alternar **conteúdo do mesmo objeto** (tipos de produção do pesquisador). Ícone 14px antes do rótulo. Padronizar em `neutral-*` (hoje `slate-*`).
 
 ### Tabs de visão: `sc-viewtabs`
 Botões `h-10 px-4 rounded-md bg-neutral-100 text-sm font-medium`, ativo `bg-eng-blue text-white`. Usar para trocar **a visão do resultado** (Pesquisadores / Instituições / Mapa).
@@ -210,10 +210,10 @@ Cabeçalho `h-12 px-4 text-left font-medium muted`, células `p-4 border-b`, hov
 
 ## Mapeamentos (uma função por dicionário)
 
-Criar `src/lib/design-tokens.ts` e substituir as cadeias de ternário espalhadas (`timeline-researcher.tsx`, `researcher-indicators.tsx`, `Header.tsx`, `filter-sections.tsx`, `applied-filters-badges.tsx`, `facet-registry.ts`, `mapa-home.tsx`, `infinite-moving-cards.tsx`, `listagens/*`):
+Toda escolha de cor por dado passa por `src/shared/lib/design-tokens.ts`. No legado (`legado-v1`), essa lógica estava espalhada em cadeias de ternário (`timeline-researcher.tsx`, `researcher-indicators.tsx`, `Header.tsx`, `filter-sections.tsx`, `mapa-home.tsx`, `listagens/*`):
 
 ```ts
-import tokens from '../../design-kit/tokens/tokens.json';
+import tokens from '@kit/tokens/tokens.json';
 
 const norm = (s = '') => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
 

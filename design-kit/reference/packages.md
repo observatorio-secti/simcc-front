@@ -1,5 +1,7 @@
 # Pacotes: essenciais × substituíveis
 
+> **Levantamento do legado.** Este arquivo descreve a plataforma anterior, preservada na tag `legado-v1` (consulte com `git show legado-v1:<caminho>`). Os caminhos `src/...` citados aqui não existem na versão nova; o destino de cada tela está em `docs/legado/inventario.md`.
+
 Levantamento feito por importações em `src/` (excluindo `components/console/`), em nov/2026. O número é a quantidade de arquivos que importam o pacote.
 
 ## Base de UI (manter: é sobre ela que o kit é escrito)

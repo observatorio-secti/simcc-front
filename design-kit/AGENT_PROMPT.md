@@ -1,32 +1,46 @@
-# Prompt para agentes: refatoração de telas públicas do Simcc
+# Prompt para agentes: construção de telas públicas do Simcc
 
-Cole o bloco abaixo ao delegar a refatoração de uma tela (troque `<ROTA>` e `<ARQUIVOS>`).
+Cole o bloco abaixo ao delegar uma tela (troque `<TAREFA>`, `<ROTA>` e `<TEMPLATE>`).
 
 ---
 
-Você vai refatorar a tela `<ROTA>` (`<ARQUIVOS>`) do front-end Simcc (React 18 + Vite + Tailwind 3 + shadcn/radix) para o padrão do **Simcc Design Kit**, em `design-kit/`.
+Você vai construir a tela `<ROTA>` do novo front-end Simcc, correspondente à tarefa `<TAREFA>` de `docs/roadmap.md`. Stack: React 19, Vite, TanStack Router (rotas por arquivo), TanStack Query, Tailwind 4 e primitivos shadcn/radix. A tela segue o **Simcc Design Kit**, em `design-kit/`.
 
 **Antes de editar, leia:**
-1. `design-kit/DESIGN.md`: princípios, cores, tipografia, layout e templates de página.
-2. `design-kit/reference/components.md`: anatomia e receita Tailwind de cada componente.
-3. `design-kit/reference/icons.md`: ícone de cada conceito e migração phosphor → lucide.
-4. `design-kit/reference/screens.md`: template e ajustes previstos para esta rota.
-5. A página de exemplo mais próxima em `design-kit/examples/` (home, resultados ou pesquisador). Abra com `python3 -m http.server 8765 -d design-kit`.
+
+1. `CLAUDE.md` e `docs/arquitetura.md`: camadas, regras e convenções do projeto.
+2. O cartão da tarefa em `docs/roadmap.md`: escopo, dependências e critério de pronto.
+3. `design-kit/DESIGN.md`: princípios, cores, tipografia, layout, templates de página e a tabela de tradução para o Tailwind 4.
+4. `design-kit/reference/components.md` e `design-kit/reference/icons.md`.
+5. A página de exemplo mais próxima em `design-kit/examples/`. Abra com `python3 -m http.server 8765 -d design-kit`.
+6. Se a tela existia no legado, o destino dela em `docs/legado/inventario.md`. O código antigo pode ser consultado com `git show legado-v1:<caminho>`, só como referência de comportamento, nunca para copiar estrutura.
+
+**Onde cada coisa fica**
+
+- `src/routes/`: só a definição da rota (path, `validateSearch` com zod, `loader` que pré-carrega queries) e o componente da feature.
+- `src/features/<tela>/`: composição da tela. Não importa outra feature.
+- `src/entities/<entidade>/`: modelo, queries (TanStack Query) e componentes de apresentação da entidade (card, ref, avatar). É aqui que a entidade ganha **um** jeito de aparecer.
+- `src/shared/ui/`: primitivos do kit. Se um padrão do kit ainda não existe como componente (PillLink, StatCard, SectionHeader, ResultToolbar, PersonCard, ProductionCard, LoadingBlock), crie aqui seguindo a receita.
+- `src/shared/lib/design-tokens.ts`: toda escolha de cor por dado (área, qualis, tipo de produção…).
 
 **Regras obrigatórias**
-- Preserve a estética atual: moldura `neutral-100`, painel `neutral-50` `rounded-xl`, cards brancos com borda e **sem sombra**, Lexend, ação primária `bg-eng-blue hover:bg-eng-dark-blue`.
-- Siga o template da rota (A–F) e a ordem de blocos dele.
-- Cores saturadas só de dicionário: `search-*`, `area-*`, `prod-*`, `qualis-*`, `orient-*`, `status-*`, `bolsa-*`, `chart-neutral-*` (preset `design-kit/tokens/tailwind.preset.js`). Proibido hex literal em classe (`bg-[#…]`) e cadeias de ternário para escolher cor; use `src/lib/design-tokens.ts`.
+
+- Estado navegável (termos, filtros, aba, página, item aberto) fica na URL. Nada de Context ou store global para isso.
+- Dados só via TanStack Query, com hooks da entidade. Nada de `fetch` ou `useEffect` buscando dados em componente.
+- Pesquisador, programa, grupo e instituição têm rota própria; um drawer sobre a lista é uma rota com overlay, não um modal global.
+- Preserve a estética do kit: moldura `neutral-100`, painel `neutral-50` `rounded-xl`, cards brancos com borda e **sem sombra**, Lexend, ação primária `bg-eng-blue hover:bg-eng-dark-blue`.
+- Siga o template `<TEMPLATE>` (A–F) e a ordem de blocos dele.
+- Cores saturadas só de dicionário: `search-*`, `area-*`, `prod-*`, `qualis-*`, `orient-*`, `status-*`, `bolsa-*`, `chart-neutral-*`. Proibido hex literal em classe (`bg-[#…]`) e cadeias de ternário para escolher cor.
 - Cinzas: só `neutral-*` (exceto o bloco de carregamento `slate-300`/`slate-500`).
 - Raios: `rounded-md` em controles, `rounded-lg` em cards, `rounded-xl` só no painel.
-- Ícones: só `lucide-react`, 16px por padrão, conforme `icons.md`. Remova importações de `phosphor-react`, `@phosphor-icons/react` e `@tabler/icons-react` da tela.
-- Reutilize os primitivos de `src/components/ui/`; se um padrão do kit ainda não existe como componente (PillLink, StatCard, SectionHeader, ResultToolbar, PersonCard, ProductionCard, LoadingBlock), crie em `src/components/ui/` seguindo a receita e use em todas as ocorrências da tela.
+- Ícones: só `lucide-react`, 16px por padrão, conforme `icons.md`.
 - Microcopy em pt-BR, sentence case, legendas de KPI explicando o recorte.
 - Acessibilidade: `aria-label` em botões só com ícone, `aria-selected`/`aria-pressed` em tabs e toggles, foco visível.
-- Não mexa no Console (`src/components/console/`) nem nos tokens `sm-*`.
-- Não altere lógica de dados, queries ou rotas, a não ser que a tela exija para seguir o template.
 
 **Entrega**
-- Diff restrito aos arquivos da tela (mais componentes `ui/` novos, se houver).
-- Verificação: `npm run build` sem erros; a tela aberta em `npm run dev` (porta 8080) nos temas claro e escuro, em 1440px e 375px, sem rolagem horizontal.
+
+- Uma branch `feat/<TAREFA>-<slug>` a partir da `develop` e um PR para a `develop`.
+- `npm run typecheck`, `npm run lint`, `npm run test` e `npm run build` sem erros.
+- A tela aberta em `npm run dev` (porta 8080) nos temas claro e escuro, em 1440px e 375px, sem rolagem horizontal.
+- O status da tarefa atualizado em `docs/roadmap.md`.
 - Resumo curto: o que mudou, componentes criados e qualquer desvio do kit, com o motivo.

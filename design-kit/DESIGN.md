@@ -4,7 +4,7 @@ Guia de referência para a reestruturação das telas públicas do Simcc (Observ
 O objetivo é **manter a estética que já existe** (moldura neutra, azul `eng-blue`, tipografia Lexend, cards brancos sem sombra, cores semânticas fortes) e torná-la **uniforme entre telas**.
 
 > Escopo: rotas do `SearchLayout` e do `DocsLayout` (home, resultados, pesquisador, instituições, pós-graduação, grupos, indicadores, institutos, listagens, docs…).
-> Fora do escopo: o Console administrativo (`/console/*`), que tem os tokens próprios `sm-*` (navy/sky/red) no `tailwind.config.js`. Os dois conjuntos coexistem sem conflito: o kit público usa `--sc-*` / classes `sc-*` / cores `brand`, `search`, `area`, `prod`, `qualis`…
+> Fora do escopo: o Console administrativo (`/console/*`). No legado ele usava tokens próprios `sm-*` (navy/sky/red); o console novo é uma tarefa do roadmap (`docs/roadmap.md`), que decide se adota este kit. O kit público usa `--sc-*` / classes `sc-*` / cores `brand`, `search`, `area`, `prod`, `qualis`…
 
 ## Conteúdo do kit
 
@@ -16,7 +16,7 @@ design-kit/
 ├── tokens/
 │   ├── simcc.css            ← tokens CSS (--sc-*) + classes de componente (sc-*)
 │   ├── tokens.json          ← os mesmos tokens em formato W3C Design Tokens
-│   └── tailwind.preset.js   ← preset Tailwind com os dicionários semânticos
+│   └── tailwind.css         ← tema Tailwind 4 (@theme) com os dicionários semânticos
 ├── assets/
 │   ├── logo/                ← simcc.svg, simcc-white.svg, simbolo.svg, observatorio.svg, governo-bahia-secti.png
 │   ├── backgrounds/         ← ilustrações de fundo (home, graduate, indicadores, researcher)
@@ -39,6 +39,30 @@ python3 -m http.server 8765 -d design-kit
 ```
 
 Depois abra `http://localhost:8765/`.
+
+### Uso no app (Tailwind 4)
+
+O app importa o tema em `src/app/styles.css`:
+
+```css
+@import 'tailwindcss';
+@import '../../design-kit/tokens/tailwind.css';
+```
+
+O mesmo arquivo faz a ponte entre as variáveis do shadcn (`--primary`, `--border`, `--background`…) e os papéis da §2.1. Para importar arquivos do kit em TypeScript, use o alias `@kit/` (ex.: `@kit/assets/logo/simcc.svg`, `@kit/tokens/tokens.json`).
+
+Algumas receitas deste guia e de `reference/components.md` foram escritas com nomes do Tailwind 3. Ao aplicar, traduza:
+
+| Tailwind 3 | Tailwind 4 |
+|---|---|
+| `shadow-sm` / `shadow` | `shadow-xs` / `shadow-sm` |
+| `rounded-sm` / `rounded` | `rounded-xs` / `rounded-sm` |
+| `ring` (3px) | `ring-3` (`ring` agora tem 1px) |
+| `outline-none` | `outline-hidden` |
+| `bg-opacity-50`, `text-opacity-*` | `bg-black/50`, `text-white/80` |
+| borda padrão `gray-200` | borda padrão `currentColor`: o app define `border-border` na camada base |
+
+`rounded-md`, `rounded-lg`, `rounded-xl` e as cores do kit não mudam.
 
 ---
 
@@ -68,7 +92,7 @@ Depois abra `http://localhost:8765/`.
 | Título do hero central | `--sc-text-strong` | `text-slate-800` | `#1E293B` | `#FAFAFA` |
 | Bloco de carregamento | `--sc-loading` | `bg-slate-300` | `#CBD5E1` | `#404040` |
 
-O tema escuro é aplicado pela classe `.dark` no `<html>` (next-themes, `attribute="class"`).
+O tema escuro é aplicado pela classe `.dark` no `<html>` (no app, por `src/shared/lib/theme.ts`; preferência claro/escuro/sistema salva no navegador).
 
 ### 2.2 Marca
 
@@ -84,7 +108,7 @@ O tema escuro é aplicado pela classe `.dark` no `<html>` (next-themes, `attribu
 
 ### 2.3 Dicionários semânticos (não alterar valores)
 
-Todos estão em `tokens.json`, como variável `--sc-*` e como cor Tailwind no preset.
+Todos estão em `tokens.json`, como variável `--sc-*` e como cor Tailwind no tema (`tokens/tailwind.css`).
 
 **Tipo de busca** (`search-*`, `--sc-type-*`): swatch do seletor, chip de termo, botão de buscar, ranking, badge de evidências.
 
@@ -102,12 +126,12 @@ Todos estão em `tokens.json`, como variável `--sc-*` e como cor Tailwind no pr
 
 **Status**: Concluída `#6BC26B` · Em andamento `#DBB540`. **Bolsas**: PQ `#00D000` · DT `#183EFF`. **Gênero**: F `#D15697` · M `#5F82ED`. **Escala neutra para gráficos**: `#213E59 → #98A8BA` (6 passos).
 
-A página `/dicionario-cores` é a documentação pública desses dicionários. Ela deve ler de `tokens.json` (ou do preset), e não manter uma cópia própria.
+A página `/dicionario-cores` é a documentação pública desses dicionários. Ela deve ler de `tokens.json`, e não manter uma cópia própria.
 
 ### 2.4 Regras de cor
 
 - Texto sobre cor de dicionário é **branco e bold** (badge sólido). Para cores claras (`area-exatas`, `qualis-A3/A4`, `prod-capitulo`, `orient-ic`, `prod-oficina`) prefira usá-las como **marcador** (`sc-dot`, borda esquerda, barra) e não como fundo de texto.
-- Não use hex literal em componente (`bg-[#20BDBE]`). Use a classe do preset (`bg-area-saude`) ou uma função de mapeamento única (ver `reference/components.md` §Mapeamentos).
+- Não use hex literal em componente (`bg-[#20BDBE]`). Use a classe do tema (`bg-area-saude`) ou uma função de mapeamento única (ver `reference/components.md` §Mapeamentos).
 - Gráficos: série única usa a cor do dicionário correspondente; série sem semântica usa `chart-neutral-1…6`; nunca a paleta padrão do Recharts/Highcharts.
 
 ## 3. Tipografia
@@ -136,7 +160,7 @@ Título de produção (artigo etc.) fica **em caixa alta** (`uppercase`), como n
 
 - **Espaço**: base 4px. Gaps usuais: 8 (dentro de controles), 12–16 (entre cards), 24 (entre seções), 32 (gutter lateral da página; 16 no mobile).
 - **Raio**: `rounded-md` 6px em **todos os controles** (botão, input, chip, badge, tab de visão, item de menu). `rounded-lg` 8px em cards. `rounded-xl` 12px só no painel de conteúdo. `rounded-full` só em `sc-tag` contador, dots e avatar pequeno.
-- **Elevação**: plana. Sombra apenas em tab segmentada ativa (`shadow-sm`), avatar de perfil (`shadow-md`) e sobreposições (popover, dropdown, dialog: `shadow-lg`).
+- **Elevação**: plana. Sombra apenas em tab segmentada ativa (`shadow-xs`), avatar de perfil (`shadow-md`) e sobreposições (popover, dropdown, dialog: `shadow-lg`).
 - **Movimento**: `transition-colors` 150ms `ease`. Acordeões usam as animações `accordion-down/up` já existentes. Hover de foto de pesquisador: `scale(1.04)` 300ms. Respeitar `prefers-reduced-motion`.
 
 ## 5. Ícones

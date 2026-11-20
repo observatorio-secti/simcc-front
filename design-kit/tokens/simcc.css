@@ -167,7 +167,7 @@
   --sc-chart-6: #98a8ba;
 }
 
-/* Tema escuro (next-themes aplica .dark no <html>) */
+/* Tema escuro (o app aplica .dark no <html>) */
 .dark {
   --sc-frame: #000000;
   --sc-panel: var(--sc-n-900);

@@ -1,3 +1,5 @@
+// Legado: lê logos e fundos de src/ da plataforma anterior. Rode sobre um
+// checkout da tag legado-v1 (os arquivos gerados já estão em design-kit/assets).
 import fs from 'fs'; import path from 'path';
 const root = process.argv[2], out = path.join(root,'design-kit/assets');
 // logos: JSX -> SVG

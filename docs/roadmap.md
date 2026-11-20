@@ -1,0 +1,222 @@
+# Roadmap do novo front
+
+Atualizado em 2026-11-20. Cada tarefa tem um ID, as dependências e um critério de "pronto". Escolha uma tarefa **a fazer** cujas dependências estejam **feitas**; o fluxo de trabalho está em [README.md](README.md).
+
+**Status possíveis:** a fazer · em andamento · em revisão · feito · bloqueada (dependência externa).
+
+## Visão geral
+
+| Fase         | O que entrega                                                                | Pode começar                                   |
+| ------------ | ---------------------------------------------------------------------------- | ---------------------------------------------- |
+| 0. Setup     | Projeto limpo, tooling, kit no Tailwind 4, este plano                        | feito                                          |
+| 1. Fundação  | Cliente da API, primitivos de UI, moldura, sessão, motor de listagem, testes | agora, em paralelo                             |
+| 2. Entidades | Modelo, queries e componentes de cada entidade                               | após F1.1 e F1.2                               |
+| 3. Telas     | Telas pelos templates do kit                                                 | conforme as entidades ficam prontas            |
+| 4. Virada    | Paridade, ambiente de produção, merge na `main`                              | quando a fase 3 e a fase 3 do backend fecharem |
+
+```mermaid
+graph LR
+  F0[F0 Setup] --> F11[F1.1 API v2]
+  F0 --> F12[F1.2 Primitivos UI]
+  F0 --> F17[F1.7 Analytics]
+  F12 --> F13[F1.3 Moldura]
+  F11 --> F14[F1.4 Sessão]
+  F11 --> F16[F1.6 Testes]
+  F11 --> F15[F1.5 Motor de listagem]
+  F12 --> F15
+  F11 --> E1[E1 Pesquisador]
+  F12 --> E1
+  F11 --> E2[E2 Produções]
+  F12 --> E2
+  F11 --> E3[E3 Instituição]
+  F11 --> E4[E4 Programa]
+  F11 --> E5[E5 Grupo / ODA]
+  F13 --> T1[T1 Busca: home]
+  F15 --> T2[T2 Busca: resultados]
+  T1 --> T2
+  E1 --> T2
+  E2 --> T2
+  E1 --> T3[T3 Pesquisador]
+  E2 --> T3
+  F13 --> T3
+  E3 --> T4[T4 Instituições]
+  E4 --> T5[T5 Pós-graduação]
+  E5 --> T6[T6 Grupos]
+  F13 --> T8[T8 Documentos]
+  F14 --> T12[T12 Console]
+```
+
+## Quadro de tarefas
+
+| ID    | Tarefa                                            | Depende de       | Bloqueio externo                                                              | Status    | Responsável |
+| ----- | ------------------------------------------------- | ---------------- | ----------------------------------------------------------------------------- | --------- | ----------- |
+| F0    | Setup inicial                                     | —                | —                                                                             | feito     | —           |
+| F1.1  | Cliente e tipos da API v2                         | F0               | —                                                                             | a fazer   |             |
+| F1.2  | Primitivos do kit e `design-tokens.ts`            | F0               | —                                                                             | a fazer   |             |
+| F1.3  | Moldura e navegação                               | F1.2             | —                                                                             | a fazer   |             |
+| F1.4  | Sessão e autenticação                             | F1.1             | IdP: cookie `httpOnly`, `/me` com escopos                                     | a fazer   |             |
+| F1.5  | Motor de listagem                                 | F1.1, F1.2       | Backend fase 0: `param` nas facetas (contornável)                             | a fazer   |             |
+| F1.6  | Infraestrutura de testes (MSW)                    | F1.1             | —                                                                             | a fazer   |             |
+| F1.7  | Analytics (GA4)                                   | F0               | —                                                                             | a fazer   |             |
+| K1    | Gerar tema e CSS do kit a partir de `tokens.json` | F0               | —                                                                             | a fazer   |             |
+| E1    | Entidade pesquisador                              | F1.1, F1.2       | Backend fase 0 (`id`, `image_url`) e fase 1 (detalhe completo)                | a fazer   |             |
+| E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | Backend fase 1 (enum único, `highlights`, `brand`); `report` ainda não pedido | a fazer   |             |
+| E3    | Entidade instituição                              | F1.1, F1.2       | Backend fase 1 (detalhe, facetas)                                             | a fazer   |             |
+| E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | Backend fase 1 (detalhe com linhas)                                           | a fazer   |             |
+| E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                                             | a fazer   |             |
+| E6    | Entidade revista                                  | F1.1, F1.2       | Backend fase 2                                                                | bloqueada |             |
+| T1    | Busca: home e barra de busca                      | F1.3             | —                                                                             | a fazer   |             |
+| T2    | Busca: resultados                                 | T1, F1.5, E1, E2 | —                                                                             | a fazer   |             |
+| T3    | Perfil do pesquisador                             | F1.3, E1, E2     | Backend fase 1 (detalhe completo)                                             | a fazer   |             |
+| T4    | Instituições (lista e detalhe)                    | F1.3, F1.5, E3   | Backend fase 1                                                                | a fazer   |             |
+| T5    | Pós-graduação (landing, lista e detalhe)          | F1.3, F1.5, E4   | Backend fase 1                                                                | a fazer   |             |
+| T6    | Grupos de pesquisa                                | F1.3, F1.5, E5   | —                                                                             | a fazer   |             |
+| T7    | Indicadores                                       | F1.3             | Backend fase 2 (`/v2/metrics/*`)                                              | bloqueada |             |
+| T8    | Páginas de documento                              | F1.3             | —                                                                             | a fazer   |             |
+| T9    | Vídeos                                            | F1.3             | Decisão de hospedagem                                                         | a fazer   |             |
+| T10   | MarIA                                             | F1.3, E1, E2     | Backend fase 3                                                                | bloqueada |             |
+| T11   | Páginas autônomas (sobre, observatório, tv)       | F1.2             | —                                                                             | a fazer   |             |
+| T12   | Console administrativo                            | F1.4, F1.2       | Times de admin e ETL                                                          | a fazer   |             |
+| D1    | Decidir destino das telas sem dono                | —                | Produto                                                                       | a fazer   |             |
+| V1–V5 | Virada (ver fase 4)                               | fase 3           | Backend fase 3                                                                | a fazer   |             |
+
+## Fase 1: fundação
+
+### F1.1 Cliente e tipos da API v2
+
+- **Objetivo:** uma forma única e tipada de chamar a v2.
+- **Toca em:** `src/api/`, `src/config/`.
+- **Pronto quando:**
+  - `npm run api:types` gera `src/api/generated/simcc-v2.d.ts` a partir de `/v2/openapi.json` (não do mesclado), e o arquivo está commitado;
+  - `src/api/simcc.ts` exporta um cliente `openapi-fetch` com `baseUrl` de `env.simccApiUrl`;
+  - um middleware converte erros (`{ error: { code, message, details } }` e o antigo `{ detail }`) em `ApiError` (`status`, `code`, `message`, `details`);
+  - existem helpers de tipo para os envelopes de lista e de detalhe; o de detalhe aceita o objeto solto e `{ data, meta }`, porque o backend migra na fase 3;
+  - testes unitários da normalização de erro.
+
+### F1.2 Primitivos do kit e `design-tokens.ts`
+
+- **Objetivo:** a base visual que todas as telas usam.
+- **Toca em:** `src/shared/ui/`, `src/shared/lib/`, `components.json`.
+- **Pronto quando:**
+  - `components.json` do shadcn aponta para `@/shared/ui` e `@/shared/lib`;
+  - primitivos adaptados ao kit (`design-kit/reference/components.md`): button, card (sem sombra), badge, input, tabs, accordion, checkbox, dialog, sheet, dropdown-menu, popover, select, separator, skeleton, tooltip, table, scroll-area, toggle-group, sonner;
+  - componentes do kit: `PillLink`, `StatCard`, `SectionHeader`, `ResultToolbar` (sem "Baixar resultado", ver [ADR 0006](decisoes/0006-sem-exportacao-csv.md)), `LoadingBlock`, `EmptyState`;
+  - `src/shared/lib/design-tokens.ts` com um mapeamento por dicionário (área, Qualis, tipo de produção, tipo de busca, orientação, status, bolsa), com testes;
+  - uma vitrine dos primitivos numa rota só de desenvolvimento, para revisão visual.
+
+### F1.3 Moldura e navegação
+
+- **Objetivo:** topbar, sidebar e crumbbar da área pública (`DESIGN.md` §6.1).
+- **Toca em:** `src/features/shell/`, `src/routes/` (rota de layout sem path), `src/routes/__root.tsx`.
+- **Pronto quando:**
+  - uma rota de layout envolve as telas públicas com a moldura;
+  - o breadcrumb usa o nome legível de cada rota (`staticData.crumb`), e não o slug;
+  - sidebar colapsável (preferência salva via `src/shared/lib/storage.ts`), sheet no mobile;
+  - 404 e tela de erro definitivas no padrão do kit;
+  - a home provisória da fase 0 é removida.
+
+### F1.4 Sessão e autenticação
+
+- **Objetivo:** login no IdP e rotas protegidas ([ADR 0008](decisoes/0008-autenticacao.md)).
+- **Toca em:** `src/api/idp.ts`, `src/features/auth/`, `src/routes/auth.*`, `src/app/` (sessão no contexto do router).
+- **Pronto quando:**
+  - fluxo PKCE completo (login, callback, troca do code, logout), portado de `legado-v1:src/services/auth.ts`;
+  - access token só em memória, com refresh por fila (padrão de `legado-v1:src/lib/api.ts`);
+  - `beforeLoad` redireciona rotas protegidas;
+  - `useSession()` expõe usuário e escopos;
+  - a solução provisória para o refresh token, enquanto o IdP não emite cookie, está registrada no ADR 0008.
+
+### F1.5 Motor de listagem
+
+- **Objetivo:** a mesma mecânica de busca, filtro, faceta, ordenação e paginação em todas as listas.
+- **Toca em:** `src/shared/lib/search-params.ts`, `src/shared/ui/` (FacetPanel, Pagination, SortSelect).
+- **Pronto quando:**
+  - um schema zod de busca é usado tanto no `validateSearch` quanto na chamada à API, sem conversão manual por tela;
+  - `FacetPanel` renderiza qualquer `FacetResult` da v2. A faceta `year` vira intervalo (`year_start`/`year_end`). Enquanto o backend não envia `param`, um mapa local faceta → filtro resolve;
+  - paginação e ordenação mudam a URL;
+  - testes do round-trip URL ↔ API.
+
+### F1.6 Infraestrutura de testes
+
+- **Toca em:** `src/test/`.
+- **Pronto quando:** existem handlers MSW a partir dos exemplos do OpenAPI; `renderRoute()` monta uma rota real com router em memória e `QueryClient` de teste; há um teste de exemplo de tela.
+
+### F1.7 Analytics (GA4)
+
+- **Toca em:** `src/shared/lib/analytics.ts`, `src/app/`.
+- **Pronto quando:** um `page_view` é enviado a cada navegação do router, só quando `VITE_GA_MEASUREMENT_ID` está definido; sem a variável, nenhum script do Google é carregado.
+
+### K1 Tokens do kit gerados de `tokens.json`
+
+- **Toca em:** `design-kit/tokens/`, `scripts/`.
+- **Pronto quando:** um script gera `tailwind.css` e o bloco `:root` de `simcc.css` a partir de `tokens.json`, e a CI falha se os arquivos estiverem fora de sincronia.
+
+## Fase 2: entidades
+
+Cada entidade fica em `src/entities/<nome>/`, com:
+
+- `model.ts`: tipos derivados dos gerados, mais rótulos e formatação;
+- `queries.ts`: `queryOptions` com as keys `['<nome>', '<operação>', params]`;
+- `ui/`: componentes de apresentação.
+
+As entidades são independentes entre si e podem ser feitas em paralelo.
+
+| ID  | Entidade                             | Componentes esperados                                                                                                | Observações                                                                                                                                                                                                                                                 |
+| --- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| E1  | Pesquisador (`researcher`)           | `ResearcherRef` (nome com link), `ResearcherAvatar`, `PersonCard`, cabeçalho de perfil                               | Usar `id` e `image_url`; `include=education,experience,foment` no detalhe                                                                                                                                                                                   |
+| E2  | Produção (`production`)              | Registro por tipo: cor, ícone, título, subtítulo, etiquetas, campos do detalhe. `ProductionCard`, `ProductionDetail` | Portar a ideia de `legado-v1:src/components/homepage/result-home-v2/production-registry.ts`. Tipos: article, book, book_chapter, software, patent, event, research_project, brand, report. `report` (relatório técnico) ainda precisa ser pedido ao backend |
+| E3  | Instituição (`institution`)          | `InstitutionRef`, `EntityCard`                                                                                       | Detalhe depende do backend fase 1                                                                                                                                                                                                                           |
+| E4  | Programa (`graduate-program`)        | `ProgramRef`, `EntityCard`, linhas de pesquisa                                                                       | Detalhe depende do backend fase 1                                                                                                                                                                                                                           |
+| E5  | Grupo de pesquisa (`research-group`) | `GroupRef`, `EntityCard`                                                                                             | Cliente em `src/api/oda/` com schema zod; ver [ADR 0007](decisoes/0007-escopo-de-dados.md)                                                                                                                                                                  |
+| E6  | Revista (`magazine`)                 | `MagazineRef` com Qualis e JCR                                                                                       | Bloqueada: backend fase 2                                                                                                                                                                                                                                   |
+
+**Pronto quando**, para cada entidade: queries e componentes testados, e componentes visíveis na vitrine de desenvolvimento.
+
+## Fase 3: telas
+
+Templates de `design-kit/DESIGN.md` §6.2. As rotas novas propostas estão em [legado/inventario.md](legado/inventario.md); a tarefa confirma o path e atualiza o inventário.
+
+| ID  | Tela                         | Template  | Notas                                                                                                                                                                                                                                                    |
+| --- | ---------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T1  | Busca: home e barra de busca | A         | Feature `search`. Seletor de tipo, sugestões via `/v2/suggestion`                                                                                                                                                                                        |
+| T2  | Busca: resultados            | D         | Mesma feature `search`, depois da T1. Abas por tipo, facetas, KPIs, ranking. Abrir um pesquisador navega para a rota do perfil (overlay)                                                                                                                 |
+| T3  | Perfil do pesquisador        | E         | `/pesquisadores/$id`, abas de produção. Nuvem de termos quando existir `/v2/researcher/{id}/terms` (backend fase 2)                                                                                                                                      |
+| T4  | Instituições                 | C → E     | Lista e detalhe                                                                                                                                                                                                                                          |
+| T5  | Pós-graduação                | B → C/E   | Mapa Leaflet dos territórios. GeoJSON: `git show legado-v1:public/territorio_relacionado.json`                                                                                                                                                           |
+| T6  | Grupos de pesquisa           | C         | Dados da ODA                                                                                                                                                                                                                                             |
+| T7  | Indicadores                  | B         | Bloqueada: `/v2/metrics/{indicador}`, migrado um por vez pelo backend                                                                                                                                                                                    |
+| T8  | Documentos                   | F         | Termos, privacidade, API, informações e dicionário de cores (lendo `@kit/tokens/tokens.json`). Textos recuperados da tag                                                                                                                                 |
+| T9  | Vídeos                       | F         | Antes de começar, decidir onde hospedar os vídeos (144 MB no legado, em `public/vid`)                                                                                                                                                                    |
+| T10 | MarIA                        | D (chat)  | Bloqueada: backend fase 3                                                                                                                                                                                                                                |
+| T11 | Sobre, Observatório, TV      | autônomas | Mídia recuperada da tag (`legado-v1:assets/observatorio/`)                                                                                                                                                                                               |
+| T12 | Console                      | próprio   | Instituições, pesquisadores, coleções e ETL. Decide se adota o kit público. ETL só com token do IdP                                                                                                                                                      |
+| D1  | Telas sem dono               | —         | Decidir entre reconstruir ou descontinuar: incites, índice do pesquisador, provimento de cargo, painéis de dados externos, listagens (bolsistas, eventos, textos em revista, relatórios técnicos), produções recentes. Registrar a decisão no inventário |
+
+**Pronto quando**, para cada tela: segue o template e as regras do kit; funciona em 1440px e 375px, nos temas claro e escuro; todo estado navegável está na URL; há teste com a API simulada; o inventário está atualizado.
+
+## Fase 4: virada
+
+| ID  | Tarefa                    | Pronto quando                                                                                                                                                                                    |
+| --- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| V1  | Paridade                  | Toda linha de [legado/inventario.md](legado/inventario.md) está como "feita" ou "descontinuada"                                                                                                  |
+| V2  | Redirects                 | URLs antigas relevantes (`/researcher`, `/instituicao/:acronym`, `/resultados*`, `/resultados-ia`…) redirecionam para as novas                                                                   |
+| V3  | Ambiente de produção      | `.env` do servidor com os nomes novos (`.env.example`); `deploy-obs.yaml` sem o `--build-arg VITE_URL_GERAL2`; `compose.yaml` revisado (hoje aponta para uma porta de um estágio `FROM scratch`) |
+| V4  | Coordenação com o backend | Fase 3 do backend (remoção dos campos `deprecated`, detalhe em `{ data, meta }`) publicada junto com o merge `develop` → `main`                                                                  |
+| V5  | Desligamento              | Lista de rotas v1 que o front deixou de usar entregue ao backend                                                                                                                                 |
+
+## Dependências do backend
+
+Fases definidas em [backend/resposta-backend-v2.md](backend/resposta-backend-v2.md) §8.
+
+| Fase do backend | Entrega                                                                                                                                                             | Desbloqueia                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| 0               | Envelope de erro, `meta` nos catálogos, `param` nas facetas, `id` e `image_url`, `sort_by`/`sort_order` nas produções, `null` padronizado, correção de `data_as_of` | Simplifica F1.1, F1.5, E1               |
+| 1               | Detalhe completo do pesquisador, detalhe de instituição e programa, `brand` e `guidance`, `highlights`, enum único de tipo                                          | E1–E4 completos, T3, T4, T5             |
+| 2               | Exemplos no OpenAPI, revista, bolsistas, termos, Qualis e JCR tipados, primeiros indicadores                                                                        | E6, T7 (parcial), nuvem de termos na T3 |
+| 3               | Remoção dos campos `deprecated`, detalhe em `{ data, meta }`, MarIA, recentes                                                                                       | T10, V4                                 |
+
+**Fora do backend:** cookie `httpOnly` e `/me` com escopos (time do IdP, para F1.4); ETL validando o token do IdP e troca da chave exposta (time do ETL, para T12; a troca é urgente).
+
+## Pedidos ainda não feitos ao backend
+
+- Tipo de produção `report` (relatório técnico, rota legada `researcher_report`), para E2.
