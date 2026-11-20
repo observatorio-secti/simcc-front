@@ -1,0 +1,9 @@
+dist
+coverage
+package-lock.json
+src/routeTree.gen.ts
+src/api/generated
+design-kit
+.claude
+compose.yaml
+.github/workflows/deploy-obs.yaml

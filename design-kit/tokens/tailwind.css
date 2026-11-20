@@ -1,0 +1,140 @@
+/* ==========================================================================
+   Simcc Design Kit — tema Tailwind 4 (área pública)
+
+   Uso no CSS de entrada do app:
+     @import 'tailwindcss';
+     @import '<caminho>/design-kit/tokens/tailwind.css';
+
+   Substitui o antigo `tailwind.preset.js` (Tailwind 3) com os mesmos valores.
+   A fonte de verdade dos valores é `tokens.json`; ao mudar um token, mude aqui,
+   em `tokens.json` e em `simcc.css`.
+
+     bg-eng-blue            → ação primária
+     bg-search-article      → cor do tipo de busca "article"
+     bg-area-saude          → grande área CIÊNCIAS DA SAÚDE
+     border-l-qualis-A1     → borda do card de produção
+     bg-prod-patente        → tipo de produção
+   ========================================================================== */
+
+/* Tema escuro por classe: o app aplica .dark no <html> (src/shared/lib/theme.ts). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Tipografia: Lexend em tudo */
+  --font-sans: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+
+  /* Breakpoints do projeto (sm, md, lg e xl são os padrões do Tailwind) */
+  --breakpoint-2xl: 120rem; /* 1920px */
+
+  /* Marca */
+  --color-eng-blue: #559fb8;
+  --color-eng-dark-blue: #024a60;
+  --color-brand: #559fb8;
+  --color-brand-strong: #024a60;
+  --color-brand-soft: #e3f0f4;
+  --color-brand-teal: #00757a;
+  --color-brand-wine: #9c1f2e;
+  --color-deco: #c8d7e1;
+  --color-deco-soft: #e1eaf0;
+
+  /* Tipo de busca */
+  --color-search-profile: #1d4ed8;
+  --color-search-article: #3b82f6;
+  --color-search-book: #ec4899;
+  --color-search-patent: #06b6d4;
+  --color-search-software: #0d9488;
+  --color-search-speaker: #f97316;
+  --color-search-area: #22c55e;
+  --color-search-name: #ef4444;
+  --color-search-abstract: #eab308;
+  --color-search-maria: #559fb8;
+
+  /* Grande área do conhecimento (CNPq) */
+  --color-area-agrarias: #f87171;
+  --color-area-exatas: #4ade80;
+  --color-area-saude: #20bdbe;
+  --color-area-humanas: #f5831f;
+  --color-area-biologicas: #eb008b;
+  --color-area-engenharias: #fcb712;
+  --color-area-sociais: #009245;
+  --color-area-linguistica: #a67c52;
+  --color-area-outros: #1b1464;
+
+  /* Tipo de produção */
+  --color-prod-artigo: #5f82ed;
+  --color-prod-livro-capitulo: #d15697;
+  --color-prod-livro: #792f4c;
+  --color-prod-capitulo: #dbafd0;
+  --color-prod-patente: #66b4d0;
+  --color-prod-software: #096670;
+  --color-prod-marca: #1b1464;
+  --color-prod-relatorio: #662d91;
+  --color-prod-congresso: #ff5800;
+  --color-prod-simposio: #d53a2c;
+  --color-prod-seminario: #ffbd7b;
+  --color-prod-oficina: #fcee21;
+
+  /* Orientação */
+  --color-orient-ic: #8bfbd3;
+  --color-orient-mestrado: #67a896;
+  --color-orient-doutorado: #425450;
+  --color-orient-tcc: #77d2b6;
+  --color-orient-outra: #577e74;
+  --color-orient-monografia: #2f7f7c;
+  --color-orient-posdoc: #46724b;
+
+  /* Qualis (a chave mantém a caixa do dado: bg-qualis-A1) */
+  --color-qualis-A1: #34663c;
+  --color-qualis-A2: #9dc356;
+  --color-qualis-A3: #b1c38a;
+  --color-qualis-A4: #bec4b3;
+  --color-qualis-B1: #d56438;
+  --color-qualis-B2: #dd883d;
+  --color-qualis-B3: #e3b081;
+  --color-qualis-B4: #e3ac96;
+  --color-qualis-C: #ce3830;
+  --color-qualis-SQ: #4a1314;
+
+  /* Status, bolsas e gênero */
+  --color-status-concluida: #6bc26b;
+  --color-status-andamento: #dbb540;
+  --color-bolsa-PQ: #00d000;
+  --color-bolsa-DT: #183eff;
+  --color-gender-f: #d15697;
+  --color-gender-m: #5f82ed;
+
+  /* Escala neutra para gráficos sem semântica */
+  --color-chart-neutral-1: #213e59;
+  --color-chart-neutral-2: #354e68;
+  --color-chart-neutral-3: #485f78;
+  --color-chart-neutral-4: #5c7188;
+  --color-chart-neutral-5: #6f8399;
+  --color-chart-neutral-6: #98a8ba;
+
+  /* Raio: rounded-md (6px) controles, rounded-lg (8px) cards, rounded-panel (12px) painel */
+  --radius-panel: 12px;
+
+  /* Dimensões de layout: h-topbar, h-crumbbar, max-w-content */
+  --spacing-topbar: 40px;
+  --spacing-crumbbar: 68px;
+  --container-content: 1200px;
+
+  /* Hero de página: text-hero (30 → 48px) */
+  --text-hero: clamp(1.875rem, 1.2rem + 2.6vw, 3rem);
+  --text-hero--line-height: 1.1;
+  --text-hero--letter-spacing: -0.05em;
+}
+
+/* Fundos ilustrados (o caminho é relativo a este arquivo) */
+@utility bg-deco-home {
+  background-image: url('../assets/backgrounds/home.png');
+}
+@utility bg-deco-graduate {
+  background-image: url('../assets/backgrounds/graduate.png');
+}
+@utility bg-deco-indicadores {
+  background-image: url('../assets/backgrounds/indicadores.png');
+}
+@utility bg-deco-researcher {
+  background-image: url('../assets/backgrounds/researcher.png');
+}
