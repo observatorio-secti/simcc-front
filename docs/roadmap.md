@@ -60,10 +60,10 @@ graph LR
 | F0    | Setup inicial                                     | —                | —                                                           | feito      | —           |
 | F1.1  | Cliente e tipos da API v2                         | F0               | —                                                           | feito      |             |
 | F1.2  | Primitivos do kit e `design-tokens.ts`            | F0               | —                                                           | feito      |             |
-| F1.3  | Moldura e navegação                               | F1.2             | —                                                           | a fazer    |             |
+| F1.3  | Moldura e navegação                               | F1.2             | —                                                           | em revisão |             |
 | F1.4  | Sessão e autenticação                             | F1.1             | —                                                           | a fazer    |             |
 | F1.5  | Motor de listagem                                 | F1.1, F1.2       | —                                                           | a fazer    |             |
-| F1.6  | Infraestrutura de testes (MSW)                    | F1.1             | —                                                           | em revisão |             |
+| F1.6  | Infraestrutura de testes (MSW)                    | F1.1             | —                                                           | a fazer    |             |
 | F1.7  | Analytics (GA4)                                   | F0               | —                                                           | feito      |             |
 | K1    | Gerar tema e CSS do kit a partir de `tokens.json` | F0               | —                                                           | feito      |             |
 | E1    | Entidade pesquisador                              | F1.1, F1.2       | —                                                           | a fazer    |             |
