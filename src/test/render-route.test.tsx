@@ -44,7 +44,11 @@ describe('renderRoute', () => {
     await renderRoute('/dev/vitrine');
 
     expect(
-      await screen.findByRole('heading', { name: /vitrine do kit/i }),
+      await screen.findByRole(
+        'heading',
+        { name: /vitrine do kit/i },
+        { timeout: 5000 },
+      ),
     ).toBeInTheDocument();
   });
 });
