@@ -14,6 +14,8 @@ import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
+import { Route as PublicInstituicoesIndexRouteImport } from './routes/_public/instituicoes/index'
+import { Route as PublicInstituicoesIdRouteImport } from './routes/_public/instituicoes/$id'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -39,18 +41,32 @@ const DevVitrineRoute = DevVitrineRouteImport.update({
   path: '/dev/vitrine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicInstituicoesIndexRoute = PublicInstituicoesIndexRouteImport.update({
+  id: '/instituicoes/',
+  path: '/instituicoes/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicInstituicoesIdRoute = PublicInstituicoesIdRouteImport.update({
+  id: '/instituicoes/$id',
+  path: '/instituicoes/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
+  '/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/instituicoes/': typeof PublicInstituicoesIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
+  '/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/instituicoes': typeof PublicInstituicoesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +75,26 @@ export interface FileRoutesById {
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
+  '/_public/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine'
+  fullPaths:
+    | '/'
+    | '/auth/callback'
+    | '/auth/sem-acesso'
+    | '/dev/vitrine'
+    | '/instituicoes/$id'
+    | '/instituicoes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine' | '/'
+  to:
+    | '/auth/callback'
+    | '/auth/sem-acesso'
+    | '/dev/vitrine'
+    | '/'
+    | '/instituicoes/$id'
+    | '/instituicoes'
   id:
     | '__root__'
     | '/_public'
@@ -72,6 +102,8 @@ export interface FileRouteTypes {
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/_public/'
+    | '/_public/instituicoes/$id'
+    | '/_public/instituicoes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -118,15 +150,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevVitrineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public/instituicoes/': {
+      id: '/_public/instituicoes/'
+      path: '/instituicoes'
+      fullPath: '/instituicoes/'
+      preLoaderRoute: typeof PublicInstituicoesIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/instituicoes/$id': {
+      id: '/_public/instituicoes/$id'
+      path: '/instituicoes/$id'
+      fullPath: '/instituicoes/$id'
+      preLoaderRoute: typeof PublicInstituicoesIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
   }
 }
 
 interface PublicRouteChildren {
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicInstituicoesIdRoute: typeof PublicInstituicoesIdRoute
+  PublicInstituicoesIndexRoute: typeof PublicInstituicoesIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
   PublicIndexRoute: PublicIndexRoute,
+  PublicInstituicoesIdRoute: PublicInstituicoesIdRoute,
+  PublicInstituicoesIndexRoute: PublicInstituicoesIndexRoute,
 }
 
 const PublicRouteWithChildren =
