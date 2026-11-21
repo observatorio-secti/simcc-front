@@ -49,7 +49,7 @@ DefaultLayout
 | `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`           | T5               | feito         |
 | `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`       | T6               | feito         |
 | `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4               | feito         |
-| `/indicadores`                         | `/indicadores`                                   | T7               | a fazer       |
+| `/indicadores`                         | `/indicadores`                                   | T7               | feito         |
 | `/incites`                             | `/incites`                                       | D1.1             | feito         |
 | `/producoes-recentes`                  | —                                                | —                | descontinuada |
 | `/paines-dados-externos`               | `/paineis-dados-externos`                        | D1.2             | feito         |

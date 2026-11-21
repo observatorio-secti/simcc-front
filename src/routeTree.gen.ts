@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicIncitesRouteImport } from './routes/_public/incites'
+import { Route as PublicIndicadoresRouteImport } from './routes/_public/indicadores'
 import { Route as PublicIndicePesquisadorRouteImport } from './routes/_public/indice-pesquisador'
 import { Route as PublicPaineisDadosExternosRouteImport } from './routes/_public/paineis-dados-externos'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -37,6 +38,11 @@ const PublicIndexRoute = PublicIndexRouteImport.update({
 const PublicIncitesRoute = PublicIncitesRouteImport.update({
   id: '/incites',
   path: '/incites',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicIndicadoresRoute = PublicIndicadoresRouteImport.update({
+  id: '/indicadores',
+  path: '/indicadores',
   getParentRoute: () => PublicRoute,
 } as any)
 const PublicIndicePesquisadorRoute = PublicIndicePesquisadorRouteImport.update({
@@ -105,6 +111,7 @@ const PublicPosGraduacaoIdRoute = PublicPosGraduacaoIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/incites': typeof PublicIncitesRoute
+  '/indicadores': typeof PublicIndicadoresRoute
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/incites': typeof PublicIncitesRoute
+  '/indicadores': typeof PublicIndicadoresRoute
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
   '/_public/incites': typeof PublicIncitesRoute
+  '/_public/indicadores': typeof PublicIndicadoresRoute
   '/_public/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/_public/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/incites'
+    | '/indicadores'
     | '/indice-pesquisador'
     | '/paineis-dados-externos'
     | '/auth/callback'
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/incites'
+    | '/indicadores'
     | '/indice-pesquisador'
     | '/paineis-dados-externos'
     | '/auth/callback'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_public'
     | '/_public/incites'
+    | '/_public/indicadores'
     | '/_public/indice-pesquisador'
     | '/_public/paineis-dados-externos'
     | '/auth/callback'
@@ -232,6 +244,13 @@ declare module '@tanstack/react-router' {
       path: '/incites'
       fullPath: '/incites'
       preLoaderRoute: typeof PublicIncitesRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/indicadores': {
+      id: '/_public/indicadores'
+      path: '/indicadores'
+      fullPath: '/indicadores'
+      preLoaderRoute: typeof PublicIndicadoresRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/indice-pesquisador': {
@@ -323,6 +342,7 @@ declare module '@tanstack/react-router' {
 
 interface PublicRouteChildren {
   PublicIncitesRoute: typeof PublicIncitesRoute
+  PublicIndicadoresRoute: typeof PublicIndicadoresRoute
   PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
   PublicPaineisDadosExternosRoute: typeof PublicPaineisDadosExternosRoute
   PublicIndexRoute: typeof PublicIndexRoute
@@ -337,6 +357,7 @@ interface PublicRouteChildren {
 
 const PublicRouteChildren: PublicRouteChildren = {
   PublicIncitesRoute: PublicIncitesRoute,
+  PublicIndicadoresRoute: PublicIndicadoresRoute,
   PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,
   PublicPaineisDadosExternosRoute: PublicPaineisDadosExternosRoute,
   PublicIndexRoute: PublicIndexRoute,
