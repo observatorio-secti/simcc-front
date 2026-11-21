@@ -171,6 +171,18 @@
   --sc-chart-4: #5c7188;
   --sc-chart-5: #6f8399;
   --sc-chart-6: #98a8ba;
+
+  /* Níveis do índice do pesquisador */
+  --sc-index-a-plus: #22c55e;
+  --sc-index-a: #4ade80;
+  --sc-index-b-plus: #facc15;
+  --sc-index-b: #fde047;
+  --sc-index-c-plus: #fb923c;
+  --sc-index-c: #fdba74;
+  --sc-index-d-plus: #f87171;
+  --sc-index-d: #fca5a5;
+  --sc-index-e-plus: #a3a3a3;
+  --sc-index-e: #d4d4d4;
 }
 
 /* Tema escuro (o app aplica .dark no <html>) */

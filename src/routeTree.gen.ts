@@ -11,10 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicIncitesRouteImport } from './routes/_public/incites'
+import { Route as PublicIndicePesquisadorRouteImport } from './routes/_public/indice-pesquisador'
 import { Route as PublicPaineisDadosExternosRouteImport } from './routes/_public/paineis-dados-externos'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
+import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
+import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -23,6 +27,16 @@ const PublicRoute = PublicRouteImport.update({
 const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicIncitesRoute = PublicIncitesRouteImport.update({
+  id: '/incites',
+  path: '/incites',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicIndicePesquisadorRoute = PublicIndicePesquisadorRouteImport.update({
+  id: '/indice-pesquisador',
+  path: '/indice-pesquisador',
   getParentRoute: () => PublicRoute,
 } as any)
 const PublicPaineisDadosExternosRoute =
@@ -46,53 +60,87 @@ const DevVitrineRoute = DevVitrineRouteImport.update({
   path: '/dev/vitrine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicPosGraduacaoIndexRoute = PublicPosGraduacaoIndexRouteImport.update({
+  id: '/pos-graduacao/',
+  path: '/pos-graduacao/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicPosGraduacaoIdRoute = PublicPosGraduacaoIdRouteImport.update({
+  id: '/pos-graduacao/$id',
+  path: '/pos-graduacao/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/incites': typeof PublicIncitesRoute
+  '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
+  '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRoutesByTo {
+  '/incites': typeof PublicIncitesRoute
+  '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
+  '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
+  '/_public/incites': typeof PublicIncitesRoute
+  '/_public/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/_public/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
+  '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/incites'
+    | '/indice-pesquisador'
     | '/paineis-dados-externos'
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
+    | '/pos-graduacao/$id'
+    | '/pos-graduacao/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/incites'
+    | '/indice-pesquisador'
     | '/paineis-dados-externos'
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/'
+    | '/pos-graduacao/$id'
+    | '/pos-graduacao'
   id:
     | '__root__'
     | '/_public'
+    | '/_public/incites'
+    | '/_public/indice-pesquisador'
     | '/_public/paineis-dados-externos'
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/_public/'
+    | '/_public/pos-graduacao/$id'
+    | '/_public/pos-graduacao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,6 +164,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/incites': {
+      id: '/_public/incites'
+      path: '/incites'
+      fullPath: '/incites'
+      preLoaderRoute: typeof PublicIncitesRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/indice-pesquisador': {
+      id: '/_public/indice-pesquisador'
+      path: '/indice-pesquisador'
+      fullPath: '/indice-pesquisador'
+      preLoaderRoute: typeof PublicIndicePesquisadorRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/paineis-dados-externos': {
@@ -146,17 +208,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevVitrineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public/pos-graduacao/': {
+      id: '/_public/pos-graduacao/'
+      path: '/pos-graduacao'
+      fullPath: '/pos-graduacao/'
+      preLoaderRoute: typeof PublicPosGraduacaoIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/pos-graduacao/$id': {
+      id: '/_public/pos-graduacao/$id'
+      path: '/pos-graduacao/$id'
+      fullPath: '/pos-graduacao/$id'
+      preLoaderRoute: typeof PublicPosGraduacaoIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
   }
 }
 
 interface PublicRouteChildren {
+  PublicIncitesRoute: typeof PublicIncitesRoute
+  PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
   PublicPaineisDadosExternosRoute: typeof PublicPaineisDadosExternosRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicPosGraduacaoIdRoute: typeof PublicPosGraduacaoIdRoute
+  PublicPosGraduacaoIndexRoute: typeof PublicPosGraduacaoIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
+  PublicIncitesRoute: PublicIncitesRoute,
+  PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,
   PublicPaineisDadosExternosRoute: PublicPaineisDadosExternosRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicPosGraduacaoIdRoute: PublicPosGraduacaoIdRoute,
+  PublicPosGraduacaoIndexRoute: PublicPosGraduacaoIndexRoute,
 }
 
 const PublicRouteWithChildren =
