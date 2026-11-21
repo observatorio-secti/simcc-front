@@ -40,30 +40,30 @@ DefaultLayout
 
 ## Destino de cada tela
 
-| Rota antiga                            | Rota nova (proposta)                             | Tarefa           | Status        |
-| -------------------------------------- | ------------------------------------------------ | ---------------- | ------------- |
-| `/`                                    | `/`                                              | T1               | feito         |
-| `/resultados`, `/resultados-perfil`    | `/busca` (tipo e termos nos search params)       | T2               | a fazer       |
-| `/resultados-ia`                       | `/maria`                                         | T10              | bloqueada     |
-| `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca) | T3               | feito         |
-| `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`           | T5               | feito         |
-| `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`       | T6               | feito         |
-| `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4               | feito         |
-| `/indicadores`                         | `/indicadores`                                   | T7               | feito         |
-| `/incites`                             | `/incites`                                       | D1.1             | feito         |
-| `/producoes-recentes`                  | —                                                | —                | descontinuada |
-| `/paines-dados-externos`               | `/paineis-dados-externos`                        | D1.2             | feito         |
-| `/indice-pesquisador`                  | `/indice-pesquisador`                            | D1.3             | feito         |
-| `/provimento-cargo`                    | —                                                | —                | descontinuada |
-| `/listagens`                           | `/listagens` (aba nos search params)             | D1.4             | a fazer       |
-| `/console`, `/console/*`               | a definir na proposta                            | T12 (reimaginar) | a fazer       |
-| `/termos-uso`, `/politica-privacidade` | —                                                | —                | descontinuada |
-| `/api-docs`, `/informacoes`            | —                                                | —                | descontinuada |
-| `/dicionario-cores`                    | —                                                | —                | descontinuada |
-| `/videos`                              | —                                                | —                | descontinuada |
-| `/auth/callback`                       | `/auth/callback`                                 | F1.4             | em revisão    |
-| `/observatorio`, `/tv`, `/sobre`       | —                                                | —                | descontinuada |
-| `*`                                    | `*`                                              | F1.3             | em revisão    |
+| Rota antiga                            | Rota nova (proposta)                                                | Tarefa           | Status        |
+| -------------------------------------- | ------------------------------------------------------------------- | ---------------- | ------------- |
+| `/`                                    | `/`                                                                 | T1               | feito         |
+| `/resultados`, `/resultados-perfil`    | `/busca` (confirmada; tipo, aba, termo e filtros nos search params) | T2               | em revisão    |
+| `/resultados-ia`                       | `/maria`                                                            | T10              | bloqueada     |
+| `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca)                    | T3               | feito         |
+| `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`                              | T5               | feito         |
+| `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`                          | T6               | feito         |
+| `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`                                | T4               | feito         |
+| `/indicadores`                         | `/indicadores`                                                      | T7               | feito         |
+| `/incites`                             | `/incites`                                                          | D1.1             | feito         |
+| `/producoes-recentes`                  | —                                                                   | —                | descontinuada |
+| `/paines-dados-externos`               | `/paineis-dados-externos`                                           | D1.2             | feito         |
+| `/indice-pesquisador`                  | `/indice-pesquisador`                                               | D1.3             | feito         |
+| `/provimento-cargo`                    | —                                                                   | —                | descontinuada |
+| `/listagens`                           | `/listagens` (aba nos search params)                                | D1.4             | a fazer       |
+| `/console`, `/console/*`               | a definir na proposta                                               | T12 (reimaginar) | a fazer       |
+| `/termos-uso`, `/politica-privacidade` | —                                                                   | —                | descontinuada |
+| `/api-docs`, `/informacoes`            | —                                                                   | —                | descontinuada |
+| `/dicionario-cores`                    | —                                                                   | —                | descontinuada |
+| `/videos`                              | —                                                                   | —                | descontinuada |
+| `/auth/callback`                       | `/auth/callback`                                                    | F1.4             | feito         |
+| `/observatorio`, `/tv`, `/sobre`       | —                                                                   | —                | descontinuada |
+| `*`                                    | `*`                                                                 | F1.3             | feito         |
 
 ## Funcionalidades descontinuadas
 

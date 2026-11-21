@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicBuscaRouteImport } from './routes/_public/busca'
 import { Route as PublicIncitesRouteImport } from './routes/_public/incites'
 import { Route as PublicIndicadoresRouteImport } from './routes/_public/indicadores'
 import { Route as PublicIndicePesquisadorRouteImport } from './routes/_public/indice-pesquisador'
@@ -33,6 +34,11 @@ const PublicRoute = PublicRouteImport.update({
 const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicBuscaRoute = PublicBuscaRouteImport.update({
+  id: '/busca',
+  path: '/busca',
   getParentRoute: () => PublicRoute,
 } as any)
 const PublicIncitesRoute = PublicIncitesRouteImport.update({
@@ -110,6 +116,7 @@ const PublicPosGraduacaoIdRoute = PublicPosGraduacaoIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/busca': typeof PublicBuscaRoute
   '/incites': typeof PublicIncitesRoute
   '/indicadores': typeof PublicIndicadoresRoute
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRoutesByTo {
+  '/busca': typeof PublicBuscaRoute
   '/incites': typeof PublicIncitesRoute
   '/indicadores': typeof PublicIndicadoresRoute
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
+  '/_public/busca': typeof PublicBuscaRoute
   '/_public/incites': typeof PublicIncitesRoute
   '/_public/indicadores': typeof PublicIndicadoresRoute
   '/_public/indice-pesquisador': typeof PublicIndicePesquisadorRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/busca'
     | '/incites'
     | '/indicadores'
     | '/indice-pesquisador'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/pos-graduacao/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/busca'
     | '/incites'
     | '/indicadores'
     | '/indice-pesquisador'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_public'
+    | '/_public/busca'
     | '/_public/incites'
     | '/_public/indicadores'
     | '/_public/indice-pesquisador'
@@ -237,6 +249,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/busca': {
+      id: '/_public/busca'
+      path: '/busca'
+      fullPath: '/busca'
+      preLoaderRoute: typeof PublicBuscaRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/incites': {
@@ -341,6 +360,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface PublicRouteChildren {
+  PublicBuscaRoute: typeof PublicBuscaRoute
   PublicIncitesRoute: typeof PublicIncitesRoute
   PublicIndicadoresRoute: typeof PublicIndicadoresRoute
   PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
@@ -356,6 +376,7 @@ interface PublicRouteChildren {
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
+  PublicBuscaRoute: PublicBuscaRoute,
   PublicIncitesRoute: PublicIncitesRoute,
   PublicIndicadoresRoute: PublicIndicadoresRoute,
   PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,

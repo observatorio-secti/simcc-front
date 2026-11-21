@@ -1,5 +1,19 @@
 export { HomePage, type HomePageProps } from './home-page';
+export { prefetchSearchResults } from './results-prefetch';
+export { SearchResultsPage, type SearchResultsPageProps } from './results-page';
+export {
+  activeTab,
+  resultsSearch,
+  resultsSearchMiddlewares,
+  type ResultsSearch,
+} from './results-search';
 export { SearchBar, type SearchBarProps } from './search-bar';
+export {
+  SEARCH_TABS,
+  TABS_BY_SEARCH_TYPE,
+  type SearchTabDefinition,
+  type SearchTabId,
+} from './search-tabs';
 export {
   buildBuscaHref,
   homeSearchSchema,
