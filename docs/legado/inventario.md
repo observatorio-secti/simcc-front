@@ -52,7 +52,7 @@ DefaultLayout
 | `/indicadores`                         | `/indicadores`                                   | T7               | a fazer       |
 | `/incites`                             | `/incites`                                       | D1.1             | a fazer       |
 | `/producoes-recentes`                  | —                                                | —                | descontinuada |
-| `/paines-dados-externos`               | `/paineis-dados-externos`                        | D1.2             | a fazer       |
+| `/paines-dados-externos`               | `/paineis-dados-externos`                        | D1.2             | em revisão    |
 | `/indice-pesquisador`                  | `/indice-pesquisador`                            | D1.3             | a fazer       |
 | `/provimento-cargo`                    | —                                                | —                | descontinuada |
 | `/listagens`                           | `/listagens` (aba nos search params)             | D1.4             | a fazer       |
