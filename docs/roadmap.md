@@ -67,7 +67,7 @@ graph LR
 | F1.7  | Analytics (GA4)                                   | F0               | —                                                           | feito     |             |
 | K1    | Gerar tema e CSS do kit a partir de `tokens.json` | F0               | —                                                           | feito     |             |
 | E1    | Entidade pesquisador                              | F1.1, F1.2       | —                                                           | feito     |             |
-| E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | —                                                           | a fazer   |             |
+| E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | —                                                           | feito     |             |
 | E3    | Entidade instituição                              | F1.1, F1.2       | —                                                           | a fazer   |             |
 | E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | a fazer   |             |
 | E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                           | a fazer   |             |
