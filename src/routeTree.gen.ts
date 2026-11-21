@@ -15,6 +15,8 @@ import { Route as PublicIndicePesquisadorRouteImport } from './routes/_public/in
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
+import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
+import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -45,6 +47,16 @@ const DevVitrineRoute = DevVitrineRouteImport.update({
   path: '/dev/vitrine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicPosGraduacaoIndexRoute = PublicPosGraduacaoIndexRouteImport.update({
+  id: '/pos-graduacao/',
+  path: '/pos-graduacao/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicPosGraduacaoIdRoute = PublicPosGraduacaoIdRouteImport.update({
+  id: '/pos-graduacao/$id',
+  path: '/pos-graduacao/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -52,6 +64,8 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
+  '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRoutesByTo {
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
@@ -59,6 +73,8 @@ export interface FileRoutesByTo {
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
+  '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,6 +84,8 @@ export interface FileRoutesById {
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
+  '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -77,6 +95,8 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
+    | '/pos-graduacao/$id'
+    | '/pos-graduacao/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/indice-pesquisador'
@@ -84,6 +104,8 @@ export interface FileRouteTypes {
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/'
+    | '/pos-graduacao/$id'
+    | '/pos-graduacao'
   id:
     | '__root__'
     | '/_public'
@@ -92,6 +114,8 @@ export interface FileRouteTypes {
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/_public/'
+    | '/_public/pos-graduacao/$id'
+    | '/_public/pos-graduacao/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,17 +169,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevVitrineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public/pos-graduacao/': {
+      id: '/_public/pos-graduacao/'
+      path: '/pos-graduacao'
+      fullPath: '/pos-graduacao/'
+      preLoaderRoute: typeof PublicPosGraduacaoIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/pos-graduacao/$id': {
+      id: '/_public/pos-graduacao/$id'
+      path: '/pos-graduacao/$id'
+      fullPath: '/pos-graduacao/$id'
+      preLoaderRoute: typeof PublicPosGraduacaoIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
   }
 }
 
 interface PublicRouteChildren {
   PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicPosGraduacaoIdRoute: typeof PublicPosGraduacaoIdRoute
+  PublicPosGraduacaoIndexRoute: typeof PublicPosGraduacaoIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
   PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicPosGraduacaoIdRoute: PublicPosGraduacaoIdRoute,
+  PublicPosGraduacaoIndexRoute: PublicPosGraduacaoIndexRoute,
 }
 
 const PublicRouteWithChildren =
