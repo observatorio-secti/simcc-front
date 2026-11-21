@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicIndicePesquisadorRouteImport } from './routes/_public/indice-pesquisador'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
@@ -24,6 +25,11 @@ const PublicRoute = PublicRouteImport.update({
 const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicIndicePesquisadorRoute = PublicIndicePesquisadorRouteImport.update({
+  id: '/indice-pesquisador',
+  path: '/indice-pesquisador',
   getParentRoute: () => PublicRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -54,6 +60,7 @@ const PublicPosGraduacaoIdRoute = PublicPosGraduacaoIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
@@ -61,6 +68,7 @@ export interface FileRoutesByFullPath {
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRoutesByTo {
+  '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
@@ -71,6 +79,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
+  '/_public/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
@@ -82,6 +91,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/indice-pesquisador'
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/pos-graduacao/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/indice-pesquisador'
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
@@ -98,6 +109,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_public'
+    | '/_public/indice-pesquisador'
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
@@ -127,6 +139,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/indice-pesquisador': {
+      id: '/_public/indice-pesquisador'
+      path: '/indice-pesquisador'
+      fullPath: '/indice-pesquisador'
+      preLoaderRoute: typeof PublicIndicePesquisadorRouteImport
       parentRoute: typeof PublicRoute
     }
     '/auth/callback': {
@@ -168,12 +187,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface PublicRouteChildren {
+  PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicPosGraduacaoIdRoute: typeof PublicPosGraduacaoIdRoute
   PublicPosGraduacaoIndexRoute: typeof PublicPosGraduacaoIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
+  PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicPosGraduacaoIdRoute: PublicPosGraduacaoIdRoute,
   PublicPosGraduacaoIndexRoute: PublicPosGraduacaoIndexRoute,
