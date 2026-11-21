@@ -42,18 +42,18 @@ DefaultLayout
 
 | Rota antiga                            | Rota nova (proposta)                             | Tarefa           | Status        |
 | -------------------------------------- | ------------------------------------------------ | ---------------- | ------------- |
-| `/`                                    | `/`                                              | T1               | a fazer       |
+| `/`                                    | `/`                                              | T1               | feito         |
 | `/resultados`, `/resultados-perfil`    | `/busca` (tipo e termos nos search params)       | T2               | a fazer       |
 | `/resultados-ia`                       | `/maria`                                         | T10              | bloqueada     |
 | `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca) | T3               | a fazer       |
-| `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`           | T5               | a fazer       |
+| `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`           | T5               | feito         |
 | `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`       | T6               | a fazer       |
 | `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4               | a fazer       |
 | `/indicadores`                         | `/indicadores`                                   | T7               | a fazer       |
-| `/incites`                             | `/incites`                                       | D1.1             | em revisão    |
+| `/incites`                             | `/incites`                                       | D1.1             | feito         |
 | `/producoes-recentes`                  | —                                                | —                | descontinuada |
 | `/paines-dados-externos`               | `/paineis-dados-externos`                        | D1.2             | a fazer       |
-| `/indice-pesquisador`                  | `/indice-pesquisador`                            | D1.3             | a fazer       |
+| `/indice-pesquisador`                  | `/indice-pesquisador`                            | D1.3             | feito         |
 | `/provimento-cargo`                    | —                                                | —                | descontinuada |
 | `/listagens`                           | `/listagens` (aba nos search params)             | D1.4             | a fazer       |
 | `/console`, `/console/*`               | a definir na proposta                            | T12 (reimaginar) | a fazer       |
