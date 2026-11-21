@@ -45,7 +45,7 @@ DefaultLayout
 | `/`                                    | `/`                                              | T1               | feito         |
 | `/resultados`, `/resultados-perfil`    | `/busca` (tipo e termos nos search params)       | T2               | a fazer       |
 | `/resultados-ia`                       | `/maria`                                         | T10              | bloqueada     |
-| `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca) | T3               | a fazer       |
+| `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca) | T3               | feito         |
 | `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`           | T5               | feito         |
 | `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`       | T6               | feito         |
 | `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4               | feito         |

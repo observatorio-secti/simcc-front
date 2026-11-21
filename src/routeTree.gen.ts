@@ -21,6 +21,7 @@ import { Route as PublicGruposPesquisaIndexRouteImport } from './routes/_public/
 import { Route as PublicGruposPesquisaIdRouteImport } from './routes/_public/grupos-pesquisa/$id'
 import { Route as PublicInstituicoesIndexRouteImport } from './routes/_public/instituicoes/index'
 import { Route as PublicInstituicoesIdRouteImport } from './routes/_public/instituicoes/$id'
+import { Route as PublicPesquisadoresIdRouteImport } from './routes/_public/pesquisadores/$id'
 import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
 import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
 
@@ -85,6 +86,11 @@ const PublicInstituicoesIdRoute = PublicInstituicoesIdRouteImport.update({
   path: '/instituicoes/$id',
   getParentRoute: () => PublicRoute,
 } as any)
+const PublicPesquisadoresIdRoute = PublicPesquisadoresIdRouteImport.update({
+  id: '/pesquisadores/$id',
+  path: '/pesquisadores/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 const PublicPosGraduacaoIndexRoute = PublicPosGraduacaoIndexRouteImport.update({
   id: '/pos-graduacao/',
   path: '/pos-graduacao/',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/dev/vitrine': typeof DevVitrineRoute
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/instituicoes/': typeof PublicInstituicoesIndexRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/grupos-pesquisa': typeof PublicGruposPesquisaIndexRoute
   '/instituicoes': typeof PublicInstituicoesIndexRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_public/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/_public/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/_public/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/_public/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/dev/vitrine'
     | '/grupos-pesquisa/$id'
     | '/instituicoes/$id'
+    | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
     | '/grupos-pesquisa/'
     | '/instituicoes/'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/'
     | '/grupos-pesquisa/$id'
     | '/instituicoes/$id'
+    | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
     | '/grupos-pesquisa'
     | '/instituicoes'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/_public/'
     | '/_public/grupos-pesquisa/$id'
     | '/_public/instituicoes/$id'
+    | '/_public/pesquisadores/$id'
     | '/_public/pos-graduacao/$id'
     | '/_public/grupos-pesquisa/'
     | '/_public/instituicoes/'
@@ -285,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicInstituicoesIdRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/pesquisadores/$id': {
+      id: '/_public/pesquisadores/$id'
+      path: '/pesquisadores/$id'
+      fullPath: '/pesquisadores/$id'
+      preLoaderRoute: typeof PublicPesquisadoresIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
     '/_public/pos-graduacao/': {
       id: '/_public/pos-graduacao/'
       path: '/pos-graduacao'
@@ -309,6 +328,7 @@ interface PublicRouteChildren {
   PublicIndexRoute: typeof PublicIndexRoute
   PublicGruposPesquisaIdRoute: typeof PublicGruposPesquisaIdRoute
   PublicInstituicoesIdRoute: typeof PublicInstituicoesIdRoute
+  PublicPesquisadoresIdRoute: typeof PublicPesquisadoresIdRoute
   PublicPosGraduacaoIdRoute: typeof PublicPosGraduacaoIdRoute
   PublicGruposPesquisaIndexRoute: typeof PublicGruposPesquisaIndexRoute
   PublicInstituicoesIndexRoute: typeof PublicInstituicoesIndexRoute
@@ -322,6 +342,7 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicIndexRoute: PublicIndexRoute,
   PublicGruposPesquisaIdRoute: PublicGruposPesquisaIdRoute,
   PublicInstituicoesIdRoute: PublicInstituicoesIdRoute,
+  PublicPesquisadoresIdRoute: PublicPesquisadoresIdRoute,
   PublicPosGraduacaoIdRoute: PublicPosGraduacaoIdRoute,
   PublicGruposPesquisaIndexRoute: PublicGruposPesquisaIndexRoute,
   PublicInstituicoesIndexRoute: PublicInstituicoesIndexRoute,
