@@ -48,7 +48,7 @@ DefaultLayout
 | `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca) | T3               | a fazer       |
 | `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`           | T5               | feito         |
 | `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`       | T6               | a fazer       |
-| `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4               | a fazer       |
+| `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4               | feito         |
 | `/indicadores`                         | `/indicadores`                                   | T7               | a fazer       |
 | `/incites`                             | `/incites`                                       | D1.1             | feito         |
 | `/producoes-recentes`                  | —                                                | —                | descontinuada |

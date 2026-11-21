@@ -17,6 +17,8 @@ import { Route as PublicPaineisDadosExternosRouteImport } from './routes/_public
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
+import { Route as PublicInstituicoesIndexRouteImport } from './routes/_public/instituicoes/index'
+import { Route as PublicInstituicoesIdRouteImport } from './routes/_public/instituicoes/$id'
 import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
 import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
 
@@ -60,6 +62,16 @@ const DevVitrineRoute = DevVitrineRouteImport.update({
   path: '/dev/vitrine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicInstituicoesIndexRoute = PublicInstituicoesIndexRouteImport.update({
+  id: '/instituicoes/',
+  path: '/instituicoes/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicInstituicoesIdRoute = PublicInstituicoesIdRouteImport.update({
+  id: '/instituicoes/$id',
+  path: '/instituicoes/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 const PublicPosGraduacaoIndexRoute = PublicPosGraduacaoIndexRouteImport.update({
   id: '/pos-graduacao/',
   path: '/pos-graduacao/',
@@ -79,7 +91,9 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
+  '/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRoutesByTo {
@@ -90,7 +104,9 @@ export interface FileRoutesByTo {
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
+  '/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/instituicoes': typeof PublicInstituicoesIndexRoute
   '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRoutesById {
@@ -103,7 +119,9 @@ export interface FileRoutesById {
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
+  '/_public/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
 export interface FileRouteTypes {
@@ -116,7 +134,9 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
+    | '/instituicoes/$id'
     | '/pos-graduacao/$id'
+    | '/instituicoes/'
     | '/pos-graduacao/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,7 +147,9 @@ export interface FileRouteTypes {
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/'
+    | '/instituicoes/$id'
     | '/pos-graduacao/$id'
+    | '/instituicoes'
     | '/pos-graduacao'
   id:
     | '__root__'
@@ -139,7 +161,9 @@ export interface FileRouteTypes {
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/_public/'
+    | '/_public/instituicoes/$id'
     | '/_public/pos-graduacao/$id'
+    | '/_public/instituicoes/'
     | '/_public/pos-graduacao/'
   fileRoutesById: FileRoutesById
 }
@@ -208,6 +232,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevVitrineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public/instituicoes/': {
+      id: '/_public/instituicoes/'
+      path: '/instituicoes'
+      fullPath: '/instituicoes/'
+      preLoaderRoute: typeof PublicInstituicoesIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/instituicoes/$id': {
+      id: '/_public/instituicoes/$id'
+      path: '/instituicoes/$id'
+      fullPath: '/instituicoes/$id'
+      preLoaderRoute: typeof PublicInstituicoesIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
     '/_public/pos-graduacao/': {
       id: '/_public/pos-graduacao/'
       path: '/pos-graduacao'
@@ -230,7 +268,9 @@ interface PublicRouteChildren {
   PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
   PublicPaineisDadosExternosRoute: typeof PublicPaineisDadosExternosRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicInstituicoesIdRoute: typeof PublicInstituicoesIdRoute
   PublicPosGraduacaoIdRoute: typeof PublicPosGraduacaoIdRoute
+  PublicInstituicoesIndexRoute: typeof PublicInstituicoesIndexRoute
   PublicPosGraduacaoIndexRoute: typeof PublicPosGraduacaoIndexRoute
 }
 
@@ -239,7 +279,9 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,
   PublicPaineisDadosExternosRoute: PublicPaineisDadosExternosRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicInstituicoesIdRoute: PublicInstituicoesIdRoute,
   PublicPosGraduacaoIdRoute: PublicPosGraduacaoIdRoute,
+  PublicInstituicoesIndexRoute: PublicInstituicoesIndexRoute,
   PublicPosGraduacaoIndexRoute: PublicPosGraduacaoIndexRoute,
 }
 

@@ -1,0 +1,139 @@
+import { screen, waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { describe, expect, it } from 'vitest';
+import { v2Fixtures } from '@/test/msw/fixtures';
+import { simccV2Url } from '@/test/msw/handlers';
+import { renderRoute } from '@/test/render-route';
+
+describe('Rotas de instituições (T4)', () => {
+  it('renderiza a listagem de instituições com total e busca navegável na URL', async () => {
+    const capturedQueries: string[] = [];
+
+    const { router, user } = await renderRoute('/instituicoes', {
+      handlers: [
+        http.get(simccV2Url('/institution'), ({ request }) => {
+          const url = new URL(request.url);
+          capturedQueries.push(url.searchParams.get('q') ?? '');
+
+          if (url.searchParams.get('q') === 'inexistente') {
+            return HttpResponse.json({
+              ...v2Fixtures['/institution'],
+              data: [],
+              pagination: {
+                ...v2Fixtures['/institution'].pagination,
+                total_items: 0,
+                total_pages: 0,
+                has_next: false,
+                has_prev: false,
+              },
+            });
+          }
+
+          return HttpResponse.json(v2Fixtures['/institution']);
+        }),
+      ],
+    });
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Instituições' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Universidade Estadual de Santa Cruz'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Total de instituições')).toBeInTheDocument();
+
+    const searchInput = screen.getByRole('searchbox', {
+      name: /pesquisar instituições/i,
+    });
+    await user.type(searchInput, 'inexistente{Enter}');
+
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('q=inexistente');
+    });
+
+    expect(
+      await screen.findByText('Nenhuma instituição encontrada'),
+    ).toBeInTheDocument();
+    expect(capturedQueries).toContain('inexistente');
+
+    const clearButtons = screen.getAllByRole('button', {
+      name: 'Limpar busca',
+    });
+    await user.click(clearButtons[0]!);
+    await waitFor(() => {
+      expect(router.state.location.searchStr).not.toContain('q=');
+    });
+  });
+
+  it('alterna visualização entre grade e lista na URL e navega para o detalhe', async () => {
+    const { router, user } = await renderRoute('/instituicoes');
+
+    const listToggle = screen.getByRole('radio', {
+      name: 'Visualização em lista',
+    });
+    await user.click(listToggle);
+
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('view=list');
+    });
+
+    const link = screen.getByRole('link', {
+      name: /Universidade Estadual de Santa Cruz/i,
+    });
+    await user.click(link);
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe(
+        '/instituicoes/3f2a9c1e-5b7d-4e8a-9c21-7d4e5f6a8b90',
+      );
+    });
+
+    expect(
+      await screen.findByRole(
+        'heading',
+        {
+          level: 1,
+          name: 'Universidade Estadual de Santa Cruz',
+        },
+        { timeout: 4000 },
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('renderiza detalhe da instituição com pesquisadores e alterna para aba de programas na URL', async () => {
+    const { router, user } = await renderRoute(
+      '/instituicoes/3f2a9c1e-5b7d-4e8a-9c21-7d4e5f6a8b90',
+    );
+
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Universidade Estadual de Santa Cruz',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Universidade pública estadual localizada em Ilhéus, Bahia.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('412').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('18').length).toBeGreaterThan(0);
+
+    expect(await screen.findByText('Ana Maria Silva')).toBeInTheDocument();
+
+    const programsTab = screen.getByRole('tab', {
+      name: /Programas de pós-graduação/i,
+    });
+    await user.click(programsTab);
+
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('tab=programs');
+    });
+
+    expect(
+      await screen.findByText(
+        /Programa de Pós-Graduação em Modelagem Computacional/i,
+      ),
+    ).toBeInTheDocument();
+  });
+});
