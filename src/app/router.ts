@@ -1,5 +1,6 @@
-import { createRouter } from '@tanstack/react-router';
+import { createRouter, type RouterHistory } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
+import { type SessionStore, sessionStore } from '@/features/auth';
 import { routeTree } from '@/routeTree.gen';
 import type { Analytics } from '@/shared/lib/analytics';
 import { getAppAnalytics, trackPageViews } from './analytics';
@@ -7,10 +8,13 @@ import { getAppAnalytics, trackPageViews } from './analytics';
 export function createAppRouter(
   queryClient: QueryClient,
   analytics: Analytics = getAppAnalytics(),
+  session: SessionStore = sessionStore,
+  history?: RouterHistory,
 ) {
   const router = createRouter({
     routeTree,
-    context: { queryClient },
+    context: { queryClient, session },
+    history,
     // VITE_BASE_PATH (ex.: /simcc/) chega aqui como BASE_URL.
     basepath: import.meta.env.BASE_URL.replace(/\/$/, '') || '/',
     defaultPreload: 'intent',
