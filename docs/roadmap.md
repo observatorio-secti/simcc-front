@@ -60,18 +60,18 @@ graph LR
 | F0    | Setup inicial                                     | —                | —                                                           | feito                 | —           |
 | F1.1  | Cliente e tipos da API v2                         | F0               | —                                                           | feito                 |             |
 | F1.2  | Primitivos do kit e `design-tokens.ts`            | F0               | —                                                           | feito                 |             |
-| F1.3  | Moldura e navegação                               | F1.2             | —                                                           | a fazer               |             |
-| F1.4  | Sessão e autenticação                             | F1.1             | —                                                           | a fazer               |             |
-| F1.5  | Motor de listagem                                 | F1.1, F1.2       | —                                                           | a fazer               |             |
-| F1.6  | Infraestrutura de testes (MSW)                    | F1.1             | —                                                           | a fazer               |             |
+| F1.3  | Moldura e navegação                               | F1.2             | —                                                           | feito                 |             |
+| F1.4  | Sessão e autenticação                             | F1.1             | —                                                           | feito                 |             |
+| F1.5  | Motor de listagem                                 | F1.1, F1.2       | —                                                           | feito                 |             |
+| F1.6  | Infraestrutura de testes (MSW)                    | F1.1             | —                                                           | feito                 |             |
 | F1.7  | Analytics (GA4)                                   | F0               | —                                                           | feito                 |             |
 | K1    | Gerar tema e CSS do kit a partir de `tokens.json` | F0               | —                                                           | feito                 |             |
-| E1    | Entidade pesquisador                              | F1.1, F1.2       | —                                                           | a fazer               |             |
-| E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | —                                                           | a fazer               |             |
-| E3    | Entidade instituição                              | F1.1, F1.2       | —                                                           | a fazer               |             |
-| E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | a fazer               |             |
-| E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                           | a fazer               |             |
-| E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | a fazer               |             |
+| E1    | Entidade pesquisador                              | F1.1, F1.2       | —                                                           | feito                 |             |
+| E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | —                                                           | feito                 |             |
+| E3    | Entidade instituição                              | F1.1, F1.2       | —                                                           | feito                 |             |
+| E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | feito                 |             |
+| E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                           | feito                 |             |
+| E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | feito                 |             |
 | T1    | Busca: home e barra de busca                      | F1.3             | —                                                           | a fazer               |             |
 | T2    | Busca: resultados                                 | T1, F1.5, E1, E2 | —                                                           | a fazer               |             |
 | T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | a fazer               |             |
