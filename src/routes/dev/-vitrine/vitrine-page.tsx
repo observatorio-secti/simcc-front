@@ -1,6 +1,7 @@
 import { Toaster } from '@/shared/ui/sonner';
 import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import { DictionariesShowcase } from './dictionaries';
+import { InstitutionShowcase } from './institution';
 import { KitComponentsShowcase } from './kit-components';
 import { PrimitivesShowcase } from './primitives';
 import { ProductionShowcase } from './production';
@@ -24,6 +25,7 @@ const SECTIONS = [
   ['dicionarios', 'Dicionários'],
   ['pesquisador', 'Pesquisador'],
   ['producao', 'Produção'],
+  ['instituicao', 'Instituição'],
 ] as const;
 
 /** Vitrine do kit (só em desenvolvimento). Ver src/routes/dev/vitrine.tsx. */
@@ -69,6 +71,7 @@ export function VitrinePage() {
         <DictionariesShowcase />
         <ResearcherShowcase />
         <ProductionShowcase />
+        <InstitutionShowcase />
       </main>
       <Toaster />
     </div>
