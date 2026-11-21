@@ -72,18 +72,18 @@ graph LR
 | E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | feito                 |                |
 | E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                           | feito                 |                |
 | E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | feito                 |                |
-| T1    | Busca: home e barra de busca                      | F1.3             | —                                                           | a fazer               |                |
+| T1    | Busca: home e barra de busca                      | F1.3             | —                                                           | feito                 | t1-busca-home  |
 | T2    | Busca: resultados                                 | T1, F1.5, E1, E2 | —                                                           | a fazer               |                |
-| T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | a fazer               |                |
-| T4    | Instituições (lista e detalhe)                    | F1.3, F1.5, E3   | —                                                           | a fazer               |                |
-| T5    | Pós-graduação (landing, lista e detalhe)          | F1.3, F1.5, E4   | —                                                           | a fazer               |                |
-| T6    | Grupos de pesquisa                                | F1.3, F1.5, E5   | —                                                           | a fazer               |                |
-| T7    | Indicadores                                       | F1.3             | Indicadores além de produção ainda sem rota `/v2/metrics/*` | em revisão            | t7-indicadores |
+| T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | feito                 |                |
+| T4    | Instituições (lista e detalhe)                    | F1.3, F1.5, E3   | —                                                           | feito                 | t4-instit      |
+| T5    | Pós-graduação (landing, lista e detalhe)          | F1.3, F1.5, E4   | —                                                           | feito                 | t5-pos-grad    |
+| T6    | Grupos de pesquisa                                | F1.3, F1.5, E5   | —                                                           | feito                 | t6-grupos      |
+| T7    | Indicadores                                       | F1.3             | Indicadores além de produção ainda sem rota `/v2/metrics/*` | feito                 | t7-indicadores |
 | T10   | MarIA                                             | F1.3, E1, E2     | Virada do backend                                           | bloqueada             |                |
 | T12   | Console (a reimaginar)                            | F1.4, F1.2       | —                                                           | em revisão (proposta) | t12-prop       |
-| D1.1  | InCites                                           | F1.3             | —                                                           | a fazer               |                |
-| D1.2  | Painéis de dados externos                         | F1.3             | —                                                           | a fazer               |                |
-| D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                                                           | a fazer               |                |
+| D1.1  | InCites                                           | F1.3             | —                                                           | feito                 | d1-1-incites   |
+| D1.2  | Painéis de dados externos                         | F1.3             | —                                                           | feito                 | d1-2-paineis   |
+| D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                                                           | feito                 | d1-3-indice    |
 | D1.4  | Listagens                                         | F1.5, E1, E2, E6 | —                                                           | a fazer               |                |
 | V1–V5 | Virada (ver fase 4)                               | fase 3           | Virada do backend                                           | a fazer               |                |
 
