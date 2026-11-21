@@ -1,9 +1,13 @@
 import { Toaster } from '@/shared/ui/sonner';
 import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import { DictionariesShowcase } from './dictionaries';
+import { GraduateProgramShowcase } from './graduate-program';
+import { InstitutionShowcase } from './institution';
 import { KitComponentsShowcase } from './kit-components';
 import { PrimitivesShowcase } from './primitives';
+import { ProductionShowcase } from './production';
 import { ResearchGroupShowcase } from './research-group';
+import { ResearcherShowcase } from './researcher';
 
 const SECTIONS = [
   ['botao', 'Botão'],
@@ -21,6 +25,10 @@ const SECTIONS = [
   ['result-toolbar', 'ResultToolbar'],
   ['estados', 'Estados'],
   ['dicionarios', 'Dicionários'],
+  ['pesquisador', 'Pesquisador'],
+  ['producao', 'Produção'],
+  ['instituicao', 'Instituição'],
+  ['programa', 'Programa'],
   ['grupo-pesquisa', 'Grupo de pesquisa'],
 ] as const;
 
@@ -65,6 +73,10 @@ export function VitrinePage() {
         <PrimitivesShowcase />
         <KitComponentsShowcase />
         <DictionariesShowcase />
+        <ResearcherShowcase />
+        <ProductionShowcase />
+        <InstitutionShowcase />
+        <GraduateProgramShowcase />
         <ResearchGroupShowcase />
       </main>
       <Toaster />
