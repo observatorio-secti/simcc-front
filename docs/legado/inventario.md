@@ -55,7 +55,7 @@ DefaultLayout
 | `/paines-dados-externos`               | `/paineis-dados-externos`                                           | D1.2             | feito         |
 | `/indice-pesquisador`                  | `/indice-pesquisador`                                               | D1.3             | feito         |
 | `/provimento-cargo`                    | —                                                                   | —                | descontinuada |
-| `/listagens`                           | `/listagens` (aba nos search params)                                | D1.4             | a fazer       |
+| `/listagens`                           | `/busca` sem termo (`/listagens` redireciona, ADR 0011)             | D1.4             | em revisão    |
 | `/console`, `/console/*`               | a definir na proposta                                               | T12 (reimaginar) | a fazer       |
 | `/termos-uso`, `/politica-privacidade` | —                                                                   | —                | descontinuada |
 | `/api-docs`, `/informacoes`            | —                                                                   | —                | descontinuada |

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { magazineListQueryOptions } from '@/entities/magazine/queries';
 import { productionMetricQueryOptions } from '@/entities/production/metric-queries';
 import type { ProductionKind } from '@/entities/production/model';
 import { productionListQueryOptions } from '@/entities/production/queries';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
+import { scholarshipListQueryOptions } from '@/entities/scholarship/queries';
 import {
   FacetPanel,
   FacetSheet,
@@ -13,13 +15,19 @@ import {
 } from '@/shared/ui/facet-panel';
 import { ResultToolbar } from '@/shared/ui/result-toolbar';
 import type { SortSelection } from '@/shared/ui/sort-select';
+import {
+  MagazineResults,
+  ScholarshipResults,
+} from './components/catalog-results';
 import { ProductionResults } from './components/production-results';
 import { ResearcherRanking } from './components/researcher-ranking';
 import { ResearcherResults } from './components/researcher-results';
 import { ResultsTabs } from './components/results-tabs';
 import {
+  MagazineSummary,
   ProductionSummary,
   ResearcherSummary,
+  ScholarshipSummary,
 } from './components/results-summary';
 import { RESULTS_FACET_CONFIG } from './results-facets';
 import {
@@ -30,10 +38,12 @@ import {
   RESULTS_FACET_ORDER,
   resultsSearch,
   sortOptionsForTab,
+  toMagazineQuery,
   toProductionMetricQuery,
   toProductionQuery,
   toResearcherQuery,
   toResearcherRankingQuery,
+  toScholarshipQuery,
   type ResultsSearch,
   type ResultsViewMode,
 } from './results-search';
@@ -64,13 +74,15 @@ export function SearchResultsPage({
 
   const type = search.type ?? 'profile';
   const tab = activeTab(search);
-  const tabs = tabsForSearchType(type);
   const hasQuery = Boolean(search.q);
+  // Sem termo, as abas são os catálogos da v2 (listagens, D1.4 / ADR 0011).
+  const tabs = tabsForSearchType(type, hasQuery);
   const sort = resolveSort(tab, search);
   const sortOptions = sortOptionsForTab(tab, hasQuery);
   const view: ResultsViewMode = search.view ?? 'grid';
 
   const isResearcherTab = tab.source === 'researcher';
+  const isProductionTab = tab.source === 'production';
   const productionKind = tab.source === 'production' ? tab.kind : IDLE_KIND;
 
   const researcherQuery = useQuery({
@@ -90,7 +102,7 @@ export function SearchResultsPage({
       productionKind,
       toProductionQuery(productionKind, search),
     ),
-    enabled: !isResearcherTab,
+    enabled: isProductionTab,
     // Mantém a página anterior só dentro do mesmo tipo de produção.
     placeholderData: (previous, previousQuery) =>
       previousQuery?.queryKey[1] === productionKind ? previous : undefined,
@@ -101,10 +113,27 @@ export function SearchResultsPage({
       productionKind,
       toProductionMetricQuery(search),
     ),
-    enabled: !isResearcherTab,
+    enabled: isProductionTab,
   });
 
-  const listQuery = isResearcherTab ? researcherQuery : productionQuery;
+  const scholarshipQuery = useQuery({
+    ...scholarshipListQueryOptions(toScholarshipQuery(search)),
+    enabled: tab.source === 'scholarship',
+    placeholderData: keepPreviousData,
+  });
+
+  const magazineQuery = useQuery({
+    ...magazineListQueryOptions(toMagazineQuery(search)),
+    enabled: tab.source === 'magazine',
+    placeholderData: keepPreviousData,
+  });
+
+  const listQuery = {
+    researcher: researcherQuery,
+    production: productionQuery,
+    scholarship: scholarshipQuery,
+    magazine: magazineQuery,
+  }[tab.source];
   const facets = listQuery.data?.facets ?? null;
   const activeFiltersCount = countTabFilters(search, tab);
 
@@ -236,6 +265,46 @@ export function SearchResultsPage({
                   { resetPage: false },
                 )
               }
+            />
+          </>
+        ) : tab.source === 'scholarship' ? (
+          <>
+            <ScholarshipSummary
+              total={scholarshipQuery.data?.pagination.total_items}
+              facets={scholarshipQuery.data?.facets}
+              loading={scholarshipQuery.isPending}
+              modality={search.modality}
+            />
+            <ScholarshipResults
+              {...listCallbacks}
+              items={scholarshipQuery.data?.data}
+              pagination={scholarshipQuery.data?.pagination}
+              isPending={scholarshipQuery.isPending}
+              isFetching={scholarshipQuery.isFetching}
+              isError={scholarshipQuery.isError}
+              sort={sort}
+              sortOptions={sortOptions}
+              hasFilters={activeFiltersCount > 0}
+            />
+          </>
+        ) : tab.source === 'magazine' ? (
+          <>
+            <MagazineSummary
+              total={magazineQuery.data?.pagination.total_items}
+              facets={magazineQuery.data?.facets}
+              loading={magazineQuery.isPending}
+              qualis={search.qualis}
+            />
+            <MagazineResults
+              {...listCallbacks}
+              items={magazineQuery.data?.data}
+              pagination={magazineQuery.data?.pagination}
+              isPending={magazineQuery.isPending}
+              isFetching={magazineQuery.isFetching}
+              isError={magazineQuery.isError}
+              sort={sort}
+              sortOptions={sortOptions}
+              hasFilters={activeFiltersCount > 0}
             />
           </>
         ) : (

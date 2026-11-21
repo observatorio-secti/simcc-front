@@ -14,10 +14,10 @@ import type {
   ResearcherTerm,
 } from '@/entities/researcher/model';
 import { formatCount } from '@/entities/researcher/model';
+import type { Scholarship as ScholarshipItem } from '@/entities/scholarship/model';
 import { productionColor, scholarshipColor } from '@/shared/lib/design-tokens';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Card } from '@/shared/ui/card';
-import type { ScholarshipItem } from '../queries';
 import { TermCloud } from './term-cloud';
 
 export interface ProfileSidebarProps {

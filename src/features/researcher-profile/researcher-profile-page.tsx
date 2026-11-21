@@ -21,6 +21,7 @@ import {
   researcherTermsQueryOptions,
 } from '@/entities/researcher/queries';
 import { ResearcherProfileHeader } from '@/entities/researcher/ui/researcher-profile-header';
+import { researcherScholarshipsQueryOptions } from '@/entities/scholarship/queries';
 import { Button } from '@/shared/ui/button';
 import {
   DropdownMenu,
@@ -36,7 +37,6 @@ import { ProductionListSection } from './components/production-list-section';
 import { ProfileSidebar } from './components/profile-sidebar';
 import { TrajectoryTab } from './components/trajectory-tab';
 import { YearFilter } from './components/year-filter';
-import { researcherScholarshipsQueryOptions } from './queries';
 import type { ProfileTab, ResearcherProfileSearch } from './search-schema';
 
 export interface ResearcherProfilePageProps {

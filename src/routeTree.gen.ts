@@ -15,6 +15,7 @@ import { Route as PublicBuscaRouteImport } from './routes/_public/busca'
 import { Route as PublicIncitesRouteImport } from './routes/_public/incites'
 import { Route as PublicIndicadoresRouteImport } from './routes/_public/indicadores'
 import { Route as PublicIndicePesquisadorRouteImport } from './routes/_public/indice-pesquisador'
+import { Route as PublicListagensRouteImport } from './routes/_public/listagens'
 import { Route as PublicPaineisDadosExternosRouteImport } from './routes/_public/paineis-dados-externos'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
@@ -54,6 +55,11 @@ const PublicIndicadoresRoute = PublicIndicadoresRouteImport.update({
 const PublicIndicePesquisadorRoute = PublicIndicePesquisadorRouteImport.update({
   id: '/indice-pesquisador',
   path: '/indice-pesquisador',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicListagensRoute = PublicListagensRouteImport.update({
+  id: '/listagens',
+  path: '/listagens',
   getParentRoute: () => PublicRoute,
 } as any)
 const PublicPaineisDadosExternosRoute =
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/incites': typeof PublicIncitesRoute
   '/indicadores': typeof PublicIndicadoresRoute
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
+  '/listagens': typeof PublicListagensRoute
   '/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/incites': typeof PublicIncitesRoute
   '/indicadores': typeof PublicIndicadoresRoute
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
+  '/listagens': typeof PublicListagensRoute
   '/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/_public/incites': typeof PublicIncitesRoute
   '/_public/indicadores': typeof PublicIndicadoresRoute
   '/_public/indice-pesquisador': typeof PublicIndicePesquisadorRoute
+  '/_public/listagens': typeof PublicListagensRoute
   '/_public/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/incites'
     | '/indicadores'
     | '/indice-pesquisador'
+    | '/listagens'
     | '/paineis-dados-externos'
     | '/auth/callback'
     | '/auth/sem-acesso'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/incites'
     | '/indicadores'
     | '/indice-pesquisador'
+    | '/listagens'
     | '/paineis-dados-externos'
     | '/auth/callback'
     | '/auth/sem-acesso'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/_public/incites'
     | '/_public/indicadores'
     | '/_public/indice-pesquisador'
+    | '/_public/listagens'
     | '/_public/paineis-dados-externos'
     | '/auth/callback'
     | '/auth/sem-acesso'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       path: '/indice-pesquisador'
       fullPath: '/indice-pesquisador'
       preLoaderRoute: typeof PublicIndicePesquisadorRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/listagens': {
+      id: '/_public/listagens'
+      path: '/listagens'
+      fullPath: '/listagens'
+      preLoaderRoute: typeof PublicListagensRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/paineis-dados-externos': {
@@ -364,6 +383,7 @@ interface PublicRouteChildren {
   PublicIncitesRoute: typeof PublicIncitesRoute
   PublicIndicadoresRoute: typeof PublicIndicadoresRoute
   PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
+  PublicListagensRoute: typeof PublicListagensRoute
   PublicPaineisDadosExternosRoute: typeof PublicPaineisDadosExternosRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicGruposPesquisaIdRoute: typeof PublicGruposPesquisaIdRoute
@@ -380,6 +400,7 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicIncitesRoute: PublicIncitesRoute,
   PublicIndicadoresRoute: PublicIndicadoresRoute,
   PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,
+  PublicListagensRoute: PublicListagensRoute,
   PublicPaineisDadosExternosRoute: PublicPaineisDadosExternosRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicGruposPesquisaIdRoute: PublicGruposPesquisaIdRoute,
