@@ -71,7 +71,7 @@ graph LR
 | E3    | Entidade instituição                              | F1.1, F1.2       | —                                                           | feito     |             |
 | E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | feito     |             |
 | E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                           | feito     |             |
-| E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | a fazer   |             |
+| E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | feito     |             |
 | T1    | Busca: home e barra de busca                      | F1.3             | —                                                           | a fazer   |             |
 | T2    | Busca: resultados                                 | T1, F1.5, E1, E2 | —                                                           | a fazer   |             |
 | T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | a fazer   |             |

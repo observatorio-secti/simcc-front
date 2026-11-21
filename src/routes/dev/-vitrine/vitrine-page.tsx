@@ -4,6 +4,7 @@ import { DictionariesShowcase } from './dictionaries';
 import { GraduateProgramShowcase } from './graduate-program';
 import { InstitutionShowcase } from './institution';
 import { KitComponentsShowcase } from './kit-components';
+import { MagazineShowcase } from './magazine';
 import { PrimitivesShowcase } from './primitives';
 import { ProductionShowcase } from './production';
 import { ResearchGroupShowcase } from './research-group';
@@ -30,6 +31,7 @@ const SECTIONS = [
   ['instituicao', 'Instituição'],
   ['programa', 'Programa'],
   ['grupo-pesquisa', 'Grupo de pesquisa'],
+  ['revista', 'Revista'],
 ] as const;
 
 /** Vitrine do kit (só em desenvolvimento). Ver src/routes/dev/vitrine.tsx. */
@@ -78,6 +80,7 @@ export function VitrinePage() {
         <InstitutionShowcase />
         <GraduateProgramShowcase />
         <ResearchGroupShowcase />
+        <MagazineShowcase />
       </main>
       <Toaster />
     </div>
