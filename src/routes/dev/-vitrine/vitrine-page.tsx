@@ -4,6 +4,7 @@ import { DictionariesShowcase } from './dictionaries';
 import { KitComponentsShowcase } from './kit-components';
 import { PrimitivesShowcase } from './primitives';
 import { ProductionShowcase } from './production';
+import { ResearcherShowcase } from './researcher';
 
 const SECTIONS = [
   ['botao', 'Botão'],
@@ -21,6 +22,7 @@ const SECTIONS = [
   ['result-toolbar', 'ResultToolbar'],
   ['estados', 'Estados'],
   ['dicionarios', 'Dicionários'],
+  ['pesquisador', 'Pesquisador'],
   ['producao', 'Produção'],
 ] as const;
 
@@ -65,6 +67,7 @@ export function VitrinePage() {
         <PrimitivesShowcase />
         <KitComponentsShowcase />
         <DictionariesShowcase />
+        <ResearcherShowcase />
         <ProductionShowcase />
       </main>
       <Toaster />
