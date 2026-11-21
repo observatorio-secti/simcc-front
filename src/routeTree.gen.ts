@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as PublicIncitesRouteImport } from './routes/_public/incites'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
@@ -22,6 +23,11 @@ const PublicRoute = PublicRouteImport.update({
 const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicIncitesRoute = PublicIncitesRouteImport.update({
+  id: '/incites',
+  path: '/incites',
   getParentRoute: () => PublicRoute,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -42,11 +48,13 @@ const DevVitrineRoute = DevVitrineRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/incites': typeof PublicIncitesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
 }
 export interface FileRoutesByTo {
+  '/incites': typeof PublicIncitesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
@@ -55,6 +63,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
+  '/_public/incites': typeof PublicIncitesRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
@@ -62,12 +71,14 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine'
+  fullPaths:
+    '/' | '/incites' | '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine' | '/'
+  to: '/incites' | '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine' | '/'
   id:
     | '__root__'
     | '/_public'
+    | '/_public/incites'
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
@@ -97,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicIndexRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/incites': {
+      id: '/_public/incites'
+      path: '/incites'
+      fullPath: '/incites'
+      preLoaderRoute: typeof PublicIncitesRouteImport
+      parentRoute: typeof PublicRoute
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -122,10 +140,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface PublicRouteChildren {
+  PublicIncitesRoute: typeof PublicIncitesRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
+  PublicIncitesRoute: PublicIncitesRoute,
   PublicIndexRoute: PublicIndexRoute,
 }
 
