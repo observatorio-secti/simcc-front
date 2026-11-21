@@ -50,7 +50,7 @@ DefaultLayout
 | `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`       | T6               | a fazer       |
 | `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`             | T4               | a fazer       |
 | `/indicadores`                         | `/indicadores`                                   | T7               | a fazer       |
-| `/incites`                             | `/incites`                                       | D1.1             | a fazer       |
+| `/incites`                             | `/incites`                                       | D1.1             | feito         |
 | `/producoes-recentes`                  | —                                                | —                | descontinuada |
 | `/paines-dados-externos`               | `/paineis-dados-externos`                        | D1.2             | a fazer       |
 | `/indice-pesquisador`                  | `/indice-pesquisador`                            | D1.3             | feito         |

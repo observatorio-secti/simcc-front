@@ -81,7 +81,7 @@ graph LR
 | T7    | Indicadores                                       | F1.3             | Indicadores além de produção ainda sem rota `/v2/metrics/*` | a fazer               |               |
 | T10   | MarIA                                             | F1.3, E1, E2     | Virada do backend                                           | bloqueada             |               |
 | T12   | Console (a reimaginar)                            | F1.4, F1.2       | —                                                           | em revisão (proposta) | t12-prop      |
-| D1.1  | InCites                                           | F1.3             | —                                                           | a fazer               |               |
+| D1.1  | InCites                                           | F1.3             | —                                                           | feito                 | d1-1-incites  |
 | D1.2  | Painéis de dados externos                         | F1.3             | —                                                           | a fazer               |               |
 | D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                                                           | feito                 | d1-3-indice   |
 | D1.4  | Listagens                                         | F1.5, E1, E2, E6 | —                                                           | a fazer               |               |
