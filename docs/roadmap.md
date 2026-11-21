@@ -77,7 +77,7 @@ graph LR
 | T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | a fazer               |               |
 | T4    | Instituições (lista e detalhe)                    | F1.3, F1.5, E3   | —                                                           | feito                 | t4-instit     |
 | T5    | Pós-graduação (landing, lista e detalhe)          | F1.3, F1.5, E4   | —                                                           | feito                 | t5-pos-grad   |
-| T6    | Grupos de pesquisa                                | F1.3, F1.5, E5   | —                                                           | a fazer               |               |
+| T6    | Grupos de pesquisa                                | F1.3, F1.5, E5   | —                                                           | feito                 | t6-grupos     |
 | T7    | Indicadores                                       | F1.3             | Indicadores além de produção ainda sem rota `/v2/metrics/*` | a fazer               |               |
 | T10   | MarIA                                             | F1.3, E1, E2     | Virada do backend                                           | bloqueada             |               |
 | T12   | Console (a reimaginar)                            | F1.4, F1.2       | —                                                           | em revisão (proposta) | t12-prop      |

@@ -17,6 +17,8 @@ import { Route as PublicPaineisDadosExternosRouteImport } from './routes/_public
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
+import { Route as PublicGruposPesquisaIndexRouteImport } from './routes/_public/grupos-pesquisa/index'
+import { Route as PublicGruposPesquisaIdRouteImport } from './routes/_public/grupos-pesquisa/$id'
 import { Route as PublicInstituicoesIndexRouteImport } from './routes/_public/instituicoes/index'
 import { Route as PublicInstituicoesIdRouteImport } from './routes/_public/instituicoes/$id'
 import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
@@ -62,6 +64,17 @@ const DevVitrineRoute = DevVitrineRouteImport.update({
   path: '/dev/vitrine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicGruposPesquisaIndexRoute =
+  PublicGruposPesquisaIndexRouteImport.update({
+    id: '/grupos-pesquisa/',
+    path: '/grupos-pesquisa/',
+    getParentRoute: () => PublicRoute,
+  } as any)
+const PublicGruposPesquisaIdRoute = PublicGruposPesquisaIdRouteImport.update({
+  id: '/grupos-pesquisa/$id',
+  path: '/grupos-pesquisa/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 const PublicInstituicoesIndexRoute = PublicInstituicoesIndexRouteImport.update({
   id: '/instituicoes/',
   path: '/instituicoes/',
@@ -91,8 +104,10 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
+  '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
@@ -104,8 +119,10 @@ export interface FileRoutesByTo {
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
+  '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/grupos-pesquisa': typeof PublicGruposPesquisaIndexRoute
   '/instituicoes': typeof PublicInstituicoesIndexRoute
   '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
 }
@@ -119,8 +136,10 @@ export interface FileRoutesById {
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
+  '/_public/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/_public/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/_public/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
 }
@@ -134,8 +153,10 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/dev/vitrine'
+    | '/grupos-pesquisa/$id'
     | '/instituicoes/$id'
     | '/pos-graduacao/$id'
+    | '/grupos-pesquisa/'
     | '/instituicoes/'
     | '/pos-graduacao/'
   fileRoutesByTo: FileRoutesByTo
@@ -147,8 +168,10 @@ export interface FileRouteTypes {
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/'
+    | '/grupos-pesquisa/$id'
     | '/instituicoes/$id'
     | '/pos-graduacao/$id'
+    | '/grupos-pesquisa'
     | '/instituicoes'
     | '/pos-graduacao'
   id:
@@ -161,8 +184,10 @@ export interface FileRouteTypes {
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/_public/'
+    | '/_public/grupos-pesquisa/$id'
     | '/_public/instituicoes/$id'
     | '/_public/pos-graduacao/$id'
+    | '/_public/grupos-pesquisa/'
     | '/_public/instituicoes/'
     | '/_public/pos-graduacao/'
   fileRoutesById: FileRoutesById
@@ -232,6 +257,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevVitrineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public/grupos-pesquisa/': {
+      id: '/_public/grupos-pesquisa/'
+      path: '/grupos-pesquisa'
+      fullPath: '/grupos-pesquisa/'
+      preLoaderRoute: typeof PublicGruposPesquisaIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/grupos-pesquisa/$id': {
+      id: '/_public/grupos-pesquisa/$id'
+      path: '/grupos-pesquisa/$id'
+      fullPath: '/grupos-pesquisa/$id'
+      preLoaderRoute: typeof PublicGruposPesquisaIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
     '/_public/instituicoes/': {
       id: '/_public/instituicoes/'
       path: '/instituicoes'
@@ -268,8 +307,10 @@ interface PublicRouteChildren {
   PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
   PublicPaineisDadosExternosRoute: typeof PublicPaineisDadosExternosRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicGruposPesquisaIdRoute: typeof PublicGruposPesquisaIdRoute
   PublicInstituicoesIdRoute: typeof PublicInstituicoesIdRoute
   PublicPosGraduacaoIdRoute: typeof PublicPosGraduacaoIdRoute
+  PublicGruposPesquisaIndexRoute: typeof PublicGruposPesquisaIndexRoute
   PublicInstituicoesIndexRoute: typeof PublicInstituicoesIndexRoute
   PublicPosGraduacaoIndexRoute: typeof PublicPosGraduacaoIndexRoute
 }
@@ -279,8 +320,10 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,
   PublicPaineisDadosExternosRoute: PublicPaineisDadosExternosRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicGruposPesquisaIdRoute: PublicGruposPesquisaIdRoute,
   PublicInstituicoesIdRoute: PublicInstituicoesIdRoute,
   PublicPosGraduacaoIdRoute: PublicPosGraduacaoIdRoute,
+  PublicGruposPesquisaIndexRoute: PublicGruposPesquisaIndexRoute,
   PublicInstituicoesIndexRoute: PublicInstituicoesIndexRoute,
   PublicPosGraduacaoIndexRoute: PublicPosGraduacaoIndexRoute,
 }
