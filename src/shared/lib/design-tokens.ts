@@ -659,3 +659,96 @@ export function chartNeutralBg(index: number): string {
   const size = CHART_NEUTRAL_BG.length;
   return CHART_NEUTRAL_BG[((index % size) + size) % size] as string;
 }
+
+// ---------------------------------------------------------------------------
+// Nível do índice do pesquisador (`index-*`)
+// ---------------------------------------------------------------------------
+
+export const INDEX_LEVEL_COLORS = {
+  'A+': {
+    label: 'Nível A+',
+    bg: 'bg-index-a-plus',
+    text: 'text-index-a-plus',
+    borderLeft: 'border-l-index-a-plus',
+  },
+  A: {
+    label: 'Nível A',
+    bg: 'bg-index-a',
+    text: 'text-index-a',
+    borderLeft: 'border-l-index-a',
+    light: true,
+  },
+  'B+': {
+    label: 'Nível B+',
+    bg: 'bg-index-b-plus',
+    text: 'text-index-b-plus',
+    borderLeft: 'border-l-index-b-plus',
+    light: true,
+  },
+  B: {
+    label: 'Nível B',
+    bg: 'bg-index-b',
+    text: 'text-index-b',
+    borderLeft: 'border-l-index-b',
+    light: true,
+  },
+  'C+': {
+    label: 'Nível C+',
+    bg: 'bg-index-c-plus',
+    text: 'text-index-c-plus',
+    borderLeft: 'border-l-index-c-plus',
+    light: true,
+  },
+  C: {
+    label: 'Nível C',
+    bg: 'bg-index-c',
+    text: 'text-index-c',
+    borderLeft: 'border-l-index-c',
+    light: true,
+  },
+  'D+': {
+    label: 'Nível D+',
+    bg: 'bg-index-d-plus',
+    text: 'text-index-d-plus',
+    borderLeft: 'border-l-index-d-plus',
+    light: true,
+  },
+  D: {
+    label: 'Nível D',
+    bg: 'bg-index-d',
+    text: 'text-index-d',
+    borderLeft: 'border-l-index-d',
+    light: true,
+  },
+  'E+': {
+    label: 'Nível E+',
+    bg: 'bg-index-e-plus',
+    text: 'text-index-e-plus',
+    borderLeft: 'border-l-index-e-plus',
+    light: true,
+  },
+  E: {
+    label: 'Nível E',
+    bg: 'bg-index-e',
+    text: 'text-index-e',
+    borderLeft: 'border-l-index-e',
+    light: true,
+  },
+} as const satisfies Record<string, DictionaryColor>;
+
+export type IndexLevelKey = keyof typeof INDEX_LEVEL_COLORS;
+
+/** Normaliza um nível do índice do pesquisador (`A+`, `a+`, `B`…). */
+export function indexLevelKey(
+  value: string | null | undefined,
+): IndexLevelKey | null {
+  const raw = (value ?? '').trim().toUpperCase();
+  return raw in INDEX_LEVEL_COLORS ? (raw as IndexLevelKey) : null;
+}
+
+export function indexLevelColor(
+  value: string | null | undefined,
+): DictionaryColor {
+  const key = indexLevelKey(value);
+  return key ? INDEX_LEVEL_COLORS[key] : FALLBACK_COLOR;
+}

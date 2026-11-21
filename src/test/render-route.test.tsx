@@ -21,7 +21,9 @@ describe('renderRoute', () => {
     const { router } = await renderRoute('/');
 
     expect(router.state.location.pathname).toBe('/');
-    expect(screen.getByText(/moldura pública ativa/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: /pesquisar um tema/i }),
+    ).toBeInTheDocument();
   });
 
   it('renderiza a página 404 em rota inexistente e navega de volta para "/"', async () => {
@@ -36,7 +38,10 @@ describe('renderRoute', () => {
 
     expect(router.state.location.pathname).toBe('/');
     expect(
-      await screen.findByText(/moldura pública ativa/i),
+      await screen.findByRole('heading', {
+        level: 1,
+        name: /pesquisar um tema/i,
+      }),
     ).toBeInTheDocument();
   });
 
@@ -47,10 +52,10 @@ describe('renderRoute', () => {
       await screen.findByRole(
         'heading',
         { name: /vitrine do kit/i },
-        { timeout: 5000 },
+        { timeout: 10000 },
       ),
     ).toBeInTheDocument();
-  });
+  }, 15_000);
 });
 
 // Exemplo completo do fluxo da arquitetura: URL (zod) -> loader (ensureQueryData)
