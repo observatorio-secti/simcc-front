@@ -17,6 +17,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "api:types": "node scripts/api-types.mjs",
+    "api:examples": "node scripts/openapi-examples.mjs",
     "tokens": "node scripts/tokens.mjs",
     "tokens:check": "node scripts/tokens.mjs --check"
   },
@@ -56,6 +57,7 @@
     "eslint-plugin-react-refresh": "^0.5.8",
     "globals": "^17.14.0",
     "jsdom": "^29.1.1",
+    "msw": "^2.15.0",
     "openapi-typescript": "^7.13.0",
     "prettier": "^3.10.1",
     "prettier-plugin-tailwindcss": "^0.8.1",

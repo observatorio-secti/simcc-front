@@ -61,9 +61,9 @@ DefaultLayout
 | `/api-docs`, `/informacoes`            | —                                                | —                | descontinuada |
 | `/dicionario-cores`                    | —                                                | —                | descontinuada |
 | `/videos`                              | —                                                | —                | descontinuada |
-| `/auth/callback`                       | `/auth/callback`                                 | F1.4             | a fazer       |
+| `/auth/callback`                       | `/auth/callback`                                 | F1.4             | em revisão    |
 | `/observatorio`, `/tv`, `/sobre`       | —                                                | —                | descontinuada |
-| `*`                                    | `*`                                              | F1.3             | a fazer       |
+| `*`                                    | `*`                                              | F1.3             | em revisão    |
 
 ## Funcionalidades descontinuadas
 
