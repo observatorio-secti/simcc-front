@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
 
 const PublicRoute = PublicRouteImport.update({
@@ -22,6 +24,16 @@ const PublicIndexRoute = PublicIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PublicRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSemAcessoRoute = AuthSemAcessoRouteImport.update({
+  id: '/auth/sem-acesso',
+  path: '/auth/sem-acesso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DevVitrineRoute = DevVitrineRouteImport.update({
   id: '/dev/vitrine',
   path: '/dev/vitrine',
@@ -30,28 +42,42 @@ const DevVitrineRoute = DevVitrineRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
 }
 export interface FileRoutesByTo {
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dev/vitrine'
+  fullPaths: '/' | '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine'
   fileRoutesByTo: FileRoutesByTo
-  to: '/dev/vitrine' | '/'
-  id: '__root__' | '/_public' | '/dev/vitrine' | '/_public/'
+  to: '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine' | '/'
+  id:
+    | '__root__'
+    | '/_public'
+    | '/auth/callback'
+    | '/auth/sem-acesso'
+    | '/dev/vitrine'
+    | '/_public/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthSemAcessoRoute: typeof AuthSemAcessoRoute
   DevVitrineRoute: typeof DevVitrineRoute
 }
 
@@ -70,6 +96,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
       parentRoute: typeof PublicRoute
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/sem-acesso': {
+      id: '/auth/sem-acesso'
+      path: '/auth/sem-acesso'
+      fullPath: '/auth/sem-acesso'
+      preLoaderRoute: typeof AuthSemAcessoRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dev/vitrine': {
       id: '/dev/vitrine'
@@ -94,6 +134,8 @@ const PublicRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
+  AuthCallbackRoute: AuthCallbackRoute,
+  AuthSemAcessoRoute: AuthSemAcessoRoute,
   DevVitrineRoute: DevVitrineRoute,
 }
 export const routeTree = rootRouteImport

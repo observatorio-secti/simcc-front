@@ -21,28 +21,22 @@ describe('renderRoute', () => {
     const { router } = await renderRoute('/');
 
     expect(router.state.location.pathname).toBe('/');
-    expect(
-      screen.getByRole('heading', {
-        name: /o simcc está sendo reconstruído/i,
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/moldura pública ativa/i)).toBeInTheDocument();
   });
 
   it('renderiza a página 404 em rota inexistente e navega de volta para "/"', async () => {
     const { router, user } = await renderRoute('/rota-que-nao-existe');
 
-    expect(screen.getByText('404')).toBeInTheDocument();
+    expect(screen.getByText(/erro 404/i)).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: /página não encontrada/i }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('link', { name: /voltar ao início/i }));
+    await user.click(screen.getByRole('link', { name: /^página inicial$/i }));
 
     expect(router.state.location.pathname).toBe('/');
     expect(
-      await screen.findByRole('heading', {
-        name: /o simcc está sendo reconstruído/i,
-      }),
+      await screen.findByText(/moldura pública ativa/i),
     ).toBeInTheDocument();
   });
 
