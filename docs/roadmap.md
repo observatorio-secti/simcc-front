@@ -74,7 +74,7 @@ graph LR
 | E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | feito                 |             |
 | T1    | Busca: home e barra de busca                      | F1.3             | —                                                           | a fazer               |             |
 | T2    | Busca: resultados                                 | T1, F1.5, E1, E2 | —                                                           | a fazer               |             |
-| T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | a fazer               |             |
+| T3    | Perfil do pesquisador                             | F1.3, E1, E2     | —                                                           | em revisão            |             |
 | T4    | Instituições (lista e detalhe)                    | F1.3, F1.5, E3   | —                                                           | a fazer               |             |
 | T5    | Pós-graduação (landing, lista e detalhe)          | F1.3, F1.5, E4   | —                                                           | a fazer               |             |
 | T6    | Grupos de pesquisa                                | F1.3, F1.5, E5   | —                                                           | a fazer               |             |
