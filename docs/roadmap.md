@@ -83,7 +83,7 @@ graph LR
 | T12   | Console (a reimaginar)                            | F1.4, F1.2       | —                                                           | em revisão (proposta) | t12-prop    |
 | D1.1  | InCites                                           | F1.3             | —                                                           | a fazer               |             |
 | D1.2  | Painéis de dados externos                         | F1.3             | —                                                           | a fazer               |             |
-| D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                                                           | a fazer               |             |
+| D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                                                           | em revisão            | d1-3-indice |
 | D1.4  | Listagens                                         | F1.5, E1, E2, E6 | —                                                           | a fazer               |             |
 | V1–V5 | Virada (ver fase 4)                               | fase 3           | Virada do backend                                           | a fazer               |             |
 

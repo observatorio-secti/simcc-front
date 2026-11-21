@@ -130,6 +130,9 @@ const tailwindTheme = [
   'Escala neutra para gráficos sem semântica',
   ...group('color.chart-neutral', '--color-chart-neutral-'),
 
+  'Nível do índice do pesquisador',
+  ...group('color.index-level', '--color-index-'),
+
   'Raio: rounded-md (6px) controles, rounded-lg (8px) cards, rounded-panel (12px) painel',
   ['--radius-panel', 'radius.xl'],
 
@@ -218,6 +221,9 @@ const simccRoot = [
 
   'Escala neutra para gráficos (Cor 1–6 do dicionário)',
   ...group('color.chart-neutral', '--sc-chart-'),
+
+  'Níveis do índice do pesquisador',
+  ...group('color.index-level', '--sc-index-'),
 ];
 
 // .dark sobrescreve --sc-<chave> com cada token de color.role.dark.
