@@ -14,6 +14,8 @@ import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
+import { Route as PublicGruposPesquisaIndexRouteImport } from './routes/_public/grupos-pesquisa/index'
+import { Route as PublicGruposPesquisaIdRouteImport } from './routes/_public/grupos-pesquisa/$id'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -39,18 +41,33 @@ const DevVitrineRoute = DevVitrineRouteImport.update({
   path: '/dev/vitrine',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicGruposPesquisaIndexRoute =
+  PublicGruposPesquisaIndexRouteImport.update({
+    id: '/grupos-pesquisa/',
+    path: '/grupos-pesquisa/',
+    getParentRoute: () => PublicRoute,
+  } as any)
+const PublicGruposPesquisaIdRoute = PublicGruposPesquisaIdRouteImport.update({
+  id: '/grupos-pesquisa/$id',
+  path: '/grupos-pesquisa/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
+  '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
+  '/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
 }
 export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
+  '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
+  '/grupos-pesquisa': typeof PublicGruposPesquisaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -59,12 +76,26 @@ export interface FileRoutesById {
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
+  '/_public/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
+  '/_public/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine'
+  fullPaths:
+    | '/'
+    | '/auth/callback'
+    | '/auth/sem-acesso'
+    | '/dev/vitrine'
+    | '/grupos-pesquisa/$id'
+    | '/grupos-pesquisa/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/callback' | '/auth/sem-acesso' | '/dev/vitrine' | '/'
+  to:
+    | '/auth/callback'
+    | '/auth/sem-acesso'
+    | '/dev/vitrine'
+    | '/'
+    | '/grupos-pesquisa/$id'
+    | '/grupos-pesquisa'
   id:
     | '__root__'
     | '/_public'
@@ -72,6 +103,8 @@ export interface FileRouteTypes {
     | '/auth/sem-acesso'
     | '/dev/vitrine'
     | '/_public/'
+    | '/_public/grupos-pesquisa/$id'
+    | '/_public/grupos-pesquisa/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -118,15 +151,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevVitrineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_public/grupos-pesquisa/': {
+      id: '/_public/grupos-pesquisa/'
+      path: '/grupos-pesquisa'
+      fullPath: '/grupos-pesquisa/'
+      preLoaderRoute: typeof PublicGruposPesquisaIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/grupos-pesquisa/$id': {
+      id: '/_public/grupos-pesquisa/$id'
+      path: '/grupos-pesquisa/$id'
+      fullPath: '/grupos-pesquisa/$id'
+      preLoaderRoute: typeof PublicGruposPesquisaIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
   }
 }
 
 interface PublicRouteChildren {
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicGruposPesquisaIdRoute: typeof PublicGruposPesquisaIdRoute
+  PublicGruposPesquisaIndexRoute: typeof PublicGruposPesquisaIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
   PublicIndexRoute: PublicIndexRoute,
+  PublicGruposPesquisaIdRoute: PublicGruposPesquisaIdRoute,
+  PublicGruposPesquisaIndexRoute: PublicGruposPesquisaIndexRoute,
 }
 
 const PublicRouteWithChildren =
