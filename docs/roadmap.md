@@ -69,7 +69,7 @@ graph LR
 | E1    | Entidade pesquisador                              | F1.1, F1.2       | —                                                           | feito     |             |
 | E2    | Entidade produção (registro por tipo)             | F1.1, F1.2       | —                                                           | feito     |             |
 | E3    | Entidade instituição                              | F1.1, F1.2       | —                                                           | feito     |             |
-| E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | a fazer   |             |
+| E4    | Entidade programa de pós-graduação                | F1.1, F1.2       | —                                                           | feito     |             |
 | E5    | Entidade grupo de pesquisa (adaptador ODA)        | F1.1, F1.2       | —                                                           | a fazer   |             |
 | E6    | Entidade revista                                  | F1.1, F1.2       | —                                                           | a fazer   |             |
 | T1    | Busca: home e barra de busca                      | F1.3             | —                                                           | a fazer   |             |
