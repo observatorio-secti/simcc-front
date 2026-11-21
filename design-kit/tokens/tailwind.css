@@ -110,6 +110,18 @@
   --color-chart-neutral-5: #6f8399;
   --color-chart-neutral-6: #98a8ba;
 
+  /* Nível do índice do pesquisador */
+  --color-index-a-plus: #22c55e;
+  --color-index-a: #4ade80;
+  --color-index-b-plus: #facc15;
+  --color-index-b: #fde047;
+  --color-index-c-plus: #fb923c;
+  --color-index-c: #fdba74;
+  --color-index-d-plus: #f87171;
+  --color-index-d: #fca5a5;
+  --color-index-e-plus: #a3a3a3;
+  --color-index-e: #d4d4d4;
+
   /* Raio: rounded-md (6px) controles, rounded-lg (8px) cards, rounded-panel (12px) painel */
   --radius-panel: 12px;
 

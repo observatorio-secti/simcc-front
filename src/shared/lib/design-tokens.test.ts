@@ -5,6 +5,7 @@ import {
   CHART_NEUTRAL_BG,
   FALLBACK_COLOR,
   GENDER_COLORS,
+  INDEX_LEVEL_COLORS,
   ORIENTATION_COLORS,
   PRODUCTION_COLORS,
   QUALIS_COLORS,
@@ -16,6 +17,8 @@ import {
   chartNeutralBg,
   eventNatureKey,
   genderKey,
+  indexLevelColor,
+  indexLevelKey,
   normalizeKey,
   orientationKey,
   productionKey,
@@ -37,6 +40,7 @@ const DICTIONARIES: Record<string, Record<string, DictionaryColor>> = {
   status: STATUS_COLORS,
   bolsa: SCHOLARSHIP_COLORS,
   gender: GENDER_COLORS,
+  index: INDEX_LEVEL_COLORS,
 };
 
 // O tema é lido do disco: no Vitest, `import '...css?raw'` chega vazio (CSS
@@ -92,7 +96,7 @@ describe('dicionários de cor', () => {
       ].map((className) => className.replace(/^bg-/, '')),
     );
     const dictionaryTokens = [...themeColors].filter((token) =>
-      /^(search|area|prod|qualis|orient|status|bolsa|gender|chart-neutral)-/.test(
+      /^(search|area|prod|qualis|orient|status|bolsa|gender|chart-neutral|index)-/.test(
         token ?? '',
       ),
     );
@@ -274,5 +278,30 @@ describe('chartNeutralBg', () => {
     expect(chartNeutralBg(5)).toBe('bg-chart-neutral-6');
     expect(chartNeutralBg(6)).toBe('bg-chart-neutral-1');
     expect(chartNeutralBg(-1)).toBe('bg-chart-neutral-6');
+  });
+});
+
+describe('indexLevelKey', () => {
+  it.each([
+    ['A+', 'A+'],
+    ['a+', 'A+'],
+    ['A', 'A'],
+    ['B+', 'B+'],
+    ['B', 'B'],
+    ['C+', 'C+'],
+    ['C', 'C'],
+    ['D+', 'D+'],
+    ['D', 'D'],
+    ['E+', 'E+'],
+    ['e', 'E'],
+  ] as const)('%s → %s', (value, key) => {
+    expect(indexLevelKey(value)).toBe(key);
+  });
+
+  it('valor desconhecido usa a cor neutra', () => {
+    expect(indexLevelKey('')).toBeNull();
+    expect(indexLevelKey('F')).toBeNull();
+    expect(indexLevelColor('F')).toBe(FALLBACK_COLOR);
+    expect(indexLevelColor('A+').bg).toBe('bg-index-a-plus');
   });
 });
