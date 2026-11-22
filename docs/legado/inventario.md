@@ -44,7 +44,7 @@ DefaultLayout
 | -------------------------------------- | ------------------------------------------------------------------- | ---------------- | ------------- |
 | `/`                                    | `/`                                                                 | T1               | feito         |
 | `/resultados`, `/resultados-perfil`    | `/busca` (confirmada; tipo, aba, termo e filtros nos search params) | T2               | em revisão    |
-| `/resultados-ia`                       | `/maria`                                                            | T10              | bloqueada     |
+| `/resultados-ia`                       | `/maria`                                                            | T10              | em revisão    |
 | `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca)                    | T3               | feito         |
 | `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`                              | T5               | feito         |
 | `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`                          | T6               | feito         |
