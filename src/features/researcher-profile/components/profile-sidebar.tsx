@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import {
   BarChart3,
   BookOpen,
@@ -14,10 +15,17 @@ import type {
   ResearcherTerm,
 } from '@/entities/researcher/model';
 import { formatCount } from '@/entities/researcher/model';
-import type { Scholarship as ScholarshipItem } from '@/entities/scholarship/model';
-import { productionColor, scholarshipColor } from '@/shared/lib/design-tokens';
+import {
+  formatScholarshipLevel,
+  formatScholarshipModality,
+  scholarshipModalityColor,
+  type Scholarship as ScholarshipItem,
+} from '@/entities/scholarship/model';
+import { cn } from '@/shared/lib/cn';
+import { indexLevelColor, productionColor } from '@/shared/lib/design-tokens';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Card } from '@/shared/ui/card';
+import { focusRing } from '@/shared/ui/focus-ring';
 import { TermCloud } from './term-cloud';
 
 export interface ProfileSidebarProps {
@@ -26,14 +34,6 @@ export interface ProfileSidebarProps {
   terms: readonly ResearcherTerm[];
   termsLoading?: boolean;
   termsError?: boolean;
-}
-
-function formatScholarshipLabel(item: ScholarshipItem): string {
-  const parts = [item.modality?.trim(), item.category_level?.trim()].filter(
-    Boolean,
-  );
-  if (parts.length > 0) return parts.join(' – ');
-  return item.funding_program?.trim() || item.call_title?.trim() || 'Bolsa';
 }
 
 /**
@@ -109,54 +109,111 @@ export function ProfileSidebar({
           <h2 className="text-2xl font-semibold tracking-tight">
             Informações gerais
           </h2>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5">
             {bibliometrics?.h_index != null && (
-              <Tag variant="outline">
-                <BarChart3 aria-hidden />
+              <span className="inline-flex min-h-9 items-center gap-2 rounded-md border bg-card px-3.5 py-2 text-sm font-medium text-foreground">
+                <BarChart3
+                  className="size-4 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
                 <span>
-                  Índice H no OpenAlex: {formatCount(bibliometrics.h_index)}
+                  Índice H no OpenAlex:{' '}
+                  <strong className="font-semibold tabular-nums">
+                    {formatCount(bibliometrics.h_index)}
+                  </strong>
                 </span>
-              </Tag>
+              </span>
             )}
             {bibliometrics?.cited_by_count != null && (
-              <Tag variant="outline">
-                <Quote aria-hidden />
+              <span className="inline-flex min-h-9 items-center gap-2 rounded-md border bg-card px-3.5 py-2 text-sm font-medium text-foreground">
+                <Quote
+                  className="size-4 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
                 <span>
-                  Citações: {formatCount(bibliometrics.cited_by_count)}
+                  Citações:{' '}
+                  <strong className="font-semibold tabular-nums">
+                    {formatCount(bibliometrics.cited_by_count)}
+                  </strong>
                 </span>
-              </Tag>
+              </span>
             )}
             {bibliometrics?.i10_index != null && (
-              <Tag variant="outline">
-                <BarChart3 aria-hidden />
-                <span>Índice i10: {formatCount(bibliometrics.i10_index)}</span>
-              </Tag>
+              <span className="inline-flex min-h-9 items-center gap-2 rounded-md border bg-card px-3.5 py-2 text-sm font-medium text-foreground">
+                <BarChart3
+                  className="size-4 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
+                <span>
+                  Índice i10:{' '}
+                  <strong className="font-semibold tabular-nums">
+                    {formatCount(bibliometrics.i10_index)}
+                  </strong>
+                </span>
+              </span>
             )}
             {scholarships.map((item) => {
-              const color = scholarshipColor(
+              const color = scholarshipModalityColor(
                 item.modality ?? item.funding_program,
               );
-              const label = formatScholarshipLabel(item);
+              const modalityLabel = formatScholarshipModality(item);
+              const levelLabel = formatScholarshipLevel(item.category_level);
               const details = [item.institute, item.call_title]
                 .filter(Boolean)
                 .join(' · ');
               return (
-                <Tag key={item.id} variant="outline" title={details || label}>
-                  <Dot className={color.bg} />
-                  <span>{label}</span>
-                </Tag>
+                <div
+                  key={item.id}
+                  title={details || modalityLabel}
+                  className={cn(
+                    'flex w-full items-center justify-between gap-3 rounded-md border border-l-4 bg-card px-3.5 py-2.5',
+                    color.borderLeft,
+                  )}
+                >
+                  <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-foreground">
+                    <Dot className={color.bg} />
+                    <span className="truncate">{modalityLabel}</span>
+                  </span>
+                  {levelLabel && (
+                    <Badge
+                      variant="outline"
+                      size="sm"
+                      className="shrink-0 text-foreground"
+                    >
+                      {levelLabel}
+                    </Badge>
+                  )}
+                </div>
               );
             })}
-            {researcher.classification && (
-              <span className="inline-flex items-center">
-                <Badge size="sm" className="rounded-r-none bg-neutral-700">
-                  Índice do pesquisador
-                </Badge>
-                <Badge size="sm" className="rounded-l-none bg-status-concluida">
-                  {researcher.classification}
-                </Badge>
-              </span>
-            )}
+            {researcher.classification &&
+              (() => {
+                const levelColor = indexLevelColor(researcher.classification);
+                return (
+                  <Link
+                    to="/indice-pesquisador"
+                    title="Saiba mais sobre o índice do pesquisador"
+                    className={cn(
+                      'group flex w-full items-stretch overflow-hidden rounded-md border text-sm font-semibold',
+                      focusRing,
+                    )}
+                  >
+                    <span className="flex flex-1 items-center gap-2 bg-eng-blue px-3.5 py-2.5 text-white transition-colors group-hover:bg-eng-dark-blue">
+                      <BarChart3 className="size-4 shrink-0" aria-hidden />
+                      <span>Índice do pesquisador</span>
+                    </span>
+                    <span
+                      className={cn(
+                        'flex min-w-12 items-center justify-center px-4 py-2.5 font-bold tabular-nums',
+                        levelColor.bg,
+                        levelColor.light ? 'text-neutral-900' : 'text-white',
+                      )}
+                    >
+                      {researcher.classification}
+                    </span>
+                  </Link>
+                );
+              })()}
           </div>
         </section>
       )}
