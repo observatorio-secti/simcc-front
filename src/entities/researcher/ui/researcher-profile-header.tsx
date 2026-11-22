@@ -46,8 +46,10 @@ export interface ResearcherProfileHeaderProps {
   highlightQuery?: string | readonly string[];
   /** Tipo de busca que define a cor do destaque no resumo (padrão: `profile`). */
   searchType?: string | null;
-  /** Ações exibidas no canto superior direito (ex.: abrir, baixar PDF, mais). */
+  /** Ações exibidas no canto superior direito (ex.: abrir, mais). */
   actions?: ReactNode;
+  /** Oculta avatar, barra superior, nome e instituição (quando já exibidos no header do overlay). */
+  hideIdentity?: boolean;
   className?: string;
 }
 
@@ -82,6 +84,7 @@ export function ResearcherProfileHeader({
   highlightQuery,
   searchType = 'profile',
   actions,
+  hideIdentity = false,
   className,
 }: ResearcherProfileHeaderProps) {
   const [expanded, setExpanded] = useState(false);
@@ -112,29 +115,35 @@ export function ResearcherProfileHeader({
   const lattesBadgeColor = areaColor('outros');
   const orcidBadgeColor = qualisColor('A2');
 
-  const hasBarContent =
-    lattesUpdate !== null || active !== undefined || actions !== undefined;
+  const hasBarContent = hideIdentity
+    ? active !== undefined
+    : lattesUpdate !== null || active !== undefined || actions !== undefined;
 
   return (
     <Card
       data-slot="researcher-profile-header"
       className={cn(
-        'relative mt-12 items-center gap-3 px-4 pt-16 pb-6 text-center sm:px-6',
+        'relative items-center gap-3 text-center',
+        hideIdentity
+          ? 'border-0 bg-transparent p-0 shadow-none'
+          : 'mt-12 px-4 pt-16 pb-6 sm:px-6',
         className,
       )}
     >
-      <ResearcherAvatar
-        name={researcher.name}
-        imageUrl={researcher.image_url}
-        size="lg"
-        decorative
-        className="absolute -top-12 left-1/2 -translate-x-1/2"
-      />
+      {!hideIdentity && (
+        <ResearcherAvatar
+          name={researcher.name}
+          imageUrl={researcher.image_url}
+          size="lg"
+          decorative
+          className="absolute -top-12 left-1/2 -translate-x-1/2"
+        />
+      )}
 
       {hasBarContent && (
         <div className="order-first flex w-full flex-wrap items-center justify-between gap-2 md:order-none md:w-auto">
           <div className="flex flex-wrap items-center gap-2 md:absolute md:top-4 md:left-4 md:max-w-[calc(50%-64px)]">
-            {lattesUpdate !== null && (
+            {!hideIdentity && lattesUpdate !== null && (
               <Tag variant="outline">
                 <Calendar aria-hidden />
                 <span>Atualização do Lattes: {lattesUpdate}</span>
@@ -150,7 +159,7 @@ export function ResearcherProfileHeader({
               </Badge>
             )}
           </div>
-          {actions !== undefined && (
+          {!hideIdentity && actions !== undefined && (
             <div className="ml-auto flex flex-wrap items-center gap-1.5 md:absolute md:top-4 md:right-4 md:max-w-[calc(50%-64px)]">
               {actions}
             </div>
@@ -158,15 +167,19 @@ export function ResearcherProfileHeader({
         </div>
       )}
 
-      <h1 className="max-w-3xl text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-        {researcher.name}
-      </h1>
+      {!hideIdentity && (
+        <>
+          <h1 className="max-w-3xl text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            {researcher.name}
+          </h1>
 
-      {affiliationNames && (
-        <p className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground sm:text-base">
-          <Building2 className="size-4 shrink-0" aria-hidden />
-          <span>{affiliationNames}</span>
-        </p>
+          {affiliationNames && (
+            <p className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground sm:text-base">
+              <Building2 className="size-4 shrink-0" aria-hidden />
+              <span>{affiliationNames}</span>
+            </p>
+          )}
+        </>
       )}
 
       <div className="flex max-w-4xl flex-wrap items-center justify-center gap-2">
@@ -268,7 +281,7 @@ export function ResearcherProfileHeader({
         <>
           <p
             className={cn(
-              'max-w-4xl text-left text-sm leading-relaxed text-muted-foreground sm:text-justify',
+              'w-full text-left text-sm leading-relaxed text-muted-foreground sm:text-justify',
               isLongAbstract && !expanded && 'line-clamp-3',
             )}
           >

@@ -2,33 +2,21 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import {
   BookOpen,
   Briefcase,
-  Copy,
-  FileDown,
   FileSpreadsheet,
   FileText,
   FolderKanban,
   GraduationCap,
   Lightbulb,
-  MoreHorizontal,
   Presentation,
-  Share2,
 } from 'lucide-react';
-import { toast } from 'sonner';
 import type { ProductionKind } from '@/entities/production/model';
-import { formatCount, normalizeOrcid } from '@/entities/researcher/model';
+import { formatCount } from '@/entities/researcher/model';
 import {
   researcherDetailQueryOptions,
   researcherTermsQueryOptions,
 } from '@/entities/researcher/queries';
 import { ResearcherProfileHeader } from '@/entities/researcher/ui/researcher-profile-header';
 import { researcherScholarshipsQueryOptions } from '@/entities/scholarship/queries';
-import { Button } from '@/shared/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { ArticlesTab } from './components/articles-tab';
 import { GuidanceTab } from './components/guidance-tab';
@@ -38,6 +26,7 @@ import {
   MultiKindYearChart,
 } from './components/production-year-charts';
 import { ProfileSidebar } from './components/profile-sidebar';
+import { ResearcherProfileActions } from './components/researcher-profile-actions';
 import { TrajectoryTab } from './components/trajectory-tab';
 import { YearFilter } from './components/year-filter';
 import type { ProfileTab, ResearcherProfileSearch } from './search-schema';
@@ -51,15 +40,8 @@ export interface ResearcherProfilePageProps {
    * overlay mascarado como `/producoes/<slug>/<id>` (ADR 0010).
    */
   onOpenProduction: (kind: ProductionKind, id: string) => void;
-}
-
-async function copyText(text: string, label: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    toast.success(`${label} copiado`);
-  } catch {
-    toast.error(`Não foi possível copiar ${label.toLowerCase()}`);
-  }
+  /** Oculta a identidade no cabeçalho quando exibido dentro do overlay. */
+  hideHeaderIdentity?: boolean;
 }
 
 function renderTabCount(count: number | undefined) {
@@ -79,6 +61,7 @@ export function ResearcherProfilePage({
   search,
   onUpdateSearch,
   onOpenProduction,
+  hideHeaderIdentity = false,
 }: ResearcherProfilePageProps) {
   const { data: detailResponse } = useSuspenseQuery(
     researcherDetailQueryOptions(researcherId),
@@ -98,9 +81,6 @@ export function ResearcherProfilePage({
   const terms = termsResponse?.data ?? [];
   const scholarships = scholarshipsResponse?.data ?? [];
   const counts = researcher.counts;
-
-  const orcid = normalizeOrcid(researcher.identifiers.orcid);
-  const lattesId = researcher.identifiers.lattes_id?.trim() || null;
 
   function handleOpenProduction(kind: ProductionKind, itemId: string) {
     onOpenProduction(kind, itemId);
@@ -123,67 +103,11 @@ export function ResearcherProfilePage({
         researcher={researcher}
         highlightQuery={search.q}
         searchType={search.search_type}
+        hideIdentity={hideHeaderIdentity}
         actions={
-          <>
-            <Button
-              type="button"
-              size="icon-sm"
-              variant="outline"
-              aria-label="Copiar link do perfil"
-              onClick={() =>
-                void copyText(window.location.href, 'Link do perfil')
-              }
-            >
-              <Share2 aria-hidden />
-            </Button>
-            <Button
-              type="button"
-              size="icon-sm"
-              variant="outline"
-              aria-label="Imprimir perfil"
-              onClick={() => window.print()}
-            >
-              <FileDown aria-hidden />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  size="icon-sm"
-                  variant="ghost"
-                  aria-label="Mais ações"
-                >
-                  <MoreHorizontal aria-hidden />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() =>
-                    void copyText(window.location.href, 'Link do perfil')
-                  }
-                >
-                  <Copy className="size-4" aria-hidden />
-                  Copiar link do perfil
-                </DropdownMenuItem>
-                {orcid && (
-                  <DropdownMenuItem
-                    onClick={() => void copyText(orcid, 'ORCID')}
-                  >
-                    <Copy className="size-4" aria-hidden />
-                    Copiar ORCID
-                  </DropdownMenuItem>
-                )}
-                {lattesId && (
-                  <DropdownMenuItem
-                    onClick={() => void copyText(lattesId, 'ID Lattes')}
-                  >
-                    <Copy className="size-4" aria-hidden />
-                    Copiar ID Lattes
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
+          hideHeaderIdentity ? undefined : (
+            <ResearcherProfileActions researcher={researcher} />
+          )
         }
       />
 
