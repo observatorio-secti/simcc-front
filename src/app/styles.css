@@ -81,6 +81,30 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Séries de gráfico sem semântica (paleta categórica, ordem fixa). O tema
+   escuro usa os mesmos matizes ajustados para a superfície escura. */
+:root {
+  --chart-series-1: var(--color-chart-cat-1);
+  --chart-series-2: var(--color-chart-cat-2);
+  --chart-series-3: var(--color-chart-cat-3);
+  --chart-series-4: var(--color-chart-cat-4);
+  --chart-series-5: var(--color-chart-cat-5);
+  --chart-series-6: var(--color-chart-cat-6);
+  --chart-series-7: var(--color-chart-cat-7);
+  --chart-series-8: var(--color-chart-cat-8);
+}
+
+.dark {
+  --chart-series-1: var(--color-chart-cat-dark-1);
+  --chart-series-2: var(--color-chart-cat-dark-2);
+  --chart-series-3: var(--color-chart-cat-dark-3);
+  --chart-series-4: var(--color-chart-cat-dark-4);
+  --chart-series-5: var(--color-chart-cat-dark-5);
+  --chart-series-6: var(--color-chart-cat-dark-6);
+  --chart-series-7: var(--color-chart-cat-dark-7);
+  --chart-series-8: var(--color-chart-cat-dark-8);
+}
+
 @layer base {
   /* No Tailwind 4 a borda padrão é currentColor; o kit usa neutral-200. */
   *,
@@ -118,5 +142,25 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+/* Cursor de escrita no fim da resposta da MarIA enquanto o texto chega. */
+.maria-typing > :last-child > :last-child::after {
+  content: '';
+  display: inline-block;
+  width: 0.45em;
+  height: 1em;
+  margin-left: 0.15em;
+  vertical-align: -0.15em;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.55;
+  animation: maria-caret 1s steps(2, start) infinite;
+}
+
+@keyframes maria-caret {
+  to {
+    visibility: hidden;
   }
 }

@@ -868,3 +868,24 @@ export function indexLevelColor(
   const key = indexLevelKey(value);
   return key ? INDEX_LEVEL_COLORS[key] : FALLBACK_COLOR;
 }
+
+// ---------------------------------------------------------------------------
+// Paleta categórica de gráficos (`chart-cat-*`)
+// ---------------------------------------------------------------------------
+
+/**
+ * Quantas séries sem semântica cabem num gráfico. A ordem é fixa e validada
+ * para daltonismo; passar disso exige agrupar em "Outros" (nunca repetir cor).
+ */
+export const CHART_SERIES_MAX = 8;
+
+/**
+ * Cor da série `index` (0 a 7) como variável CSS. O tema escuro troca o valor
+ * (src/app/styles.css). Índice fora da paleta devolve a cor neutra de "Outros".
+ */
+export function chartSeriesColor(index: number): string {
+  if (!Number.isInteger(index) || index < 0 || index >= CHART_SERIES_MAX) {
+    return 'var(--color-chart-neutral-6)';
+  }
+  return `var(--chart-series-${index + 1})`;
+}

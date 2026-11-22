@@ -353,3 +353,18 @@ describe('runStatusKey', () => {
     expect(runStatusColor('FAILED').bg).toBe('bg-run-failed');
   });
 });
+
+describe('chartSeriesColor', () => {
+  it('usa a paleta categórica em ordem fixa e neutro fora dela', async () => {
+    const { chartSeriesColor, CHART_SERIES_MAX } =
+      await import('./design-tokens');
+    expect(chartSeriesColor(0)).toBe('var(--chart-series-1)');
+    expect(chartSeriesColor(CHART_SERIES_MAX - 1)).toBe(
+      'var(--chart-series-8)',
+    );
+    expect(chartSeriesColor(CHART_SERIES_MAX)).toBe(
+      'var(--color-chart-neutral-6)',
+    );
+    expect(chartSeriesColor(-1)).toBe('var(--color-chart-neutral-6)');
+  });
+});
