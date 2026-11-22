@@ -1,4 +1,8 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  notFound,
+  stripSearchParams,
+} from '@tanstack/react-router';
 import {
   researcherDetailQueryOptions,
   researcherTermsQueryOptions,
@@ -11,6 +15,7 @@ import {
 import { ResearcherProfilePage } from '@/features/researcher-profile/researcher-profile-page';
 import {
   cleanProfileSearch,
+  PROFILE_SEARCH_DEFAULTS,
   researcherProfileSearchSchema,
   type ResearcherProfileSearch,
 } from '@/features/researcher-profile/search-schema';
@@ -18,6 +23,11 @@ import {
 export const Route = createFileRoute('/_public/pesquisadores/$id')({
   staticData: { crumb: 'Pesquisador' },
   validateSearch: researcherProfileSearchSchema,
+  // Omite os padrões (aba, página, visão) da URL, inclusive na máscara do
+  // overlay aberto a partir da busca (ADR 0010).
+  search: {
+    middlewares: [stripSearchParams(PROFILE_SEARCH_DEFAULTS)],
+  },
   loader: async ({ context, params }) => {
     try {
       const detail = await context.queryClient.ensureQueryData(
