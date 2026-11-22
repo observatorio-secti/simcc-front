@@ -12,19 +12,21 @@ export interface RequireAdminParams {
  * - sem sessão em memória: tenta retomar silenciosamente via `prompt=none`
  *   preservando a rota de destino no `state`;
  * - autenticado sem `is_admin`: redireciona para a tela de "sem acesso";
+ * - admin: devolve `{ viewer }` ao contexto das rotas filhas (sem sobrescrever
+ *   `context.session`, que continua sendo a store);
  * - erro transitório (ex.: 502/504 em `/me` com tokens ativos): propaga o erro
  *   sem encerrar a sessão.
  */
 export async function requireAdmin({
   context,
   location,
-}: RequireAdminParams): Promise<{ session: SessionSnapshot }> {
+}: RequireAdminParams): Promise<{ viewer: SessionSnapshot }> {
   const { session } = context;
   const snapshot = await session.ensureSession();
 
   if (snapshot.status === 'authenticated') {
     if (snapshot.isAdmin) {
-      return { session: snapshot };
+      return { viewer: snapshot };
     }
     throw redirect({
       to: '/auth/sem-acesso',

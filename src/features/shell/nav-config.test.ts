@@ -58,3 +58,13 @@ describe('nav-config', () => {
     expect(allUrls).toContain('/paineis-dados-externos');
   });
 });
+
+describe('isActive com exact (menu do console)', () => {
+  it('a visão geral do console não fica ativa nas subrotas', () => {
+    expect(isActive('/console', '/console', { exact: true })).toBe(true);
+    expect(isActive('/console', '/console/admins', { exact: true })).toBe(
+      false,
+    );
+    expect(isActive('/console/admins', '/console/admins?q=ana')).toBe(true);
+  });
+});

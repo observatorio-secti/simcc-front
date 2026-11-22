@@ -631,6 +631,67 @@ export function statusColor(value: string | null | undefined): DictionaryColor {
 }
 
 // ---------------------------------------------------------------------------
+// Estado de execução (`run-*`): runs e etapas do ETL no console
+// ---------------------------------------------------------------------------
+
+export const RUN_STATUS_COLORS = {
+  succeeded: {
+    label: 'Sucesso',
+    bg: 'bg-run-succeeded',
+    text: 'text-run-succeeded',
+    borderLeft: 'border-l-run-succeeded',
+  },
+  failed: {
+    label: 'Falha',
+    bg: 'bg-run-failed',
+    text: 'text-run-failed',
+    borderLeft: 'border-l-run-failed',
+  },
+  running: {
+    label: 'Em execução',
+    bg: 'bg-run-running',
+    text: 'text-run-running',
+    borderLeft: 'border-l-run-running',
+  },
+  queued: {
+    label: 'Na fila',
+    bg: 'bg-run-queued',
+    text: 'text-run-queued',
+    borderLeft: 'border-l-run-queued',
+  },
+} as const satisfies Record<string, DictionaryColor>;
+
+export type RunStatusKey = keyof typeof RUN_STATUS_COLORS;
+
+/**
+ * Status do ETL (`SUCCEEDED`, `FAILED`, `RUNNING`, `PENDING`, `ACCEPTED`…) na
+ * chave do dicionário. Valor desconhecido devolve `null`.
+ */
+export function runStatusKey(
+  value: string | null | undefined,
+): RunStatusKey | null {
+  const normalized = normalizeKey(value);
+  if (!normalized) return null;
+  if (/^(SUCCEEDED|SUCCESS|COMPLETED|DONE)$/.test(normalized)) {
+    return 'succeeded';
+  }
+  if (/^(FAILED|FAILURE|ERROR)$/.test(normalized)) return 'failed';
+  if (/^(RUNNING|IN PROGRESS|STARTED)$/.test(normalized)) return 'running';
+  if (/^(PENDING|ACCEPTED|QUEUED)$/.test(normalized)) return 'queued';
+  return null;
+}
+
+/** Cor do status; desconhecido usa o neutro com o rótulo "Desconhecido". */
+export function runStatusColor(
+  value: string | null | undefined,
+): DictionaryColor {
+  const key = runStatusKey(value);
+  return key
+    ? RUN_STATUS_COLORS[key]
+    : { ...FALLBACK_COLOR, label: 'Desconhecido' };
+}
+
+// ---------------------------------------------------------------------------
 // Bolsa CNPq (`bolsa-*`)
 // ---------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import {
   Link,
   useLocation,
@@ -23,10 +23,20 @@ import {
   type NavItem,
 } from './nav-config';
 
+export type SidebarNavRenderProps = {
+  pathname: string;
+  collapsed: boolean;
+  onNavigate?: () => void;
+};
+
 export type AppSidebarProps = {
   collapsed: boolean;
   mobileOpen: boolean;
   onMobileOpenChange: (open: boolean) => void;
+  /** Navegação própria (ex.: menu do console); padrão: menu público. */
+  renderNav?: (props: SidebarNavRenderProps) => ReactNode;
+  /** Descrição do menu no sheet do mobile, para leitores de tela. */
+  mobileDescription?: string;
 };
 
 const ACTIVE_ITEM_CLASS =
@@ -34,7 +44,7 @@ const ACTIVE_ITEM_CLASS =
 const INACTIVE_ITEM_CLASS =
   'text-foreground hover:bg-neutral-200 dark:hover:bg-neutral-800';
 
-function SidebarLink({
+export function SidebarLink({
   item,
   pathname,
   collapsed,
@@ -45,13 +55,13 @@ function SidebarLink({
   collapsed: boolean;
   onNavigate?: () => void;
 }) {
-  const active = isActive(item.url, pathname);
+  const active = isActive(item.url, pathname, { exact: item.exact });
   const Icon = item.icon;
 
   const link = (
     <Link<RegisteredRouter, string, string>
       href={item.url}
-      activeOptions={{ exact: item.url === '/' }}
+      activeOptions={{ exact: item.exact || item.url === '/' }}
       activeProps={{}}
       inactiveProps={{}}
       aria-label={collapsed ? item.title : undefined}
@@ -227,10 +237,16 @@ function SidebarNavContent({
  * Barra lateral pública: colapsável no desktop (`16rem` ↔ `3rem`) e
  * apresentada em `Sheet` no mobile (`< md`).
  */
+function PublicSidebarNav(props: SidebarNavRenderProps) {
+  return <SidebarNavContent {...props} />;
+}
+
 export function AppSidebar({
   collapsed,
   mobileOpen,
   onMobileOpenChange,
+  renderNav = PublicSidebarNav,
+  mobileDescription = 'Menu principal da plataforma Simcc',
 }: AppSidebarProps) {
   const { pathname } = useLocation();
 
@@ -245,7 +261,7 @@ export function AppSidebar({
           collapsed ? 'w-[3rem]' : 'w-[16rem]',
         )}
       >
-        <SidebarNavContent pathname={pathname} collapsed={collapsed} />
+        {renderNav({ pathname, collapsed })}
       </aside>
 
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
@@ -256,15 +272,15 @@ export function AppSidebar({
           <SheetHeader className="border-b border-neutral-200 px-2 pt-2 pb-3 dark:border-neutral-800">
             <SheetTitle className="text-sm font-semibold">Navegação</SheetTitle>
             <SheetDescription className="sr-only">
-              Menu principal da plataforma Simcc
+              {mobileDescription}
             </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto pt-2">
-            <SidebarNavContent
-              pathname={pathname}
-              collapsed={false}
-              onNavigate={() => onMobileOpenChange(false)}
-            />
+            {renderNav({
+              pathname,
+              collapsed: false,
+              onNavigate: () => onMobileOpenChange(false),
+            })}
           </div>
         </SheetContent>
       </Sheet>

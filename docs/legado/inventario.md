@@ -57,7 +57,12 @@ DefaultLayout
 | `/indice-pesquisador`                  | `/indice-pesquisador`                                               | D1.3             | feito         |
 | `/provimento-cargo`                    | —                                                                   | —                | descontinuada |
 | `/listagens`                           | `/busca` sem termo (`/listagens` redireciona, ADR 0011)             | D1.4, V4.1       | em revisão    |
-| `/console`, `/console/*`               | a definir na proposta                                               | T12 (reimaginar) | a fazer       |
+| `/console`                             | `/console` (último run do ETL e totais)                             | T12.1            | em revisão    |
+| — (novo)                               | `/console/admins`                                                   | T12.1            | em revisão    |
+| `/console/instituicoes(/:id)`          | `/console/instituicoes`, `/console/instituicoes/$id`                | T12.2 (cadastro) | a fazer       |
+| `/console/pesquisadores`               | `/console/pesquisadores`, `/console/pesquisadores/$id`              | T12.2 (cadastro) | a fazer       |
+| `/console/colecoes`                    | `/console/colecoes`                                                 | T12.2 (cadastro) | a fazer       |
+| `/console/etl(/:runId)`                | `/console/etl`, `/console/etl/$runId`                               | T12.3            | a fazer       |
 | `/termos-uso`, `/politica-privacidade` | —                                                                   | —                | descontinuada |
 | `/api-docs`, `/informacoes`            | —                                                                   | —                | descontinuada |
 | `/dicionario-cores`                    | —                                                                   | —                | descontinuada |

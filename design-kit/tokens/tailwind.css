@@ -96,9 +96,13 @@
   --color-qualis-C: #ce3830;
   --color-qualis-SQ: #4a1314;
 
-  /* Status, bolsas e gênero */
+  /* Status, estado de execução, bolsas e gênero */
   --color-status-concluida: #6bc26b;
   --color-status-andamento: #dbb540;
+  --color-run-succeeded: #16a34a;
+  --color-run-failed: #ef4444;
+  --color-run-running: #559fb8;
+  --color-run-queued: #f59e0b;
   --color-bolsa-PQ: #00d000;
   --color-bolsa-DT: #183eff;
   --color-gender-f: #d15697;

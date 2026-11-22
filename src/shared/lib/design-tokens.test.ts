@@ -10,6 +10,7 @@ import {
   PRODUCTION_COLORS,
   QUALIS_COLORS,
   QUALIS_STATUS_COLORS,
+  RUN_STATUS_COLORS,
   SCHOLARSHIP_COLORS,
   SEARCH_TYPE_COLORS,
   STATUS_COLORS,
@@ -27,6 +28,8 @@ import {
   qualisFacetColor,
   qualisKey,
   qualisStatusKey,
+  runStatusColor,
+  runStatusKey,
   scholarshipKey,
   searchTypeColor,
   searchTypeKey,
@@ -44,6 +47,7 @@ const DICTIONARIES: Record<string, Record<string, DictionaryColor>> = {
   bolsa: SCHOLARSHIP_COLORS,
   gender: GENDER_COLORS,
   index: INDEX_LEVEL_COLORS,
+  run: RUN_STATUS_COLORS,
 };
 
 // O tema é lido do disco: no Vitest, `import '...css?raw'` chega vazio (CSS
@@ -324,5 +328,28 @@ describe('indexLevelKey', () => {
     expect(indexLevelKey('F')).toBeNull();
     expect(indexLevelColor('F')).toBe(FALLBACK_COLOR);
     expect(indexLevelColor('A+').bg).toBe('bg-index-a-plus');
+  });
+});
+
+describe('runStatusKey', () => {
+  it.each([
+    ['SUCCEEDED', 'succeeded'],
+    ['FAILED', 'failed'],
+    ['RUNNING', 'running'],
+    ['PENDING', 'queued'],
+    ['ACCEPTED', 'queued'],
+    ['running', 'running'],
+  ] as const)('%s → %s', (value, key) => {
+    expect(runStatusKey(value)).toBe(key);
+  });
+
+  it('status desconhecido usa o neutro com rótulo próprio', () => {
+    expect(runStatusKey('')).toBeNull();
+    expect(runStatusKey('CANCELLED')).toBeNull();
+    expect(runStatusColor('CANCELLED')).toMatchObject({
+      bg: FALLBACK_COLOR.bg,
+      label: 'Desconhecido',
+    });
+    expect(runStatusColor('FAILED').bg).toBe('bg-run-failed');
   });
 });

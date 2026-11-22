@@ -17,6 +17,8 @@ O design kit da área pública (`design-kit/`) foi escrito para Tailwind 3, com 
 
 ## Consequências
 
+- **Adendo (T12, 2026-11-22):** o console administrativo usa o mesmo kit (`--sc-*` e `src/shared/ui/`). Não existem tokens `sm-*`. O estado de execução do ETL é um dicionário do tema (`color.run-status` → `bg-run-*`).
+
 - Algumas receitas do kit usam nomes do Tailwind 3 (`shadow-sm`, `rounded`, `ring`). A tabela de tradução está em `design-kit/DESIGN.md`, na seção "Uso no app".
 - Mudar um token é editar só `tokens.json` e rodar `npm run tokens` (cartão K1 do roadmap). A CI roda `npm run tokens:check` e falha se os arquivos gerados estiverem fora de sincronia.
 - O app só lê classes de `src/` (`@import 'tailwindcss' source(none)` + `@source '../'`), para os HTML de exemplo do kit não inflarem o CSS.

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
+import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicBuscaRouteImport } from './routes/_public/busca'
 import { Route as PublicIncitesRouteImport } from './routes/_public/incites'
@@ -24,6 +25,8 @@ import { Route as PublicResultadosIaRouteImport } from './routes/_public/resulta
 import { Route as PublicResultadosPerfilRouteImport } from './routes/_public/resultados-perfil'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
+import { Route as ConsoleIndexRouteImport } from './routes/console/index'
+import { Route as ConsoleAdminsRouteImport } from './routes/console/admins'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
 import { Route as PublicGruposPesquisaIndexRouteImport } from './routes/_public/grupos-pesquisa/index'
 import { Route as PublicGruposPesquisaIdRouteImport } from './routes/_public/grupos-pesquisa/$id'
@@ -38,6 +41,11 @@ import { Route as PublicProducoesKindIdRouteImport } from './routes/_public/prod
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleRoute = ConsoleRouteImport.update({
+  id: '/console',
+  path: '/console',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
@@ -112,6 +120,16 @@ const AuthSemAcessoRoute = AuthSemAcessoRouteImport.update({
   path: '/auth/sem-acesso',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleAdminsRoute = ConsoleAdminsRouteImport.update({
+  id: '/admins',
+  path: '/admins',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const DevVitrineRoute = DevVitrineRouteImport.update({
   id: '/dev/vitrine',
   path: '/dev/vitrine',
@@ -172,6 +190,7 @@ const PublicProducoesKindIdRoute = PublicProducoesKindIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/console': typeof ConsoleRouteWithChildren
   '/busca': typeof PublicBuscaRoute
   '/incites': typeof PublicIncitesRoute
   '/indicadores': typeof PublicIndicadoresRoute
@@ -185,7 +204,9 @@ export interface FileRoutesByFullPath {
   '/resultados-perfil': typeof PublicResultadosPerfilRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
+  '/console/admins': typeof ConsoleAdminsRoute
   '/dev/vitrine': typeof DevVitrineRoute
+  '/console/': typeof ConsoleIndexRoute
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
@@ -211,8 +232,10 @@ export interface FileRoutesByTo {
   '/resultados-perfil': typeof PublicResultadosPerfilRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
+  '/console/admins': typeof ConsoleAdminsRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
+  '/console': typeof ConsoleIndexRoute
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
@@ -227,6 +250,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
+  '/console': typeof ConsoleRouteWithChildren
   '/_public/busca': typeof PublicBuscaRoute
   '/_public/incites': typeof PublicIncitesRoute
   '/_public/indicadores': typeof PublicIndicadoresRoute
@@ -240,8 +264,10 @@ export interface FileRoutesById {
   '/_public/resultados-perfil': typeof PublicResultadosPerfilRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
+  '/console/admins': typeof ConsoleAdminsRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
+  '/console/': typeof ConsoleIndexRoute
   '/_public/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/_public/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/_public/instituicoes/$id': typeof PublicInstituicoesIdRoute
@@ -257,6 +283,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/console'
     | '/busca'
     | '/incites'
     | '/indicadores'
@@ -270,7 +297,9 @@ export interface FileRouteTypes {
     | '/resultados-perfil'
     | '/auth/callback'
     | '/auth/sem-acesso'
+    | '/console/admins'
     | '/dev/vitrine'
+    | '/console/'
     | '/grupos-pesquisa/$id'
     | '/instituicao/$acronym'
     | '/instituicoes/$id'
@@ -296,8 +325,10 @@ export interface FileRouteTypes {
     | '/resultados-perfil'
     | '/auth/callback'
     | '/auth/sem-acesso'
+    | '/console/admins'
     | '/dev/vitrine'
     | '/'
+    | '/console'
     | '/grupos-pesquisa/$id'
     | '/instituicao/$acronym'
     | '/instituicoes/$id'
@@ -311,6 +342,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_public'
+    | '/console'
     | '/_public/busca'
     | '/_public/incites'
     | '/_public/indicadores'
@@ -324,8 +356,10 @@ export interface FileRouteTypes {
     | '/_public/resultados-perfil'
     | '/auth/callback'
     | '/auth/sem-acesso'
+    | '/console/admins'
     | '/dev/vitrine'
     | '/_public/'
+    | '/console/'
     | '/_public/grupos-pesquisa/$id'
     | '/_public/instituicao/$acronym'
     | '/_public/instituicoes/$id'
@@ -340,6 +374,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
+  ConsoleRoute: typeof ConsoleRouteWithChildren
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthSemAcessoRoute: typeof AuthSemAcessoRoute
   DevVitrineRoute: typeof DevVitrineRoute
@@ -352,6 +387,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console': {
+      id: '/console'
+      path: '/console'
+      fullPath: '/console'
+      preLoaderRoute: typeof ConsoleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public/': {
@@ -451,6 +493,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/sem-acesso'
       preLoaderRoute: typeof AuthSemAcessoRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/console/': {
+      id: '/console/'
+      path: '/'
+      fullPath: '/console/'
+      preLoaderRoute: typeof ConsoleIndexRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/admins': {
+      id: '/console/admins'
+      path: '/admins'
+      fullPath: '/console/admins'
+      preLoaderRoute: typeof ConsoleAdminsRouteImport
+      parentRoute: typeof ConsoleRoute
     }
     '/dev/vitrine': {
       id: '/dev/vitrine'
@@ -585,8 +641,22 @@ const PublicRouteChildren: PublicRouteChildren = {
 const PublicRouteWithChildren =
   PublicRoute._addFileChildren(PublicRouteChildren)
 
+interface ConsoleRouteChildren {
+  ConsoleAdminsRoute: typeof ConsoleAdminsRoute
+  ConsoleIndexRoute: typeof ConsoleIndexRoute
+}
+
+const ConsoleRouteChildren: ConsoleRouteChildren = {
+  ConsoleAdminsRoute: ConsoleAdminsRoute,
+  ConsoleIndexRoute: ConsoleIndexRoute,
+}
+
+const ConsoleRouteWithChildren =
+  ConsoleRoute._addFileChildren(ConsoleRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
+  ConsoleRoute: ConsoleRouteWithChildren,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthSemAcessoRoute: AuthSemAcessoRoute,
   DevVitrineRoute: DevVitrineRoute,
