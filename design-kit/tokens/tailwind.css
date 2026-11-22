@@ -116,24 +116,6 @@
   --color-chart-neutral-5: #6f8399;
   --color-chart-neutral-6: #98a8ba;
 
-  /* Paleta categórica para gráficos com várias séries (ordem fixa; validada para daltonismo) */
-  --color-chart-cat-1: #2a78d6;
-  --color-chart-cat-2: #eb6834;
-  --color-chart-cat-3: #1baf7a;
-  --color-chart-cat-4: #eda100;
-  --color-chart-cat-5: #e87ba4;
-  --color-chart-cat-6: #008300;
-  --color-chart-cat-7: #6250d6;
-  --color-chart-cat-8: #e34948;
-  --color-chart-cat-dark-1: #3987e5;
-  --color-chart-cat-dark-2: #d95926;
-  --color-chart-cat-dark-3: #199e70;
-  --color-chart-cat-dark-4: #c98500;
-  --color-chart-cat-dark-5: #d55181;
-  --color-chart-cat-dark-6: #0ca30c;
-  --color-chart-cat-dark-7: #9085e9;
-  --color-chart-cat-dark-8: #e66767;
-
   /* Nível do índice do pesquisador */
   --color-index-a-plus: #22c55e;
   --color-index-a: #4ade80;

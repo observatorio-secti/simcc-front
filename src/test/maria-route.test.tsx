@@ -223,17 +223,9 @@ describe('/maria/$conversationId', () => {
       'Mais uma{Enter}',
     );
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      /chegou ao limite de perguntas.*Nada foi gravado/,
+      'Limite de 10 perguntas da conversa atingido.',
     );
-    expect(
-      screen.queryByRole('button', { name: /Tentar novamente/ }),
-    ).toBeNull();
-    expect(
-      screen.getAllByRole('link', { name: /Iniciar nova conversa/ })[0],
-    ).toHaveAttribute('href', '/maria');
-    expect(
-      screen.getByRole('textbox', { name: 'Sua pergunta para a MarIA' }),
-    ).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /Tentar de novo/ })).toBeNull();
   }, 15000);
 
   it('desliga o envio quando a conversa chegou ao limite', async () => {

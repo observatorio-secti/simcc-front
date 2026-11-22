@@ -1,7 +1,6 @@
 import { skipToken, useQuery, type QueryClient } from '@tanstack/react-query';
 import { ApiError, clientErrorCodes, isAbortError } from '@/api/errors';
 import { streamMessage, type MariaActivity } from '@/api/maria';
-import { addBrowserConversation } from '@/entities/conversation/browser-conversations';
 import type {
   ConversationBlock,
   ConversationMessage,
@@ -13,9 +12,6 @@ import { conversationKeys } from '@/entities/conversation/queries';
 // do stream: sobrevive à troca de rota (de `/maria` para `/maria/$id`) e não
 // depende de nenhum componente montado. Quando a resposta termina, as duas
 // mensagens entram no cache de mensagens e este estado sai do cache.
-//
-// Erro ou interrupção descartam o rascunho da resposta (a API não grava nada)
-// e deixam só a pergunta, para a tela devolvê-la ao campo de texto.
 
 export type ConversationStreamStatus = 'streaming' | 'error' | 'stopped';
 
@@ -33,7 +29,7 @@ export interface ConversationStreamState {
   controller: AbortController;
 }
 
-export function applyDelta(
+function applyDelta(
   blocks: ConversationBlock[],
   index: number,
   type: string,
@@ -125,8 +121,6 @@ export async function startConversationStream(
             ],
           );
           queryClient.removeQueries({ queryKey: key, exact: true });
-          // Só agora a conversa existe de fato: entra na lista do navegador.
-          addBrowserConversation(conversationId);
           await Promise.all([
             queryClient.invalidateQueries({
               queryKey: conversationKeys.detail(conversationId),
@@ -147,12 +141,7 @@ export async function startConversationStream(
     });
   } catch (error) {
     if (isAbortError(error) || controller.signal.aborted) {
-      update((state) => ({
-        ...state,
-        status: 'stopped',
-        blocks: [],
-        activities: [],
-      }));
+      update((state) => ({ ...state, status: 'stopped' }));
       return;
     }
     const apiError =
@@ -164,13 +153,7 @@ export async function startConversationStream(
             message: 'Não foi possível concluir a resposta da MarIA.',
             cause: error,
           });
-    update((state) => ({
-      ...state,
-      status: 'error',
-      error: apiError,
-      blocks: [],
-      activities: [],
-    }));
+    update((state) => ({ ...state, status: 'error', error: apiError }));
     // O limite de perguntas pode ter mudado.
     void queryClient.invalidateQueries({
       queryKey: conversationKeys.detail(conversationId),
@@ -190,18 +173,15 @@ export function stopConversationStream(
     ?.controller.abort();
 }
 
-/** Descarta o aviso de erro ou de interrupção (nunca uma resposta em curso). */
+/** Descarta o aviso de erro ou de interrupção. */
 export function dismissConversationStream(
   queryClient: QueryClient,
   conversationId: string,
 ) {
-  const key = conversationKeys.stream(conversationId);
-  if (
-    queryClient.getQueryData<ConversationStreamState>(key)?.status ===
-    'streaming'
-  )
-    return;
-  queryClient.removeQueries({ queryKey: key, exact: true });
+  queryClient.removeQueries({
+    queryKey: conversationKeys.stream(conversationId),
+    exact: true,
+  });
 }
 
 /** Lê do cache a resposta em andamento (nunca busca nada). */

@@ -1,12 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import {
-  createConversation,
-  getConversation,
-  isMariaConfigured,
-  listMessages,
-} from '@/api/maria';
-
-export { isMariaConfigured };
+import { getConversation, listMessages } from '@/api/maria';
 
 export const conversationKeys = {
   all: ['conversation'] as const,
@@ -30,9 +23,4 @@ export function conversationMessagesQueryOptions(id: string) {
     queryKey: conversationKeys.messages(id),
     queryFn: async ({ signal }) => (await listMessages(id, signal)).messages,
   });
-}
-
-/** Cria uma conversa vazia (`POST /conversations`). */
-export function createNewConversation(signal?: AbortSignal) {
-  return createConversation(signal);
 }

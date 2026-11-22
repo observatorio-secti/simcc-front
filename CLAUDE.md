@@ -39,7 +39,7 @@ React 19, Vite, TypeScript estrito, TanStack Router (rotas por arquivo em `src/r
 - **Uma entidade, um conjunto de componentes**, em `src/entities/<nome>/ui/`.
 - **Cor por dado** só via `src/shared/lib/design-tokens.ts` e classes do tema (`bg-area-saude`, `bg-qualis-A1`…). Sem hex em classe.
 - `localStorage`/`sessionStorage` só via `src/shared/lib/storage.ts`. Nenhum segredo em variável `VITE_*`.
-- Sem exportação CSV (ADR 0006), exceto os blocos de dados da MarIA (ADR 0013). Grupos de pesquisa vêm da ODA (ADR 0007).
+- Sem exportação CSV (ADR 0006). Grupos de pesquisa vêm da ODA (ADR 0007).
 - Código em inglês; textos da interface em pt-BR, sentence case; URLs públicas em pt-BR, kebab-case.
 - `src/routeTree.gen.ts` é gerado: não edite. Em conflito de merge, rode `npm run build` para regenerar.
 

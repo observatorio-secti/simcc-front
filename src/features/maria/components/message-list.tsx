@@ -1,15 +1,13 @@
-import { useEffect, useRef, type ReactNode } from 'react';
-import { Link } from '@tanstack/react-router';
+import { useEffect, useRef } from 'react';
 import {
   AlertTriangle,
   CircleStop,
-  ClipboardCopy,
   Loader2,
-  Plus,
   RotateCw,
+  Search,
+  Sparkles,
   X,
 } from 'lucide-react';
-import { toast } from 'sonner';
 import {
   formatMessageTime,
   messageText,
@@ -23,52 +21,31 @@ import { MessageBlocks } from './message-blocks';
 
 const mariaColor = searchTypeColor('maria');
 
-function UserQuestion({
-  text,
-  time,
-  pending = false,
-}: {
-  text: string;
-  time?: string;
-  pending?: boolean;
-}) {
+function UserBubble({ text, time }: { text: string; time?: string }) {
   return (
-    <li
-      data-slot="maria-user-message"
-      data-pending={pending || undefined}
-      className={cn(
-        'flex flex-col gap-1 border-l-2 border-eng-blue pl-4 transition-opacity',
-        pending && 'opacity-70',
-      )}
-    >
-      <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        Sua pergunta
-        {pending ? (
-          <span className="inline-flex items-center gap-1">
-            <Loader2 className="size-3 animate-spin" aria-hidden />
-            enviando…
-          </span>
-        ) : (
-          time && <span className="font-normal">{time}</span>
+    <li data-slot="maria-user-message" className="flex justify-end">
+      <div className="flex max-w-[85%] flex-col items-end gap-1">
+        <p className="rounded-lg rounded-br-sm bg-eng-blue px-3.5 py-2 text-sm whitespace-pre-wrap text-white">
+          {text}
+        </p>
+        {time && (
+          <span className="text-[11px] text-muted-foreground">{time}</span>
         )}
-      </span>
-      <p className="text-base font-medium whitespace-pre-wrap text-foreground">
-        {text}
-      </p>
+      </div>
     </li>
   );
 }
 
-function MariaSeal() {
+function AssistantAvatar() {
   return (
     <span
       aria-hidden
       className={cn(
-        'grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold text-white',
+        'mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-white',
         mariaColor.bg,
       )}
     >
-      M
+      <Sparkles className="size-4" />
     </span>
   );
 }
@@ -77,93 +54,59 @@ function AssistantMessage({
   children,
   time,
   busy,
-  actions,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
   time?: string;
   busy?: boolean;
-  actions?: ReactNode;
 }) {
   return (
     <li
       data-slot="maria-assistant-message"
-      className="flex flex-col gap-3"
+      className="flex gap-3"
       aria-busy={busy || undefined}
     >
-      <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-        <MariaSeal />
-        MarIA
-        {time && (
-          <span className="text-xs font-normal text-muted-foreground">
-            {time}
-          </span>
-        )}
-      </span>
-      <div className="flex min-w-0 flex-col gap-3">{children}</div>
-      {actions && <div className="flex flex-wrap gap-1">{actions}</div>}
+      <AssistantAvatar />
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <span className="text-xs font-semibold text-foreground">
+          MarIA
+          {time && (
+            <span className="ml-2 font-normal text-muted-foreground">
+              {time}
+            </span>
+          )}
+        </span>
+        {children}
+      </div>
     </li>
   );
 }
 
-/** Texto em Markdown da resposta, para "Copiar texto". */
-function answerText(message: Pick<ConversationMessage, 'content'>) {
-  return messageText(message);
-}
-
-function CopyAnswerButton({ message }: { message: ConversationMessage }) {
-  const text = answerText(message);
-  if (!text) return null;
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="sm"
-      className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
-      onClick={() => {
-        navigator.clipboard.writeText(text).then(
-          () => toast.success('Texto copiado.'),
-          () => toast.error('Não foi possível copiar o texto.'),
-        );
-      }}
-    >
-      <ClipboardCopy aria-hidden />
-      Copiar texto
-    </Button>
-  );
-}
-
-/** O que a MarIA está fazendo agora (substitui o "digitando…"). */
-function LiveActivity({ stream }: { stream: ConversationStreamState }) {
+function Activities({ stream }: { stream: ConversationStreamState }) {
   const last = stream.activities.at(-1);
+  const waiting = stream.status === 'streaming' && stream.blocks.length === 0;
+  if (!waiting && stream.activities.length === 0) return null;
+
   return (
-    <p
+    <div
       role="status"
       aria-live="polite"
-      data-slot="maria-live-activity"
-      className="inline-flex items-start gap-2 text-sm text-muted-foreground"
+      className="flex flex-col gap-1 text-xs text-muted-foreground"
     >
-      <Loader2
-        className="mt-0.5 size-4 shrink-0 animate-spin text-eng-blue"
-        aria-hidden
-      />
-      <span>
-        {last ? last.description : 'Analisando a pergunta…'}
-        {last?.source && <span className="ml-1 text-xs">· {last.source}</span>}
-      </span>
-    </p>
+      {waiting ? (
+        <span className="inline-flex items-center gap-1.5">
+          <Loader2 className="size-3.5 animate-spin" aria-hidden />
+          {last ? last.description : 'Pensando na resposta…'}
+        </span>
+      ) : (
+        <span className="inline-flex items-center gap-1.5">
+          <Search className="size-3.5" aria-hidden />
+          {stream.activities.length === 1
+            ? '1 consulta aos dados'
+            : `${stream.activities.length} consultas aos dados`}
+        </span>
+      )}
+    </div>
   );
-}
-
-/** Mensagem de erro conforme o status (429, 503, rede, stream). */
-function outcomeMessage(stream: ConversationStreamState): string {
-  const status = stream.error?.status;
-  if (status === 429) {
-    return 'Esta conversa chegou ao limite de perguntas. Inicie uma nova conversa para continuar.';
-  }
-  if (status === 503) {
-    return 'O serviço de IA está temporariamente indisponível. Tente de novo em alguns minutos.';
-  }
-  return stream.error?.message ?? 'Não foi possível obter a resposta.';
 }
 
 function StreamOutcome({
@@ -182,11 +125,10 @@ function StreamOutcome({
   return (
     <div
       role={stopped ? 'status' : 'alert'}
-      data-slot="maria-stream-outcome"
       className={cn(
         'flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3 text-sm',
         stopped
-          ? 'bg-card text-foreground'
+          ? 'bg-card text-muted-foreground'
           : 'border-destructive/40 bg-destructive/10 text-destructive',
       )}
     >
@@ -196,32 +138,23 @@ function StreamOutcome({
         ) : (
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
         )}
-        <span>
-          {stopped ? 'Resposta interrompida.' : outcomeMessage(stream)}{' '}
-          <strong className="font-semibold">Nada foi gravado</strong>
-          {limitReached ? '.' : ': sua pergunta voltou para o campo de texto.'}
-        </span>
+        {stopped
+          ? 'Resposta interrompida. A pergunta não foi gravada na conversa.'
+          : (stream.error?.message ?? 'Não foi possível obter a resposta.')}
       </span>
       <span className="flex gap-2">
-        {limitReached ? (
-          <Button asChild size="sm">
-            <Link to="/maria">
-              <Plus aria-hidden />
-              Iniciar nova conversa
-            </Link>
-          </Button>
-        ) : (
+        {!limitReached && (
           <Button type="button" variant="outline" size="sm" onClick={onRetry}>
             <RotateCw aria-hidden />
-            {stopped ? 'Reenviar' : 'Tentar novamente'}
+            {stopped ? 'Reenviar' : 'Tentar de novo'}
           </Button>
         )}
         <Button
           type="button"
           variant="ghost"
-          size="icon-sm"
+          size="sm"
           onClick={onDismiss}
-          aria-label="Fechar aviso"
+          aria-label="Descartar pergunta"
         >
           <X aria-hidden />
         </Button>
@@ -238,7 +171,7 @@ export interface MessageListProps {
   onDismiss: () => void;
 }
 
-/** Pares pergunta e resposta gravados e, no fim, a resposta em andamento. */
+/** Mensagens gravadas e, no fim, a resposta em andamento. */
 export function MessageList({
   messages,
   stream,
@@ -248,7 +181,6 @@ export function MessageList({
 }: MessageListProps) {
   const endRef = useRef<HTMLDivElement>(null);
   const lastIndex = messages.length - 1;
-  const streaming = stream?.status === 'streaming';
   const streamSize = stream
     ? stream.blocks.reduce(
         (size, block) =>
@@ -263,15 +195,15 @@ export function MessageList({
     const panel = end?.closest<HTMLElement>('[data-slot="shell-panel"]');
     if (!end || !panel) return;
     const distance = panel.scrollHeight - panel.scrollTop - panel.clientHeight;
-    if (distance < 320) end.scrollIntoView?.({ block: 'end' });
+    if (distance < 240) end.scrollIntoView?.({ block: 'end' });
   }, [messages.length, streamSize, stream?.status]);
 
   return (
-    <div className="flex flex-col gap-8">
-      <ol aria-label="Mensagens" className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
+      <ol aria-label="Mensagens" className="flex flex-col gap-6">
         {messages.map((message, index) =>
           message.role === 'user' ? (
-            <UserQuestion
+            <UserBubble
               key={message.id}
               text={messageText(message)}
               time={formatMessageTime(message.created_at)}
@@ -280,40 +212,33 @@ export function MessageList({
             <AssistantMessage
               key={message.id}
               time={formatMessageTime(message.created_at)}
-              actions={<CopyAnswerButton message={message} />}
             >
               <MessageBlocks
                 blocks={message.content}
-                // Só a última resposta oferece os próximos caminhos.
+                // Só a última resposta oferece perguntas de continuação.
                 onAsk={index === lastIndex && !stream ? onAsk : undefined}
               />
             </AssistantMessage>
           ),
         )}
 
-        {/* Rascunho: some em erro ou interrupção (nada foi gravado). */}
-        {streaming && (
+        {stream && (
           <>
-            <UserQuestion
+            <UserBubble
               text={
                 stream.userMessage
                   ? messageText(stream.userMessage)
                   : stream.question
               }
-              pending
             />
-            <AssistantMessage busy>
-              {stream.blocks.length === 0 ? (
-                <LiveActivity stream={stream} />
-              ) : (
-                <>
-                  <MessageBlocks blocks={stream.blocks} streaming />
-                  {stream.blocks.at(-1)?.type !== 'text' && (
-                    <LiveActivity stream={stream} />
-                  )}
-                </>
-              )}
-            </AssistantMessage>
+            {(stream.status === 'streaming' ||
+              stream.blocks.length > 0 ||
+              stream.activities.length > 0) && (
+              <AssistantMessage busy={stream.status === 'streaming'}>
+                <Activities stream={stream} />
+                <MessageBlocks blocks={stream.blocks} />
+              </AssistantMessage>
+            )}
           </>
         )}
       </ol>

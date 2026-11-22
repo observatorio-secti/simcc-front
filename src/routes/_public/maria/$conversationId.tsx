@@ -18,14 +18,11 @@ export const Route = createFileRoute('/_public/maria/$conversationId')({
       conversationMessagesQueryOptions(params.conversationId),
     );
     try {
-      const detail = await queryClient.ensureQueryData(
+      await queryClient.ensureQueryData(
         conversationDetailQueryOptions(params.conversationId),
       );
-      // Abrir uma conversa com perguntas (inclusive por link) a guarda neste
-      // navegador. A recém-criada, ainda vazia, entra na primeira resposta.
-      if (!preload && detail.questions_asked > 0) {
-        addBrowserConversation(params.conversationId);
-      }
+      // Abrir a conversa (inclusive por link) a guarda neste navegador.
+      if (!preload) addBrowserConversation(params.conversationId);
     } catch {
       // A página mostra o erro (404: "Conversa não encontrada").
     }
