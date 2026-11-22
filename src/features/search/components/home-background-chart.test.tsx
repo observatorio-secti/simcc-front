@@ -20,7 +20,7 @@ describe('HomeBackgroundChart', () => {
     expect(paths).toHaveLength(4);
   });
 
-  it('alterna automaticamente entre as séries a cada 5 segundos', () => {
+  it('alterna automaticamente entre as séries a cada 8 segundos', () => {
     vi.useFakeTimers();
     render(<HomeBackgroundChart />);
 
@@ -28,12 +28,12 @@ describe('HomeBackgroundChart', () => {
     expect(wrapper).toHaveAttribute('data-active-series', 'count_article');
 
     act(() => {
-      vi.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(8000);
     });
     expect(wrapper).toHaveAttribute('data-active-series', 'count_patent');
 
     act(() => {
-      vi.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(8000);
     });
     expect(wrapper).toHaveAttribute(
       'data-active-series',
@@ -41,7 +41,7 @@ describe('HomeBackgroundChart', () => {
     );
 
     act(() => {
-      vi.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(8000);
     });
     expect(wrapper).toHaveAttribute('data-active-series', 'count_article');
   });

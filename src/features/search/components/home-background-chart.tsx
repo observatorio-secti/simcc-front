@@ -2,9 +2,9 @@ import { useEffect, useId, useMemo, useState } from 'react';
 
 const VIEWBOX_WIDTH = 1200;
 const VIEWBOX_HEIGHT = 600;
-const TOP_PADDING = 48;
-const BOTTOM_PADDING = 16;
-const ROTATION_INTERVAL_MS = 5000;
+const TOP_PADDING = 64;
+const BOTTOM_PADDING = 24;
+const ROTATION_INTERVAL_MS = 8000;
 
 interface ChartSeries {
   key: 'count_article' | 'count_patent' | 'count_guidance_in_progress';
@@ -12,22 +12,22 @@ interface ChartSeries {
 }
 
 /**
- * Série histórica estática inspirada nos indicadores gerais da plataforma
- * (artigos, patentes e orientações em andamento) para renderização imediata
- * sem depender de consulta à API.
+ * Dados reais agregados da plataforma (2022–2026) para artigos, patentes e
+ * orientações em andamento, mantendo curvas suaves com poucas oscilações e
+ * renderização imediata sem aguardar consulta à API.
  */
 const STATIC_SERIES: readonly ChartSeries[] = [
   {
     key: 'count_article',
-    values: [28, 36, 33, 48, 55, 51, 68, 76, 72, 86, 94, 88],
+    values: [11955, 11989, 13224, 12490, 8986],
   },
   {
     key: 'count_patent',
-    values: [14, 19, 25, 22, 34, 42, 39, 52, 61, 57, 70, 78],
+    values: [109, 96, 138, 143, 133],
   },
   {
     key: 'count_guidance_in_progress',
-    values: [42, 46, 39, 44, 58, 63, 54, 60, 74, 69, 82, 91],
+    values: [1821, 3020, 5359, 10744, 8561],
   },
 ];
 
@@ -126,12 +126,9 @@ export function HomeBackgroundChart() {
   }, []);
 
   const computedSeries = useMemo(() => {
-    const maxValue = Math.max(
-      ...STATIC_SERIES.flatMap((series) => series.values),
-      1,
-    );
     return STATIC_SERIES.map((series, index) => {
-      const linePath = buildMonotonePath(series.values, maxValue);
+      const seriesMax = Math.max(...series.values, 1);
+      const linePath = buildMonotonePath(series.values, seriesMax);
       return {
         key: series.key,
         linePath,
@@ -183,7 +180,7 @@ export function HomeBackgroundChart() {
             d={activeSeries.areaPath}
             fill={`url(#${gradientId})`}
             style={{
-              animation: 'home-chart-area 900ms ease-out forwards',
+              animation: 'home-chart-area 1600ms ease-out forwards',
             }}
           />
           <path
@@ -196,7 +193,7 @@ export function HomeBackgroundChart() {
             pathLength={1}
             strokeDasharray="1"
             style={{
-              animation: 'home-chart-draw 1400ms ease-out forwards',
+              animation: 'home-chart-draw 2600ms ease-in-out forwards',
             }}
           />
         </g>
