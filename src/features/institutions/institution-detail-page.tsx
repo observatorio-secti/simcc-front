@@ -3,18 +3,11 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import {
   Award,
-  BookOpen,
   Building2,
-  FileSpreadsheet,
-  FileText,
   FlaskConical,
-  FolderKanban,
   GraduationCap,
   Hash,
-  Lightbulb,
-  MapPin,
   Microscope,
-  Presentation,
   Search,
   Users,
   X,
@@ -39,7 +32,7 @@ import { PersonCard } from '@/entities/researcher/ui/person-card';
 import { cn } from '@/shared/lib/cn';
 import { Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Card, CardContent } from '@/shared/ui/card';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { focusRing } from '@/shared/ui/focus-ring';
 import { Input } from '@/shared/ui/input';
@@ -48,25 +41,16 @@ import { Pagination } from '@/shared/ui/pagination';
 import { StatCard } from '@/shared/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
-import { InstitutionProductionsTab } from './institution-productions-tab';
+import {
+  PRODUCTION_TAB_ITEMS,
+  PRODUCTION_TAB_KINDS,
+  ProductionsTab,
+} from '@/entities/production/ui/productions-tab';
 import {
   institutionDetailSearch,
   type InstitutionDetailSearch,
   type InstitutionDetailTab,
 } from './search-schema';
-
-const PRODUCTION_TAB_KINDS: Record<
-  Exclude<InstitutionDetailTab, 'researchers' | 'programs'>,
-  readonly ProductionKind[]
-> = {
-  articles: ['article'],
-  books: ['book', 'book_chapter'],
-  technical: ['patent', 'software', 'brand'],
-  reports: ['report'],
-  guidance: ['guidance'],
-  events: ['event', 'event_work'],
-  projects: ['research_project'],
-};
 
 function isInstitutionDetailTab(value: string): value is InstitutionDetailTab {
   return (
@@ -412,9 +396,6 @@ export function InstitutionDetailPage({
   const researchGroupsCount = institution.counts?.research_groups ?? 0;
   const labsCount = institution.counts?.labs ?? 0;
   const scholarshipsBreakdown = institution.scholarships ?? [];
-  const hasCoordinates =
-    typeof institution.latitude === 'number' &&
-    typeof institution.longitude === 'number';
 
   return (
     <div className="flex flex-col gap-6">
@@ -516,34 +497,12 @@ export function InstitutionDetailPage({
                 <GraduationCap aria-hidden />
                 <span>Programas de pós-graduação</span>
               </TabsTrigger>
-              <TabsTrigger value="articles">
-                <FileText aria-hidden />
-                <span>Artigos</span>
-              </TabsTrigger>
-              <TabsTrigger value="books">
-                <BookOpen aria-hidden />
-                <span>Livros e capítulos</span>
-              </TabsTrigger>
-              <TabsTrigger value="technical">
-                <Lightbulb aria-hidden />
-                <span>Produção técnica</span>
-              </TabsTrigger>
-              <TabsTrigger value="reports">
-                <FileSpreadsheet aria-hidden />
-                <span>Relatórios técnicos</span>
-              </TabsTrigger>
-              <TabsTrigger value="guidance">
-                <GraduationCap aria-hidden />
-                <span>Orientações</span>
-              </TabsTrigger>
-              <TabsTrigger value="events">
-                <Presentation aria-hidden />
-                <span>Eventos</span>
-              </TabsTrigger>
-              <TabsTrigger value="projects">
-                <FolderKanban aria-hidden />
-                <span>Projetos</span>
-              </TabsTrigger>
+              {PRODUCTION_TAB_ITEMS.map(({ key, label, icon: Icon }) => (
+                <TabsTrigger key={key} value={key}>
+                  <Icon aria-hidden />
+                  <span>{label}</span>
+                </TabsTrigger>
+              ))}
             </TabsList>
 
             <form
@@ -623,17 +582,14 @@ export function InstitutionDetailPage({
               />
             </TabsContent>
 
-            {(
-              Object.entries(PRODUCTION_TAB_KINDS) as Array<
-                [
-                  Exclude<InstitutionDetailTab, 'researchers' | 'programs'>,
-                  readonly ProductionKind[],
-                ]
-              >
-            ).map(([tabKey, kinds]) => (
-              <TabsContent key={tabKey} value={tabKey} className="mt-0">
-                <InstitutionProductionsTab
-                  institutionId={institution.id}
+            {PRODUCTION_TAB_ITEMS.map(({ key, kinds }) => (
+              <TabsContent key={key} value={key} className="mt-0">
+                <ProductionsTab
+                  scopeFilter={{ institution_id: [institution.id] }}
+                  emptyContext={{
+                    inScope: 'nesta instituição',
+                    owner: 'Esta instituição',
+                  }}
                   kinds={kinds}
                   search={search}
                   onUpdateSearch={updateSearch}

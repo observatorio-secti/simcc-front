@@ -1,3 +1,4 @@
+import { useState, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import {
@@ -9,11 +10,13 @@ import {
   Hash,
   Mail,
   MapPin,
-  PieChart,
   Phone,
+  Search,
   TextSearch,
   User,
+  UserCheck,
   Users,
+  X,
 } from 'lucide-react';
 import {
   cleanProgramText,
@@ -27,81 +30,120 @@ import {
 import { graduateProgramDetailQueryOptions } from '@/entities/graduate-program/queries';
 import { ResearchLines } from '@/entities/graduate-program/ui/research-lines';
 import { InstitutionRef } from '@/entities/institution/ui/institution-ref';
+import type { ProductionKind } from '@/entities/production/model';
+import {
+  PRODUCTION_TAB_ITEMS,
+  PRODUCTION_TAB_KINDS,
+  ProductionsTab,
+} from '@/entities/production/ui/productions-tab';
+import type { ResearcherSummary } from '@/entities/researcher/model';
+import { researcherListQueryOptions } from '@/entities/researcher/queries';
+import { PersonCard } from '@/entities/researcher/ui/person-card';
 import { cn } from '@/shared/lib/cn';
 import { FALLBACK_COLOR } from '@/shared/lib/design-tokens';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { EmptyState } from '@/shared/ui/empty-state';
+import { Input } from '@/shared/ui/input';
 import { LoadingBlock } from '@/shared/ui/loading-block';
+import { Pagination } from '@/shared/ui/pagination';
 import { PowerBiEmbed } from '@/shared/ui/power-bi-embed';
-import { SectionHeader } from '@/shared/ui/section-header';
 import { StatCard } from '@/shared/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { DISCENTES_PANEL } from './program-panels';
 import {
-  PROGRAM_PANELS,
+  graduateProgramDetailSearch,
   type GraduateProgramDetailSearch,
-} from './program-panels';
+  type GraduateProgramDetailTab,
+} from './search';
+
+const DEFAULT_DETAIL_SEARCH: GraduateProgramDetailSearch =
+  graduateProgramDetailSearch.schema.parse({});
+
+function isGraduateProgramDetailTab(
+  value: string,
+): value is GraduateProgramDetailTab {
+  return (
+    value === 'researchers' ||
+    value === 'students' ||
+    value in PRODUCTION_TAB_KINDS
+  );
+}
 
 export interface GraduateProgramDetailPageProps {
   programId: string;
   search?: GraduateProgramDetailSearch;
+  onOpenProduction?: (kind: ProductionKind, id: string) => void;
 }
 
-function ProgramPanelSection({
+function GraduateProgramResearchersTab({
   programId,
   search,
+  onPageChange,
+  onPerPageChange,
+  onClearQuery,
 }: {
   programId: string;
   search: GraduateProgramDetailSearch;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
+  onClearQuery: () => void;
 }) {
-  const navigate = useNavigate();
-  const active = search.painel ?? 'producao';
+  const { data, isPending, isFetching } = useQuery(
+    researcherListQueryOptions({
+      graduate_program_id: [programId],
+      q: search.q,
+      page: search.page,
+      per_page: search.per_page,
+    }),
+  );
 
-  function handleChange(value: string) {
-    const next = PROGRAM_PANELS.find((panel) => panel.id === value);
-    if (!next) return;
-    void navigate({
-      to: '/pos-graduacao/$id',
-      params: { id: programId },
-      search: { painel: next.id === 'producao' ? undefined : next.id },
-      replace: true,
-      resetScroll: false,
-    });
+  if (isPending) {
+    return <LoadingBlock />;
+  }
+
+  const researchers = data?.data ?? [];
+  if (researchers.length === 0) {
+    return (
+      <EmptyState
+        icon={Users}
+        title="Nenhum pesquisador encontrado"
+        description={
+          search.q
+            ? `Não encontramos pesquisadores para "${search.q}" neste programa.`
+            : 'Este programa ainda não possui pesquisadores listados.'
+        }
+        action={
+          search.q ? (
+            <Button type="button" variant="outline" onClick={onClearQuery}>
+              Limpar filtro
+            </Button>
+          ) : undefined
+        }
+      />
+    );
   }
 
   return (
-    <section aria-labelledby="program-panel-heading" className="flex flex-col">
-      <SectionHeader
-        id="program-panel-heading"
-        title="Painel"
-        icon={PieChart}
-      />
-      <Tabs
-        value={active}
-        onValueChange={handleChange}
-        className="flex flex-col gap-3"
-      >
-        <TabsList className="w-full justify-start overflow-x-auto bg-neutral-100 dark:bg-neutral-800">
-          {PROGRAM_PANELS.map((panel) => (
-            <TabsTrigger key={panel.id} value={panel.id}>
-              {panel.title}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        {PROGRAM_PANELS.map((panel) => (
-          <TabsContent key={panel.id} value={panel.id} className="mt-0">
-            <PowerBiEmbed
-              src={panel.src}
-              title={panel.title}
-              description={panel.description}
-              previewSrc={panel.previewSrc}
-              unavailable={panel.unavailable}
-            />
-          </TabsContent>
+    <div aria-busy={isFetching || undefined} className="flex flex-col gap-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {researchers.map((researcher) => (
+          <PersonCard
+            key={researcher.id}
+            researcher={researcher as ResearcherSummary}
+          />
         ))}
-      </Tabs>
-    </section>
+      </div>
+
+      {data?.pagination && (
+        <Pagination
+          pagination={data.pagination}
+          onPageChange={onPageChange}
+          onPerPageChange={onPerPageChange}
+        />
+      )}
+    </div>
   );
 }
 
@@ -119,10 +161,63 @@ function normalizeSiteUrl(raw: string | null | undefined): string | null {
  */
 export function GraduateProgramDetailPage({
   programId,
-  search = {},
+  search = DEFAULT_DETAIL_SEARCH,
+  onOpenProduction,
 }: GraduateProgramDetailPageProps) {
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/pos-graduacao/$id' });
   const detailQuery = useQuery(graduateProgramDetailQueryOptions(programId));
+
+  const [queryInput, setQueryInput] = useState(search.q ?? '');
+  const [prevSearchQ, setPrevSearchQ] = useState(search.q);
+
+  if (prevSearchQ !== search.q) {
+    setPrevSearchQ(search.q);
+    setQueryInput(search.q ?? '');
+  }
+
+  const activeTab: GraduateProgramDetailTab = search.tab ?? 'researchers';
+
+  function updateSearch(
+    patch: Partial<GraduateProgramDetailSearch>,
+    options?: { resetPage?: boolean },
+  ) {
+    const next = graduateProgramDetailSearch.update(search, patch, options);
+    void navigate({
+      search: () => next,
+    });
+  }
+
+  function handleTabChange(nextValue: string) {
+    if (!isGraduateProgramDetailTab(nextValue)) return;
+    const isProductionTab =
+      nextValue !== 'researchers' && nextValue !== 'students';
+    updateSearch({
+      tab: nextValue === 'researchers' ? undefined : nextValue,
+      q: undefined,
+      ...(!isProductionTab
+        ? {
+            year_start: undefined,
+            year_end: undefined,
+            sort_by: undefined,
+            sort_order: undefined,
+            view: undefined,
+          }
+        : {}),
+    });
+  }
+
+  function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmed = queryInput.trim();
+    updateSearch({ q: trimmed || undefined });
+  }
+
+  function handleClearQuery() {
+    setQueryInput('');
+    if (search.q) {
+      updateSearch({ q: undefined });
+    }
+  }
 
   if (detailQuery.isPending) {
     return (
@@ -345,7 +440,115 @@ export function GraduateProgramDetailPage({
 
           <ResearchLines lines={researchLines} />
 
-          <ProgramPanelSection programId={programId} search={search} />
+          <Tabs
+            value={activeTab}
+            onValueChange={handleTabChange}
+            className="flex flex-col gap-4"
+          >
+            <TabsList variant="pills">
+              <TabsTrigger value="researchers">
+                <Users aria-hidden />
+                <span>Pesquisadores</span>
+              </TabsTrigger>
+              {PRODUCTION_TAB_ITEMS.map(({ key, label, icon: Icon }) => (
+                <TabsTrigger key={key} value={key}>
+                  <Icon aria-hidden />
+                  <span>{label}</span>
+                </TabsTrigger>
+              ))}
+              <TabsTrigger value="students">
+                <UserCheck aria-hidden />
+                <span>{DISCENTES_PANEL.title}</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {activeTab !== 'students' && (
+              <form
+                role="search"
+                aria-label={
+                  activeTab === 'researchers'
+                    ? 'Filtrar pesquisadores do programa'
+                    : 'Filtrar produções do programa'
+                }
+                onSubmit={handleSearchSubmit}
+                className="flex h-[52px] items-center gap-3 rounded-lg border bg-card px-4"
+              >
+                <Search
+                  className="size-4 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
+                <Input
+                  type="search"
+                  value={queryInput}
+                  onChange={(event) => setQueryInput(event.target.value)}
+                  placeholder={
+                    activeTab === 'researchers'
+                      ? 'Filtrar pesquisadores por nome ou termo'
+                      : 'Filtrar produções por título ou termo'
+                  }
+                  aria-label={
+                    activeTab === 'researchers'
+                      ? 'Filtrar pesquisadores por nome ou termo'
+                      : 'Filtrar produções por título ou termo'
+                  }
+                  className="h-auto flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+                />
+                {queryInput && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={handleClearQuery}
+                    aria-label="Limpar filtro"
+                  >
+                    <X className="size-4" aria-hidden />
+                  </Button>
+                )}
+                <Button type="submit" size="sm">
+                  Filtrar
+                </Button>
+              </form>
+            )}
+
+            <TabsContent value="researchers" className="mt-0">
+              <GraduateProgramResearchersTab
+                programId={programId}
+                search={search}
+                onPageChange={(page) =>
+                  updateSearch({ page }, { resetPage: false })
+                }
+                onPerPageChange={(per_page) => updateSearch({ per_page })}
+                onClearQuery={handleClearQuery}
+              />
+            </TabsContent>
+
+            {PRODUCTION_TAB_ITEMS.map(({ key, kinds }) => (
+              <TabsContent key={key} value={key} className="mt-0">
+                <ProductionsTab
+                  scopeFilter={{ graduate_program_id: [programId] }}
+                  emptyContext={{
+                    inScope: 'neste programa',
+                    owner: 'Este programa',
+                  }}
+                  kinds={kinds}
+                  search={search}
+                  onUpdateSearch={updateSearch}
+                  onOpenProduction={onOpenProduction}
+                  onClearQuery={handleClearQuery}
+                />
+              </TabsContent>
+            ))}
+
+            <TabsContent value="students" className="mt-0">
+              <PowerBiEmbed
+                src={DISCENTES_PANEL.src}
+                title={DISCENTES_PANEL.title}
+                description={DISCENTES_PANEL.description}
+                previewSrc={DISCENTES_PANEL.previewSrc}
+                unavailable={DISCENTES_PANEL.unavailable}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
 
         <aside className="flex flex-col gap-4">

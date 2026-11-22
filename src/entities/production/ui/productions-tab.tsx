@@ -1,6 +1,17 @@
 import { useId, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { LayoutGrid, Rows3 } from 'lucide-react';
+import {
+  BookOpen,
+  FileSpreadsheet,
+  FileText,
+  FolderKanban,
+  GraduationCap,
+  LayoutGrid,
+  Lightbulb,
+  Presentation,
+  Rows3,
+  type LucideIcon,
+} from 'lucide-react';
 import type {
   ProductionItem,
   ProductionKind,
@@ -17,41 +28,128 @@ import { SectionHeader } from '@/shared/ui/section-header';
 import { SortSelect, type SortOption } from '@/shared/ui/sort-select';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/ui/toggle-group';
 import { YearFilter } from '@/shared/ui/year-filter';
-import type {
-  InstitutionDetailSearch,
-  InstitutionProductionSortBy,
-  InstitutionViewMode,
-} from './search-schema';
 
-const ARTICLE_SORT_OPTIONS: readonly SortOption<InstitutionProductionSortBy>[] =
-  [
-    { value: 'year', label: 'Ano', defaultOrder: 'desc' },
-    { value: 'citations', label: 'Citações', defaultOrder: 'desc' },
-    { value: 'title', label: 'Título', defaultOrder: 'asc' },
-  ];
+export type ProductionTabKey =
+  | 'articles'
+  | 'books'
+  | 'technical'
+  | 'reports'
+  | 'guidance'
+  | 'events'
+  | 'projects';
 
-const DEFAULT_SORT_OPTIONS: readonly SortOption<InstitutionProductionSortBy>[] =
-  [
-    { value: 'year', label: 'Ano', defaultOrder: 'desc' },
-    { value: 'title', label: 'Título', defaultOrder: 'asc' },
-  ];
+export interface ProductionTabItem {
+  readonly key: ProductionTabKey;
+  readonly label: string;
+  readonly icon: LucideIcon;
+  readonly kinds: readonly ProductionKind[];
+}
 
-interface InstitutionProductionSectionProps {
-  institutionId: string;
+export const PRODUCTION_TAB_ITEMS: readonly ProductionTabItem[] = [
+  { key: 'articles', label: 'Artigos', icon: FileText, kinds: ['article'] },
+  {
+    key: 'books',
+    label: 'Livros e capítulos',
+    icon: BookOpen,
+    kinds: ['book', 'book_chapter'],
+  },
+  {
+    key: 'technical',
+    label: 'Produção técnica',
+    icon: Lightbulb,
+    kinds: ['patent', 'software', 'brand'],
+  },
+  {
+    key: 'reports',
+    label: 'Relatórios técnicos',
+    icon: FileSpreadsheet,
+    kinds: ['report'],
+  },
+  {
+    key: 'guidance',
+    label: 'Orientações',
+    icon: GraduationCap,
+    kinds: ['guidance'],
+  },
+  {
+    key: 'events',
+    label: 'Eventos',
+    icon: Presentation,
+    kinds: ['event', 'event_work'],
+  },
+  {
+    key: 'projects',
+    label: 'Projetos',
+    icon: FolderKanban,
+    kinds: ['research_project'],
+  },
+];
+
+export const PRODUCTION_TAB_KINDS: Record<
+  ProductionTabKey,
+  readonly ProductionKind[]
+> = {
+  articles: ['article'],
+  books: ['book', 'book_chapter'],
+  technical: ['patent', 'software', 'brand'],
+  reports: ['report'],
+  guidance: ['guidance'],
+  events: ['event', 'event_work'],
+  projects: ['research_project'],
+};
+
+export type ProductionTabSortBy = 'year' | 'citations' | 'title';
+export type ProductionTabViewMode = 'grid' | 'list';
+
+export interface ProductionsTabSearch {
+  q?: string;
+  year_start?: number;
+  year_end?: number;
+  sort_by?: ProductionTabSortBy;
+  sort_order?: 'asc' | 'desc';
+  page: number;
+  per_page: number;
+  view?: ProductionTabViewMode;
+}
+
+export type ProductionScopeFilter =
+  | { institution_id: string[] }
+  | { graduate_program_id: string[] };
+
+export interface ProductionEmptyContext {
+  inScope: string;
+  owner: string;
+}
+
+const ARTICLE_SORT_OPTIONS: readonly SortOption<ProductionTabSortBy>[] = [
+  { value: 'year', label: 'Ano', defaultOrder: 'desc' },
+  { value: 'citations', label: 'Citações', defaultOrder: 'desc' },
+  { value: 'title', label: 'Título', defaultOrder: 'asc' },
+];
+
+const DEFAULT_SORT_OPTIONS: readonly SortOption<ProductionTabSortBy>[] = [
+  { value: 'year', label: 'Ano', defaultOrder: 'desc' },
+  { value: 'title', label: 'Título', defaultOrder: 'asc' },
+];
+
+interface ProductionSectionProps {
+  scopeFilter: ProductionScopeFilter;
+  emptyContext: ProductionEmptyContext;
   kind: ProductionKind;
-  search: InstitutionDetailSearch;
-  view: InstitutionViewMode;
+  search: ProductionsTabSearch;
+  view: ProductionTabViewMode;
   collapsible?: boolean;
   onUpdateSearch: (
-    patch: Partial<InstitutionDetailSearch>,
+    patch: Partial<ProductionsTabSearch>,
     options?: { resetPage?: boolean },
   ) => void;
   onOpenProduction?: (kind: ProductionKind, id: string) => void;
   onClearFilters: () => void;
 }
 
-function InstitutionProductionSection({
-  institutionId,
+function ProductionSection({
+  scopeFilter,
+  emptyContext,
   kind,
   search,
   view,
@@ -59,7 +157,7 @@ function InstitutionProductionSection({
   onUpdateSearch,
   onOpenProduction,
   onClearFilters,
-}: InstitutionProductionSectionProps) {
+}: ProductionSectionProps) {
   const [open, setOpen] = useState(true);
   const contentId = useId();
   const definition = getProductionDefinition(kind);
@@ -69,7 +167,7 @@ function InstitutionProductionSection({
       : search.sort_by;
 
   const queryParams: ProductionQuery<ProductionKind> = {
-    institution_id: [institutionId],
+    ...scopeFilter,
     ...(search.q ? { q: search.q } : {}),
     ...(search.year_start !== undefined
       ? { year_start: search.year_start }
@@ -133,8 +231,8 @@ function InstitutionProductionSection({
               title={`Nenhum registro em ${definition.title.toLowerCase()}`}
               description={
                 hasFilters
-                  ? `Não encontramos ${definition.title.toLowerCase()} para os filtros aplicados nesta instituição.`
-                  : `Esta instituição ainda não possui ${definition.title.toLowerCase()} cadastrados.`
+                  ? `Não encontramos ${definition.title.toLowerCase()} para os filtros aplicados ${emptyContext.inScope}.`
+                  : `${emptyContext.owner} ainda não possui ${definition.title.toLowerCase()} cadastrados.`
               }
               action={
                 hasFilters ? (
@@ -192,12 +290,13 @@ function InstitutionProductionSection({
   );
 }
 
-export interface InstitutionProductionsTabProps {
-  institutionId: string;
+export interface ProductionsTabProps {
+  scopeFilter: ProductionScopeFilter;
+  emptyContext: ProductionEmptyContext;
   kinds: readonly ProductionKind[];
-  search: InstitutionDetailSearch;
+  search: ProductionsTabSearch;
   onUpdateSearch: (
-    patch: Partial<InstitutionDetailSearch>,
+    patch: Partial<ProductionsTabSearch>,
     options?: { resetPage?: boolean },
   ) => void;
   onOpenProduction?: (kind: ProductionKind, id: string) => void;
@@ -205,17 +304,18 @@ export interface InstitutionProductionsTabProps {
 }
 
 /**
- * Conteúdo de uma aba de produção da instituição (suporta um ou mais `ProductionKind`).
+ * Aba reutilizável de produções filtrada por instituição ou programa de pós-graduação.
  */
-export function InstitutionProductionsTab({
-  institutionId,
+export function ProductionsTab({
+  scopeFilter,
+  emptyContext,
   kinds,
   search,
   onUpdateSearch,
   onOpenProduction,
   onClearQuery,
-}: InstitutionProductionsTabProps) {
-  const view: InstitutionViewMode = search.view ?? 'grid';
+}: ProductionsTabProps) {
+  const view: ProductionTabViewMode = search.view ?? 'grid';
   const hasArticle = kinds.includes('article');
   const sortOptions = hasArticle ? ARTICLE_SORT_OPTIONS : DEFAULT_SORT_OPTIONS;
   const sortBy =
@@ -286,9 +386,10 @@ export function InstitutionProductionsTab({
 
       <div className="flex flex-col gap-6">
         {kinds.map((kind) => (
-          <InstitutionProductionSection
+          <ProductionSection
             key={kind}
-            institutionId={institutionId}
+            scopeFilter={scopeFilter}
+            emptyContext={emptyContext}
             kind={kind}
             search={search}
             view={view}

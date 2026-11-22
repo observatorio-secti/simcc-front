@@ -6,6 +6,7 @@ import type {
   GraduateProgramSummary,
 } from '@/entities/graduate-program/model';
 import { renderRoute } from './render-route';
+import { v2Fixtures } from './msw/fixtures';
 import { simccV2Url } from './msw/handlers';
 import type { TerritoryGeoJson } from '@/features/graduate-programs/territory-geo';
 
@@ -226,7 +227,10 @@ describe('Rotas de Pós-graduação (T5)', () => {
       screen.getByText('Engenharia de Software e Sistemas Distribuídos'),
     ).toBeInTheDocument();
   });
-  it('mostra a seção de painel do programa com abas na URL', async () => {
+  it('não exibe seção Painel nem Produção geral, e lista pesquisadores, produções e discentes em abas diretas', async () => {
+    const capturedResearcherProgramIds: string[] = [];
+    const capturedArticleProgramIds: string[] = [];
+
     const { router, user } = await renderRoute('/pos-graduacao/prog-1', {
       handlers: [
         http.get(simccV2Url('/graduate-program/{program_id}'), () =>
@@ -235,23 +239,64 @@ describe('Rotas de Pós-graduação (T5)', () => {
             meta: { data_as_of: '2026-11-20T00:00:00Z' },
           }),
         ),
+        http.get(simccV2Url('/researcher'), ({ request }) => {
+          const url = new URL(request.url);
+          capturedResearcherProgramIds.push(
+            ...url.searchParams.getAll('graduate_program_id'),
+          );
+          return HttpResponse.json(v2Fixtures['/researcher']);
+        }),
+        http.get(simccV2Url('/production/article'), ({ request }) => {
+          const url = new URL(request.url);
+          capturedArticleProgramIds.push(
+            ...url.searchParams.getAll('graduate_program_id'),
+          );
+          return HttpResponse.json(v2Fixtures['/production/article']);
+        }),
       ],
     });
 
     expect(
-      await screen.findByRole('heading', { name: 'Painel' }),
+      await screen.findByRole('heading', {
+        name: 'Programa de Pós-Graduação em Ciência da Computação',
+      }),
     ).toBeInTheDocument();
-    // Painéis despublicados no Power BI: aviso no lugar do iframe
+
     expect(
-      screen.getByText(/Produção geral: painel indisponível no momento/),
-    ).toBeInTheDocument();
+      screen.queryByRole('heading', { name: 'Painel' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('tab', { name: 'Produção geral' }),
+    ).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(capturedResearcherProgramIds).toContain('prog-1');
+    });
 
     await user.click(screen.getByRole('tab', { name: 'Discentes' }));
     await waitFor(() => {
-      expect(router.state.location.search).toEqual({ painel: 'discentes' });
+      expect(router.state.location.search).toMatchObject({ tab: 'students' });
     });
     expect(
       screen.getByText(/Discentes: painel indisponível no momento/),
     ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: 'Artigos' }));
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({ tab: 'articles' });
+    });
+    await waitFor(() => {
+      expect(capturedArticleProgramIds).toContain('prog-1');
+    });
+
+    const articleLink = await screen.findByRole('link', {
+      name: /Redes neurais aplicadas a solos/i,
+    });
+    expect(articleLink).toBeInTheDocument();
+
+    await user.click(articleLink);
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('production=article');
+    });
   });
 });

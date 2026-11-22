@@ -3,6 +3,7 @@ import type {
   GraduateProgramSearch,
   GraduateProgramSortBy,
 } from '@/entities/graduate-program/model';
+import { productionRefParam } from '@/entities/production/links';
 import {
   createListSearch,
   searchStringArrayParam,
@@ -76,3 +77,46 @@ export function toGraduateProgramQueryParams(
     facets: [...GRADUATE_PROGRAM_FACETS],
   };
 }
+
+export const GRADUATE_PROGRAM_DETAIL_VIEW_MODES = ['grid', 'list'] as const;
+export type GraduateProgramDetailViewMode =
+  (typeof GRADUATE_PROGRAM_DETAIL_VIEW_MODES)[number];
+
+export const GRADUATE_PROGRAM_DETAIL_TABS = [
+  'researchers',
+  'articles',
+  'books',
+  'technical',
+  'reports',
+  'guidance',
+  'events',
+  'projects',
+  'students',
+] as const;
+export type GraduateProgramDetailTab =
+  (typeof GRADUATE_PROGRAM_DETAIL_TABS)[number];
+
+export const GRADUATE_PROGRAM_PRODUCTION_SORT_BY = [
+  'year',
+  'citations',
+  'title',
+] as const;
+export type GraduateProgramProductionSortBy =
+  (typeof GRADUATE_PROGRAM_PRODUCTION_SORT_BY)[number];
+
+export const graduateProgramDetailSearch = createListSearch({
+  sortBy: GRADUATE_PROGRAM_PRODUCTION_SORT_BY,
+  defaultSortBy: 'year',
+  defaultSortOrder: 'desc',
+  defaultPerPage: 12,
+  yearRange: true,
+  extra: {
+    tab: z.enum(GRADUATE_PROGRAM_DETAIL_TABS).optional().catch(undefined),
+    view: z.enum(GRADUATE_PROGRAM_DETAIL_VIEW_MODES).optional().catch(undefined),
+    production: productionRefParam,
+  },
+});
+
+export type GraduateProgramDetailSearch = z.output<
+  typeof graduateProgramDetailSearch.schema
+>;
