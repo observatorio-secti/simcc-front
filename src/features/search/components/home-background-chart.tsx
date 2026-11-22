@@ -145,7 +145,7 @@ export function HomeBackgroundChart() {
       aria-hidden="true"
       data-testid="home-background-chart"
       data-active-series={activeSeries.key}
-      className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[75vh] overflow-hidden opacity-30 select-none"
+      className="pointer-events-none absolute top-0 -right-3 -left-3 z-0 h-[75vh] overflow-hidden opacity-30 select-none md:-right-7 md:-left-7"
     >
       <svg
         viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
