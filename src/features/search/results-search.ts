@@ -1,5 +1,6 @@
 import { stripSearchParams } from '@tanstack/react-router';
 import { z } from 'zod';
+import { productionRefParam } from '@/entities/production/links';
 import {
   MAGAZINE_SORT_OPTIONS,
   type MagazineQuery,
@@ -43,7 +44,8 @@ import {
 
 // Estado de `/busca` (T2): um só schema da F1.5 para a URL e para a API v2.
 // Os filtros usam os nomes dos parâmetros da v2 (o `param` de cada faceta);
-// `type`, `tab`, `view`, `researcher` e `profile` são só da tela.
+// `type`, `tab`, `view`, `researcher`, `profile` e `production` são só da
+// tela.
 
 export const RESEARCHER_CLASSIFICATIONS = [
   'A+',
@@ -129,6 +131,8 @@ export const resultsSearch = createListSearch({
     researcher: searchStringParam(),
     /** Search params do perfil aberto no overlay, como query string. */
     profile: searchStringParam(),
+    /** Produção aberta no overlay (`<kind da v2>:<id>`, T13 / ADR 0010). */
+    production: productionRefParam,
   },
 });
 

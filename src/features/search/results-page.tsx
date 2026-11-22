@@ -54,6 +54,8 @@ export interface SearchResultsPageProps {
   search: ResultsSearch;
   /** Abre o perfil como overlay (quem monta a rota decide a navegação). */
   onOpenResearcher: (id: string) => void;
+  /** Abre a produção como overlay (T13; quem monta a rota decide a navegação). */
+  onOpenProduction: (kind: ProductionKind, id: string) => void;
 }
 
 // Sem aba de produção ativa, as queries de produção ficam desligadas; o tipo
@@ -68,6 +70,7 @@ const IDLE_KIND: ProductionKind = 'article';
 export function SearchResultsPage({
   search,
   onOpenResearcher,
+  onOpenProduction,
 }: SearchResultsPageProps) {
   const navigate = useNavigate({ from: '/busca' });
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -321,6 +324,7 @@ export function SearchResultsPage({
             />
             <ProductionResults
               {...listCallbacks}
+              onOpenProduction={onOpenProduction}
               kind={tab.kind}
               items={productionQuery.data?.data}
               pagination={productionQuery.data?.pagination}
