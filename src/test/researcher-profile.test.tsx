@@ -32,7 +32,7 @@ describe('Rota /pesquisadores/$id (T3)', () => {
     const firstArticle = v2Fixtures['/production/article'].data[0];
     if (firstArticle) {
       expect(
-        await findByRole('button', { name: firstArticle.title }),
+        await findByRole('link', { name: firstArticle.title }),
       ).toBeInTheDocument();
     }
   }, 15000);
@@ -55,29 +55,6 @@ describe('Rota /pesquisadores/$id (T3)', () => {
     });
     expect(
       await findByText(/Formação acadêmica|Sem dados de trajetória/i),
-    ).toBeInTheDocument();
-  }, 15000);
-
-  it('abre e fecha o dossiê da produção via search params', async () => {
-    const { findByRole, findByText, router, user } = await renderRoute(
-      `/pesquisadores/${RESEARCHER_ID}`,
-    );
-
-    const firstArticle = v2Fixtures['/production/article'].data[0];
-    expect(firstArticle).toBeDefined();
-    if (!firstArticle) return;
-
-    const articleButton = await findByRole('button', {
-      name: firstArticle.title,
-    });
-    await user.click(articleButton);
-
-    await waitFor(() => {
-      expect(router.state.location.search.prod_kind).toBe('article');
-      expect(router.state.location.search.prod_id).toBe(firstArticle.id);
-    });
-    expect(
-      await findByText('Registro completo da produção científica ou técnica.'),
     ).toBeInTheDocument();
   }, 15000);
 

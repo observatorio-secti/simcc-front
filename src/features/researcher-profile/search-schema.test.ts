@@ -18,8 +18,6 @@ describe('researcherProfileSearchSchema', () => {
       sort_order: undefined,
       q: undefined,
       search_type: undefined,
-      prod_kind: undefined,
-      prod_id: undefined,
     });
   });
 
@@ -35,8 +33,6 @@ describe('researcherProfileSearchSchema', () => {
       sort_order: 'desc',
       q: 'robotica',
       search_type: 'profile',
-      prod_kind: 'article',
-      prod_id: 'art-1',
     });
 
     expect(parsed.tab).toBe('guidance');
@@ -49,8 +45,6 @@ describe('researcherProfileSearchSchema', () => {
     expect(parsed.sort_order).toBe('desc');
     expect(parsed.q).toBe('robotica');
     expect(parsed.search_type).toBe('profile');
-    expect(parsed.prod_kind).toBe('article');
-    expect(parsed.prod_id).toBe('art-1');
   });
 
   it('faz fallback seguro para valores inválidos', () => {
@@ -59,14 +53,12 @@ describe('researcherProfileSearchSchema', () => {
       page: -5,
       view: 'cards',
       sort_by: 'unknown',
-      prod_kind: 'invalid_kind',
     });
 
     expect(parsed.tab).toBe('articles');
     expect(parsed.page).toBe(1);
     expect(parsed.view).toBe('grid');
     expect(parsed.sort_by).toBeUndefined();
-    expect(parsed.prod_kind).toBeUndefined();
   });
 
   it('remove valores padrão em cleanProfileSearch', () => {

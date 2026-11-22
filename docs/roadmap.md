@@ -86,13 +86,15 @@ graph LR
 | T12.1 | Console: base e admins                            | T12              | —                 | em revisão            | t12-1-console  |
 | T12.2 | Console: cadastro acadêmico                       | T12.1            | —                 | a fazer               |                |
 | T12.3 | Console: sincronização (ETL)                      | T12.1            | —                 | a fazer               |                |
-| T13   | Detalhe de produção (rota com overlay)            | E2, T2           | —                 | a fazer               |                |
+| T13   | Detalhe de produção (rota com overlay)            | E2, T2           | —                 | em revisão            | t13-producao   |
 | D1.1  | InCites                                           | F1.3             | —                 | feito                 | d1-1-incites   |
 | D1.2  | Painéis de dados externos                         | F1.3             | —                 | feito                 | d1-2-paineis   |
 | D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                 | feito                 | d1-3-indice    |
 | D1.4  | Listagens                                         | F1.5, E1, E2, E6 | —                 | em revisão            | d1-4-listagens |
 | V4.1  | Contrato final da v2                              | fase 3           | —                 | em revisão            |                |
-| V1–V5 | Virada (ver fase 4)                               | fase 3           | Virada do backend | a fazer               |                |
+| V2    | Redirects das URLs do legado                      | fase 3           | —                 | em revisão            | v2-redirects   |
+| V3    | Ambiente de produção                              | —                | —                 | em revisão            | v3-prod        |
+| V1–V5 | Virada (ver fase 4, exceto V2 e V3)               | fase 3           | Virada do backend | a fazer               |                |
 
 ## Fase 1: fundação
 
@@ -205,7 +207,7 @@ Templates de `design-kit/DESIGN.md` §6.2. As rotas novas propostas estão em [l
 | T7  | Indicadores                  | F         | Painéis do Power BI do legado embutidos por aba (`?painel=`), sem indicadores calculados na plataforma ([ADR 0012](decisoes/0012-indicadores-via-power-bi.md)). Pedidos `/v2/metrics/search` e `/v2/metrics/graduate-program` cancelados                                                                                                                                                                                                                                                                                                                                    |
 | T10 | MarIA                        | D (chat)  | Bloqueada: virada do backend                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | T12 | Console                      | C (lista) | **Reimaginar, não portar.** Proposta [aprovada](propostas/t12-console.md) em 2026-11-22: kit público (`--sc-*`), status de execução no tema (`run-*`), GA4 fora, admin cadastrado pelo `sub`. Tipos da API de admin gerados do OpenAPI. Admin faz tudo ([ADR 0008](decisoes/0008-autenticacao.md)). **T12.1**: layout, guarda, visão geral, `/console/admins`, entidades `admin`/`etl`/`academic`, `ConfirmImpactDialog`. **T12.2**: instituições, pesquisadores, coleções. **T12.3**: `/console/etl(/$runId)`. O legado (`legado-v1`) só serviu para levantar o que havia. |
-| T13 | Detalhe de produção          | E         | Rota própria para a produção (ex.: `/producoes/$kind/$id`), aberta como overlay sobre `/busca` e sobre o perfil, com o mesmo mecanismo de máscara do ADR 0010. Hoje o ADR 0004 não é cumprido para produções: na busca o `ProductionCard` não abre detalhe, e no perfil o dossiê é um diálogo controlado por `prod_kind`/`prod_id` sem URL própria. Usa `ProductionDetail` da E2                                                                                                                                                                                            |
+| T13 | Detalhe de produção          | E         | `/producoes/$kind/$id`, com `$kind` = slug pt-BR do registro da E2 (`artigo`, `capitulo-de-livro`, `texto-em-revista`…). Página completa com `ProductionDetail` no template E. Overlay sobre `/busca` (cards de produção e perfil em overlay) e sobre `/pesquisadores/$id` pelo parâmetro `production=<kind>:<id>` mascarado, como no ADR 0010 (nota de 2026-11-22). Substitui o diálogo `prod_kind`/`prod_id` do perfil                                                                                                                                                    |
 
 ### Telas complementares (D1)
 

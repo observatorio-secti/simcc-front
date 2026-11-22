@@ -36,11 +36,13 @@ export interface ProductionResultsProps<K extends ProductionKind> {
   onClearFilters: () => void;
   onClearQuery: () => void;
   onOpenResearcher: (id: string) => void;
+  /** Clique simples no título do card abre a produção (overlay, T13). */
+  onOpenProduction: (kind: K, id: string) => void;
 }
 
 /**
- * Lista de produções de um tipo (`ProductionCard`). Sem rota de detalhe de
- * produção por enquanto (T13); os chips de autor abrem o overlay do perfil.
+ * Lista de produções de um tipo (`ProductionCard`). O título do card abre a
+ * produção (T13) e os chips de autor, o perfil, ambos como overlay.
  */
 export function ProductionResults<K extends ProductionKind>({
   kind,
@@ -60,6 +62,7 @@ export function ProductionResults<K extends ProductionKind>({
   onClearFilters,
   onClearQuery,
   onOpenResearcher,
+  onOpenProduction,
 }: ProductionResultsProps<K>) {
   const [open, setOpen] = useState(true);
   const definition = getProductionDefinition(kind);
@@ -120,6 +123,9 @@ export function ProductionResults<K extends ProductionKind>({
                     <ProductionCard
                       kind={kind}
                       item={item}
+                      onOpen={(selected) =>
+                        onOpenProduction(kind, (selected as ProductionItem).id)
+                      }
                       className="h-full"
                     />
                   </li>

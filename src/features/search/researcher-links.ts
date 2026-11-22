@@ -1,16 +1,5 @@
 import type { MouseEvent } from 'react';
-
-/** Clique simples (sem modificador): pode ser tratado como navegação interna. */
-export function isPlainLeftClick(event: MouseEvent): boolean {
-  return (
-    !event.defaultPrevented &&
-    event.button === 0 &&
-    !event.metaKey &&
-    !event.ctrlKey &&
-    !event.shiftKey &&
-    !event.altKey
-  );
-}
+import { isPlainLeftClick } from '@/shared/lib/plain-click';
 
 const RESEARCHER_PATH = /\/pesquisadores\/([^/?#]+)\/?$/;
 

@@ -1,0 +1,33 @@
+# Vira /etc/nginx/conf.d/default.conf no start do container (envsubst do
+# entrypoint do nginx). ${BASE_PATH} vem do Dockerfile e termina em barra
+# (ex.: /simcc/). As variáveis do próprio nginx ($uri) ficam intactas porque o
+# envsubst só troca variáveis de ambiente definidas.
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+
+    # Redirect relativo (/simcc -> /simcc/): atrás do proxy do servidor, o
+    # nginx não sabe o host nem a porta públicos.
+    absolute_redirect off;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    # Assets com hash no nome: imutáveis. Arquivo ausente é 404, nunca o
+    # index.html (senão o navegador recebe HTML no lugar de um chunk JS).
+    location ^~ ${BASE_PATH}assets/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # Fallback de SPA: rota profunda (F5 em /simcc/pesquisadores/<id>) devolve
+    # o index.html e o TanStack Router resolve a rota no navegador. Nada aqui
+    # vai para cache longo: o index.html é quem aponta para os assets do
+    # deploy atual.
+    location ${BASE_PATH} {
+        try_files $uri $uri/ ${BASE_PATH}index.html;
+        add_header Cache-Control "no-cache";
+    }
+}
