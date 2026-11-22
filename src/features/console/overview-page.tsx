@@ -25,9 +25,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { StatCard } from '@/shared/ui/stat-card';
-import { formatDateTime } from './format';
+import { formatDateTime } from '@/shared/lib/format';
+import { SectionError } from '@/shared/ui/section-error';
 import { RunStatusBadge } from './run-status-badge';
-import { SectionError } from './section-error';
 
 /** Enquanto o último run está ativo, a visão geral consulta de novo. */
 const ACTIVE_RUN_POLL_MS = 10_000;

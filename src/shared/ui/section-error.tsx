@@ -1,7 +1,7 @@
 import { AlertTriangle, RotateCcw } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
+import { errorMessage } from '@/shared/lib/error-message';
 import { Button } from '@/shared/ui/button';
-import { errorMessage } from './error-message';
 
 /**
  * Erro recuperável numa seção (kit: alerta + "Tentar novamente"). Não derruba
