@@ -44,7 +44,12 @@ export function ResultToolbar({
       <div className="ml-auto flex items-center gap-1">
         {actions}
         {onFiltersClick && (
-          <Button variant="ghost" size="sm" onClick={onFiltersClick}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onFiltersClick}
+            className="lg:hidden"
+          >
             <SlidersHorizontal aria-hidden />
             Filtros
             {filtersCount ? (
