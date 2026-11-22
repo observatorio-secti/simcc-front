@@ -46,6 +46,7 @@ DefaultLayout
 | `/resultados`, `/resultados-perfil`    | `/busca` (confirmada; tipo, aba, termo e filtros nos search params) | T2               | em revisão    |
 | `/resultados-ia`                       | `/maria`                                                            | T10              | bloqueada     |
 | `/researcher` (+ modal)                | `/pesquisadores/$id` (overlay a partir da busca)                    | T3               | feito         |
+| Modal de produção (resultados, perfil) | `/producoes/$kind/$id` (overlay sobre a busca e o perfil, ADR 0010) | T13              | em revisão    |
 | `/pos-graduacao`                       | `/pos-graduacao`, `/pos-graduacao/$id`                              | T5               | feito         |
 | `/grupos-pesquisa`                     | `/grupos-pesquisa`, `/grupos-pesquisa/$id`                          | T6               | feito         |
 | `/instituicao/:acronym?`               | `/instituicoes`, `/instituicoes/$id`                                | T4               | feito         |

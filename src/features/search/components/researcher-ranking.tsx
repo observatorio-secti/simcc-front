@@ -8,7 +8,7 @@ import { cn } from '@/shared/lib/cn';
 import { focusRing } from '@/shared/ui/focus-ring';
 import { SectionHeader } from '@/shared/ui/section-header';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { isPlainLeftClick } from '../researcher-links';
+import { isPlainLeftClick } from '@/shared/lib/plain-click';
 import { searchTypeBgClass, type SearchType } from '../search-schema';
 
 const MIN_REM = 0.75;

@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import type { ProductionKind } from '@/entities/production/model';
-import { PRODUCTION_KINDS } from '@/entities/production/model';
 import {
   cleanSearchParams,
   searchEnumArrayParam,
@@ -112,20 +110,6 @@ const sortOrderParam = z
   })
   .catch(undefined);
 
-const prodKindParam = z
-  .unknown()
-  .transform((raw): ProductionKind | undefined => {
-    const val = Array.isArray(raw) ? raw[0] : raw;
-    if (
-      typeof val === 'string' &&
-      (PRODUCTION_KINDS as readonly string[]).includes(val)
-    ) {
-      return val as ProductionKind;
-    }
-    return undefined;
-  })
-  .catch(undefined);
-
 export const researcherProfileSearchSchema = z.object({
   tab: tabParam,
   qualis: searchEnumArrayParam(QUALIS_STRATA),
@@ -140,8 +124,6 @@ export const researcherProfileSearchSchema = z.object({
   sort_order: sortOrderParam,
   q: searchStringParam(),
   search_type: searchStringParam(),
-  prod_kind: prodKindParam,
-  prod_id: searchStringParam(),
 });
 
 export type ResearcherProfileSearch = z.infer<

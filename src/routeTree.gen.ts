@@ -27,6 +27,7 @@ import { Route as PublicInstituicoesIdRouteImport } from './routes/_public/insti
 import { Route as PublicPesquisadoresIdRouteImport } from './routes/_public/pesquisadores/$id'
 import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
 import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
+import { Route as PublicProducoesKindIdRouteImport } from './routes/_public/producoes/$kind/$id'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -119,6 +120,11 @@ const PublicPosGraduacaoIdRoute = PublicPosGraduacaoIdRouteImport.update({
   path: '/pos-graduacao/$id',
   getParentRoute: () => PublicRoute,
 } as any)
+const PublicProducoesKindIdRoute = PublicProducoesKindIdRouteImport.update({
+  id: '/producoes/$kind/$id',
+  path: '/producoes/$kind/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
+  '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRoutesByTo {
   '/busca': typeof PublicBuscaRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/grupos-pesquisa': typeof PublicGruposPesquisaIndexRoute
   '/instituicoes': typeof PublicInstituicoesIndexRoute
   '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
+  '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -178,6 +186,7 @@ export interface FileRoutesById {
   '/_public/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
+  '/_public/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/grupos-pesquisa/'
     | '/instituicoes/'
     | '/pos-graduacao/'
+    | '/producoes/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/busca'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/grupos-pesquisa'
     | '/instituicoes'
     | '/pos-graduacao'
+    | '/producoes/$kind/$id'
   id:
     | '__root__'
     | '/_public'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/_public/grupos-pesquisa/'
     | '/_public/instituicoes/'
     | '/_public/pos-graduacao/'
+    | '/_public/producoes/$kind/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -375,6 +387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPosGraduacaoIdRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/producoes/$kind/$id': {
+      id: '/_public/producoes/$kind/$id'
+      path: '/producoes/$kind/$id'
+      fullPath: '/producoes/$kind/$id'
+      preLoaderRoute: typeof PublicProducoesKindIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
   }
 }
 
@@ -393,6 +412,7 @@ interface PublicRouteChildren {
   PublicGruposPesquisaIndexRoute: typeof PublicGruposPesquisaIndexRoute
   PublicInstituicoesIndexRoute: typeof PublicInstituicoesIndexRoute
   PublicPosGraduacaoIndexRoute: typeof PublicPosGraduacaoIndexRoute
+  PublicProducoesKindIdRoute: typeof PublicProducoesKindIdRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
@@ -410,6 +430,7 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicGruposPesquisaIndexRoute: PublicGruposPesquisaIndexRoute,
   PublicInstituicoesIndexRoute: PublicInstituicoesIndexRoute,
   PublicPosGraduacaoIndexRoute: PublicPosGraduacaoIndexRoute,
+  PublicProducoesKindIdRoute: PublicProducoesKindIdRoute,
 }
 
 const PublicRouteWithChildren =

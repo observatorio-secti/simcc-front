@@ -85,6 +85,11 @@ export interface ProductionDefinition<
   K extends ProductionKind = ProductionKind,
 > {
   kind: K;
+  /**
+   * Segmento público da URL do detalhe (`/producoes/<slug>/<id>`, T13): pt-BR,
+   * kebab-case, sem acento e no singular. Mudar um slug quebra links salvos.
+   */
+  slug: string;
   /** Título da seção/listagem em pt-BR, sentence case ("Artigos"). */
   title: string;
   /** Rótulo no singular e no plural ("artigo", "artigos"). */
@@ -160,6 +165,7 @@ export const PRODUCTION_REGISTRY: {
 } = {
   article: define<'article'>({
     kind: 'article',
+    slug: 'artigo',
     title: 'Artigos',
     noun: ['artigo', 'artigos'],
     icon: FileText,
@@ -221,6 +227,7 @@ export const PRODUCTION_REGISTRY: {
 
   book: define<'book'>({
     kind: 'book',
+    slug: 'livro',
     title: 'Livros',
     noun: ['livro', 'livros'],
     icon: BookOpen,
@@ -252,6 +259,7 @@ export const PRODUCTION_REGISTRY: {
 
   book_chapter: define<'book_chapter'>({
     kind: 'book_chapter',
+    slug: 'capitulo-de-livro',
     title: 'Capítulos de livros',
     noun: ['capítulo de livro', 'capítulos de livros'],
     icon: BookOpen,
@@ -295,6 +303,7 @@ export const PRODUCTION_REGISTRY: {
 
   software: define<'software'>({
     kind: 'software',
+    slug: 'software',
     title: 'Softwares',
     noun: ['software', 'softwares'],
     icon: CodeXml,
@@ -318,6 +327,7 @@ export const PRODUCTION_REGISTRY: {
 
   patent: define<'patent'>({
     kind: 'patent',
+    slug: 'patente',
     title: 'Patentes',
     noun: ['patente', 'patentes'],
     icon: Lightbulb,
@@ -340,6 +350,7 @@ export const PRODUCTION_REGISTRY: {
 
   event: define<'event'>({
     kind: 'event',
+    slug: 'evento',
     title: 'Participação em eventos',
     noun: ['participação em evento', 'participações em eventos'],
     icon: Presentation,
@@ -374,6 +385,7 @@ export const PRODUCTION_REGISTRY: {
 
   research_project: define<'research_project'>({
     kind: 'research_project',
+    slug: 'projeto-de-pesquisa',
     title: 'Projetos de pesquisa',
     noun: ['projeto de pesquisa', 'projetos de pesquisa'],
     icon: FolderKanban,
@@ -423,6 +435,7 @@ export const PRODUCTION_REGISTRY: {
 
   brand: define<'brand'>({
     kind: 'brand',
+    slug: 'marca',
     title: 'Marcas',
     noun: ['marca', 'marcas'],
     icon: Copyright,
@@ -442,6 +455,7 @@ export const PRODUCTION_REGISTRY: {
 
   guidance: define<'guidance'>({
     kind: 'guidance',
+    slug: 'orientacao',
     title: 'Orientações',
     noun: ['orientação', 'orientações'],
     icon: GraduationCap,
@@ -479,6 +493,7 @@ export const PRODUCTION_REGISTRY: {
 
   report: define<'report'>({
     kind: 'report',
+    slug: 'relatorio-tecnico',
     title: 'Relatórios técnicos',
     noun: ['relatório técnico', 'relatórios técnicos'],
     icon: FileSpreadsheet,
@@ -499,6 +514,7 @@ export const PRODUCTION_REGISTRY: {
 
   magazine_text: define<'magazine_text'>({
     kind: 'magazine_text',
+    slug: 'texto-em-revista',
     title: 'Textos em revista',
     noun: ['texto em jornal ou revista', 'textos em jornal ou revista'],
     icon: BookOpenText,
@@ -547,6 +563,7 @@ export const PRODUCTION_REGISTRY: {
 
   event_work: define<'event_work'>({
     kind: 'event_work',
+    slug: 'trabalho-em-evento',
     title: 'Trabalhos em eventos',
     noun: ['trabalho em evento', 'trabalhos em eventos'],
     icon: ScrollText,

@@ -1,7 +1,9 @@
 import { Calendar, ExternalLink } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
+import { isPlainLeftClick } from '@/shared/lib/plain-click';
 import { Badge, Dot } from '@/shared/ui/badge';
 import { focusRing } from '@/shared/ui/focus-ring';
+import { productionHref } from '../links';
 import type { ProductionItem, ProductionKind } from '../model';
 import { getProductionDefinition, MATCH_FIELD_LABELS } from '../registry';
 import { ArticleMetricsMeta } from './article-metrics-meta';
@@ -15,7 +17,10 @@ export interface ProductionCardProps<
 > {
   kind: K;
   item: ProductionItem<K>;
-  /** Ação opcional para abrir o detalhe da produção a partir do título. */
+  /**
+   * Abre o detalhe a partir do título (clique simples). Com ela, o título vira
+   * link para `/producoes/<slug>/<id>`.
+   */
   onOpen?: (item: ProductionItem<K>) => void;
   /** Exibe os chips de pesquisadores da plataforma (padrão: true). */
   showAuthors?: boolean;
@@ -91,16 +96,23 @@ export function ProductionCard<K extends ProductionKind>({
 
       <h3 className="text-sm leading-snug wrap-break-word uppercase">
         {onOpen ? (
-          <button
-            type="button"
-            onClick={() => onOpen(item)}
+          // Link real para o detalhe (T13): Ctrl/Cmd+clique e "abrir em nova
+          // aba" levam à página completa; o clique simples fica com `onOpen`
+          // (overlay sobre a lista, ADR 0010).
+          <a
+            href={productionHref(kind, concrete.id)}
+            onClick={(event) => {
+              if (!isPlainLeftClick(event)) return;
+              event.preventDefault();
+              onOpen(item);
+            }}
             className={cn(
-              'cursor-pointer rounded-xs text-left uppercase transition-colors hover:text-eng-blue',
+              'rounded-xs text-left uppercase transition-colors hover:text-eng-blue',
               focusRing,
             )}
           >
             {titleNode}
-          </button>
+          </a>
         ) : (
           titleNode
         )}
