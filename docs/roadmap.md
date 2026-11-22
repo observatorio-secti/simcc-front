@@ -89,6 +89,7 @@ graph LR
 | D1.3  | Índice do pesquisador                             | F1.3, F1.2       | —                 | feito                 | d1-3-indice    |
 | D1.4  | Listagens                                         | F1.5, E1, E2, E6 | —                 | em revisão            | d1-4-listagens |
 | V4.1  | Contrato final da v2                              | fase 3           | —                 | em revisão            |                |
+| V3    | Ambiente de produção                              | —                | —                 | em revisão            | v3-prod        |
 | V1–V5 | Virada (ver fase 4)                               | fase 3           | Virada do backend | a fazer               |                |
 
 ## Fase 1: fundação

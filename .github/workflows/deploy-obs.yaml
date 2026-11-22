@@ -14,8 +14,20 @@ jobs:
           host: ${{ secrets.HOST_DNS }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          # Gera o dist/ (estágio `export` do Dockerfile) que o servidor serve
+          # em /simcc/. As URLs são públicas (vão para o bundle) e ficam aqui
+          # para o deploy não depender dos nomes do .env do servidor; o .env,
+          # se existir, ainda vale para o que não é passado (ex.:
+          # VITE_GA_MEASUREMENT_ID). Lista completa em .env.example.
           script: |
             set -euo pipefail
             cd /opt/simcc/simcc-front
             git pull origin main --ff-only
-            docker build --build-arg VITE_BASE_PATH=/simcc/ --build-arg VITE_URL_GERAL2=https://observatoriocti.secti.ba.gov.br/oda/v1/ --output type=local,dest=./dist .
+            docker build --target export \
+              --build-arg VITE_BASE_PATH=/simcc/ \
+              --build-arg VITE_SIMCC_API_URL=https://observatoriocti.secti.ba.gov.br/simcc/api/ \
+              --build-arg VITE_ODA_API_URL=https://observatoriocti.secti.ba.gov.br/oda/v1/ \
+              --build-arg VITE_ADMIN_API_URL=https://observatoriocti.secti.ba.gov.br/simcc/admin/ \
+              --build-arg VITE_IDP_URL=https://observatoriocti.secti.ba.gov.br/idp/ \
+              --build-arg VITE_MARIA_API_URL=https://observatoriocti.secti.ba.gov.br/api-maria/ \
+              --output type=local,dest=./dist .
