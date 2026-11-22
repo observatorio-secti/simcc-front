@@ -9,6 +9,7 @@ import {
   Hash,
   Mail,
   MapPin,
+  PieChart,
   Phone,
   TextSearch,
   User,
@@ -33,10 +34,75 @@ import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { LoadingBlock } from '@/shared/ui/loading-block';
+import { PowerBiEmbed } from '@/shared/ui/power-bi-embed';
+import { SectionHeader } from '@/shared/ui/section-header';
 import { StatCard } from '@/shared/ui/stat-card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import {
+  PROGRAM_PANELS,
+  type GraduateProgramDetailSearch,
+} from './program-panels';
 
 export interface GraduateProgramDetailPageProps {
   programId: string;
+  search?: GraduateProgramDetailSearch;
+}
+
+function ProgramPanelSection({
+  programId,
+  search,
+}: {
+  programId: string;
+  search: GraduateProgramDetailSearch;
+}) {
+  const navigate = useNavigate();
+  const active = search.painel ?? 'producao';
+
+  function handleChange(value: string) {
+    const next = PROGRAM_PANELS.find((panel) => panel.id === value);
+    if (!next) return;
+    void navigate({
+      to: '/pos-graduacao/$id',
+      params: { id: programId },
+      search: { painel: next.id === 'producao' ? undefined : next.id },
+      replace: true,
+      resetScroll: false,
+    });
+  }
+
+  return (
+    <section aria-labelledby="program-panel-heading" className="flex flex-col">
+      <SectionHeader
+        id="program-panel-heading"
+        title="Painel"
+        icon={PieChart}
+      />
+      <Tabs
+        value={active}
+        onValueChange={handleChange}
+        className="flex flex-col gap-3"
+      >
+        <TabsList className="w-full justify-start overflow-x-auto bg-neutral-100 dark:bg-neutral-800">
+          {PROGRAM_PANELS.map((panel) => (
+            <TabsTrigger key={panel.id} value={panel.id}>
+              {panel.title}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {PROGRAM_PANELS.map((panel) => (
+          <TabsContent key={panel.id} value={panel.id} className="mt-0">
+            <PowerBiEmbed
+              src={panel.src}
+              title={panel.title}
+              description={panel.description}
+              previewSrc={panel.previewSrc}
+              unavailable={panel.unavailable}
+            />
+          </TabsContent>
+        ))}
+      </Tabs>
+    </section>
+  );
 }
 
 function normalizeSiteUrl(raw: string | null | undefined): string | null {
@@ -53,6 +119,7 @@ function normalizeSiteUrl(raw: string | null | undefined): string | null {
  */
 export function GraduateProgramDetailPage({
   programId,
+  search = {},
 }: GraduateProgramDetailPageProps) {
   const navigate = useNavigate();
   const detailQuery = useQuery(graduateProgramDetailQueryOptions(programId));
@@ -277,6 +344,8 @@ export function GraduateProgramDetailPage({
           </div>
 
           <ResearchLines lines={researchLines} />
+
+          <ProgramPanelSection programId={programId} search={search} />
         </div>
 
         <aside className="flex flex-col gap-4">

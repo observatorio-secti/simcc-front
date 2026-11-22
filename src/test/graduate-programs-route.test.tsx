@@ -226,4 +226,32 @@ describe('Rotas de Pós-graduação (T5)', () => {
       screen.getByText('Engenharia de Software e Sistemas Distribuídos'),
     ).toBeInTheDocument();
   });
+  it('mostra a seção de painel do programa com abas na URL', async () => {
+    const { router, user } = await renderRoute('/pos-graduacao/prog-1', {
+      handlers: [
+        http.get(simccV2Url('/graduate-program/{program_id}'), () =>
+          HttpResponse.json({
+            data: programDetail,
+            meta: { data_as_of: '2026-11-20T00:00:00Z' },
+          }),
+        ),
+      ],
+    });
+
+    expect(
+      await screen.findByRole('heading', { name: 'Painel' }),
+    ).toBeInTheDocument();
+    // Painéis despublicados no Power BI: aviso no lugar do iframe
+    expect(
+      screen.getByText(/Produção geral: painel indisponível no momento/),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: 'Discentes' }));
+    await waitFor(() => {
+      expect(router.state.location.search).toEqual({ painel: 'discentes' });
+    });
+    expect(
+      screen.getByText(/Discentes: painel indisponível no momento/),
+    ).toBeInTheDocument();
+  });
 });

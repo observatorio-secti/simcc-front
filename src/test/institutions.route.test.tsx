@@ -136,4 +136,24 @@ describe('Rotas de instituições (T4)', () => {
       ),
     ).toBeInTheDocument();
   });
+  it('mostra a aba de painel com o Power BI e guarda a aba na URL', async () => {
+    const { router, user } = await renderRoute(
+      '/instituicoes/3f2a9c1e-5b7d-4e8a-9c21-7d4e5f6a8b90',
+    );
+
+    await user.click(await screen.findByRole('tab', { name: 'Painel' }));
+
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('tab=panel');
+    });
+    // Painel despublicado no Power BI: aviso no lugar do iframe
+    expect(
+      screen.getByText(
+        /Indicadores de avaliação: painel indisponível no momento/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('search', { name: /Filtrar/ }),
+    ).not.toBeInTheDocument();
+  });
 });
