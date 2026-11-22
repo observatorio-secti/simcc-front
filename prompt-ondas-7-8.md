@@ -1,7 +1,9 @@
 Coordene as ondas 7 e 8 da reescrita do front do Simcc. Antes de começar, leia CLAUDE.md, docs/roadmap.md, docs/arquitetura.md, os ADRs em docs/decisoes/ e docs/propostas/t12-console.md.
 
 ## Estado em 2026-11-22 (fim da onda 6)
+
 A `develop` está em `5f7df85`, com tudo mergeado:
+
 - V4.1 Contrato final da v2 (#54);
 - V3 Ambiente de produção (#55);
 - V2 Redirects (#56);
@@ -12,6 +14,7 @@ A `develop` está em `5f7df85`, com tudo mergeado:
 Nada foi para a `main`.
 
 ### O que a T12.1 deixou para a onda 7 reaproveitar
+
 - **Entidades:**
   - `entities/session`: store, `useSession`, `requireAdmin` (devolve `{ viewer }`).
   - `entities/admin`.
@@ -38,18 +41,20 @@ Nada foi para a `main`.
   - Rotas `.../export/parquet` existem; não usar (ADR 0006).
 
 ### Serviços locais
-| Serviço | Endereço |
-| --- | --- |
-| simcc-back | http://localhost:8088 |
+
+| Serviço     | Endereço                                                                  |
+| ----------- | ------------------------------------------------------------------------- |
+| simcc-back  | http://localhost:8088                                                     |
 | simcc-admin | http://localhost:8060 (OpenAPI em `/openapi.json`, erros em `{ detail }`) |
-| IdP | http://localhost:8000 |
-| MarIA | http://127.0.0.1:8020 (CORS `*`) |
+| IdP         | http://localhost:8000                                                     |
+| MarIA       | http://127.0.0.1:8020 (CORS `*`)                                          |
 
 O `.env` do checkout principal já aponta para todos.
 
 `scripts/api-types.mjs` é uma lista de especificações (`simcc-v2`, `admin`, `maria`): `npm run api:types -- admin` gera só a do admin.
 
 ### Pendências conhecidas, fora do front
+
 - **simcc-back:**
   - `/v2/production/magazine-text` e `/event-work` (lista, detalhe e métricas) dão 500 (provável migração `d3f1a2b4c5e6` não aplicada);
   - `/v2/researcher/{id}/terms` dá 500;
@@ -59,12 +64,14 @@ O `.env` do checkout principal já aponta para todos.
 - **ETL:** a chave vazada no legado continua sem troca. Não dispare run real do ETL sem eu autorizar na conversa.
 
 ### Lições da onda 6
+
 - Com 4 ou 5 agentes em paralelo, o load passa de 25 e testes de rota antigos estouram o timeout de 5s. Rode `npx vitest run --maxWorkers=2` localmente quando a máquina estiver carregada (a CI passa). Uma tarefa pequena para subir o timeout global dos testes (F1.6) pode entrar na onda 8.
 - O shell é zsh: use `"${var}"` com chaves (`$b:r` é modificador) e arrays (`for b in $arr`), ou escreva o script em bash.
 - `src/routeTree.gen.ts` se resolve sozinho no merge, mas pode ficar errado: depois de todo merge, rode `npm run build`.
 - Tabelas do `docs/roadmap.md` e do `docs/legado/inventario.md` conflitam linha a linha. Cada tarefa edita só as próprias linhas e mantém a largura das colunas.
 
 ## Regras de toda tarefa
+
 - **Execução:** cada tarefa roda num subagente com isolamento em worktree.
   - Antes, rode `git fetch origin develop main`.
   - A branch `feat/<id>-<slug>` sai de `origin/develop`.
@@ -100,6 +107,7 @@ O `.env` do checkout principal já aponta para todos.
   Depois **espere eu avisar** para começar a próxima. Dentro de uma onda, não precisa pedir ok.
 
 ## Onda 7 (em paralelo)
+
 - **T12.2 Console: cadastro acadêmico**, branch `feat/t12.2-console-academico`, feature `features/console-academic`:
   - `/console/instituicoes` e `/console/instituicoes/$institutionId`;
   - `/console/pesquisadores` e `/console/pesquisadores/$researcherId`, aberto como overlay sobre a lista (ADR 0010; página direta no F5);
@@ -118,6 +126,7 @@ O `.env` do checkout principal já aponta para todos.
 - Uma feature não importa outra: o que for comum vai para `entities/` ou `shared/`. As duas tarefas tocam `nav-config.ts`, o que deve dar só um conflito pequeno.
 
 ## Onda 8 (preparação da virada)
+
 - **V1 Paridade:** cada linha do `docs/legado/inventario.md` fica como "feita" ou "descontinuada", com uma justificativa.
   - O que depende das pendências do backend acima entra como "feita", com a pendência registrada. Exemplos: as abas de texto em revista e trabalho em evento.
   - Registre também os desvios conhecidos:

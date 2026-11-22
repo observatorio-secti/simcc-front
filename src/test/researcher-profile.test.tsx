@@ -19,9 +19,7 @@ describe('Rota /pesquisadores/$id (T3)', () => {
     ).toBeInTheDocument();
 
     // Sidebar: informações gerais, bolsa (/v2/scholarship) e nuvem de termos (/v2/researcher/{id}/terms)
-    expect(
-      await findByText('Produtividade em Pesquisa'),
-    ).toBeInTheDocument();
+    expect(await findByText('Produtividade em Pesquisa')).toBeInTheDocument();
     expect(await findByText('solos')).toBeInTheDocument();
     expect(await findByText('redes')).toBeInTheDocument();
 
