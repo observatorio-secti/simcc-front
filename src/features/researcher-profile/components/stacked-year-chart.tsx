@@ -231,7 +231,7 @@ export function StackedYearChart({
                           ? `${bucket.tooltipPeriod} — Total: ${bucket.value} (${summary})`
                           : `${bucket.tooltipPeriod} — Total: ${bucket.value}`
                       }
-                      className="flex min-w-0 flex-1 max-w-12 flex-col items-center gap-1.5"
+                      className="flex max-w-12 min-w-0 flex-1 flex-col items-center gap-1.5"
                     >
                       <div
                         className="flex w-full max-w-8 flex-col-reverse items-center gap-0.5"
@@ -311,7 +311,10 @@ export function StackedYearChart({
                           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"
                         >
                           <span
-                            className={cn('size-2.5 rounded-[2px]', s.bgClassName)}
+                            className={cn(
+                              'size-2.5 rounded-[2px]',
+                              s.bgClassName,
+                            )}
                             aria-hidden
                           />
                           <span>{s.label}</span>
@@ -332,7 +335,10 @@ export function StackedYearChart({
                         )}
                       >
                         <span
-                          className={cn('size-2.5 rounded-[2px]', s.bgClassName)}
+                          className={cn(
+                            'size-2.5 rounded-[2px]',
+                            s.bgClassName,
+                          )}
                           aria-hidden
                         />
                         <span>{s.label}</span>

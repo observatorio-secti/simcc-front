@@ -66,7 +66,11 @@ function estimateBox(
   };
 }
 
-function fitsInCanvas(box: BoundingBox, width: number, height: number): boolean {
+function fitsInCanvas(
+  box: BoundingBox,
+  width: number,
+  height: number,
+): boolean {
   return (
     box.left >= MARGIN &&
     box.right <= width - MARGIN &&
@@ -111,7 +115,9 @@ function tryPlaceTerm(
       continue;
     }
 
-    const hasCollision = placedBoxes.some((existing) => overlaps(box, existing));
+    const hasCollision = placedBoxes.some((existing) =>
+      overlaps(box, existing),
+    );
     if (!hasCollision) {
       return { x, y, box };
     }
@@ -161,10 +167,13 @@ export function computeTermCloudLayout(
 
   for (const [index, item] of normalized.entries()) {
     const ratio =
-      maxFreq === minFreq ? 0.6 : (item.frequency - minFreq) / (maxFreq - minFreq);
+      maxFreq === minFreq
+        ? 0.6
+        : (item.frequency - minFreq) / (maxFreq - minFreq);
 
     const rawFontSize = MIN_FONT_SIZE + ratio * (MAX_FONT_SIZE - MIN_FONT_SIZE);
-    const maxSafeFontSize = (width - MARGIN * 2 - PADDING_X) / Math.max(1, item.term.length * 0.6);
+    const maxSafeFontSize =
+      (width - MARGIN * 2 - PADDING_X) / Math.max(1, item.term.length * 0.6);
     const initialFontSize = Math.max(
       MIN_FIT_FONT_SIZE,
       Math.round(Math.min(rawFontSize, maxSafeFontSize) * 10) / 10,
@@ -172,8 +181,7 @@ export function computeTermCloudLayout(
 
     const fontWeight = getFontWeight(ratio);
     const colorClass = getColorClass(ratio);
-    const shouldRotate =
-      index > 2 && index % 4 === 3 && item.term.length <= 12;
+    const shouldRotate = index > 2 && index % 4 === 3 && item.term.length <= 12;
     const preferredRotate: 0 | -90 = shouldRotate ? -90 : 0;
 
     let candidate = tryPlaceTerm(

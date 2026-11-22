@@ -112,7 +112,10 @@ export const graduateProgramDetailSearch = createListSearch({
   yearRange: true,
   extra: {
     tab: z.enum(GRADUATE_PROGRAM_DETAIL_TABS).optional().catch(undefined),
-    view: z.enum(GRADUATE_PROGRAM_DETAIL_VIEW_MODES).optional().catch(undefined),
+    view: z
+      .enum(GRADUATE_PROGRAM_DETAIL_VIEW_MODES)
+      .optional()
+      .catch(undefined),
     production: productionRefParam,
   },
 });

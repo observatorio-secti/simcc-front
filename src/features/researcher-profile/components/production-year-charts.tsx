@@ -176,10 +176,7 @@ export function MultiKindYearChart({
 }
 
 export type MetricGroupDimension =
-  | 'nature'
-  | 'status'
-  | 'type_participation'
-  | 'none';
+  'nature' | 'status' | 'type_participation' | 'none';
 
 export interface GroupedMetricYearChartProps {
   title: string;

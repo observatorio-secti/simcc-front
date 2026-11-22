@@ -12,14 +12,7 @@ vi.mock('@tanstack/react-router', async (importOriginal) => {
   return {
     ...actual,
     CatchBoundary: ({ children }: { children: ReactNode }) => <>{children}</>,
-    Link: ({
-      children,
-      to,
-      ...props
-    }: {
-      children: ReactNode;
-      to: string;
-    }) => (
+    Link: ({ children, to, ...props }: { children: ReactNode; to: string }) => (
       <a href={to} {...props}>
         {children}
       </a>

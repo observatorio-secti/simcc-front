@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { useLocation } from '@tanstack/react-router';
 import { ConsoleShortcut } from './console-shortcut';
 import { Crumbbar } from './crumbbar';
@@ -64,7 +70,8 @@ export function PublicLayout({
 
     if (pathname !== '/busca') return;
 
-    const prevQuery = new URLSearchParams(prev.searchStr).get('q')?.trim() ?? '';
+    const prevQuery =
+      new URLSearchParams(prev.searchStr).get('q')?.trim() ?? '';
     const nextQuery = new URLSearchParams(searchStr).get('q')?.trim() ?? '';
     const enteredBusca = prev.pathname !== '/busca';
     const searchedAgainOnBusca = Boolean(nextQuery && nextQuery !== prevQuery);

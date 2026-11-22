@@ -335,9 +335,7 @@ describe('atalho "Console" na topbar pública', () => {
     expect(
       await screen.findByRole('link', { name: 'Console' }),
     ).toHaveAttribute('href', '/console');
-    expect(
-      screen.getByRole('button', { name: 'Entrar' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Entrar' })).toBeInTheDocument();
   });
 
   it('não aparece para logado sem is_admin, mas exibe Sair', async () => {

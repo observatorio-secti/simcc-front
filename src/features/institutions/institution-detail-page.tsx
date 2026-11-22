@@ -41,11 +41,11 @@ import { Pagination } from '@/shared/ui/pagination';
 import { StatCard } from '@/shared/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
+import { ProductionsTab } from '@/entities/production/ui/productions-tab';
 import {
   PRODUCTION_TAB_ITEMS,
   PRODUCTION_TAB_KINDS,
-  ProductionsTab,
-} from '@/entities/production/ui/productions-tab';
+} from '@/entities/production/ui/productions-tab-config';
 import {
   institutionDetailSearch,
   type InstitutionDetailSearch,
@@ -482,121 +482,121 @@ export function InstitutionDetailPage({
       </div>
 
       <Tabs
-            value={activeTab}
-            onValueChange={handleTabChange}
-            className="flex flex-col gap-4"
-          >
-            <TabsList variant="pills">
-              <TabsTrigger value="researchers">
-                <Users aria-hidden />
-                <span>Pesquisadores</span>
-              </TabsTrigger>
-              <TabsTrigger value="programs">
-                <GraduationCap aria-hidden />
-                <span>Programas de pós-graduação</span>
-              </TabsTrigger>
-              {PRODUCTION_TAB_ITEMS.map(({ key, label, icon: Icon }) => (
-                <TabsTrigger key={key} value={key}>
-                  <Icon aria-hidden />
-                  <span>{label}</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="flex flex-col gap-4"
+      >
+        <TabsList variant="pills">
+          <TabsTrigger value="researchers">
+            <Users aria-hidden />
+            <span>Pesquisadores</span>
+          </TabsTrigger>
+          <TabsTrigger value="programs">
+            <GraduationCap aria-hidden />
+            <span>Programas de pós-graduação</span>
+          </TabsTrigger>
+          {PRODUCTION_TAB_ITEMS.map(({ key, label, icon: Icon }) => (
+            <TabsTrigger key={key} value={key}>
+              <Icon aria-hidden />
+              <span>{label}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-            <form
-              role="search"
-              aria-label={
-                activeTab === 'researchers'
-                  ? 'Filtrar pesquisadores da instituição'
-                  : activeTab === 'programs'
-                    ? 'Filtrar programas da instituição'
-                    : 'Filtrar produções da instituição'
-              }
-              onSubmit={handleSearchSubmit}
-              className="flex h-[52px] items-center gap-3 rounded-lg border bg-card px-4"
+        <form
+          role="search"
+          aria-label={
+            activeTab === 'researchers'
+              ? 'Filtrar pesquisadores da instituição'
+              : activeTab === 'programs'
+                ? 'Filtrar programas da instituição'
+                : 'Filtrar produções da instituição'
+          }
+          onSubmit={handleSearchSubmit}
+          className="flex h-[52px] items-center gap-3 rounded-lg border bg-card px-4"
+        >
+          <Search
+            className="size-4 shrink-0 text-muted-foreground"
+            aria-hidden
+          />
+          <Input
+            type="search"
+            value={queryInput}
+            onChange={(event) => setQueryInput(event.target.value)}
+            placeholder={
+              activeTab === 'researchers'
+                ? 'Filtrar pesquisadores por nome ou termo'
+                : activeTab === 'programs'
+                  ? 'Filtrar programas por nome ou sigla'
+                  : 'Filtrar produções por título ou termo'
+            }
+            aria-label={
+              activeTab === 'researchers'
+                ? 'Filtrar pesquisadores por nome ou termo'
+                : activeTab === 'programs'
+                  ? 'Filtrar programas por nome ou sigla'
+                  : 'Filtrar produções por título ou termo'
+            }
+            className="h-auto flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+          />
+          {queryInput && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleClearQuery}
+              aria-label="Limpar filtro"
             >
-              <Search
-                className="size-4 shrink-0 text-muted-foreground"
-                aria-hidden
-              />
-              <Input
-                type="search"
-                value={queryInput}
-                onChange={(event) => setQueryInput(event.target.value)}
-                placeholder={
-                  activeTab === 'researchers'
-                    ? 'Filtrar pesquisadores por nome ou termo'
-                    : activeTab === 'programs'
-                      ? 'Filtrar programas por nome ou sigla'
-                      : 'Filtrar produções por título ou termo'
-                }
-                aria-label={
-                  activeTab === 'researchers'
-                    ? 'Filtrar pesquisadores por nome ou termo'
-                    : activeTab === 'programs'
-                      ? 'Filtrar programas por nome ou sigla'
-                      : 'Filtrar produções por título ou termo'
-                }
-                className="h-auto flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
-              />
-              {queryInput && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleClearQuery}
-                  aria-label="Limpar filtro"
-                >
-                  <X className="size-4" aria-hidden />
-                </Button>
-              )}
-              <Button type="submit" size="sm">
-                Filtrar
-              </Button>
-            </form>
+              <X className="size-4" aria-hidden />
+            </Button>
+          )}
+          <Button type="submit" size="sm">
+            Filtrar
+          </Button>
+        </form>
 
-            <TabsContent value="researchers" className="mt-0">
-              <InstitutionResearchersTab
-                institutionId={institution.id}
-                search={search}
-                onPageChange={(page) =>
-                  updateSearch({ page }, { resetPage: false })
-                }
-                onPerPageChange={(per_page) => updateSearch({ per_page })}
-                onClearQuery={handleClearQuery}
-              />
-            </TabsContent>
+        <TabsContent value="researchers" className="mt-0">
+          <InstitutionResearchersTab
+            institutionId={institution.id}
+            search={search}
+            onPageChange={(page) =>
+              updateSearch({ page }, { resetPage: false })
+            }
+            onPerPageChange={(per_page) => updateSearch({ per_page })}
+            onClearQuery={handleClearQuery}
+          />
+        </TabsContent>
 
-            <TabsContent value="programs" className="mt-0">
-              <InstitutionProgramsTab
-                institutionId={institution.id}
-                institutionLabel={acronym ?? displayName}
-                search={search}
-                onPageChange={(page) =>
-                  updateSearch({ page }, { resetPage: false })
-                }
-                onPerPageChange={(per_page) => updateSearch({ per_page })}
-                onClearQuery={handleClearQuery}
-              />
-            </TabsContent>
+        <TabsContent value="programs" className="mt-0">
+          <InstitutionProgramsTab
+            institutionId={institution.id}
+            institutionLabel={acronym ?? displayName}
+            search={search}
+            onPageChange={(page) =>
+              updateSearch({ page }, { resetPage: false })
+            }
+            onPerPageChange={(per_page) => updateSearch({ per_page })}
+            onClearQuery={handleClearQuery}
+          />
+        </TabsContent>
 
-            {PRODUCTION_TAB_ITEMS.map(({ key, kinds }) => (
-              <TabsContent key={key} value={key} className="mt-0">
-                <ProductionsTab
-                  scopeFilter={{ institution_id: [institution.id] }}
-                  emptyContext={{
-                    inScope: 'nesta instituição',
-                    owner: 'Esta instituição',
-                  }}
-                  kinds={kinds}
-                  search={search}
-                  onUpdateSearch={updateSearch}
-                  onOpenProduction={onOpenProduction}
-                  onClearQuery={handleClearQuery}
-                />
-              </TabsContent>
-            ))}
-          </Tabs>
+        {PRODUCTION_TAB_ITEMS.map(({ key, kinds }) => (
+          <TabsContent key={key} value={key} className="mt-0">
+            <ProductionsTab
+              scopeFilter={{ institution_id: [institution.id] }}
+              emptyContext={{
+                inScope: 'nesta instituição',
+                owner: 'Esta instituição',
+              }}
+              kinds={kinds}
+              search={search}
+              onUpdateSearch={updateSearch}
+              onOpenProduction={onOpenProduction}
+              onClearQuery={handleClearQuery}
+            />
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 }

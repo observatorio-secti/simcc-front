@@ -36,9 +36,7 @@ describe('computeTermCloudLayout', () => {
   });
 
   it('ignora termos vazios e retorna vazio quando maxTerms <= 0', () => {
-    expect(
-      computeTermCloudLayout([{ term: '   ', frequency: 5 }]),
-    ).toEqual([]);
+    expect(computeTermCloudLayout([{ term: '   ', frequency: 5 }])).toEqual([]);
     expect(computeTermCloudLayout(SAMPLE_TERMS, { maxTerms: 0 })).toEqual([]);
   });
 });

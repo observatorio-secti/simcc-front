@@ -60,6 +60,8 @@ describe('institutionDetailSearch', () => {
       q: 'computação',
       page: 2,
       per_page: 12,
+      sort_by: 'year',
+      sort_order: 'desc',
     });
   });
 

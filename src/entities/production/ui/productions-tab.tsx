@@ -1,17 +1,6 @@
 import { useId, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  BookOpen,
-  FileSpreadsheet,
-  FileText,
-  FolderKanban,
-  GraduationCap,
-  LayoutGrid,
-  Lightbulb,
-  Presentation,
-  Rows3,
-  type LucideIcon,
-} from 'lucide-react';
+import { LayoutGrid, Rows3 } from 'lucide-react';
 import type {
   ProductionItem,
   ProductionKind,
@@ -29,74 +18,10 @@ import { SortSelect, type SortOption } from '@/shared/ui/sort-select';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/ui/toggle-group';
 import { YearFilter } from '@/shared/ui/year-filter';
 
-export type ProductionTabKey =
-  | 'articles'
-  | 'books'
-  | 'technical'
-  | 'reports'
-  | 'guidance'
-  | 'events'
-  | 'projects';
-
-export interface ProductionTabItem {
-  readonly key: ProductionTabKey;
-  readonly label: string;
-  readonly icon: LucideIcon;
-  readonly kinds: readonly ProductionKind[];
-}
-
-export const PRODUCTION_TAB_ITEMS: readonly ProductionTabItem[] = [
-  { key: 'articles', label: 'Artigos', icon: FileText, kinds: ['article'] },
-  {
-    key: 'books',
-    label: 'Livros e capítulos',
-    icon: BookOpen,
-    kinds: ['book', 'book_chapter'],
-  },
-  {
-    key: 'technical',
-    label: 'Produção técnica',
-    icon: Lightbulb,
-    kinds: ['patent', 'software', 'brand'],
-  },
-  {
-    key: 'reports',
-    label: 'Relatórios técnicos',
-    icon: FileSpreadsheet,
-    kinds: ['report'],
-  },
-  {
-    key: 'guidance',
-    label: 'Orientações',
-    icon: GraduationCap,
-    kinds: ['guidance'],
-  },
-  {
-    key: 'events',
-    label: 'Eventos',
-    icon: Presentation,
-    kinds: ['event', 'event_work'],
-  },
-  {
-    key: 'projects',
-    label: 'Projetos',
-    icon: FolderKanban,
-    kinds: ['research_project'],
-  },
-];
-
-export const PRODUCTION_TAB_KINDS: Record<
+export type {
+  ProductionTabItem,
   ProductionTabKey,
-  readonly ProductionKind[]
-> = {
-  articles: ['article'],
-  books: ['book', 'book_chapter'],
-  technical: ['patent', 'software', 'brand'],
-  reports: ['report'],
-  guidance: ['guidance'],
-  events: ['event', 'event_work'],
-  projects: ['research_project'],
-};
+} from './productions-tab-config';
 
 export type ProductionTabSortBy = 'year' | 'citations' | 'title';
 export type ProductionTabViewMode = 'grid' | 'list';
@@ -113,8 +38,7 @@ export interface ProductionsTabSearch {
 }
 
 export type ProductionScopeFilter =
-  | { institution_id: string[] }
-  | { graduate_program_id: string[] };
+  { institution_id: string[] } | { graduate_program_id: string[] };
 
 export interface ProductionEmptyContext {
   inScope: string;
@@ -191,7 +115,9 @@ function ProductionSection({
     | undefined;
   const items = typedData?.data ?? [];
   const hasFilters = Boolean(
-    search.q || search.year_start !== undefined || search.year_end !== undefined,
+    search.q ||
+    search.year_start !== undefined ||
+    search.year_end !== undefined,
   );
 
   return (

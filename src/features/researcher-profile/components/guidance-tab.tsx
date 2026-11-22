@@ -73,125 +73,125 @@ export function GuidanceTab({
       />
 
       <section className="flex flex-col gap-3">
-      <SectionHeader
-        title={
-          <span className="inline-flex items-center gap-2">
-            <span>Orientações</span>
-            {!isLoading && !isError && (
-              <Tag variant="neutral" className="tabular-nums">
-                {formatCount(total)}
-              </Tag>
-            )}
-          </span>
-        }
-        icon={GraduationCap}
-      >
-        <ToggleGroup
-          type="single"
-          value={view}
-          onValueChange={(next) => {
-            if (next === 'grid' || next === 'list') {
-              onViewChange(next);
-            }
-          }}
-          aria-label="Modo de visualização"
-        >
-          <ToggleGroupItem value="list" aria-label="Ver em tabela">
-            <Rows3 className="size-4" aria-hidden />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="grid" aria-label="Ver em blocos">
-            <LayoutGrid className="size-4" aria-hidden />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </SectionHeader>
-
-      {isLoading ? (
-        <LoadingBlock />
-      ) : isError ? (
-        <EmptyState
-          title="Não foi possível carregar as orientações"
-          description="Tente recarregar a página ou ajustar os filtros."
-        />
-      ) : items.length === 0 ? (
-        <EmptyState
+        <SectionHeader
+          title={
+            <span className="inline-flex items-center gap-2">
+              <span>Orientações</span>
+              {!isLoading && !isError && (
+                <Tag variant="neutral" className="tabular-nums">
+                  {formatCount(total)}
+                </Tag>
+              )}
+            </span>
+          }
           icon={GraduationCap}
-          title="Nenhuma orientação encontrada"
-          description="Não há orientações registradas para este filtro."
-        />
-      ) : view === 'list' ? (
-        <Card className="overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Orientando(a) / Título</TableHead>
-                <TableHead>Natureza</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Ano</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.map((item) => {
-                const natColor = orientationColor(item.nature);
-                const stColor = item.status ? statusColor(item.status) : null;
-                return (
-                  <TableRow
-                    key={item.id}
-                    className="cursor-pointer"
-                    onClick={() => onOpenItem(item)}
-                  >
-                    <TableCell className="font-medium">
-                      <div>{item.oriented || item.title}</div>
-                      {item.oriented && item.title && (
-                        <div className="line-clamp-1 text-xs font-normal text-muted-foreground">
-                          {item.title}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center gap-2 text-sm">
-                        <Dot className={natColor.bg} />
-                        <span>{item.nature || natColor.label}</span>
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      {item.status && stColor ? (
-                        <Badge size="sm" className={stColor.bg}>
-                          {item.status}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {item.year ?? '—'}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Card>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {items.map((item) => (
-            <ProductionCard
-              key={item.id}
-              kind="guidance"
-              item={item}
-              showAuthors={false}
-              onOpen={onOpenItem}
-            />
-          ))}
-        </div>
-      )}
+        >
+          <ToggleGroup
+            type="single"
+            value={view}
+            onValueChange={(next) => {
+              if (next === 'grid' || next === 'list') {
+                onViewChange(next);
+              }
+            }}
+            aria-label="Modo de visualização"
+          >
+            <ToggleGroupItem value="list" aria-label="Ver em tabela">
+              <Rows3 className="size-4" aria-hidden />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="grid" aria-label="Ver em blocos">
+              <LayoutGrid className="size-4" aria-hidden />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </SectionHeader>
 
-      {totalPages > 1 && (
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-        />
-      )}
+        {isLoading ? (
+          <LoadingBlock />
+        ) : isError ? (
+          <EmptyState
+            title="Não foi possível carregar as orientações"
+            description="Tente recarregar a página ou ajustar os filtros."
+          />
+        ) : items.length === 0 ? (
+          <EmptyState
+            icon={GraduationCap}
+            title="Nenhuma orientação encontrada"
+            description="Não há orientações registradas para este filtro."
+          />
+        ) : view === 'list' ? (
+          <Card className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Orientando(a) / Título</TableHead>
+                  <TableHead>Natureza</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Ano</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {items.map((item) => {
+                  const natColor = orientationColor(item.nature);
+                  const stColor = item.status ? statusColor(item.status) : null;
+                  return (
+                    <TableRow
+                      key={item.id}
+                      className="cursor-pointer"
+                      onClick={() => onOpenItem(item)}
+                    >
+                      <TableCell className="font-medium">
+                        <div>{item.oriented || item.title}</div>
+                        {item.oriented && item.title && (
+                          <div className="line-clamp-1 text-xs font-normal text-muted-foreground">
+                            {item.title}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <span className="inline-flex items-center gap-2 text-sm">
+                          <Dot className={natColor.bg} />
+                          <span>{item.nature || natColor.label}</span>
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {item.status && stColor ? (
+                          <Badge size="sm" className={stColor.bg}>
+                            {item.status}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {item.year ?? '—'}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Card>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {items.map((item) => (
+              <ProductionCard
+                key={item.id}
+                kind="guidance"
+                item={item}
+                showAuthors={false}
+                onOpen={onOpenItem}
+              />
+            ))}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
+        )}
       </section>
     </div>
   );

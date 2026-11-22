@@ -185,9 +185,10 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       expect(router.state.location.searchStr).toContain('tab=pesquisadores');
     });
     expect(await screen.findByText('Ana Souza')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'Ana Souza' }),
-    ).toHaveAttribute('href', '/researcher?name=Ana+Souza');
+    expect(screen.getByRole('link', { name: 'Ana Souza' })).toHaveAttribute(
+      'href',
+      '/researcher?name=Ana+Souza',
+    );
     expect(
       screen.getByText('Doutorado em Ciência da Computação'),
     ).toBeInTheDocument();
@@ -201,20 +202,23 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       name: 'Ana Souza',
     };
 
-    const { user, router } = await renderRoute('/grupos-pesquisa/grp-1?tab=pesquisadores', {
-      handlers: [
-        ...createOdaHandlers(),
-        http.get(simccV2Url('/researcher'), () =>
-          HttpResponse.json({
-            ...v2Fixtures['/researcher'],
-            data: [anaResearcher],
-          }),
-        ),
-        http.get(simccV2Url('/researcher/:researcher_id'), () =>
-          HttpResponse.json(anaResearcher),
-        ),
-      ],
-    });
+    const { user, router } = await renderRoute(
+      '/grupos-pesquisa/grp-1?tab=pesquisadores',
+      {
+        handlers: [
+          ...createOdaHandlers(),
+          http.get(simccV2Url('/researcher'), () =>
+            HttpResponse.json({
+              ...v2Fixtures['/researcher'],
+              data: [anaResearcher],
+            }),
+          ),
+          http.get(simccV2Url('/researcher/:researcher_id'), () =>
+            HttpResponse.json(anaResearcher),
+          ),
+        ],
+      },
+    );
 
     const link = await screen.findByRole('link', { name: 'Ana Souza' });
     await user.click(link);

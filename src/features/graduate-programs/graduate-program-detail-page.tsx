@@ -31,11 +31,11 @@ import { graduateProgramDetailQueryOptions } from '@/entities/graduate-program/q
 import { ResearchLines } from '@/entities/graduate-program/ui/research-lines';
 import { InstitutionRef } from '@/entities/institution/ui/institution-ref';
 import type { ProductionKind } from '@/entities/production/model';
+import { ProductionsTab } from '@/entities/production/ui/productions-tab';
 import {
   PRODUCTION_TAB_ITEMS,
   PRODUCTION_TAB_KINDS,
-  ProductionsTab,
-} from '@/entities/production/ui/productions-tab';
+} from '@/entities/production/ui/productions-tab-config';
 import type { ResearcherSummary } from '@/entities/researcher/model';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { PersonCard } from '@/entities/researcher/ui/person-card';

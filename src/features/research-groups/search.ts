@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { createListSearch, searchStringParam } from '@/shared/lib/search-params';
+import {
+  createListSearch,
+  searchStringParam,
+} from '@/shared/lib/search-params';
 
 export const GROUP_VIEW_MODES = ['grid', 'list'] as const;
 export type GroupViewMode = (typeof GROUP_VIEW_MODES)[number];

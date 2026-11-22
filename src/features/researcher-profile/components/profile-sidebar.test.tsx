@@ -6,14 +6,7 @@ import type { Scholarship } from '@/entities/scholarship/model';
 import { ProfileSidebar } from './profile-sidebar';
 
 vi.mock('@tanstack/react-router', () => ({
-  Link: ({
-    children,
-    to,
-    ...props
-  }: {
-    children: ReactNode;
-    to: string;
-  }) => (
+  Link: ({ children, to, ...props }: { children: ReactNode; to: string }) => (
     <a href={to} {...props}>
       {children}
     </a>
