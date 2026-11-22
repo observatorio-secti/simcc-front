@@ -1,6 +1,12 @@
 node_modules
 .git
+.github
+.claude
 .agents
-dist
 .vscode
+dist
+coverage
+docs
 *.log
+# O .env entra no contexto de build de propósito: só tem variáveis VITE_*
+# públicas (ver .env.example). Os --build-arg vencem o que estiver nele.

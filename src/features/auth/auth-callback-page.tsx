@@ -16,8 +16,11 @@ import {
 } from '@/shared/ui/card';
 import { Spinner } from '@/shared/ui/loading-block';
 import { AuthShell } from './auth-shell';
-import { type SessionStore, sessionStore } from './session-store';
-import { useSession } from './use-session';
+import {
+  type SessionStore,
+  sessionStore,
+  useSession,
+} from '@/entities/session';
 
 export interface AuthCallbackPageProps {
   code?: string;

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PublicRouteImport } from './routes/_public'
+import { Route as ConsoleRouteImport } from './routes/console'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as PublicBuscaRouteImport } from './routes/_public/busca'
 import { Route as PublicIncitesRouteImport } from './routes/_public/incites'
@@ -18,11 +19,20 @@ import { Route as PublicIndicePesquisadorRouteImport } from './routes/_public/in
 import { Route as PublicListagensRouteImport } from './routes/_public/listagens'
 import { Route as PublicMariaRouteRouteImport } from './routes/_public/maria/route'
 import { Route as PublicPaineisDadosExternosRouteImport } from './routes/_public/paineis-dados-externos'
+import { Route as PublicPainesDadosExternosRouteImport } from './routes/_public/paines-dados-externos'
+import { Route as PublicResearcherRouteImport } from './routes/_public/researcher'
+import { Route as PublicResultadosRouteImport } from './routes/_public/resultados'
+import { Route as PublicResultadosIaRouteImport } from './routes/_public/resultados-ia'
+import { Route as PublicResultadosPerfilRouteImport } from './routes/_public/resultados-perfil'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
+import { Route as ConsoleIndexRouteImport } from './routes/console/index'
+import { Route as ConsoleAdminsRouteImport } from './routes/console/admins'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
 import { Route as PublicGruposPesquisaIndexRouteImport } from './routes/_public/grupos-pesquisa/index'
 import { Route as PublicGruposPesquisaIdRouteImport } from './routes/_public/grupos-pesquisa/$id'
+import { Route as PublicInstituicaoIndexRouteImport } from './routes/_public/instituicao/index'
+import { Route as PublicInstituicaoAcronymRouteImport } from './routes/_public/instituicao/$acronym'
 import { Route as PublicInstituicoesIndexRouteImport } from './routes/_public/instituicoes/index'
 import { Route as PublicInstituicoesIdRouteImport } from './routes/_public/instituicoes/$id'
 import { Route as PublicMariaIndexRouteImport } from './routes/_public/maria/index'
@@ -30,9 +40,15 @@ import { Route as PublicMariaConversationIdRouteImport } from './routes/_public/
 import { Route as PublicPesquisadoresIdRouteImport } from './routes/_public/pesquisadores/$id'
 import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
 import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
+import { Route as PublicProducoesKindIdRouteImport } from './routes/_public/producoes/$kind/$id'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleRoute = ConsoleRouteImport.update({
+  id: '/console',
+  path: '/console',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
@@ -76,6 +92,32 @@ const PublicPaineisDadosExternosRoute =
     path: '/paineis-dados-externos',
     getParentRoute: () => PublicRoute,
   } as any)
+const PublicPainesDadosExternosRoute =
+  PublicPainesDadosExternosRouteImport.update({
+    id: '/paines-dados-externos',
+    path: '/paines-dados-externos',
+    getParentRoute: () => PublicRoute,
+  } as any)
+const PublicResearcherRoute = PublicResearcherRouteImport.update({
+  id: '/researcher',
+  path: '/researcher',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicResultadosRoute = PublicResultadosRouteImport.update({
+  id: '/resultados',
+  path: '/resultados',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicResultadosIaRoute = PublicResultadosIaRouteImport.update({
+  id: '/resultados-ia',
+  path: '/resultados-ia',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicResultadosPerfilRoute = PublicResultadosPerfilRouteImport.update({
+  id: '/resultados-perfil',
+  path: '/resultados-perfil',
+  getParentRoute: () => PublicRoute,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -85,6 +127,16 @@ const AuthSemAcessoRoute = AuthSemAcessoRouteImport.update({
   id: '/auth/sem-acesso',
   path: '/auth/sem-acesso',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ConsoleIndexRoute = ConsoleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleAdminsRoute = ConsoleAdminsRouteImport.update({
+  id: '/admins',
+  path: '/admins',
+  getParentRoute: () => ConsoleRoute,
 } as any)
 const DevVitrineRoute = DevVitrineRouteImport.update({
   id: '/dev/vitrine',
@@ -102,6 +154,17 @@ const PublicGruposPesquisaIdRoute = PublicGruposPesquisaIdRouteImport.update({
   path: '/grupos-pesquisa/$id',
   getParentRoute: () => PublicRoute,
 } as any)
+const PublicInstituicaoIndexRoute = PublicInstituicaoIndexRouteImport.update({
+  id: '/instituicao/',
+  path: '/instituicao/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicInstituicaoAcronymRoute =
+  PublicInstituicaoAcronymRouteImport.update({
+    id: '/instituicao/$acronym',
+    path: '/instituicao/$acronym',
+    getParentRoute: () => PublicRoute,
+  } as any)
 const PublicInstituicoesIndexRoute = PublicInstituicoesIndexRouteImport.update({
   id: '/instituicoes/',
   path: '/instituicoes/',
@@ -138,9 +201,15 @@ const PublicPosGraduacaoIdRoute = PublicPosGraduacaoIdRouteImport.update({
   path: '/pos-graduacao/$id',
   getParentRoute: () => PublicRoute,
 } as any)
+const PublicProducoesKindIdRoute = PublicProducoesKindIdRouteImport.update({
+  id: '/producoes/$kind/$id',
+  path: '/producoes/$kind/$id',
+  getParentRoute: () => PublicRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
+  '/console': typeof ConsoleRouteWithChildren
   '/maria': typeof PublicMariaRouteRouteWithChildren
   '/busca': typeof PublicBuscaRoute
   '/incites': typeof PublicIncitesRoute
@@ -148,18 +217,28 @@ export interface FileRoutesByFullPath {
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/listagens': typeof PublicListagensRoute
   '/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
+  '/paines-dados-externos': typeof PublicPainesDadosExternosRoute
+  '/researcher': typeof PublicResearcherRoute
+  '/resultados': typeof PublicResultadosRoute
+  '/resultados-ia': typeof PublicResultadosIaRoute
+  '/resultados-perfil': typeof PublicResultadosPerfilRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
+  '/console/admins': typeof ConsoleAdminsRoute
   '/dev/vitrine': typeof DevVitrineRoute
+  '/console/': typeof ConsoleIndexRoute
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
+  '/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
+  '/instituicao/': typeof PublicInstituicaoIndexRoute
   '/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/maria/': typeof PublicMariaIndexRoute
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
+  '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRoutesByTo {
   '/busca': typeof PublicBuscaRoute
@@ -168,23 +247,34 @@ export interface FileRoutesByTo {
   '/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/listagens': typeof PublicListagensRoute
   '/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
+  '/paines-dados-externos': typeof PublicPainesDadosExternosRoute
+  '/researcher': typeof PublicResearcherRoute
+  '/resultados': typeof PublicResultadosRoute
+  '/resultados-ia': typeof PublicResultadosIaRoute
+  '/resultados-perfil': typeof PublicResultadosPerfilRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
+  '/console/admins': typeof ConsoleAdminsRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
+  '/console': typeof ConsoleIndexRoute
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
+  '/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/grupos-pesquisa': typeof PublicGruposPesquisaIndexRoute
+  '/instituicao': typeof PublicInstituicaoIndexRoute
   '/instituicoes': typeof PublicInstituicoesIndexRoute
   '/maria': typeof PublicMariaIndexRoute
   '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
+  '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
+  '/console': typeof ConsoleRouteWithChildren
   '/_public/maria': typeof PublicMariaRouteRouteWithChildren
   '/_public/busca': typeof PublicBuscaRoute
   '/_public/incites': typeof PublicIncitesRoute
@@ -192,24 +282,35 @@ export interface FileRoutesById {
   '/_public/indice-pesquisador': typeof PublicIndicePesquisadorRoute
   '/_public/listagens': typeof PublicListagensRoute
   '/_public/paineis-dados-externos': typeof PublicPaineisDadosExternosRoute
+  '/_public/paines-dados-externos': typeof PublicPainesDadosExternosRoute
+  '/_public/researcher': typeof PublicResearcherRoute
+  '/_public/resultados': typeof PublicResultadosRoute
+  '/_public/resultados-ia': typeof PublicResultadosIaRoute
+  '/_public/resultados-perfil': typeof PublicResultadosPerfilRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
+  '/console/admins': typeof ConsoleAdminsRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
+  '/console/': typeof ConsoleIndexRoute
   '/_public/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
+  '/_public/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/_public/instituicoes/$id': typeof PublicInstituicoesIdRoute
   '/_public/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/_public/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/_public/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
+  '/_public/instituicao/': typeof PublicInstituicaoIndexRoute
   '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/_public/maria/': typeof PublicMariaIndexRoute
   '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
+  '/_public/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/console'
     | '/maria'
     | '/busca'
     | '/incites'
@@ -217,18 +318,28 @@ export interface FileRouteTypes {
     | '/indice-pesquisador'
     | '/listagens'
     | '/paineis-dados-externos'
+    | '/paines-dados-externos'
+    | '/researcher'
+    | '/resultados'
+    | '/resultados-ia'
+    | '/resultados-perfil'
     | '/auth/callback'
     | '/auth/sem-acesso'
+    | '/console/admins'
     | '/dev/vitrine'
+    | '/console/'
     | '/grupos-pesquisa/$id'
+    | '/instituicao/$acronym'
     | '/instituicoes/$id'
     | '/maria/$conversationId'
     | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
     | '/grupos-pesquisa/'
+    | '/instituicao/'
     | '/instituicoes/'
     | '/maria/'
     | '/pos-graduacao/'
+    | '/producoes/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/busca'
@@ -237,22 +348,33 @@ export interface FileRouteTypes {
     | '/indice-pesquisador'
     | '/listagens'
     | '/paineis-dados-externos'
+    | '/paines-dados-externos'
+    | '/researcher'
+    | '/resultados'
+    | '/resultados-ia'
+    | '/resultados-perfil'
     | '/auth/callback'
     | '/auth/sem-acesso'
+    | '/console/admins'
     | '/dev/vitrine'
     | '/'
+    | '/console'
     | '/grupos-pesquisa/$id'
+    | '/instituicao/$acronym'
     | '/instituicoes/$id'
     | '/maria/$conversationId'
     | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
     | '/grupos-pesquisa'
+    | '/instituicao'
     | '/instituicoes'
     | '/maria'
     | '/pos-graduacao'
+    | '/producoes/$kind/$id'
   id:
     | '__root__'
     | '/_public'
+    | '/console'
     | '/_public/maria'
     | '/_public/busca'
     | '/_public/incites'
@@ -260,23 +382,34 @@ export interface FileRouteTypes {
     | '/_public/indice-pesquisador'
     | '/_public/listagens'
     | '/_public/paineis-dados-externos'
+    | '/_public/paines-dados-externos'
+    | '/_public/researcher'
+    | '/_public/resultados'
+    | '/_public/resultados-ia'
+    | '/_public/resultados-perfil'
     | '/auth/callback'
     | '/auth/sem-acesso'
+    | '/console/admins'
     | '/dev/vitrine'
     | '/_public/'
+    | '/console/'
     | '/_public/grupos-pesquisa/$id'
+    | '/_public/instituicao/$acronym'
     | '/_public/instituicoes/$id'
     | '/_public/maria/$conversationId'
     | '/_public/pesquisadores/$id'
     | '/_public/pos-graduacao/$id'
     | '/_public/grupos-pesquisa/'
+    | '/_public/instituicao/'
     | '/_public/instituicoes/'
     | '/_public/maria/'
     | '/_public/pos-graduacao/'
+    | '/_public/producoes/$kind/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
+  ConsoleRoute: typeof ConsoleRouteWithChildren
   AuthCallbackRoute: typeof AuthCallbackRoute
   AuthSemAcessoRoute: typeof AuthSemAcessoRoute
   DevVitrineRoute: typeof DevVitrineRoute
@@ -289,6 +422,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/console': {
+      id: '/console'
+      path: '/console'
+      fullPath: '/console'
+      preLoaderRoute: typeof ConsoleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_public/': {
@@ -347,6 +487,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPaineisDadosExternosRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/paines-dados-externos': {
+      id: '/_public/paines-dados-externos'
+      path: '/paines-dados-externos'
+      fullPath: '/paines-dados-externos'
+      preLoaderRoute: typeof PublicPainesDadosExternosRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/researcher': {
+      id: '/_public/researcher'
+      path: '/researcher'
+      fullPath: '/researcher'
+      preLoaderRoute: typeof PublicResearcherRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/resultados': {
+      id: '/_public/resultados'
+      path: '/resultados'
+      fullPath: '/resultados'
+      preLoaderRoute: typeof PublicResultadosRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/resultados-ia': {
+      id: '/_public/resultados-ia'
+      path: '/resultados-ia'
+      fullPath: '/resultados-ia'
+      preLoaderRoute: typeof PublicResultadosIaRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/resultados-perfil': {
+      id: '/_public/resultados-perfil'
+      path: '/resultados-perfil'
+      fullPath: '/resultados-perfil'
+      preLoaderRoute: typeof PublicResultadosPerfilRouteImport
+      parentRoute: typeof PublicRoute
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -360,6 +535,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth/sem-acesso'
       preLoaderRoute: typeof AuthSemAcessoRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/console/': {
+      id: '/console/'
+      path: '/'
+      fullPath: '/console/'
+      preLoaderRoute: typeof ConsoleIndexRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/admins': {
+      id: '/console/admins'
+      path: '/admins'
+      fullPath: '/console/admins'
+      preLoaderRoute: typeof ConsoleAdminsRouteImport
+      parentRoute: typeof ConsoleRoute
     }
     '/dev/vitrine': {
       id: '/dev/vitrine'
@@ -380,6 +569,20 @@ declare module '@tanstack/react-router' {
       path: '/grupos-pesquisa/$id'
       fullPath: '/grupos-pesquisa/$id'
       preLoaderRoute: typeof PublicGruposPesquisaIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/instituicao/': {
+      id: '/_public/instituicao/'
+      path: '/instituicao'
+      fullPath: '/instituicao/'
+      preLoaderRoute: typeof PublicInstituicaoIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/instituicao/$acronym': {
+      id: '/_public/instituicao/$acronym'
+      path: '/instituicao/$acronym'
+      fullPath: '/instituicao/$acronym'
+      preLoaderRoute: typeof PublicInstituicaoAcronymRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/instituicoes/': {
@@ -431,6 +634,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPosGraduacaoIdRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/producoes/$kind/$id': {
+      id: '/_public/producoes/$kind/$id'
+      path: '/producoes/$kind/$id'
+      fullPath: '/producoes/$kind/$id'
+      preLoaderRoute: typeof PublicProducoesKindIdRouteImport
+      parentRoute: typeof PublicRoute
+    }
   }
 }
 
@@ -455,14 +665,22 @@ interface PublicRouteChildren {
   PublicIndicePesquisadorRoute: typeof PublicIndicePesquisadorRoute
   PublicListagensRoute: typeof PublicListagensRoute
   PublicPaineisDadosExternosRoute: typeof PublicPaineisDadosExternosRoute
+  PublicPainesDadosExternosRoute: typeof PublicPainesDadosExternosRoute
+  PublicResearcherRoute: typeof PublicResearcherRoute
+  PublicResultadosRoute: typeof PublicResultadosRoute
+  PublicResultadosIaRoute: typeof PublicResultadosIaRoute
+  PublicResultadosPerfilRoute: typeof PublicResultadosPerfilRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicGruposPesquisaIdRoute: typeof PublicGruposPesquisaIdRoute
+  PublicInstituicaoAcronymRoute: typeof PublicInstituicaoAcronymRoute
   PublicInstituicoesIdRoute: typeof PublicInstituicoesIdRoute
   PublicPesquisadoresIdRoute: typeof PublicPesquisadoresIdRoute
   PublicPosGraduacaoIdRoute: typeof PublicPosGraduacaoIdRoute
   PublicGruposPesquisaIndexRoute: typeof PublicGruposPesquisaIndexRoute
+  PublicInstituicaoIndexRoute: typeof PublicInstituicaoIndexRoute
   PublicInstituicoesIndexRoute: typeof PublicInstituicoesIndexRoute
   PublicPosGraduacaoIndexRoute: typeof PublicPosGraduacaoIndexRoute
+  PublicProducoesKindIdRoute: typeof PublicProducoesKindIdRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
@@ -473,21 +691,43 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicIndicePesquisadorRoute: PublicIndicePesquisadorRoute,
   PublicListagensRoute: PublicListagensRoute,
   PublicPaineisDadosExternosRoute: PublicPaineisDadosExternosRoute,
+  PublicPainesDadosExternosRoute: PublicPainesDadosExternosRoute,
+  PublicResearcherRoute: PublicResearcherRoute,
+  PublicResultadosRoute: PublicResultadosRoute,
+  PublicResultadosIaRoute: PublicResultadosIaRoute,
+  PublicResultadosPerfilRoute: PublicResultadosPerfilRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicGruposPesquisaIdRoute: PublicGruposPesquisaIdRoute,
+  PublicInstituicaoAcronymRoute: PublicInstituicaoAcronymRoute,
   PublicInstituicoesIdRoute: PublicInstituicoesIdRoute,
   PublicPesquisadoresIdRoute: PublicPesquisadoresIdRoute,
   PublicPosGraduacaoIdRoute: PublicPosGraduacaoIdRoute,
   PublicGruposPesquisaIndexRoute: PublicGruposPesquisaIndexRoute,
+  PublicInstituicaoIndexRoute: PublicInstituicaoIndexRoute,
   PublicInstituicoesIndexRoute: PublicInstituicoesIndexRoute,
   PublicPosGraduacaoIndexRoute: PublicPosGraduacaoIndexRoute,
+  PublicProducoesKindIdRoute: PublicProducoesKindIdRoute,
 }
 
 const PublicRouteWithChildren =
   PublicRoute._addFileChildren(PublicRouteChildren)
 
+interface ConsoleRouteChildren {
+  ConsoleAdminsRoute: typeof ConsoleAdminsRoute
+  ConsoleIndexRoute: typeof ConsoleIndexRoute
+}
+
+const ConsoleRouteChildren: ConsoleRouteChildren = {
+  ConsoleAdminsRoute: ConsoleAdminsRoute,
+  ConsoleIndexRoute: ConsoleIndexRoute,
+}
+
+const ConsoleRouteWithChildren =
+  ConsoleRoute._addFileChildren(ConsoleRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
+  ConsoleRoute: ConsoleRouteWithChildren,
   AuthCallbackRoute: AuthCallbackRoute,
   AuthSemAcessoRoute: AuthSemAcessoRoute,
   DevVitrineRoute: DevVitrineRoute,

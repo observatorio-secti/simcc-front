@@ -3,8 +3,16 @@ import {
   useLocation,
   useRouter,
 } from '@tanstack/react-router';
+import {
+  decodeProductionRef,
+  encodeProductionRef,
+  productionRouteParams,
+} from '@/entities/production/links';
+import type { ProductionKind } from '@/entities/production/model';
+import { productionDetailQueryOptions } from '@/entities/production/queries';
 import { researcherDetailQueryOptions } from '@/entities/researcher/queries';
 import { ErrorPage } from '@/features/errors/error-page';
+import { ProductionDetailOverlay } from '@/features/production-detail';
 import {
   decodeProfileOverlaySearch,
   encodeProfileOverlaySearch,
@@ -12,6 +20,7 @@ import {
 import { ResearcherProfileOverlay } from '@/features/researcher-profile/researcher-profile-overlay';
 import type { ResearcherProfileSearch } from '@/features/researcher-profile/search-schema';
 import {
+  interceptResearcherLink,
   prefetchSearchResults,
   resultsSearch,
   resultsSearchMiddlewares,
@@ -37,16 +46,25 @@ export const Route = createFileRoute('/_public/busca')({
         researcherDetailQueryOptions(deps.search.researcher),
       );
     }
+    const production = decodeProductionRef(deps.search.production);
+    if (production) {
+      void context.queryClient.prefetchQuery(
+        productionDetailQueryOptions(production.kind, production.id),
+      );
+    }
   },
   errorComponent: ErrorPage,
   component: BuscaRoute,
 });
 
 /**
- * `/busca` com o perfil do pesquisador como overlay (ADR 0004 e 0010). A
- * lista fica montada; abrir um pesquisador navega para `/busca?researcher=…`
- * mascarado como `/pesquisadores/$id`, então a barra de endereço mostra o
- * perfil, voltar fecha o overlay e o link copiado abre a página completa.
+ * `/busca` com o perfil do pesquisador e a produção como overlays (ADR 0004 e
+ * 0010). A lista fica montada; abrir um pesquisador navega para
+ * `/busca?researcher=…` mascarado como `/pesquisadores/$id`, e abrir uma
+ * produção (de um card ou de dentro do perfil) navega para
+ * `/busca?production=<kind>:<id>` mascarado como `/producoes/<slug>/<id>`.
+ * A barra de endereço mostra a entidade do topo, voltar fecha só o overlay
+ * do topo e o link copiado abre a página completa dessa entidade.
  */
 function BuscaRoute() {
   const search = Route.useSearch();
@@ -55,6 +73,9 @@ function BuscaRoute() {
   const openedHere = useLocation({
     select: (location) => Boolean(location.state.searchOverlay),
   });
+  const productionOpenedHere = useLocation({
+    select: (location) => Boolean(location.state.productionOverlay),
+  });
 
   const type = search.type ?? 'profile';
   const profileSearch = decodeProfileOverlaySearch(search.profile, {
@@ -62,6 +83,7 @@ function BuscaRoute() {
     searchType: type,
   });
   const { routeSearch } = encodeProfileOverlaySearch(profileSearch);
+  const production = decodeProductionRef(search.production);
 
   function showResearcher(
     id: string,
@@ -76,13 +98,22 @@ function BuscaRoute() {
         });
     const next = encodeProfileOverlaySearch(base, patch ?? {});
     void navigate({
-      search: (prev) => ({ ...prev, researcher: id, profile: next.encoded }),
+      search: (prev) => ({
+        ...prev,
+        researcher: id,
+        profile: next.encoded,
+        production: undefined,
+      }),
       mask: {
         to: '/pesquisadores/$id',
         params: { id },
         search: next.routeSearch as ResearcherProfileSearch,
       },
-      state: (prev) => ({ ...prev, searchOverlay: true }),
+      state: (prev) => ({
+        ...prev,
+        searchOverlay: true,
+        productionOverlay: undefined,
+      }),
       replace: options.replace,
       resetScroll: false,
     });
@@ -107,7 +138,42 @@ function BuscaRoute() {
         ...prev,
         researcher: undefined,
         profile: undefined,
+        production: undefined,
       }),
+      replace: true,
+      resetScroll: false,
+    });
+  }
+
+  function handleOpenProduction(kind: ProductionKind, id: string) {
+    const ref = { kind, id };
+    void navigate({
+      search: (prev) => ({ ...prev, production: encodeProductionRef(ref) }),
+      mask: { to: '/producoes/$kind/$id', params: productionRouteParams(ref) },
+      state: (prev) => ({ ...prev, productionOverlay: true }),
+      replace: Boolean(search.production),
+      resetScroll: false,
+    });
+  }
+
+  function handleCloseProduction() {
+    if (productionOpenedHere && router.history.canGoBack()) {
+      router.history.back();
+      return;
+    }
+    // Aberta direto (link com `?production=`): remove o parâmetro e, se o
+    // perfil continua aberto por baixo, a barra volta a mostrar o perfil.
+    const researcher = search.researcher;
+    void navigate({
+      search: (prev) => ({ ...prev, production: undefined }),
+      ...(researcher && {
+        mask: {
+          to: '/pesquisadores/$id',
+          params: { id: researcher },
+          search: routeSearch as ResearcherProfileSearch,
+        },
+      }),
+      state: (prev) => ({ ...prev, productionOverlay: undefined }),
       replace: true,
       resetScroll: false,
     });
@@ -118,13 +184,24 @@ function BuscaRoute() {
       <SearchResultsPage
         search={search}
         onOpenResearcher={handleOpenResearcher}
+        onOpenProduction={handleOpenProduction}
       />
       <ResearcherProfileOverlay
         researcherId={search.researcher}
         search={profileSearch}
         routeSearch={routeSearch}
         onUpdateSearch={handleUpdateProfile}
+        onOpenProduction={handleOpenProduction}
         onClose={handleClose}
+      />
+      <ProductionDetailOverlay
+        production={production}
+        onClose={handleCloseProduction}
+        onContentClick={(event) =>
+          interceptResearcherLink(event, (id) =>
+            showResearcher(id, null, { replace: false }),
+          )
+        }
       />
     </>
   );

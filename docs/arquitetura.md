@@ -82,6 +82,14 @@ entities/<x>/ui ── renderiza o modelo
 
 Toda variável `VITE_*` vai para o JavaScript público: **nunca** coloque segredo nelas. As variáveis são validadas uma única vez em `src/config/env.ts`, e o resto do código importa `env` de lá. A lista está em `.env.example`.
 
+## Build e deploy
+
+As variáveis `VITE_*` entram no **build**, não em tempo de execução: mudar uma URL exige um build novo. O `Dockerfile` tem três estágios:
+
+- `builder` (node): `npm ci` e `npm run build`. Cada `VITE_*` é um `ARG` sem valor padrão, então um `--build-arg` vence o `.env` copiado com o código e, quando não é passado, o `.env` vale. `VITE_BASE_PATH` tem padrão `/simcc/`.
+- `export` (`scratch`): só o `dist/`. É o que o `deploy-obs.yaml` usa (`docker build --target export --output type=local,dest=./dist .`), com as URLs de produção como `--build-arg`; o servidor serve essa pasta em `/simcc/`.
+- `runtime` (nginx, estágio padrão): serve o app sob o basepath, com fallback de SPA para o `index.html` (F5 em rota profunda), cache imutável em `assets/` e `no-cache` no resto. A configuração está em `nginx/default.conf.template`. O `compose.yaml` sobe esse estágio na porta 7004, a do legado.
+
 ## Estilo
 
 O tema do design kit (`design-kit/tokens/tailwind.css`) é importado em `src/app/styles.css`, que também liga as variáveis do shadcn aos papéis do kit. As regras visuais estão em `design-kit/DESIGN.md`. Para importar arquivos do kit no código, use o alias `@kit/` (ex.: `@kit/assets/logo/simcc.svg`).

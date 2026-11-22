@@ -20,13 +20,9 @@ vi.stubEnv('VITE_IDP_URL', 'https://api.test/idp/');
 const { createAdminClient } = await import('@/api/admin');
 const { base64UrlEncode, createIdpClient, readPkceTransaction } =
   await import('@/api/idp');
-const {
-  AccessDeniedPage,
-  AuthCallbackPage,
-  createSessionStore,
-  requireAdmin,
-  useSession,
-} = await import('./index');
+const { AccessDeniedPage, AuthCallbackPage } = await import('./index');
+const { createSessionStore, requireAdmin, useSession } =
+  await import('@/entities/session');
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -62,7 +58,14 @@ function createHarness({
   });
   const adminClient = createAdminClient({
     baseUrl: 'https://api.test/simcc/admin/',
-    fetch: adminFetch,
+    // O cliente tipado entrega um `Request`; os mocks leem URL e cabeçalhos.
+    fetch: (input, init) =>
+      input instanceof Request
+        ? adminFetch(input.url, {
+            method: input.method,
+            headers: input.headers,
+          })
+        : adminFetch(input, init),
     getAccessToken: () => idpClient.getAccessToken(),
     hasRefreshToken: () => idpClient.hasRefreshToken(),
     refreshAccessToken: (failed) =>
@@ -377,14 +380,14 @@ describe('sessionStore e useSession', () => {
     await session.handleCallback({ code: 'c1', state });
 
     await expect(
-      adminClient.request('/etl/runs', { method: 'POST' }),
+      adminClient.api().POST('/etl/runs', { body: { force: false } }),
     ).rejects.toMatchObject({ status: 502 });
     expect(session.getSnapshot().isAuthenticated).toBe(true);
     expect(session.hasTokensInMemory()).toBe(true);
     expect(navigateExternal).not.toHaveBeenCalled();
 
     // Agora uma chamada retorna 401 e o refresh falha (invalid_grant) -> retoma com prompt=none
-    await expect(adminClient.request('/admins')).rejects.toBeInstanceOf(
+    await expect(adminClient.api().GET('/admins')).rejects.toBeInstanceOf(
       ApiError,
     );
     expect(session.getSnapshot().status).toBe('anonymous');

@@ -1,40 +1,33 @@
-import { z } from 'zod';
+import createClient, { type Client, type Middleware } from 'openapi-fetch';
 import { env } from '@/config/env';
 import {
   ApiError,
   apiErrorFromResponse,
   clientErrorCodes,
   isAbortError,
+  isApiError,
   networkError,
 } from './errors';
+import type { components, paths } from './generated/simcc-admin';
 import { idp } from './idp';
+import { unwrap } from './simcc';
 
-// Cliente da API administrativa (`simcc-admin`).
+// Cliente da API administrativa (`simcc-admin`), tipado pelo OpenAPI dela
+// (`src/api/generated/simcc-admin.d.ts`, gerado por `npm run api:types`).
 //
-// Envia `Authorization: Bearer <token>` exclusivamente para `env.adminApiUrl`,
-// normaliza erros `{ detail }` do FastAPI em `ApiError` e trata 401 (renovação
-// em fila única + 1 repetição), 403 (acesso negado) e 502/504 (erro de ação
-// sem derrubar a sessão). Veja ADR 0008.
+// - Envia `Authorization: Bearer <token>` só para `env.adminApiUrl`.
+// - 401: renova pela fila única do IdP e repete a chamada uma vez; se falhar
+//   de novo, avisa a sessão (`onAuthFailure`), que retoma com `prompt=none`.
+// - 403: avisa a sessão (`onForbidden`), que passa a mostrar "sem acesso".
+// - 502/504: erro da ação, sem derrubar a sessão nem limpar tokens.
+// - Erros `{ detail }` do FastAPI viram `ApiError` (ADR 0003 e 0008).
 
-export const adminUserSchema = z.object({
-  sub: z.string().min(1),
-  name: z
-    .string()
-    .nullish()
-    .transform((v) => v ?? null),
-  email: z
-    .string()
-    .nullish()
-    .transform((v) => v ?? null),
-});
+export type AdminSchemas = components['schemas'];
+export type AdminPaths = paths;
 
-export const adminMeSchema = z.object({
-  user: adminUserSchema,
-  is_admin: z.boolean(),
-});
-
-export type AdminUser = z.infer<typeof adminUserSchema>;
-export type AdminMeResponse = z.infer<typeof adminMeSchema>;
+/** Identidade devolvida por `GET /me`. */
+export type AdminUser = AdminSchemas['MeUser'];
+export type AdminMeResponse = AdminSchemas['MeResponse'];
 
 export interface AdminClientOptions {
   baseUrl?: string;
@@ -43,10 +36,7 @@ export interface AdminClientOptions {
   hasRefreshToken?: () => boolean;
   refreshAccessToken: (failedAccessToken?: string) => Promise<string>;
   onAuthFailure?: () => void;
-}
-
-export interface AdminRequestOptions extends Omit<RequestInit, 'headers'> {
-  headers?: HeadersInit;
+  onForbidden?: () => void;
 }
 
 export function isAdminApiConfigured(
@@ -59,6 +49,14 @@ function normalizeTrailingSlash(url: string): string {
   return url.endsWith('/') ? url : `${url}/`;
 }
 
+function notConfiguredError() {
+  return new ApiError({
+    status: 0,
+    code: 'admin_api_not_configured',
+    message: 'A API administrativa (VITE_ADMIN_API_URL) não está configurada.',
+  });
+}
+
 /**
  * Resolve o caminho contra a URL base da API de admin e garante que o token
  * jamais saia para outro host ou prefixo de caminho.
@@ -68,16 +66,10 @@ export function resolveAdminUrl(
   path: string,
 ): string {
   if (!isAdminApiConfigured(baseUrl)) {
-    throw new ApiError({
-      status: 0,
-      code: 'admin_api_not_configured',
-      message:
-        'A API administrativa (VITE_ADMIN_API_URL) não está configurada.',
-    });
+    throw notConfiguredError();
   }
 
-  const normalizedBase = normalizeTrailingSlash(baseUrl);
-  const base = new URL(normalizedBase);
+  const base = new URL(normalizeTrailingSlash(baseUrl));
   const trimmed = path.trim();
 
   if (trimmed.startsWith('//')) {
@@ -118,7 +110,10 @@ const hasBody = (response: Response) =>
 const GENERIC_SERVER_MESSAGE =
   'O servidor não conseguiu responder. Tente de novo mais tarde.';
 
-async function normalizeAdminError(response: Response): Promise<ApiError> {
+/** Normaliza a resposta de erro, com mensagens próprias para 502/504 sem corpo. */
+export async function normalizeAdminError(
+  response: Response,
+): Promise<ApiError> {
   const error = await apiErrorFromResponse(response);
 
   if (response.status === 502 && error.message === GENERIC_SERVER_MESSAGE) {
@@ -149,128 +144,122 @@ export function createAdminClient(options: AdminClientOptions) {
   const fetchFn =
     options.fetch ?? ((...args: Parameters<typeof fetch>) => fetch(...args));
   let authFailureHandler = options.onAuthFailure;
+  let forbiddenHandler = options.onForbidden;
 
-  function notifyAuthFailure() {
-    authFailureHandler?.();
-  }
-
-  async function executeFetch(
-    url: string,
+  async function sendWithToken(
+    request: Request,
     token: string,
-    init: AdminRequestOptions,
   ): Promise<Response> {
-    const headers = new Headers(init.headers);
+    const headers = new Headers(request.headers);
     headers.set('Authorization', `Bearer ${token}`);
-    if (!headers.has('Accept')) {
-      headers.set('Accept', 'application/json');
-    }
-
+    if (!headers.has('Accept')) headers.set('Accept', 'application/json');
     try {
-      return await fetchFn(url, {
-        ...init,
-        headers,
-      });
+      return await fetchFn(new Request(request, { headers }));
     } catch (error) {
       if (isAbortError(error)) throw error;
       throw networkError(error);
     }
   }
 
-  async function request<T>(
-    path: string,
-    init: AdminRequestOptions = {},
-  ): Promise<T> {
-    const url = resolveAdminUrl(getBaseUrl(), path);
-
-    let token = options.getAccessToken();
-    if (!token) {
-      if (options.hasRefreshToken?.()) {
-        try {
-          token = await options.refreshAccessToken();
-        } catch (error) {
-          if (!isAbortError(error)) {
-            notifyAuthFailure();
-          }
-          throw error;
-        }
-      } else {
-        notifyAuthFailure();
-        throw new ApiError({
-          status: 401,
-          code: clientErrorCodes.unauthorized,
-          message: 'Sessão não autenticada.',
-        });
-      }
-    }
-
-    let response = await executeFetch(url, token, init);
-
-    if (response.status === 401) {
-      let nextToken: string;
+  async function obtainToken(): Promise<string> {
+    const token = options.getAccessToken();
+    if (token) return token;
+    if (options.hasRefreshToken?.()) {
       try {
-        nextToken = await options.refreshAccessToken(token);
+        return await options.refreshAccessToken();
       } catch (error) {
-        if (!isAbortError(error)) {
-          notifyAuthFailure();
-        }
+        if (!isAbortError(error)) authFailureHandler?.();
         throw error;
       }
+    }
+    authFailureHandler?.();
+    throw new ApiError({
+      status: 401,
+      code: clientErrorCodes.unauthorized,
+      message: 'Sessão não autenticada.',
+    });
+  }
 
-      response = await executeFetch(url, nextToken, init);
+  /**
+   * `fetch` entregue ao `openapi-fetch`: confere o destino, injeta o Bearer e
+   * faz a renovação com uma única repetição em 401.
+   */
+  async function authorizedFetch(request: Request): Promise<Response> {
+    resolveAdminUrl(getBaseUrl(), request.url);
+    const retryRequest = request.clone();
 
-      if (response.status === 401) {
-        notifyAuthFailure();
+    const token = await obtainToken();
+    let response = await sendWithToken(request, token);
+    if (response.status !== 401) return response;
+
+    let nextToken: string;
+    try {
+      nextToken = await options.refreshAccessToken(token);
+    } catch (error) {
+      if (!isAbortError(error)) authFailureHandler?.();
+      throw error;
+    }
+
+    response = await sendWithToken(retryRequest, nextToken);
+    if (response.status === 401) authFailureHandler?.();
+    return response;
+  }
+
+  const errorMiddleware: Middleware = {
+    async onResponse({ response, options: requestOptions }) {
+      if (!response.ok) {
+        if (response.status === 403) forbiddenHandler?.();
         throw await normalizeAdminError(response);
       }
-    }
+      if (
+        requestOptions.parseAs === 'json' &&
+        hasBody(response) &&
+        !isJsonContentType(response)
+      ) {
+        throw new ApiError({
+          status: response.status,
+          code: clientErrorCodes.invalidResponse,
+          message: 'A API administrativa respondeu num formato inesperado.',
+        });
+      }
+      return undefined;
+    },
+    onError({ error }) {
+      if (isAbortError(error) || isApiError(error)) return undefined;
+      return networkError(error);
+    },
+  };
 
-    if (!response.ok) {
-      throw await normalizeAdminError(response);
-    }
+  let cached: { baseUrl: string; client: Client<paths> } | null = null;
 
-    if (!hasBody(response)) {
-      return undefined as T;
-    }
-
-    if (!isJsonContentType(response)) {
-      throw new ApiError({
-        status: response.status,
-        code: clientErrorCodes.invalidResponse,
-        message: 'A API administrativa respondeu num formato inesperado.',
+  /** Cliente `openapi-fetch` tipado pelo OpenAPI da API de admin. */
+  function api(): Client<paths> {
+    const baseUrl = getBaseUrl();
+    if (!isAdminApiConfigured(baseUrl)) throw notConfiguredError();
+    if (cached?.baseUrl !== baseUrl) {
+      const client = createClient<paths>({
+        baseUrl: normalizeTrailingSlash(baseUrl).replace(/\/$/, ''),
+        fetch: authorizedFetch,
       });
+      client.use(errorMiddleware);
+      cached = { baseUrl, client };
     }
-
-    try {
-      return (await response.json()) as T;
-    } catch (error) {
-      throw new ApiError({
-        status: response.status,
-        code: clientErrorCodes.invalidResponse,
-        message: 'Não foi possível ler a resposta JSON da API administrativa.',
-        cause: error,
-      });
-    }
+    return cached.client;
   }
 
   async function fetchMe(signal?: AbortSignal): Promise<AdminMeResponse> {
-    const data = await request<unknown>('me', { method: 'GET', signal });
-    const parsed = adminMeSchema.safeParse(data);
-    if (!parsed.success) {
-      throw new ApiError({
-        status: 200,
-        code: clientErrorCodes.invalidResponse,
-        message: 'Formato inválido na resposta de /me da API administrativa.',
-      });
-    }
-    return parsed.data;
+    return unwrap(api().GET('/me', { signal }));
   }
 
   return {
     isConfigured: () => isAdminApiConfigured(getBaseUrl()),
-    request,
+    api,
     fetchMe,
     setAuthFailureHandler(handler: (() => void) | undefined) {
       authFailureHandler = handler;
+    },
+    setForbiddenHandler(handler: (() => void) | undefined) {
+      forbiddenHandler = handler;
     },
   };
 }
@@ -284,4 +273,17 @@ export const admin = createAdminClient({
     idp.refreshAccessToken({ failedAccessToken }),
 });
 
+/** Atalho para o cliente tipado da instância única: `adminApi().GET('/admins')`. */
+export const adminApi = () => admin.api();
+
 export const fetchMe = (signal?: AbortSignal) => admin.fetchMe(signal);
+
+/**
+ * Para chamadas sem corpo de resposta (ex.: `DELETE` com `204`): o
+ * middleware já rejeitou os erros, então só falta descartar o resultado.
+ */
+export async function unwrapEmpty(
+  request: Promise<{ response: Response }>,
+): Promise<void> {
+  await request;
+}

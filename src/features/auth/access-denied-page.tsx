@@ -1,6 +1,20 @@
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { Home, LogIn, LogOut, ShieldAlert } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  Copy,
+  LogIn,
+  LogOut,
+  ShieldAlert,
+} from 'lucide-react';
+import { toast } from 'sonner';
 import { sanitizeReturnTo } from '@/api/idp';
+import {
+  type SessionStore,
+  sessionStore,
+  useSession,
+} from '@/entities/session';
 import { Button } from '@/shared/ui/button';
 import {
   Card,
@@ -9,8 +23,6 @@ import {
   CardHeader,
 } from '@/shared/ui/card';
 import { AuthShell } from './auth-shell';
-import { type SessionStore, sessionStore } from './session-store';
-import { useSession } from './use-session';
 
 export interface AccessDeniedPageProps {
   from?: string;
@@ -18,10 +30,60 @@ export interface AccessDeniedPageProps {
   session?: SessionStore;
 }
 
+async function copyText(text: string): Promise<boolean> {
+  try {
+    if (!navigator.clipboard?.writeText) return false;
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function SubField({ sub }: { sub: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    const ok = await copyText(sub);
+    if (ok) {
+      setCopied(true);
+      toast.success('Sub copiado.');
+    } else {
+      toast.error('Não foi possível copiar. Selecione o texto e copie.');
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <p className="text-xs font-medium text-foreground">Seu sub no IdP</p>
+      <div className="flex items-center gap-2 rounded-md border bg-card py-1 pr-1 pl-3">
+        <code
+          data-testid="session-sub"
+          className="min-w-0 flex-1 font-mono text-xs break-all text-foreground select-all"
+        >
+          {sub}
+        </code>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={copied ? 'Sub copiado' : 'Copiar sub'}
+          onClick={() => void handleCopy()}
+        >
+          {copied ? <Check aria-hidden /> : <Copy aria-hidden />}
+        </Button>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Envie este identificador a um administrador do Simcc para pedir acesso.
+      </p>
+    </div>
+  );
+}
+
 /**
- * Tela de "sem acesso" exibida quando o usuário está autenticado no IdP mas
- * não possui `is_admin` em `GET <admin>/me`, ou quando o login não está
- * configurado no ambiente.
+ * Tela de "sem acesso": o usuário está autenticado no IdP, mas
+ * `GET <admin>/me` diz que não é admin (ou a API respondeu 403). Também cobre
+ * o ambiente sem login configurado.
  */
 export function AccessDeniedPage({
   from,
@@ -32,14 +94,16 @@ export function AccessDeniedPage({
     useSession(session);
   const safeFrom = sanitizeReturnTo(from ?? '/');
 
-  const accountLabel = user?.name || user?.email || user?.sub || null;
+  const accountLabel = user?.name || user?.email || null;
   const showSecondaryEmail =
     Boolean(user?.name) && Boolean(user?.email) && user?.name !== user?.email;
 
   const description =
     reason === 'idp_unconfigured'
       ? 'A autenticação administrativa não está configurada neste ambiente.'
-      : 'Sua conta está autenticada, mas não possui permissão de administrador para acessar o console do Simcc.';
+      : isAuthenticated
+        ? 'Sua conta está autenticada, mas não tem permissão de administrador no console do Simcc.'
+        : 'O console do Simcc é restrito a administradores. Entre com uma conta que tenha permissão.';
 
   return (
     <AuthShell>
@@ -64,11 +128,15 @@ export function AccessDeniedPage({
             </div>
           )}
 
+          {isAuthenticated && user?.sub && reason !== 'idp_unconfigured' && (
+            <SubField sub={user.sub} />
+          )}
+
           <div className="flex flex-wrap items-center gap-3">
             <Button asChild>
               <Link to="/">
-                <Home aria-hidden />
-                Página inicial
+                <ArrowLeft aria-hidden />
+                Voltar ao observatório
               </Link>
             </Button>
 

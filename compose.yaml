@@ -1,11 +1,17 @@
+# Sobe o estágio `runtime` do Dockerfile (nginx) na porta 7004 do host, a mesma
+# do legado. O app fica em http://<host>:7004/simcc/.
+#
+# As variáveis VITE_* são lidas no BUILD, não em tempo de execução: vêm do
+# .env copiado com o código (ver .env.example). O basepath fica fixo em
+# /simcc/ para que um VITE_BASE_PATH=/ de desenvolvimento no .env não vaze.
 services:
   simcc-client:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runtime
       args:
-        VITE_BASE_PATH: ${VITE_BASE_PATH:-/}
+        VITE_BASE_PATH: /simcc/
     restart: unless-stopped
-    env_file: ./.env
     ports:
       - "7004:80"

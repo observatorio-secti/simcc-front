@@ -3,13 +3,14 @@
 Única camada que faz requisições HTTP (o lint bloqueia `fetch` fora daqui). Pode importar `shared/` e `config/`.
 
 - `generated/simcc-v2.d.ts`: tipos gerados do OpenAPI da v2 (`npm run api:types`, lê `<VITE_SIMCC_API_URL>v2/openapi.json`). Não edite à mão; o arquivo é commitado.
+- `generated/simcc-admin.d.ts`: tipos gerados do OpenAPI da API de admin (`npm run api:types`, lê `<VITE_ADMIN_API_URL>openapi.json`). `npm run api:types -- admin` gera só esse. Para uma API nova, acrescente uma entrada na lista `specs` de `scripts/api-types.mjs`.
 - `simcc.ts`: cliente `openapi-fetch` da v2 (`simcc`), com o middleware de erro, e o helper `unwrap`.
 - `errors.ts`: `ApiError`, a normalização dos formatos de erro e o middleware.
 - `types.ts`: helpers de tipo sobre o contrato gerado (envelopes de lista e de detalhe, query e parâmetros de caminho).
 - `oda/`: cliente e adaptador da API ODA (grupos de pesquisa), com schema zod na borda (tarefa E5).
 - `idp.ts`: fluxo PKCE com o IdP (tarefa F1.4). O IdP só autentica.
 - `maria.ts`: API da MarIA (`VITE_MARIA_API_URL`), com tipos em `generated/maria.d.ts` (`npm run api:types -- maria`). Usa só `/conversations/{id}`, as mensagens e o stream SSE (`parseSse`); a listagem `GET /conversations` traz as conversas de todo mundo e não é usada (tarefa T10).
-- `admin.ts`: API de admin, com o token do IdP. Permissões (`/me`) e ações do ETL; o front não chama o ETL ([ADR 0008](../../docs/decisoes/0008-autenticacao.md)).
+- `admin.ts`: API de admin, com o token do IdP. Cliente `openapi-fetch` tipado por `simcc-admin.d.ts` (`adminApi().GET('/admins')`), com renovação em 401, aviso de 403 à sessão e erros `{ detail }` como `ApiError`. Permissões (`/me`), admins, cadastro acadêmico e ações do ETL; o front não chama o ETL ([ADR 0008](../../docs/decisoes/0008-autenticacao.md)).
 
 Componentes não importam daqui diretamente: quem chama a API são as `queries.ts` de cada entidade.
 

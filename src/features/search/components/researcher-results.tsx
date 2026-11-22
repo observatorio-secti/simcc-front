@@ -12,7 +12,7 @@ import {
   type SortSelection,
 } from '@/shared/ui/sort-select';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/ui/toggle-group';
-import { isPlainLeftClick } from '../researcher-links';
+import { isPlainLeftClick } from '@/shared/lib/plain-click';
 import type { ResolvedSort, ResultsViewMode } from '../results-search';
 import type { SearchType } from '../search-schema';
 import { ResultsEmpty, ResultsError } from './result-states';

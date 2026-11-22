@@ -1,6 +1,7 @@
 export { HomePage, type HomePageProps } from './home-page';
 export { listingTabToSearchTab } from './listing-tabs';
 export { prefetchSearchResults } from './results-prefetch';
+export { interceptResearcherLink } from './researcher-links';
 export { SearchResultsPage, type SearchResultsPageProps } from './results-page';
 export {
   activeTab,

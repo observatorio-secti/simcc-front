@@ -12,6 +12,7 @@ import {
 } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { RequestHandler } from 'msw';
+import { sessionStore, type SessionStore } from '@/entities/session';
 import { routeTree as appRouteTree } from '@/routeTree.gen';
 import { server } from './msw/server';
 
@@ -44,6 +45,8 @@ export interface RenderRouteOptions<
   basepath?: string;
   /** Aguarda `router.load()` antes de montar a árvore (padrão `true`). */
   awaitLoad?: boolean;
+  /** Store de sessão do contexto do router; padrão: a store única do app. */
+  session?: SessionStore;
 }
 
 export interface RenderRouteResult<
@@ -59,10 +62,11 @@ function createMemoryRouter<TRouteTree extends AnyRoute>(
   queryClient: QueryClient,
   routeTree: TRouteTree,
   basepath: string,
+  session: SessionStore,
 ) {
   return createRouter({
     routeTree,
-    context: { queryClient },
+    context: { queryClient, session },
     history: createMemoryHistory({ initialEntries: [initialUrl] }),
     basepath,
     defaultPreload: 'intent',
@@ -86,6 +90,7 @@ export async function renderRoute<
     routeTree = appRouteTree as TRouteTree,
     basepath = import.meta.env.BASE_URL.replace(/\/$/, '') || '/',
     awaitLoad = true,
+    session = sessionStore,
     ...renderOptions
   } = options;
 
@@ -98,6 +103,7 @@ export async function renderRoute<
     queryClient,
     routeTree,
     basepath,
+    session,
   );
 
   if (awaitLoad) {

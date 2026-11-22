@@ -4,7 +4,7 @@ Guia de referência para a reestruturação das telas públicas do Simcc (Observ
 O objetivo é **manter a estética que já existe** (moldura neutra, azul `eng-blue`, tipografia Lexend, cards brancos sem sombra, cores semânticas fortes) e torná-la **uniforme entre telas**.
 
 > Escopo: rotas do `SearchLayout` e do `DocsLayout` (home, resultados, pesquisador, instituições, pós-graduação, grupos, indicadores, institutos, listagens, docs…).
-> Fora do escopo: o Console administrativo (`/console/*`). No legado ele usava tokens próprios `sm-*` (navy/sky/red); o console novo é uma tarefa do roadmap (`docs/roadmap.md`), que decide se adota este kit. O kit público usa `--sc-*` / classes `sc-*` / cores `brand`, `search`, `area`, `prod`, `qualis`…
+> O Console administrativo (`/console/*`) também usa este kit (decisão da T12, 2026-11-22): mesma moldura, menu lateral próprio e nenhum token `sm-*` do legado. O kit usa `--sc-*` / classes `sc-*` / cores `brand`, `search`, `area`, `prod`, `qualis`, `run`…
 
 ## Conteúdo do kit
 
@@ -135,7 +135,7 @@ Todos estão em `tokens.json`, como variável `--sc-*` e como cor Tailwind no te
 
 **Orientação** (`orient-*`): IC `#8BFBD3` · Mestrado `#67A896` · Doutorado `#425450` · TCC `#77D2B6` · Outra natureza `#577E74` · Monografia `#2F7F7C` · Pós-doc `#46724B`.
 
-**Status**: Concluída `#6BC26B` · Em andamento `#DBB540`. **Bolsas**: PQ `#00D000` · DT `#183EFF`. **Gênero**: F `#D15697` · M `#5F82ED`. **Escala neutra para gráficos**: `#213E59 → #98A8BA` (6 passos).
+**Status**: Concluída `#6BC26B` · Em andamento `#DBB540`. **Estado de execução** (`run-*`, ETL no console; sempre com rótulo, como dot ou borda): Sucesso `#16A34A` · Falha `#EF4444` · Em execução `#559FB8` · Na fila `#F59E0B`. **Bolsas**: PQ `#00D000` · DT `#183EFF`. **Gênero**: F `#D15697` · M `#5F82ED`. **Escala neutra para gráficos**: `#213E59 → #98A8BA` (6 passos).
 
 A página `/dicionario-cores` é a documentação pública desses dicionários. Ela deve ler de `tokens.json`, e não manter uma cópia própria.
 

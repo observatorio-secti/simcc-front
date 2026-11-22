@@ -1,15 +1,18 @@
 import {
   AArrowUp,
+  ArrowLeft,
   BarChart3,
   Building2,
   Download,
   GraduationCap,
   Home,
   Landmark,
+  LayoutDashboard,
   Link2,
   MoreHorizontal,
   PanelsTopLeft,
   SearchCheck,
+  ShieldCheck,
   Sparkles,
   Users,
   Wrench,
@@ -23,6 +26,8 @@ export type NavItem = {
   title: string;
   url: string;
   icon: LucideIcon;
+  /** Ativo só na própria URL, sem as subrotas (ex.: `/console`). */
+  exact?: boolean;
 };
 
 export type NavSection = {
@@ -80,6 +85,29 @@ export const PLATFORM_NAV_SECTIONS: readonly NavSection[] = [
   },
 ];
 
+/**
+ * Menu do console (`/console/*`). Pesquisadores, Instituições, Coleções e
+ * Sincronização entram quando as rotas da T12.2 e da T12.3 existirem: o
+ * `Link` tipado do router não aceita rota que ainda não existe, e o `href`
+ * solto levaria ao 404.
+ */
+export const CONSOLE_NAV_ITEMS: readonly NavItem[] = [
+  {
+    title: 'Visão geral',
+    url: '/console',
+    icon: LayoutDashboard,
+    exact: true,
+  },
+  { title: 'Administradores', url: '/console/admins', icon: ShieldCheck },
+];
+
+export const CONSOLE_BACK_ITEM: NavItem = {
+  title: 'Voltar ao observatório',
+  url: '/',
+  icon: ArrowLeft,
+  exact: true,
+};
+
 function normalizePath(path: string): string {
   const withoutQuery = path.split(/[?#]/)[0] ?? '/';
   if (withoutQuery.length > 1) {
@@ -92,12 +120,16 @@ function normalizePath(path: string): string {
  * Regra única de item ativo na navegação lateral: a raiz exige igualdade exata;
  * as demais rotas ativam também suas subrotas (ex.: `/instituicoes/ufba`).
  */
-export function isActive(url: string, pathname: string): boolean {
+export function isActive(
+  url: string,
+  pathname: string,
+  options: { exact?: boolean } = {},
+): boolean {
   const normalizedUrl = normalizePath(url);
   const normalizedPathname = normalizePath(pathname);
 
-  if (normalizedUrl === '/') {
-    return normalizedPathname === '/';
+  if (normalizedUrl === '/' || options.exact) {
+    return normalizedPathname === normalizedUrl;
   }
 
   return (
