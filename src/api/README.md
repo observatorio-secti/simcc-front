@@ -58,6 +58,6 @@ type ResearcherDetail = DetailData<'/researcher/{researcher_id}'>;
 type ResearcherSearch = QueryOf<'/researcher'>;
 ```
 
-`ListPath` são as rotas de lista paginada (`{ data, pagination, filters_applied, sort, meta, facets }`) e `DetailPath` as de detalhe (`{ data, meta }`). As listas curtas (`/suggestion`, `/researcher/{researcher_id}/terms`, `/metrics/production/{kind}`, `/analytics`) não têm paginação e ficam fora das duas; use `ResponseOf<P>`.
+`ListPath` são as rotas de lista paginada (`{ data, pagination, filters_applied, sort, meta, facets }`) e `DetailPath` as de detalhe (`{ data, meta }`). As listas curtas (`/suggestion`, `/researcher/{researcher_id}/terms`, `/metrics/production/{kind}`, `/analytics`, `/analytics/pages`) não têm paginação e ficam fora das duas; use `ResponseOf<P>`.
 
-Não use os campos marcados `@deprecated` no tipo gerado (`researcher_id`, `image`): use `id` e `image_url`.
+Os campos `deprecated` (`researcher_id` e `image` do pesquisador) saíram do contrato na virada (V4.1): use `id` e `image_url`. Se o backend marcar outro campo como `@deprecated`, não o use.

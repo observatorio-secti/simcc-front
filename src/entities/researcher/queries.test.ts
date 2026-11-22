@@ -102,10 +102,8 @@ describe('researcherDetailQueryOptions', () => {
       jsonResponse({
         data: {
           id: 'res-1',
-          researcher_id: 'res-1',
           name: 'Helena Duarte Ramos',
           image_url: 'http://api.test/v2/researcher/res-1/image',
-          image: '',
           affiliations: [],
           identifiers: { lattes_id: '123' },
           graduate_programs: [],

@@ -106,6 +106,34 @@ describe('Rota /busca (T2)', () => {
     });
   }, 15000);
 
+  it.each([
+    ['name', 'name', 'com o nome contendo'],
+    ['abstract', 'abstract', 'com o resumo contendo'],
+  ] as const)(
+    'busca do tipo %s envia search_in=%s a /v2/researcher',
+    async (type, searchIn, caption) => {
+      const researchers = captureList('/researcher');
+      const { findByText } = await renderRoute(`/busca?q=silva&type=${type}`, {
+        handlers: [researchers.handler],
+      });
+
+      expect(await findByText('Total de pesquisadores')).toBeInTheDocument();
+      expect(await findByText(caption)).toBeInTheDocument();
+      await waitFor(() => {
+        expect(researchers.calls.length).toBeGreaterThan(0);
+      });
+      for (const params of researchers.calls) {
+        expect(params.get('q')).toBe('silva');
+        expect(params.get('search_in')).toBe(searchIn);
+        expect(params.has('source_type')).toBe(false);
+      }
+      expect(researchers.calls.at(-1)!.getAll('facets')).not.toContain(
+        'source_type',
+      );
+    },
+    15000,
+  );
+
   it('sem termo lista o catálogo da aba, ordenado por nome', async () => {
     const researchers = captureList('/researcher');
     const { findByText, queryByText } = await renderRoute('/busca', {

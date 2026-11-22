@@ -203,6 +203,31 @@ const OTHER_SAMPLES: Array<
       platform_authors: AUTHORS,
     },
   },
+  {
+    kind: 'magazine_text',
+    item: {
+      id: 'mtx-1',
+      title: 'Robôs autônomos ajudam a monitorar a costa baiana',
+      year: 2024,
+      nature: 'JORNAL_DE_NOTICIAS',
+      language: 'Português',
+      means_divulgation: 'IMPRESSO',
+      platform_authors: [AUTHORS[0]!],
+    },
+  },
+  {
+    kind: 'event_work',
+    item: {
+      id: 'evw-1',
+      title:
+        'Detecção de anomalias térmicas em subestações com visão computacional',
+      year: 2023,
+      nature: 'COMPLETO',
+      event_name: 'Simpósio Brasileiro de Sistemas Elétricos',
+      event_classification: 'NACIONAL',
+      platform_authors: AUTHORS,
+    },
+  },
 ];
 
 const DETAIL_EXAMPLES: {
@@ -343,6 +368,41 @@ const DETAIL_EXAMPLES: {
     financing: 'SECTI-BA',
     platform_authors: AUTHORS,
   },
+  magazine_text: {
+    id: 'mtx-1',
+    title: 'Robôs autônomos ajudam a monitorar a costa baiana',
+    year: 2024,
+    nature: 'JORNAL_DE_NOTICIAS',
+    language: 'Português',
+    means_divulgation: 'IMPRESSO',
+    title_en: 'Autonomous robots help monitor the Bahia coast',
+    homepage: 'https://www.example.org/noticias/robos-costa',
+    relevance: false,
+    scientific_divulgation: true,
+    all_authors_raw: 'RAMOS, H. D.',
+    platform_authors: [AUTHORS[0]!],
+  },
+  event_work: {
+    id: 'evw-1',
+    title:
+      'Detecção de anomalias térmicas em subestações com visão computacional',
+    year: 2023,
+    nature: 'COMPLETO',
+    event_name: 'Simpósio Brasileiro de Sistemas Elétricos',
+    event_classification: 'NACIONAL',
+    event_city: 'Salvador',
+    event_year: 2023,
+    proceedings_title: 'Anais do Simpósio Brasileiro de Sistemas Elétricos',
+    volume: '1',
+    start_page: '210',
+    end_page: '216',
+    publisher_name: 'SBA',
+    isbn: '978-65-00000-00-0',
+    language: 'Português',
+    relevance: true,
+    all_authors_raw: 'RAMOS, H. D.; BARRETO, C. M.',
+    platform_authors: AUTHORS,
+  },
 };
 
 export function ProductionShowcase() {
@@ -352,7 +412,7 @@ export function ProductionShowcase() {
     <Showcase
       id="producao"
       title="Produção (E2)"
-      description="Registro dos 10 tipos da v2, ProductionCard (sc-prod sem sombra, borda esquerda de 6px por Qualis/tipo/natureza/status e cores claras apenas como marcador) e ProductionDetail."
+      description="Registro dos 12 tipos da v2, ProductionCard (sc-prod sem sombra, borda esquerda de 6px por Qualis/tipo/natureza/status e cores claras apenas como marcador) e ProductionDetail."
       bare
     >
       <div className="flex flex-col gap-6">
@@ -369,7 +429,7 @@ export function ProductionShowcase() {
           </div>
         </Demo>
 
-        <Demo label="Demais 9 tipos — livro, capítulo (clara), software, patente, evento (Congresso e Oficina clara), projeto, marca, orientação (IC clara) e relatório">
+        <Demo label="Demais 11 tipos — livro, capítulo (clara), software, patente, evento (Congresso e Oficina clara), projeto, marca, orientação (IC clara), relatório, texto em revista (clara) e trabalho em evento">
           <div className="grid w-full gap-4 md:grid-cols-2 lg:grid-cols-3">
             {OTHER_SAMPLES.map(({ kind, item }) => (
               <ProductionCard

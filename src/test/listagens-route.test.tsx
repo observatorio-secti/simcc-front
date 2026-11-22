@@ -36,13 +36,52 @@ const qualisFacet: FacetResult = {
   items: [
     { value: 'A1', label: 'A1', count: 30, acronym: null, selected: false },
     { value: 'B2', label: 'B2', count: 10, acronym: null, selected: false },
+    {
+      value: 'not_rated',
+      label: 'not_rated',
+      count: 25,
+      acronym: null,
+      selected: false,
+    },
+  ],
+};
+
+const institutionFacet: FacetResult = {
+  param: 'institution_id',
+  total: 1,
+  items: [
+    {
+      value: 'inst-ufba',
+      label: 'Universidade Federal da Bahia',
+      count: 222,
+      acronym: 'UFBA',
+      selected: false,
+    },
+  ],
+};
+
+const programFacet: FacetResult = {
+  param: 'graduate_program_id',
+  total: 1,
+  items: [
+    {
+      value: 'prog-quimica',
+      label: 'QUÍMICA',
+      count: 17,
+      acronym: null,
+      selected: false,
+    },
   ],
 };
 
 /** Registra as chamadas a uma listagem da v2 e responde com a fixture e as facetas. */
 function captureList(
-  path: '/scholarship' | '/magazine',
-  facets: Record<string, FacetResult>,
+  path:
+    | '/scholarship'
+    | '/magazine'
+    | '/production/magazine-text'
+    | '/production/event-work',
+  facets: Record<string, FacetResult> = {},
 ) {
   const calls: URLSearchParams[] = [];
   const handler = http.get(simccV2Url(path), ({ request }) => {
@@ -73,18 +112,29 @@ describe('Listagens: /busca sem termo (D1.4)', () => {
       'Marcas',
       'Orientações',
       'Relatórios técnicos',
+      'Textos em revista',
+      'Trabalhos em eventos',
       'Revistas',
     ]);
   }, 15000);
 
   it('troca para bolsistas com o motor da F1.5 e filtra por faceta', async () => {
     const scholarships = captureList('/scholarship', {
+      institution: institutionFacet,
+      graduate_program: programFacet,
       modality: modalityFacet,
     });
-    const { container, findByRole, findByText, findAllByRole, router, user } =
-      await renderRoute('/busca?page=2', {
-        handlers: [scholarships.handler],
-      });
+    const {
+      container,
+      findByRole,
+      findByText,
+      findAllByText,
+      findAllByRole,
+      router,
+      user,
+    } = await renderRoute('/busca?page=2', {
+      handlers: [scholarships.handler],
+    });
 
     const tablist = await findByRole('tablist', { name: 'Visão do resultado' });
     await user.click(within(tablist).getByRole('tab', { name: 'Bolsistas' }));
@@ -107,9 +157,47 @@ describe('Listagens: /busca sem termo (D1.4)', () => {
 
     const first = scholarships.calls.at(-1)!;
     expect(first.get('sort_by')).toBe('researcher_name');
-    expect(first.getAll('facets')).toEqual(['modality', 'category_level']);
+    expect(first.getAll('facets')).toEqual([
+      'institution',
+      'graduate_program',
+      'modality',
+      'category_level',
+    ]);
+    expect(Number(first.get('facet_limit'))).toBeLessThanOrEqual(100);
     expect(first.has('q')).toBe(false);
 
+    // Facetas de instituição e programa (V4.1), com o `param` da v2.
+    expect((await findAllByText('Instituições')).length).toBeGreaterThan(0);
+    expect(
+      (await findAllByText('Programas de pós-graduação')).length,
+    ).toBeGreaterThan(0);
+    const [institutionBox] = await findAllByRole('checkbox', {
+      name: /Universidade Federal da Bahia/,
+    });
+    await user.click(institutionBox!);
+    await waitFor(() => {
+      expect(scholarships.calls.at(-1)!.getAll('institution_id')).toEqual([
+        'inst-ufba',
+      ]);
+    });
+    // Só a primeira seção (e as com filtro) abre por padrão.
+    const [programSection] = await findAllByRole('button', {
+      name: /Programas de pós-graduação/,
+    });
+    await user.click(programSection!);
+    const [programBox] = await findAllByRole('checkbox', { name: /Química/ });
+    await user.click(programBox!);
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({
+        institution_id: ['inst-ufba'],
+        graduate_program_id: ['prog-quimica'],
+      });
+    });
+
+    const [modalitySection] = await findAllByRole('button', {
+      name: /Bolsas de produtividade/,
+    });
+    await user.click(modalitySection!);
     const [checkbox] = await findAllByRole('checkbox', {
       name: /Produtividade em Pesquisa - 2/,
     });
@@ -117,6 +205,8 @@ describe('Listagens: /busca sem termo (D1.4)', () => {
     await waitFor(() => {
       expect(router.state.location.search).toMatchObject({
         tab: 'scholarships',
+        institution_id: ['inst-ufba'],
+        graduate_program_id: ['prog-quimica'],
         modality: ['Produtividade em Pesquisa - 2'],
       });
     });
@@ -162,6 +252,58 @@ describe('Listagens: /busca sem termo (D1.4)', () => {
     });
   }, 20000);
 
+  it('filtra revistas sem estrato (not_rated) com rótulo do kit', async () => {
+    const magazines = captureList('/magazine', { qualis: qualisFacet });
+    const { container, findAllByRole, findByText, router, user } =
+      await renderRoute('/busca?tab=magazines', {
+        handlers: [magazines.handler],
+      });
+
+    expect(await findByText('Total de revistas')).toBeInTheDocument();
+    const [checkbox] = await findAllByRole('checkbox', {
+      name: /Sem estrato/,
+    });
+    // O marcador usa a cor SQ do kit, via design-tokens.
+    expect(container.querySelector('[class*="bg-qualis-SQ"]')).not.toBeNull();
+    await user.click(checkbox!);
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({
+        tab: 'magazines',
+        qualis: ['not_rated'],
+      });
+    });
+    await waitFor(() => {
+      expect(magazines.calls.at(-1)!.getAll('qualis')).toEqual(['not_rated']);
+    });
+  }, 20000);
+
+  it.each([
+    ['Textos em revista', 'magazine_texts', '/production/magazine-text'],
+    ['Trabalhos em eventos', 'event_works', '/production/event-work'],
+  ] as const)(
+    'abre a aba %s com a rota nova da v2',
+    async (label, tabId, path) => {
+      const list = captureList(path);
+      const { container, findByRole, router, user } = await renderRoute(
+        '/busca',
+        { handlers: [list.handler] },
+      );
+      const tablist = await findByRole('tablist', {
+        name: 'Visão do resultado',
+      });
+      await user.click(within(tablist).getByRole('tab', { name: label }));
+      await waitFor(() => {
+        expect(router.state.location.search).toMatchObject({ tab: tabId });
+      });
+      const item = v2Fixtures[path].data[0]!;
+      await waitFor(() => {
+        expect(container).toHaveTextContent(item.title);
+      });
+      expect(list.calls.at(-1)!.get('sort_by')).toBe('year');
+    },
+    20000,
+  );
+
   it('com termo, bolsistas e revistas saem das abas', async () => {
     const { findByRole } = await renderRoute('/busca?q=solos&tab=magazines');
     const tablist = await findByRole('tablist', { name: 'Visão do resultado' });
@@ -197,4 +339,19 @@ describe('Rota /listagens (D1.4)', () => {
       tab: 'scholarships',
     });
   }, 15000);
+
+  it.each([
+    ['texto-revista', 'magazine_texts'],
+    ['work-event', 'event_works'],
+  ] as const)(
+    'traduz a aba legada %s para %s',
+    async (legacy, tab) => {
+      const { router } = await renderRoute(`/listagens?tab=${legacy}`);
+      await waitFor(() => {
+        expect(router.state.location.pathname).toBe('/busca');
+      });
+      expect(router.state.location.search).toMatchObject({ tab });
+    },
+    15000,
+  );
 });

@@ -25,10 +25,8 @@ const SAMPLE_PORTRAIT_URL =
 
 const HELENA_RESEARCHER: ResearcherSummary = {
   id: '00000000-0000-4000-8000-000000000001',
-  researcher_id: '00000000-0000-4000-8000-000000000001',
   name: 'Helena Duarte Ramos',
   image_url: SAMPLE_PORTRAIT_URL,
-  image: '',
   graduation: 'Pós-Doutorado',
   classification: 'A',
   affiliations: [
@@ -46,10 +44,8 @@ const HELENA_RESEARCHER: ResearcherSummary = {
 
 const CAIO_RESEARCHER: ResearcherSummary = {
   id: '00000000-0000-4000-8000-000000000002',
-  researcher_id: '00000000-0000-4000-8000-000000000002',
   name: 'Caio Menezes Barreto',
   image_url: '',
-  image: '',
   graduation: 'Doutorado',
   classification: 'B+',
   affiliations: [
@@ -67,10 +63,8 @@ const CAIO_RESEARCHER: ResearcherSummary = {
 
 const JULIA_RESEARCHER: ResearcherSummary = {
   id: '00000000-0000-4000-8000-000000000003',
-  researcher_id: '00000000-0000-4000-8000-000000000003',
   name: 'Júlia Andrade Souto',
   image_url: '',
-  image: '',
   graduation: 'Doutorado',
   classification: null,
   affiliations: [
@@ -94,10 +88,8 @@ const JULIA_RESEARCHER: ResearcherSummary = {
 
 const RAFAEL_RESEARCHER: ResearcherSummary = {
   id: '00000000-0000-4000-8000-000000000004',
-  researcher_id: '00000000-0000-4000-8000-000000000004',
   name: 'Rafael Nunes Prado',
   image_url: SAMPLE_PORTRAIT_URL,
-  image: '',
   graduation: 'Mestrado',
   classification: 'A+',
   affiliations: [
@@ -114,10 +106,8 @@ const RAFAEL_RESEARCHER: ResearcherSummary = {
 
 const SAMPLE_DETAIL: ResearcherDetail = {
   id: '00000000-0000-4000-8000-000000000001',
-  researcher_id: '00000000-0000-4000-8000-000000000001',
   name: 'Helena Duarte Ramos',
   image_url: SAMPLE_PORTRAIT_URL,
-  image: '',
   graduation: 'Pós-Doutorado',
   classification: 'A',
   lattes_update: '2026-10-22T03:00:00Z',

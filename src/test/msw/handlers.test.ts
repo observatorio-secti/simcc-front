@@ -73,6 +73,7 @@ describe('MSW da API v2', () => {
     const id = '00000000-0000-4000-8000-000000000001';
     const calls = [
       unwrap(simcc.GET('/analytics')),
+      unwrap(simcc.GET('/analytics/pages')),
       unwrap(simcc.GET('/researcher')),
       unwrap(
         simcc.GET('/researcher/{researcher_id}', {
@@ -151,6 +152,18 @@ describe('MSW da API v2', () => {
           params: { path: { item_id: id } },
         }),
       ),
+      unwrap(simcc.GET('/production/magazine-text')),
+      unwrap(
+        simcc.GET('/production/magazine-text/{item_id}', {
+          params: { path: { item_id: id } },
+        }),
+      ),
+      unwrap(simcc.GET('/production/event-work')),
+      unwrap(
+        simcc.GET('/production/event-work/{item_id}', {
+          params: { path: { item_id: id } },
+        }),
+      ),
       unwrap(simcc.GET('/suggestion', { params: { query: { q: 'redes' } } })),
       unwrap(simcc.GET('/magazine')),
       unwrap(
@@ -174,6 +187,8 @@ describe('MSW da API v2', () => {
     expect(calls).toHaveLength(Object.keys(v2Fixtures).length);
     const results = await Promise.all(calls);
     for (const body of results) {
+      // `/analytics/pages` é a única rota sem `meta` no contrato.
+      if ('total' in body && !('meta' in body)) continue;
       expect(body).toHaveProperty('meta', openApiMeta);
     }
   });

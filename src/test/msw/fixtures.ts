@@ -5,23 +5,9 @@ import rawExamples from './openapi-examples.json';
 // combinadas com os 5 exemplos reais extraídos de `/v2/openapi.json`
 // (`openapi-examples.json`).
 //
-// `ResearcherSummary` e `ResearcherDetail` ainda marcam os campos `@deprecated`
-// (`researcher_id`, `image`) como obrigatórios no schema até a Virada (Fase 4).
-// O front novo lê apenas `id` e `image_url`; omitimos os campos legados aqui
-// para que os testes falhem se algum código voltar a depender deles.
-type DeprecatedResearcherField = 'researcher_id' | 'image';
-
-type WithoutDeprecated<T> = Omit<T, DeprecatedResearcherField>;
-
-export type ModernResponse<P extends GetPath> = P extends '/researcher'
-  ? Omit<ResponseOf<'/researcher'>, 'data'> & {
-      data: WithoutDeprecated<Schema<'ResearcherSummary'>>[];
-    }
-  : P extends '/researcher/{researcher_id}'
-    ? Omit<ResponseOf<'/researcher/{researcher_id}'>, 'data'> & {
-        data: WithoutDeprecated<Schema<'ResearcherDetail'>>;
-      }
-    : ResponseOf<P>;
+// Os campos `deprecated` da v2 (`researcher_id`, `image`) saíram do contrato
+// na virada (V4.1): as fixtures seguem o schema gerado sem exceções.
+export type ModernResponse<P extends GetPath> = ResponseOf<P>;
 
 export type V2JsonPath = Exclude<GetPath, '/researcher/{researcher_id}/image'>;
 
@@ -141,7 +127,7 @@ function makeDetailResponse<Data>(data: Data) {
   };
 }
 
-const researcherSummary: WithoutDeprecated<Schema<'ResearcherSummary'>> = {
+const researcherSummary: Schema<'ResearcherSummary'> = {
   id: researcherRef.id,
   name: researcherRef.name,
   image_url: `https://observatoriocti.secti.ba.gov.br/simcc/api/v2/researcher/${researcherRef.id}/image`,
@@ -173,7 +159,7 @@ const researcherSummary: WithoutDeprecated<Schema<'ResearcherSummary'>> = {
   },
 };
 
-const researcherDetail: WithoutDeprecated<Schema<'ResearcherDetail'>> = {
+const researcherDetail: Schema<'ResearcherDetail'> = {
   id: researcherSummary.id,
   name: researcherSummary.name,
   image_url: researcherSummary.image_url,
@@ -446,6 +432,47 @@ const reportDetail: Schema<'ReportDetail'> = {
   financing: 'SECTI-BA',
 };
 
+const magazineTextSummary: Schema<'MagazineTextSummary'> = {
+  id: '11111111-2222-4333-8444-555555555560',
+  title: 'Sensores de baixo custo chegam às lavouras do sul da Bahia',
+  year: 2024,
+  nature: 'JORNAL_DE_NOTICIAS',
+  language: 'Português',
+  means_divulgation: 'IMPRESSO',
+  platform_authors: [researcherRef],
+  matches: null,
+};
+
+const magazineTextDetail: Schema<'MagazineTextDetail'> = {
+  ...magazineTextSummary,
+  title_en: 'Low-cost sensors reach farms in southern Bahia',
+  homepage: 'https://www.example.org/noticias/sensores',
+  relevance: false,
+  scientific_divulgation: true,
+  all_authors_raw: 'SILVA, A. M.',
+};
+
+const eventWorkSummary: Schema<'EventWorkSummary'> = {
+  id: '11111111-2222-4333-8444-555555555561',
+  title: 'Classificação de solos tropicais com aprendizado profundo',
+  year: 2023,
+  nature: 'COMPLETO',
+  event_name: 'Congresso Brasileiro de Ciência do Solo',
+  event_classification: 'NACIONAL',
+  platform_authors: [researcherRef],
+  matches: null,
+};
+
+const eventWorkDetail: Schema<'EventWorkDetail'> = {
+  ...eventWorkSummary,
+  event_city: 'Florianópolis',
+  event_year: 2023,
+  proceedings_title: 'Anais do Congresso Brasileiro de Ciência do Solo',
+  start_page: '45',
+  end_page: '48',
+  all_authors_raw: 'SILVA, A. M.',
+};
+
 const institutionDetail: Schema<'InstitutionDetail'> = {
   id: institutionRef.id,
   name: institutionRef.name,
@@ -544,7 +571,14 @@ export const v2Fixtures: V2Fixtures = {
     },
     meta: openApiMeta,
   },
-  '/researcher': makeListResponse([researcherSummary], {}),
+  '/analytics/pages': {
+    data: [
+      { page_path: '/busca', page_views: 920 },
+      { page_path: '/pesquisadores', page_views: 610 },
+    ],
+    total: 2,
+  },
+  '/researcher': makeListResponse([researcherSummary], { search_in: 'all' }),
   '/researcher/{researcher_id}': makeDetailResponse(researcherDetail),
   '/institution': makeListResponse([institutionRef], {}, null),
   '/institution/{institution_id}': makeDetailResponse(institutionDetail),
@@ -576,6 +610,10 @@ export const v2Fixtures: V2Fixtures = {
   '/production/guidance/{item_id}': makeDetailResponse(guidanceDetail),
   '/production/report': makeListResponse([reportSummary], {}),
   '/production/report/{item_id}': makeDetailResponse(reportDetail),
+  '/production/magazine-text': makeListResponse([magazineTextSummary], {}),
+  '/production/magazine-text/{item_id}': makeDetailResponse(magazineTextDetail),
+  '/production/event-work': makeListResponse([eventWorkSummary], {}),
+  '/production/event-work/{item_id}': makeDetailResponse(eventWorkDetail),
   '/suggestion': {
     data: [
       {

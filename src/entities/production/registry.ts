@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  BookOpenText,
   CodeXml,
   Copyright,
   FileSpreadsheet,
@@ -8,6 +9,7 @@ import {
   GraduationCap,
   Lightbulb,
   Presentation,
+  ScrollText,
   type LucideIcon,
 } from 'lucide-react';
 import {
@@ -24,12 +26,14 @@ import {
   doiUrl,
   formatAuthorsList,
   formatJcr,
+  formatLattesLabel,
   formatNatureLabel,
   formatPageRange,
   formatProjectStudents,
   formatQualisDetail,
   formatStatusLabel,
   formatYearRange,
+  formatYesNo,
   safeHttpUrl,
   type ProductionDetail,
   type ProductionItem,
@@ -148,7 +152,7 @@ function yearOrNull(year: number | null | undefined): string | null {
 }
 
 /**
- * Registro único dos 10 tipos de produção da API v2.
+ * Registro único dos 12 tipos de produção da API v2.
  * Sem exportação CSV (ADR 0006).
  */
 export const PRODUCTION_REGISTRY: {
@@ -492,6 +496,120 @@ export const PRODUCTION_REGISTRY: {
       { label: 'Financiamento', value: item.financing },
     ],
   }),
+
+  magazine_text: define<'magazine_text'>({
+    kind: 'magazine_text',
+    title: 'Textos em revista',
+    noun: ['texto em jornal ou revista', 'textos em jornal ou revista'],
+    icon: BookOpenText,
+    color: productionColor('magazine_text'),
+    itemColor: () => productionColor('magazine_text'),
+    sortOptions: ['relevance', 'year', 'title'],
+    itemTitle: (item) => item.title,
+    subtitle: (item) => formatLattesLabel(item.nature),
+    yearLabel: (item) => yearOrNull(item.year),
+    tags: (item) =>
+      presentTags([
+        formatLattesLabel(item.means_divulgation),
+        formatLattesLabel(item.language),
+      ]),
+    externalLinks: (item) => {
+      const links: ProductionExternalLink[] = [];
+      if ('homepage' in item) {
+        addExternalLink(links, 'Página do texto', item.homepage);
+      }
+      return links;
+    },
+    details: (item) => [
+      { label: 'Natureza', value: formatLattesLabel(item.nature) },
+      { label: 'Título em inglês', value: item.title_en },
+      { label: 'Idioma', value: formatLattesLabel(item.language) },
+      {
+        label: 'Meio de divulgação',
+        value: formatLattesLabel(item.means_divulgation),
+      },
+      {
+        label: 'Divulgação científica',
+        value: formatYesNo(item.scientific_divulgation),
+      },
+      { label: 'Produção relevante', value: formatYesNo(item.relevance) },
+      {
+        label: 'Autores',
+        value: formatAuthorsList(null, item.all_authors_raw),
+      },
+      {
+        label: 'Página do texto',
+        value: item.homepage,
+        href: safeHttpUrl(item.homepage) ?? undefined,
+      },
+    ],
+  }),
+
+  event_work: define<'event_work'>({
+    kind: 'event_work',
+    title: 'Trabalhos em eventos',
+    noun: ['trabalho em evento', 'trabalhos em eventos'],
+    icon: ScrollText,
+    color: productionColor('event_work'),
+    itemColor: () => productionColor('event_work'),
+    sortOptions: ['relevance', 'year', 'title'],
+    itemTitle: (item) => item.title,
+    subtitle: (item) => item.event_name ?? null,
+    yearLabel: (item) => yearOrNull(item.year),
+    tags: (item) =>
+      presentTags([
+        formatLattesLabel(item.nature),
+        formatLattesLabel(item.event_classification),
+      ]),
+    externalLinks: (item) => {
+      const links: ProductionExternalLink[] = [];
+      if ('homepage' in item) {
+        addExternalLink(links, 'Página do trabalho', item.homepage);
+      }
+      return links;
+    },
+    details: (item) => [
+      { label: 'Evento', value: item.event_name },
+      {
+        label: 'Classificação do evento',
+        value: formatLattesLabel(item.event_classification),
+      },
+      { label: 'Cidade do evento', value: item.event_city },
+      { label: 'Ano do evento', value: item.event_year },
+      { label: 'Natureza', value: formatLattesLabel(item.nature) },
+      { label: 'Anais', value: item.proceedings_title },
+      { label: 'Volume', value: item.volume },
+      { label: 'Fascículo', value: item.issue },
+      { label: 'Série', value: item.series },
+      {
+        label: 'Páginas',
+        value: formatPageRange(item.start_page, item.end_page),
+      },
+      { label: 'Editora', value: item.publisher_name },
+      { label: 'Cidade da editora', value: item.publisher_city },
+      { label: 'ISBN', value: item.isbn },
+      { label: 'Título em inglês', value: item.title_en },
+      { label: 'Idioma', value: formatLattesLabel(item.language) },
+      {
+        label: 'Meio de divulgação',
+        value: formatLattesLabel(item.means_divulgation),
+      },
+      {
+        label: 'Divulgação científica',
+        value: formatYesNo(item.scientific_divulgation),
+      },
+      { label: 'Produção relevante', value: formatYesNo(item.relevance) },
+      {
+        label: 'Autores',
+        value: formatAuthorsList(null, item.all_authors_raw),
+      },
+      {
+        label: 'Página do trabalho',
+        value: item.homepage,
+        href: safeHttpUrl(item.homepage) ?? undefined,
+      },
+    ],
+  }),
 };
 
 /** Acessa a definição de um tipo com inferência preservada. */
@@ -542,4 +660,6 @@ export const MATCH_FIELD_LABELS: Record<string, string> = {
   oriented: 'Orientando',
   project_name: 'Projeto',
   financing: 'Financiamento',
+  means_divulgation: 'Meio de divulgação',
+  proceedings_title: 'Anais',
 };

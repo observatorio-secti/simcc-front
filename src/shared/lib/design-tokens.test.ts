@@ -9,6 +9,7 @@ import {
   ORIENTATION_COLORS,
   PRODUCTION_COLORS,
   QUALIS_COLORS,
+  QUALIS_STATUS_COLORS,
   SCHOLARSHIP_COLORS,
   SEARCH_TYPE_COLORS,
   STATUS_COLORS,
@@ -23,7 +24,9 @@ import {
   orientationKey,
   productionKey,
   qualisColor,
+  qualisFacetColor,
   qualisKey,
+  qualisStatusKey,
   scholarshipKey,
   searchTypeColor,
   searchTypeKey,
@@ -176,6 +179,21 @@ describe('qualisKey', () => {
     expect(qualisKey('SQ')).toBe('SQ');
   });
 
+  it('not_rated vira "Sem estrato" na faceta, com a cor SQ do kit', () => {
+    expect(qualisStatusKey('not_rated')).toBe('not_rated');
+    expect(qualisStatusKey('A1')).toBeNull();
+    expect(qualisFacetColor('not_rated')).toMatchObject({
+      label: 'Sem estrato',
+      bg: QUALIS_COLORS.SQ.bg,
+    });
+    expect(qualisFacetColor('not_applicable').label).toBe('Não se aplica');
+    for (const entry of Object.values(QUALIS_STATUS_COLORS)) {
+      expect(entry.text).toBe(QUALIS_COLORS.SQ.text);
+      expect(entry.borderLeft).toBe(QUALIS_COLORS.SQ.borderLeft);
+    }
+    expect(qualisFacetColor('A2')).toBe(QUALIS_COLORS.A2);
+  });
+
   it('B5 ainda não tem cor no kit', () => {
     expect(qualisKey('B5')).toBeNull();
     expect(qualisColor('B5')).toBe(FALLBACK_COLOR);
@@ -192,6 +210,9 @@ describe('productionKey', () => {
     expect(productionKey('software')).toBe('software');
     expect(productionKey('brand')).toBe('marca');
     expect(productionKey('report')).toBe('relatorio');
+    expect(productionKey('magazine_text')).toBe('texto-revista');
+    expect(productionKey('magazine-text')).toBe('texto-revista');
+    expect(productionKey('event_work')).toBe('trabalho-evento');
   });
 
   it('aceita a chave do kit', () => {

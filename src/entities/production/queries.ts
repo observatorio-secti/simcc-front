@@ -47,6 +47,12 @@ const LIST_FETCHERS: ListFetcherMap = {
     unwrap(simcc.GET('/production/guidance', { params: { query }, signal })),
   report: (query, signal) =>
     unwrap(simcc.GET('/production/report', { params: { query }, signal })),
+  magazine_text: (query, signal) =>
+    unwrap(
+      simcc.GET('/production/magazine-text', { params: { query }, signal }),
+    ),
+  event_work: (query, signal) =>
+    unwrap(simcc.GET('/production/event-work', { params: { query }, signal })),
 };
 
 const DETAIL_FETCHERS: DetailFetcherMap = {
@@ -116,6 +122,20 @@ const DETAIL_FETCHERS: DetailFetcherMap = {
   report: (item_id, signal) =>
     unwrap(
       simcc.GET('/production/report/{item_id}', {
+        params: { path: { item_id } },
+        signal,
+      }),
+    ),
+  magazine_text: (item_id, signal) =>
+    unwrap(
+      simcc.GET('/production/magazine-text/{item_id}', {
+        params: { path: { item_id } },
+        signal,
+      }),
+    ),
+  event_work: (item_id, signal) =>
+    unwrap(
+      simcc.GET('/production/event-work/{item_id}', {
         params: { path: { item_id } },
         signal,
       }),

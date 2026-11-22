@@ -24,8 +24,8 @@ import {
 } from './model';
 
 describe('tipos derivados do contrato OpenAPI v2', () => {
-  it('cobre exatamente os 10 tipos de produção da v2', () => {
-    expect(PRODUCTION_KINDS).toHaveLength(10);
+  it('cobre exatamente os 12 tipos de produção da v2', () => {
+    expect(PRODUCTION_KINDS).toHaveLength(12);
     expectTypeOf<
       (typeof PRODUCTION_KINDS)[number]
     >().toEqualTypeOf<ProductionKind>();
@@ -63,6 +63,18 @@ describe('tipos derivados do contrato OpenAPI v2', () => {
     expectTypeOf<ProductionSummaryByKind['report']>().toEqualTypeOf<
       ListItem<'/production/report'>
     >();
+    expectTypeOf<ProductionSummaryByKind['magazine_text']>().toEqualTypeOf<
+      Schemas['MagazineTextSummary']
+    >();
+    expectTypeOf<ProductionSummaryByKind['event_work']>().toEqualTypeOf<
+      Schemas['EventWorkSummary']
+    >();
+    expectTypeOf<ProductionDetailByKind['magazine_text']>().toEqualTypeOf<
+      DetailData<'/production/magazine-text/{item_id}'>
+    >();
+    expectTypeOf<ProductionDetailByKind['event_work']>().toEqualTypeOf<
+      Schemas['EventWorkDetail']
+    >();
 
     expectTypeOf<ProductionDetailByKind['article']>().toEqualTypeOf<
       DetailData<'/production/article/{article_id}'>
@@ -93,6 +105,8 @@ describe('helpers do modelo de produção', () => {
       'research_project',
     );
     expect(normalizeProductionKind(' guidance ')).toBe('guidance');
+    expect(normalizeProductionKind('magazine-text')).toBe('magazine_text');
+    expect(normalizeProductionKind('event-work')).toBe('event_work');
     expect(normalizeProductionKind('unknown')).toBeNull();
     expect(normalizeProductionKind(null)).toBeNull();
   });

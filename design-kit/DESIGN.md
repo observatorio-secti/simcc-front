@@ -129,9 +129,9 @@ Todos estão em `tokens.json`, como variável `--sc-*` e como cor Tailwind no te
 
 **Grande área** (`area-*`): Agrárias `#F87171` · Exatas e da Terra `#4ADE80` · Saúde `#20BDBE` · Humanas `#F5831F` · Biológicas `#EB008B` · Engenharias `#FCB712` · Sociais Aplicadas `#009245` · Linguística, Letras e Artes `#A67C52` · Outros `#1B1464`.
 
-**Produção** (`prod-*`): Artigo `#5F82ED` · Livro+capítulo `#D15697` · Livro `#792F4C` · Capítulo `#DBAFD0` · Patente `#66B4D0` · Software `#096670` · Marca `#1B1464` · Relatório técnico `#662D91` · Congresso/Evento `#FF5800` · Simpósio `#D53A2C` · Seminário `#FFBD7B` · Oficina `#FCEE21`.
+**Produção** (`prod-*`): Artigo `#5F82ED` · Livro+capítulo `#D15697` · Livro `#792F4C` · Capítulo `#DBAFD0` · Patente `#66B4D0` · Software `#096670` · Marca `#1B1464` · Relatório técnico `#662D91` · Congresso/Evento `#FF5800` · Simpósio `#D53A2C` · Seminário `#FFBD7B` · Oficina `#FCEE21` · Texto em jornal ou revista `#E9A700` · Trabalho em evento `#DE2834`.
 
-**Qualis** (`qualis-*`): A1 `#34663C` · A2 `#9DC356` · A3 `#B1C38A` · A4 `#BEC4B3` · B1 `#D56438` · B2 `#DD883D` · B3 `#E3B081` · B4 `#E3AC96` · C `#CE3830` · SQ `#4A1314`.
+**Qualis** (`qualis-*`): A1 `#34663C` · A2 `#9DC356` · A3 `#B1C38A` · A4 `#BEC4B3` · B1 `#D56438` · B2 `#DD883D` · B3 `#E3B081` · B4 `#E3AC96` · C `#CE3830` · SQ `#4A1314` (também "Sem estrato", `not_rated`).
 
 **Orientação** (`orient-*`): IC `#8BFBD3` · Mestrado `#67A896` · Doutorado `#425450` · TCC `#77D2B6` · Outra natureza `#577E74` · Monografia `#2F7F7C` · Pós-doc `#46724B`.
 
@@ -141,7 +141,7 @@ A página `/dicionario-cores` é a documentação pública desses dicionários. 
 
 ### 2.4 Regras de cor
 
-- Texto sobre cor de dicionário é **branco e bold** (badge sólido). Para cores claras (`area-exatas`, `qualis-A3/A4`, `prod-capitulo`, `orient-ic`, `prod-oficina`) prefira usá-las como **marcador** (`sc-dot`, borda esquerda, barra) e não como fundo de texto.
+- Texto sobre cor de dicionário é **branco e bold** (badge sólido). Para cores claras (`area-exatas`, `qualis-A3/A4`, `prod-capitulo`, `orient-ic`, `prod-oficina`, `prod-texto-revista`) prefira usá-las como **marcador** (`sc-dot`, borda esquerda, barra) e não como fundo de texto.
 - Não use hex literal em componente (`bg-[#20BDBE]`). Use a classe do tema (`bg-area-saude`) ou uma função de mapeamento única (ver `reference/components.md` §Mapeamentos).
 - Gráficos: série única usa a cor do dicionário correspondente; série sem semântica usa `chart-neutral-1…6`; nunca a paleta padrão do Recharts/Highcharts.
 
