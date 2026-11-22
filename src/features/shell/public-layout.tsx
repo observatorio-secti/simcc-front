@@ -28,8 +28,8 @@ export function PublicLayout({
   mobileNavDescription,
 }: PublicLayoutProps) {
   const isMobile = useIsMobile();
-  const { pathname } = useLocation();
-  const prevPathnameRef = useRef(pathname);
+  const { pathname, searchStr } = useLocation();
+  const prevLocationRef = useRef({ pathname, searchStr });
   const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -53,14 +53,27 @@ export function PublicLayout({
   }, []);
 
   useEffect(() => {
-    const prevPathname = prevPathnameRef.current;
-    prevPathnameRef.current = pathname;
+    const prev = prevLocationRef.current;
+    prevLocationRef.current = { pathname, searchStr };
 
-    if (prevPathname !== '/' && pathname === '/') {
+    if (prev.pathname !== '/' && pathname === '/') {
       setCollapsed(false);
       writeSidebarCollapsed(false);
+      return;
     }
-  }, [pathname]);
+
+    if (pathname !== '/busca') return;
+
+    const prevQuery = new URLSearchParams(prev.searchStr).get('q')?.trim() ?? '';
+    const nextQuery = new URLSearchParams(searchStr).get('q')?.trim() ?? '';
+    const enteredBusca = prev.pathname !== '/busca';
+    const searchedAgainOnBusca = Boolean(nextQuery && nextQuery !== prevQuery);
+
+    if (enteredBusca || searchedAgainOnBusca) {
+      setCollapsed(true);
+      writeSidebarCollapsed(true);
+    }
+  }, [pathname, searchStr]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia?.(MOBILE_MEDIA_QUERY);
