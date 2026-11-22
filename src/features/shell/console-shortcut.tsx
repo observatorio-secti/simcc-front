@@ -1,28 +1,71 @@
 import { Link } from '@tanstack/react-router';
-import { ShieldCheck } from 'lucide-react';
+import { LogIn, LogOut, ShieldCheck } from 'lucide-react';
 import { useSession } from '@/entities/session';
 import { Button } from '@/shared/ui/button';
 
 /**
- * Atalho "Console" da topbar pública: só aparece para quem tem `is_admin`
- * (lido de `GET <admin>/me`, nunca do token). Anônimo e logado sem permissão
- * não veem o botão.
+ * Ações da topbar pública: atalho "Console" (visível para visitantes anônimos
+ * e administradores; oculto para usuário autenticado sem `is_admin`) e botão
+ * de autenticação ("Entrar" quando anônimo com IdP configurado, ou conta + "Sair"
+ * quando autenticado).
  */
 export function ConsoleShortcut() {
-  const { isAuthenticated, isAdmin } = useSession();
-  if (!isAuthenticated || !isAdmin) return null;
+  const { isAuthenticated, isAdmin, isIdpConfigured, user, login, logout } =
+    useSession();
+  const showConsole = !isAuthenticated || isAdmin;
+  const label = user?.name || user?.email || user?.sub;
 
   return (
-    <Button
-      asChild
-      variant="outline"
-      size="sm"
-      className="h-8 px-2.5 text-xs font-medium"
-    >
-      <Link to="/console">
-        <ShieldCheck aria-hidden />
-        <span className="sr-only sm:not-sr-only">Console</span>
-      </Link>
-    </Button>
+    <div className="flex min-w-0 items-center gap-2">
+      {showConsole && (
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="h-8 px-2.5 text-xs font-medium"
+        >
+          <Link to="/console">
+            <ShieldCheck aria-hidden />
+            <span className="sr-only sm:not-sr-only">Console</span>
+          </Link>
+        </Button>
+      )}
+
+      {isAuthenticated ? (
+        <>
+          {label && (
+            <span
+              className="hidden max-w-48 truncate text-xs text-muted-foreground md:inline"
+              title={user?.email ?? undefined}
+            >
+              {label}
+            </span>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8 px-2.5 text-xs font-medium"
+            onClick={() => logout()}
+          >
+            <LogOut aria-hidden />
+            <span className="sr-only sm:not-sr-only">Sair</span>
+          </Button>
+        </>
+      ) : (
+        isIdpConfigured && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8 px-2.5 text-xs font-medium"
+            onClick={() => void login()}
+          >
+            <LogIn aria-hidden />
+            <span className="sr-only sm:not-sr-only">Entrar</span>
+          </Button>
+        )
+      )}
+    </div>
   );
 }

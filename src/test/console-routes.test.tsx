@@ -329,15 +329,18 @@ describe('administradores (/console/admins)', () => {
 });
 
 describe('atalho "Console" na topbar pública', () => {
-  it('não aparece para visitante anônimo', async () => {
+  it('aparece para visitante anônimo junto com o botão Entrar e leva ao console', async () => {
     await renderRoute('/incites');
     await screen.findByRole('heading', { level: 1 });
     expect(
-      screen.queryByRole('link', { name: 'Console' }),
-    ).not.toBeInTheDocument();
+      await screen.findByRole('link', { name: 'Console' }),
+    ).toHaveAttribute('href', '/console');
+    expect(
+      screen.getByRole('button', { name: 'Entrar' }),
+    ).toBeInTheDocument();
   });
 
-  it('não aparece para logado sem is_admin', async () => {
+  it('não aparece para logado sem is_admin, mas exibe Sair', async () => {
     await signIn([
       http.get(adminUrl('me'), () =>
         HttpResponse.json({
@@ -352,9 +355,10 @@ describe('atalho "Console" na topbar pública', () => {
     expect(
       screen.queryByRole('link', { name: 'Console' }),
     ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument();
   });
 
-  it('aparece para admin e leva ao console', async () => {
+  it('aparece para admin junto com Sair e leva ao console', async () => {
     await signIn();
     await sessionStore.ensureSession();
     await renderRoute('/incites');
@@ -362,5 +366,6 @@ describe('atalho "Console" na topbar pública', () => {
     expect(
       await screen.findByRole('link', { name: 'Console' }),
     ).toHaveAttribute('href', '/console');
+    expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument();
   });
 });
