@@ -76,7 +76,7 @@ export function ResearcherProfilePage({
     data: termsResponse,
     isLoading: termsLoading,
     isError: termsError,
-  } = useQuery(researcherTermsQueryOptions(researcherId, { limit: 25 }));
+  } = useQuery(researcherTermsQueryOptions(researcherId, { limit: 18 }));
 
   const { data: scholarshipsResponse } = useQuery(
     researcherScholarshipsQueryOptions(researcherId),
