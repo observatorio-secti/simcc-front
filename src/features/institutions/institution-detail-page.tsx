@@ -54,6 +54,26 @@ export interface InstitutionDetailPageProps {
   search: InstitutionDetailSearch;
 }
 
+function InstitutionCover({ cover }: { cover?: string | null }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const src = cover?.trim() ? cover.trim() : null;
+  const showCover = src !== null && failedUrl !== src;
+
+  return (
+    <div className="h-24 bg-neutral-100 sm:h-32 dark:bg-neutral-800">
+      {showCover && (
+        <img
+          src={src}
+          alt=""
+          aria-hidden
+          onError={() => setFailedUrl(src)}
+          className="size-full object-cover"
+        />
+      )}
+    </div>
+  );
+}
+
 function InstitutionAvatar({
   institution,
 }: {
@@ -357,16 +377,7 @@ export function InstitutionDetailPage({
       </div>
 
       <Card className="overflow-hidden">
-        <div className="h-24 bg-neutral-100 sm:h-32 dark:bg-neutral-800">
-          {institution.cover && (
-            <img
-              src={institution.cover}
-              alt=""
-              aria-hidden
-              className="size-full object-cover"
-            />
-          )}
-        </div>
+        <InstitutionCover cover={institution.cover} />
         <CardContent className="relative pt-0">
           <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end">
             <InstitutionAvatar institution={institution} />
