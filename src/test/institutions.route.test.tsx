@@ -187,11 +187,10 @@ describe('Rotas de instituições (T4)', () => {
       screen.queryByRole('tab', { name: 'Painel' }),
     ).not.toBeInTheDocument();
 
-    // Sigla aparece no cabeçalho (acima do nome), mas não no card lateral "Informações gerais"
-    const aside = screen.getByRole('complementary', {
-      name: 'Informações gerais',
-    });
-    expect(aside).not.toHaveTextContent('Sigla');
+    // Sigla aparece no cabeçalho (acima do nome), sem card lateral redundante
+    expect(
+      screen.queryByRole('complementary', { name: 'Informações gerais' }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('UESC')).toBeInTheDocument();
 
     const articlesTab = await screen.findByRole('tab', {

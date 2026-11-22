@@ -433,57 +433,55 @@ export function InstitutionDetailPage({
         </CardContent>
       </Card>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="flex min-w-0 flex-col gap-6">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+        <StatCard
+          title="Pesquisadores"
+          value={researchersCount}
+          caption="vinculados à instituição"
+          icon={Users}
+        />
+        <StatCard
+          title="Programas de pós-graduação"
+          value={programsCount}
+          caption="ofertados pela instituição"
+          icon={GraduationCap}
+        />
+        <ScholarshipBreakdownTooltip breakdown={scholarshipsBreakdown}>
+          <div
+            tabIndex={scholarshipsBreakdown.length > 0 ? 0 : undefined}
+            aria-label={
+              scholarshipsBreakdown.length > 0
+                ? `Bolsistas de produtividade: ${formatInstitutionCount(scholarshipHoldersCount)}. Passe o mouse ou foque para ver o detalhamento por tipo.`
+                : undefined
+            }
+            className={cn(
+              'rounded-xl',
+              scholarshipsBreakdown.length > 0 && focusRing,
+            )}
+          >
             <StatCard
-              title="Pesquisadores"
-              value={researchersCount}
-              caption="vinculados à instituição"
-              icon={Users}
-            />
-            <StatCard
-              title="Programas de pós-graduação"
-              value={programsCount}
-              caption="ofertados pela instituição"
-              icon={GraduationCap}
-            />
-            <ScholarshipBreakdownTooltip breakdown={scholarshipsBreakdown}>
-              <div
-                tabIndex={scholarshipsBreakdown.length > 0 ? 0 : undefined}
-                aria-label={
-                  scholarshipsBreakdown.length > 0
-                    ? `Bolsistas de produtividade: ${formatInstitutionCount(scholarshipHoldersCount)}. Passe o mouse ou foque para ver o detalhamento por tipo.`
-                    : undefined
-                }
-                className={cn(
-                  'rounded-xl',
-                  scholarshipsBreakdown.length > 0 && focusRing,
-                )}
-              >
-                <StatCard
-                  title="Bolsistas de produtividade"
-                  value={scholarshipHoldersCount}
-                  caption="pesquisadores bolsistas distintos"
-                  icon={Award}
-                />
-              </div>
-            </ScholarshipBreakdownTooltip>
-            <StatCard
-              title="Grupos de pesquisa"
-              value={researchGroupsCount}
-              caption="vinculados à instituição"
-              icon={FlaskConical}
-            />
-            <StatCard
-              title="Laboratórios"
-              value={labsCount}
-              caption="vinculados à instituição"
-              icon={Microscope}
+              title="Bolsistas de produtividade"
+              value={scholarshipHoldersCount}
+              caption="pesquisadores bolsistas distintos"
+              icon={Award}
             />
           </div>
+        </ScholarshipBreakdownTooltip>
+        <StatCard
+          title="Grupos de pesquisa"
+          value={researchGroupsCount}
+          caption="vinculados à instituição"
+          icon={FlaskConical}
+        />
+        <StatCard
+          title="Laboratórios"
+          value={labsCount}
+          caption="vinculados à instituição"
+          icon={Microscope}
+        />
+      </div>
 
-          <Tabs
+      <Tabs
             value={activeTab}
             onValueChange={handleTabChange}
             className="flex flex-col gap-4"
@@ -599,85 +597,6 @@ export function InstitutionDetailPage({
               </TabsContent>
             ))}
           </Tabs>
-        </div>
-
-        <aside aria-label="Informações gerais" className="flex flex-col gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-medium">
-                Informações gerais
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3 text-sm">
-              <div className="flex items-start justify-between gap-2 border-b pb-2">
-                <span className="text-muted-foreground">Pesquisadores</span>
-                <span className="font-medium tabular-nums">
-                  {formatInstitutionCount(researchersCount)}
-                </span>
-              </div>
-              <div className="flex items-start justify-between gap-2 border-b pb-2">
-                <span className="text-muted-foreground">
-                  Programas de pós-graduação
-                </span>
-                <span className="font-medium tabular-nums">
-                  {formatInstitutionCount(programsCount)}
-                </span>
-              </div>
-              <div className="flex items-start justify-between gap-2 border-b pb-2">
-                <span className="text-muted-foreground">
-                  Bolsistas de produtividade
-                </span>
-                <ScholarshipBreakdownTooltip breakdown={scholarshipsBreakdown}>
-                  <span
-                    tabIndex={scholarshipsBreakdown.length > 0 ? 0 : undefined}
-                    className={cn(
-                      'font-medium tabular-nums',
-                      scholarshipsBreakdown.length > 0 &&
-                        'cursor-help underline decoration-dotted underline-offset-4',
-                    )}
-                  >
-                    {formatInstitutionCount(scholarshipHoldersCount)}
-                  </span>
-                </ScholarshipBreakdownTooltip>
-              </div>
-              <div className="flex items-start justify-between gap-2 border-b pb-2">
-                <span className="text-muted-foreground">
-                  Grupos de pesquisa
-                </span>
-                <span className="font-medium tabular-nums">
-                  {formatInstitutionCount(researchGroupsCount)}
-                </span>
-              </div>
-              <div className="flex items-start justify-between gap-2 border-b pb-2">
-                <span className="text-muted-foreground">Laboratórios</span>
-                <span className="font-medium tabular-nums">
-                  {formatInstitutionCount(labsCount)}
-                </span>
-              </div>
-              {institution.lattes_id && (
-                <div className="flex items-start justify-between gap-2 border-b pb-2">
-                  <span className="text-muted-foreground">Código Lattes</span>
-                  <span className="font-mono text-xs">
-                    {institution.lattes_id}
-                  </span>
-                </div>
-              )}
-              {hasCoordinates && (
-                <div className="flex items-start justify-between gap-2">
-                  <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                    <MapPin className="size-3.5" aria-hidden />
-                    <span>Coordenadas</span>
-                  </span>
-                  <span className="text-right font-mono text-xs tabular-nums">
-                    {institution.latitude?.toFixed(4)},{' '}
-                    {institution.longitude?.toFixed(4)}
-                  </span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </aside>
-      </div>
     </div>
   );
 }
