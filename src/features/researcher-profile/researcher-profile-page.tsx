@@ -58,6 +58,15 @@ async function copyText(text: string, label: string) {
   }
 }
 
+function renderTabCount(count: number | undefined) {
+  if (!count || count <= 0) return null;
+  return (
+    <span className="text-xs text-muted-foreground tabular-nums group-data-[state=active]:text-white/80">
+      ({formatCount(count)})
+    </span>
+  );
+}
+
 /**
  * Tela de perfil do pesquisador (T3, Template E de `DESIGN.md`).
  */
@@ -177,51 +186,31 @@ export function ResearcherProfilePage({
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
           <Tabs value={search.tab} onValueChange={handleTabChange}>
-            <TabsList className="w-full justify-start">
+            <TabsList variant="pills">
               <TabsTrigger value="articles">
                 <FileText aria-hidden />
                 <span>Artigos</span>
-                {counts && counts.articles > 0 && (
-                  <span className="text-xs text-muted-foreground tabular-nums">
-                    ({formatCount(counts.articles)})
-                  </span>
-                )}
+                {renderTabCount(counts?.articles)}
               </TabsTrigger>
               <TabsTrigger value="books">
                 <BookOpen aria-hidden />
                 <span>Livros e capítulos</span>
-                {booksCount > 0 && (
-                  <span className="text-xs text-muted-foreground tabular-nums">
-                    ({formatCount(booksCount)})
-                  </span>
-                )}
+                {renderTabCount(booksCount)}
               </TabsTrigger>
               <TabsTrigger value="technical">
                 <Lightbulb aria-hidden />
                 <span>Produção técnica</span>
-                {technicalCount > 0 && (
-                  <span className="text-xs text-muted-foreground tabular-nums">
-                    ({formatCount(technicalCount)})
-                  </span>
-                )}
+                {renderTabCount(technicalCount)}
               </TabsTrigger>
               <TabsTrigger value="reports">
                 <FileSpreadsheet aria-hidden />
                 <span>Relatórios técnicos</span>
-                {counts && counts.reports > 0 && (
-                  <span className="text-xs text-muted-foreground tabular-nums">
-                    ({formatCount(counts.reports)})
-                  </span>
-                )}
+                {renderTabCount(counts?.reports)}
               </TabsTrigger>
               <TabsTrigger value="guidance">
                 <GraduationCap aria-hidden />
                 <span>Orientações</span>
-                {counts && counts.guidance > 0 && (
-                  <span className="text-xs text-muted-foreground tabular-nums">
-                    ({formatCount(counts.guidance)})
-                  </span>
-                )}
+                {renderTabCount(counts?.guidance)}
               </TabsTrigger>
               <TabsTrigger value="events">
                 <Presentation aria-hidden />
