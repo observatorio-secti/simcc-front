@@ -1,6 +1,12 @@
 # Proposta T12 — Reimaginação do Console Administrativo
 
-- **Status:** em revisão (aguardando aprovação antes da Onda 4)
+- **Status:** aprovada em 2026-11-22, com as decisões abaixo. Implementação dividida em T12.1, T12.2 e T12.3 (`docs/roadmap.md`).
+- **Decisões do responsável:**
+  - visual do kit público (`--sc-*` e `src/shared/ui/`), sem tokens `sm-*`;
+  - tokens de status de execução (sucesso, falha, em execução, na fila) no tema: grupo `color.run-status` em `tokens.json`, classes `bg-run-*`, cor escolhida por `runStatusColor` em `src/shared/lib/design-tokens.ts`;
+  - métricas do GA4 fora da primeira versão: a visão geral mostra o último run do ETL e as contagens (instituições, pesquisadores, coleções, admins);
+  - o operador cadastra um admin digitando o `sub`; a tela "sem acesso" mostra o `sub` do usuário logado com botão de copiar, além de "Voltar ao observatório", "Trocar de conta" (`prompt=login`) e "Sair";
+  - tipos da API de admin gerados do OpenAPI (`src/api/generated/simcc-admin.d.ts`, `npm run api:types`).
 - **Data:** 2026-11-20
 - **Referências principais:** [ADR 0002](../decisoes/0002-url-como-estado.md), [ADR 0003](../decisoes/0003-tipos-gerados-do-openapi.md), [ADR 0004](../decisoes/0004-modais-e-drawers-como-rotas.md), [ADR 0005](../decisoes/0005-tailwind-4-e-design-kit.md), [ADR 0008](../decisoes/0008-autenticacao.md), [ADR 0009](../decisoes/0009-analytics-page-view-por-caminho.md), [arquitetura.md](../arquitetura.md), [design-kit/DESIGN.md](../../design-kit/DESIGN.md)
 

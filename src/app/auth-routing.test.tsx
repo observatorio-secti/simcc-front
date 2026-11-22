@@ -9,7 +9,7 @@ vi.stubEnv('VITE_IDP_URL', 'https://api.test/idp/');
 
 const { createAdminClient } = await import('@/api/admin');
 const { createIdpClient } = await import('@/api/idp');
-const { createSessionStore } = await import('@/features/auth');
+const { createSessionStore } = await import('@/entities/session');
 const { createAppRouter } = await import('./router');
 
 const json = (body: unknown, status = 200) =>

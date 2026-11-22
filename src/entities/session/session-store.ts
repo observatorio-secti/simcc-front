@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { admin, type AdminClient, type AdminUser } from '@/api/admin';
+import { admin, type AdminClient } from '@/api/admin';
 import { ApiError, isAbortError, isApiError } from '@/api/errors';
 import {
   clearPkceTransaction,
@@ -13,9 +13,16 @@ import {
 
 export type SessionStatus = 'anonymous' | 'loading' | 'authenticated';
 
+/** Usuário logado: vem de `GET <admin>/me` ou, em 403, do próprio token. */
+export interface SessionUser {
+  sub: string;
+  name: string | null;
+  email: string | null;
+}
+
 export interface SessionSnapshot {
   status: SessionStatus;
-  user: AdminUser | null;
+  user: SessionUser | null;
   isAdmin: boolean;
   isAuthenticated: boolean;
   error: ApiError | Error | null;
@@ -192,7 +199,11 @@ export function createSessionStore(deps: SessionStoreDeps = {}) {
       profileLoaded = true;
       setSnapshot({
         status: 'authenticated',
-        user: me.user,
+        user: {
+          sub: me.user.sub,
+          name: me.user.name ?? null,
+          email: me.user.email ?? null,
+        },
         // `is_admin` vem exclusivamente de GET <admin>/me (ADR 0008).
         isAdmin: me.is_admin,
         isAuthenticated: true,
@@ -455,6 +466,18 @@ export function createSessionStore(deps: SessionStoreDeps = {}) {
   }
 
   adminClient.setAuthFailureHandler(handleAdminAuthFailure);
+
+  /**
+   * 403 numa chamada da API de admin: o usuário deixou de ser admin (ou nunca
+   * foi). A sessão continua; só o acesso ao console cai para "sem acesso".
+   */
+  function handleAdminForbidden() {
+    if (snapshot.status === 'authenticated' && snapshot.isAdmin) {
+      setSnapshot({ ...snapshot, isAdmin: false });
+    }
+  }
+
+  adminClient.setForbiddenHandler(handleAdminForbidden);
 
   function reset() {
     profileLoaded = false;

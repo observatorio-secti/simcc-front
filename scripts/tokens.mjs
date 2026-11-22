@@ -119,9 +119,10 @@ const tailwindTheme = [
   'Qualis (a chave mantém a caixa do dado: bg-qualis-A1)',
   ...group('color.qualis', '--color-qualis-'),
 
-  'Status, bolsas e gênero',
+  'Status, estado de execução, bolsas e gênero',
   ['--color-status-concluida', 'color.status.concluida'],
   ['--color-status-andamento', 'color.status.em-andamento'],
+  ...group('color.run-status', '--color-run-'),
   ...group('color.bolsa', '--color-bolsa-'),
   ...group('color.gender', '--color-gender-', {
     rename: { feminino: 'f', masculino: 'm' },
@@ -174,6 +175,9 @@ const simccRoot = [
   ['--sc-warning', 'color.status.warning'],
   ['--sc-danger', 'color.status.danger'],
   ['--sc-info', 'color.status.info'],
+
+  'Estado de execução (ETL no console)',
+  ...group('color.run-status', '--sc-run-'),
 
   'Tipografia',
   ['--sc-font', 'font.family.sans-kit'],

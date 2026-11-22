@@ -1,6 +1,6 @@
 import { createRouter, type RouterHistory } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
-import { type SessionStore, sessionStore } from '@/features/auth';
+import { type SessionStore, sessionStore } from '@/entities/session';
 import { routeTree } from '@/routeTree.gen';
 import type { Analytics } from '@/shared/lib/analytics';
 import { getAppAnalytics, trackPageViews } from './analytics';

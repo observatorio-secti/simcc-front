@@ -1,18 +1,30 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { ConsoleShortcut } from './console-shortcut';
 import { Crumbbar } from './crumbbar';
-import { AppSidebar } from './sidebar';
+import { AppSidebar, type AppSidebarProps } from './sidebar';
 import { readSidebarCollapsed, writeSidebarCollapsed } from './sidebar-storage';
 import { Topbar } from './topbar';
 import { MOBILE_MEDIA_QUERY, useIsMobile } from './use-is-mobile';
 
 export type PublicLayoutProps = {
   children: ReactNode;
-  /** Slot opcional para ações à direita da topbar (reservado à F1.4). */
+  /** Ações à direita da topbar; padrão: atalho "Console" (só para admin). */
   topbarActions?: ReactNode;
+  /** Menu lateral próprio (o console usa o dele); padrão: menu público. */
+  renderNav?: AppSidebarProps['renderNav'];
+  mobileNavDescription?: string;
 };
 
-/** Moldura completa da área pública: sidebar, topbar, painel e crumbbar. */
-export function PublicLayout({ children, topbarActions }: PublicLayoutProps) {
+/**
+ * Moldura completa: sidebar, topbar, painel e crumbbar. A área pública usa o
+ * menu padrão; o console troca só o menu e as ações da topbar.
+ */
+export function PublicLayout({
+  children,
+  topbarActions = <ConsoleShortcut />,
+  renderNav,
+  mobileNavDescription,
+}: PublicLayoutProps) {
   const isMobile = useIsMobile();
   const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -73,6 +85,8 @@ export function PublicLayout({ children, topbarActions }: PublicLayoutProps) {
         collapsed={collapsed}
         mobileOpen={isMobile && mobileOpen}
         onMobileOpenChange={setMobileOpen}
+        renderNav={renderNav}
+        mobileDescription={mobileNavDescription}
       />
 
       <div className="flex min-w-0 flex-1 flex-col md:gap-2 md:pt-1 md:pr-2 md:pb-2">

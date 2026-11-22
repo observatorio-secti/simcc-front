@@ -65,6 +65,12 @@
   --sc-danger: #ef4444;
   --sc-info: var(--sc-brand);
 
+  /* Estado de execução (ETL no console) */
+  --sc-run-succeeded: var(--sc-success-strong);
+  --sc-run-failed: var(--sc-danger);
+  --sc-run-running: var(--sc-info);
+  --sc-run-queued: var(--sc-warning);
+
   /* Tipografia */
   --sc-font: 'Lexend', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --sc-text-2xs: 0.625rem;
