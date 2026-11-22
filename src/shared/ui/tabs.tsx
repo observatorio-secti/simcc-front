@@ -71,7 +71,7 @@ export function TabsTrigger({
           ? "group inline-flex h-10 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md bg-neutral-100 px-4 text-sm font-medium whitespace-nowrap text-neutral-700 transition-colors hover:bg-neutral-200 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-eng-blue data-[state=active]:text-white data-[state=active]:hover:bg-eng-dark-blue dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           : "inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-sm px-3 text-sm font-medium whitespace-nowrap transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
         focusRing,
-        resolvedVariant === 'segmented' && 'focus-visible:ring-offset-0',
+        'focus-visible:ring-offset-0',
         className,
       )}
       {...props}
