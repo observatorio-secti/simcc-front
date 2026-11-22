@@ -20,7 +20,7 @@ beforeAll(() => {
 });
 
 describe('HomePage e SearchBar (rota "/")', () => {
-  it('renderiza o hero de busca, palavras sugeridas e atalhos de páginas', async () => {
+  it('renderiza o hero de busca e palavras sugeridas sem os atalhos de páginas', async () => {
     await renderRoute('/');
 
     expect(
@@ -36,8 +36,8 @@ describe('HomePage e SearchBar (rota "/")', () => {
       screen.getByRole('button', { name: /robótica/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /explore por página/i }),
-    ).toBeInTheDocument();
+      screen.queryByRole('heading', { name: /explore por página/i }),
+    ).not.toBeInTheDocument();
   });
 
   it('busca sugestões em /v2/suggestion ao digitar e navega para /busca ao selecionar', async () => {

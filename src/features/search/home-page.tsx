@@ -1,21 +1,8 @@
 import { useState } from 'react';
-import { Link, useRouter, type RegisteredRouter } from '@tanstack/react-router';
-import {
-  BarChart3,
-  Building2,
-  Download,
-  GraduationCap,
-  Landmark,
-  PanelsTopLeft,
-  Sparkles,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
+import { useRouter } from '@tanstack/react-router';
 import { cn } from '@/shared/lib/cn';
-import { Card } from '@/shared/ui/card';
 import { focusRing } from '@/shared/ui/focus-ring';
 import { PillAnchor } from '@/shared/ui/pill-link';
-import { SectionHeader } from '@/shared/ui/section-header';
 import { SearchBar } from './search-bar';
 import { buildBuscaHref, type SearchType } from './search-schema';
 
@@ -31,50 +18,6 @@ const SUGGESTED_WORDS = [
   'bioinformática',
   'semiárido',
 ] as const;
-
-interface PageShortcut {
-  title: string;
-  href: string;
-  icon: LucideIcon;
-}
-
-const PAGE_SHORTCUTS: readonly PageShortcut[] = [
-  {
-    title: 'Grupos de pesquisa',
-    href: '/grupos-pesquisa',
-    icon: Users,
-  },
-  {
-    title: 'Indicadores de produção',
-    href: '/indicadores',
-    icon: BarChart3,
-  },
-  {
-    title: 'Instituições',
-    href: '/instituicoes',
-    icon: Building2,
-  },
-  {
-    title: 'Institutos de CT&I',
-    href: '/incites',
-    icon: Landmark,
-  },
-  {
-    title: 'Pós-graduação',
-    href: '/pos-graduacao',
-    icon: GraduationCap,
-  },
-  {
-    title: 'Listagens',
-    href: '/listagens',
-    icon: Download,
-  },
-  {
-    title: 'Pesquisar com IA',
-    href: '/maria',
-    icon: Sparkles,
-  },
-];
 
 export interface HomePageProps {
   initialQuery?: string;
@@ -141,35 +84,6 @@ export function HomePage({
               {word}
             </button>
           ))}
-        </div>
-      </section>
-
-      <section className="space-y-4 pb-6" aria-labelledby="explore-pages-title">
-        <SectionHeader
-          id="explore-pages-title"
-          title="Explore por página"
-          icon={PanelsTopLeft}
-        />
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {PAGE_SHORTCUTS.map((shortcut) => {
-            const Icon = shortcut.icon;
-            return (
-              <Link<RegisteredRouter, string, string>
-                key={shortcut.href}
-                href={shortcut.href}
-                className={cn('group rounded-lg', focusRing)}
-              >
-                <Card className="flex min-h-[120px] flex-col items-center justify-center gap-2.5 p-4 text-center text-xs font-medium transition-colors group-hover:bg-neutral-100/70 dark:group-hover:bg-neutral-900/70">
-                  <Icon
-                    className="size-5 text-muted-foreground transition-colors group-hover:text-eng-blue"
-                    aria-hidden
-                  />
-                  <span>{shortcut.title}</span>
-                </Card>
-              </Link>
-            );
-          })}
         </div>
       </section>
     </div>
