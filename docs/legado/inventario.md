@@ -62,7 +62,7 @@ DefaultLayout
 | `/console/instituicoes(/:id)`          | `/console/instituicoes`, `/console/instituicoes/$id`                | T12.2 (cadastro) | feito         |
 | `/console/pesquisadores`               | `/console/pesquisadores`, `/console/pesquisadores/$id`              | T12.2 (cadastro) | feito         |
 | `/console/colecoes`                    | `/console/colecoes`                                                 | T12.2 (cadastro) | feito         |
-| `/console/etl(/:runId)`                | `/console/etl`, `/console/etl/$runId`                               | T12.3            | a fazer       |
+| `/console/etl(/:runId)`                | `/console/etl`, `/console/etl/$runId`                               | T12.3            | feito         |
 | `/termos-uso`, `/politica-privacidade` | —                                                                   | —                | descontinuada |
 | `/api-docs`, `/informacoes`            | —                                                                   | —                | descontinuada |
 | `/dicionario-cores`                    | —                                                                   | —                | descontinuada |

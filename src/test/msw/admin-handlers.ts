@@ -161,7 +161,23 @@ export const adminFixtures = {
     current_routine: null,
     routines: ['lattes', 'openalex'],
     lattes_ids: null,
-    steps: {},
+    steps: {
+      lattes: {
+        status: 'SUCCEEDED',
+        duration_ms: 420000,
+        found: 100,
+        succeeded: 100,
+        failed: 0,
+      },
+      openalex: {
+        status: 'FAILED',
+        duration_ms: 330000,
+        found: 100,
+        succeeded: 90,
+        failed: 10,
+        error: 'Timeout ao consultar OpenAlex',
+      },
+    },
     error_message: 'Falha ao baixar currículos do Lattes.',
   } satisfies AdminSchemas['EtlRunDetail'],
   institutions: [
@@ -176,6 +192,27 @@ export const adminFixtures = {
     mariaResearcher,
     joaoResearcher,
   ] satisfies AdminSchemas['ResearcherItem'][],
+  etlRoutines: ['soap_lattes', 'hop_index', 'enrich_from_openalex'],
+  etlLogs: [
+    {
+      timestamp: '2026-11-21T02:00:05Z',
+      level: 'INFO',
+      routine: 'lattes',
+      message: 'Iniciando coleta de currículos',
+    },
+    {
+      timestamp: '2026-11-21T02:07:10Z',
+      level: 'WARNING',
+      routine: 'openalex',
+      message: 'Rate limit próximo ao limite',
+    },
+    {
+      timestamp: '2026-11-21T02:12:30Z',
+      level: 'ERROR',
+      routine: 'openalex',
+      message: 'Timeout ao consultar OpenAlex',
+    },
+  ] as Array<Record<string, unknown>>,
 };
 
 function listEnvelope<T>(data: T[], total = data.length) {
@@ -204,21 +241,47 @@ export function adminHandlers() {
         : adminFixtures.admins;
       return HttpResponse.json(listEnvelope(data));
     }),
-    http.get(adminUrl('etl/runs'), () =>
-      HttpResponse.json({
-        data: [adminFixtures.latestRun],
-        pagination: paginationOf(37, 1, 1),
-      }),
+    http.get(adminUrl('etl/routines'), () =>
+      HttpResponse.json(adminFixtures.etlRoutines),
     ),
+    http.get(adminUrl('etl/runs'), ({ request }) => {
+      const url = new URL(request.url);
+      const status = url.searchParams.get('status');
+      const all = [adminFixtures.latestRun];
+      const filtered = status
+        ? all.filter((run) => run.status === status)
+        : all;
+      return HttpResponse.json({
+        data: filtered,
+        pagination: paginationOf(status ? filtered.length : 37, 1, 1),
+      });
+    }),
     http.post(adminUrl('etl/runs'), () =>
       HttpResponse.json(
         {
           run_id: '55555555-5555-4555-8555-555555555555',
           status: 'ACCEPTED',
-        },
+        } satisfies AdminSchemas['EtlRunTriggerResponse'],
         { status: 202 },
       ),
     ),
+    http.get(adminUrl('etl/runs/:runId'), ({ params }) =>
+      HttpResponse.json({
+        ...adminFixtures.latestRun,
+        id: String(params.runId),
+      } satisfies AdminSchemas['EtlRunDetail']),
+    ),
+    http.get(adminUrl('etl/runs/:runId/logs'), ({ request }) => {
+      const url = new URL(request.url);
+      const offset = Number(url.searchParams.get('offset') ?? '0') || 0;
+      const limit = Number(url.searchParams.get('limit') ?? '100') || 100;
+      const slice = adminFixtures.etlLogs.slice(offset, offset + limit);
+      return HttpResponse.json({
+        lines: slice,
+        next_offset: offset + slice.length,
+        status: adminFixtures.latestRun.status,
+      } satisfies AdminSchemas['EtlRunLogsResponse']);
+    }),
     http.get(adminUrl('academic/institutions'), ({ request }) => {
       const params = new URL(request.url).searchParams;
       if (params.get('per_page') === '1' && !params.get('q')) {
