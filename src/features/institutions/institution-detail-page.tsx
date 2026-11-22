@@ -9,10 +9,10 @@ import {
 import {
   Building2,
   ChevronLeft,
+  FileText,
   GraduationCap,
   Hash,
   MapPin,
-  PieChart,
   Search,
   Users,
   X,
@@ -28,6 +28,7 @@ import {
   type InstitutionDetail,
 } from '@/entities/institution/model';
 import { institutionDetailQueryOptions } from '@/entities/institution/queries';
+import type { ProductionKind } from '@/entities/production/model';
 import type { ResearcherSummary } from '@/entities/researcher/model';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { PersonCard } from '@/entities/researcher/ui/person-card';
@@ -39,10 +40,9 @@ import { EmptyState } from '@/shared/ui/empty-state';
 import { Input } from '@/shared/ui/input';
 import { LoadingBlock } from '@/shared/ui/loading-block';
 import { Pagination } from '@/shared/ui/pagination';
-import { PowerBiEmbed } from '@/shared/ui/power-bi-embed';
 import { StatCard } from '@/shared/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import { INSTITUTION_PANEL } from './institution-panel';
+import { InstitutionProductionsTab } from './institution-productions-tab';
 import {
   institutionDetailSearch,
   type InstitutionDetailSearch,
@@ -52,6 +52,7 @@ import {
 export interface InstitutionDetailPageProps {
   institutionId: string;
   search: InstitutionDetailSearch;
+  onOpenProduction?: (kind: ProductionKind, id: string) => void;
 }
 
 function InstitutionCover({ cover }: { cover?: string | null }) {
@@ -278,6 +279,7 @@ function InstitutionProgramsTab({
 export function InstitutionDetailPage({
   institutionId,
   search,
+  onOpenProduction,
 }: InstitutionDetailPageProps) {
   const router = useRouter();
   const canGoBack = useCanGoBack();
@@ -327,11 +329,21 @@ export function InstitutionDetailPage({
     if (
       nextValue === 'researchers' ||
       nextValue === 'programs' ||
-      nextValue === 'panel'
+      nextValue === 'productions'
     ) {
       updateSearch({
         tab: nextValue === 'researchers' ? undefined : nextValue,
         q: undefined,
+        ...(nextValue !== 'productions'
+          ? {
+              kind: undefined,
+              year_start: undefined,
+              year_end: undefined,
+              sort_by: undefined,
+              sort_order: undefined,
+              view: undefined,
+            }
+          : {}),
       });
     }
   }
@@ -383,7 +395,7 @@ export function InstitutionDetailPage({
             <InstitutionAvatar institution={institution} />
             <div className="min-w-0 flex-1 pb-1">
               {showAcronym && (
-                <p className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+                <p className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                   {acronym}
                 </p>
               )}
@@ -441,59 +453,63 @@ export function InstitutionDetailPage({
                 <GraduationCap className="size-3.5" aria-hidden />
                 <span>Programas de pós-graduação</span>
               </TabsTrigger>
-              <TabsTrigger value="panel" className="gap-2">
-                <PieChart className="size-3.5" aria-hidden />
-                <span>Painel</span>
+              <TabsTrigger value="productions" className="gap-2">
+                <FileText className="size-3.5" aria-hidden />
+                <span>Produções</span>
               </TabsTrigger>
             </TabsList>
 
-            {activeTab !== 'panel' && (
-              <form
-                role="search"
+            <form
+              role="search"
+              aria-label={
+                activeTab === 'researchers'
+                  ? 'Filtrar pesquisadores da instituição'
+                  : activeTab === 'programs'
+                    ? 'Filtrar programas da instituição'
+                    : 'Filtrar produções da instituição'
+              }
+              onSubmit={handleSearchSubmit}
+              className="flex h-[52px] items-center gap-3 rounded-lg border bg-card px-4"
+            >
+              <Search
+                className="size-4 shrink-0 text-muted-foreground"
+                aria-hidden
+              />
+              <Input
+                type="search"
+                value={queryInput}
+                onChange={(event) => setQueryInput(event.target.value)}
+                placeholder={
+                  activeTab === 'researchers'
+                    ? 'Filtrar pesquisadores por nome ou termo'
+                    : activeTab === 'programs'
+                      ? 'Filtrar programas por nome ou sigla'
+                      : 'Filtrar produções por título ou termo'
+                }
                 aria-label={
                   activeTab === 'researchers'
-                    ? 'Filtrar pesquisadores da instituição'
-                    : 'Filtrar programas da instituição'
+                    ? 'Filtrar pesquisadores por nome ou termo'
+                    : activeTab === 'programs'
+                      ? 'Filtrar programas por nome ou sigla'
+                      : 'Filtrar produções por título ou termo'
                 }
-                onSubmit={handleSearchSubmit}
-                className="flex h-[52px] items-center gap-3 rounded-lg border bg-card px-4"
-              >
-                <Search
-                  className="size-4 shrink-0 text-muted-foreground"
-                  aria-hidden
-                />
-                <Input
-                  type="search"
-                  value={queryInput}
-                  onChange={(event) => setQueryInput(event.target.value)}
-                  placeholder={
-                    activeTab === 'researchers'
-                      ? 'Filtrar pesquisadores por nome ou termo'
-                      : 'Filtrar programas por nome ou sigla'
-                  }
-                  aria-label={
-                    activeTab === 'researchers'
-                      ? 'Filtrar pesquisadores por nome ou termo'
-                      : 'Filtrar programas por nome ou sigla'
-                  }
-                  className="h-auto flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
-                />
-                {queryInput && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={handleClearQuery}
-                    aria-label="Limpar filtro"
-                  >
-                    <X className="size-4" aria-hidden />
-                  </Button>
-                )}
-                <Button type="submit" size="sm">
-                  Filtrar
+                className="h-auto flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+              />
+              {queryInput && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleClearQuery}
+                  aria-label="Limpar filtro"
+                >
+                  <X className="size-4" aria-hidden />
                 </Button>
-              </form>
-            )}
+              )}
+              <Button type="submit" size="sm">
+                Filtrar
+              </Button>
+            </form>
 
             <TabsContent value="researchers" className="mt-0">
               <InstitutionResearchersTab
@@ -520,19 +536,14 @@ export function InstitutionDetailPage({
               />
             </TabsContent>
 
-            <TabsContent value="panel" className="mt-0">
-              <section aria-label="Painel" className="flex flex-col gap-3">
-                <p className="text-sm text-muted-foreground">
-                  {INSTITUTION_PANEL.description}
-                </p>
-                <PowerBiEmbed
-                  src={INSTITUTION_PANEL.src}
-                  title={INSTITUTION_PANEL.title}
-                  description={INSTITUTION_PANEL.description}
-                  previewSrc={INSTITUTION_PANEL.previewSrc}
-                  unavailable={INSTITUTION_PANEL.unavailable}
-                />
-              </section>
+            <TabsContent value="productions" className="mt-0">
+              <InstitutionProductionsTab
+                institutionId={institution.id}
+                search={search}
+                onUpdateSearch={updateSearch}
+                onOpenProduction={onOpenProduction}
+                onClearQuery={handleClearQuery}
+              />
             </TabsContent>
           </Tabs>
         </div>
@@ -545,12 +556,6 @@ export function InstitutionDetailPage({
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3 text-sm">
-              {acronym && (
-                <div className="flex items-start justify-between gap-2 border-b pb-2">
-                  <span className="text-muted-foreground">Sigla</span>
-                  <span className="font-medium">{acronym}</span>
-                </div>
-              )}
               <div className="flex items-start justify-between gap-2 border-b pb-2">
                 <span className="text-muted-foreground">Pesquisadores</span>
                 <span className="font-medium tabular-nums">

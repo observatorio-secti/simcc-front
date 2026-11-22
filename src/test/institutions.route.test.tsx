@@ -136,25 +136,59 @@ describe('Rotas de instituições (T4)', () => {
       ),
     ).toBeInTheDocument();
   });
-  it('mostra a aba de painel com o Power BI e guarda a aba na URL', async () => {
+  it('não exibe aba de painel nem sigla em Informações gerais, e lista produções da instituição na aba Produções', async () => {
+    const capturedInstitutionIds: string[] = [];
+
     const { router, user } = await renderRoute(
       '/instituicoes/3f2a9c1e-5b7d-4e8a-9c21-7d4e5f6a8b90',
+      {
+        handlers: [
+          http.get(simccV2Url('/production/article'), ({ request }) => {
+            const url = new URL(request.url);
+            capturedInstitutionIds.push(
+              ...url.searchParams.getAll('institution_id'),
+            );
+            return HttpResponse.json(v2Fixtures['/production/article']);
+          }),
+        ],
+      },
     );
 
-    await user.click(await screen.findByRole('tab', { name: 'Painel' }));
+    expect(
+      screen.queryByRole('tab', { name: 'Painel' }),
+    ).not.toBeInTheDocument();
+
+    // Sigla aparece no cabeçalho (acima do nome), mas não no card lateral "Informações gerais"
+    const aside = screen.getByRole('complementary', {
+      name: 'Informações gerais',
+    });
+    expect(aside).not.toHaveTextContent('Sigla');
+    expect(screen.getByText('UESC')).toBeInTheDocument();
+
+    const productionsTab = await screen.findByRole('tab', {
+      name: 'Produções',
+    });
+    await user.click(productionsTab);
 
     await waitFor(() => {
-      expect(router.state.location.searchStr).toContain('tab=panel');
+      expect(router.state.location.searchStr).toContain('tab=productions');
     });
-    // Painel despublicado no Power BI: aviso no lugar do iframe
-    expect(
-      screen.getByText(
-        /Indicadores de avaliação: painel indisponível no momento/,
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('search', { name: /Filtrar/ }),
-    ).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(capturedInstitutionIds).toContain(
+        '3f2a9c1e-5b7d-4e8a-9c21-7d4e5f6a8b90',
+      );
+    });
+
+    const articleLink = await screen.findByRole('link', {
+      name: /Redes neurais aplicadas a solos/i,
+    });
+    expect(articleLink).toBeInTheDocument();
+
+    await user.click(articleLink);
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('production=article');
+    });
   });
 
   it('renderiza o cover quando válido e oculta a imagem se falhar ao carregar', async () => {
