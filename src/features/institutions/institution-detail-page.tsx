@@ -1,15 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import {
-  Link,
-  useCanGoBack,
-  useNavigate,
-  useRouter,
-} from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import {
   BookOpen,
   Building2,
-  ChevronLeft,
   FileSpreadsheet,
   FileText,
   FolderKanban,
@@ -307,8 +301,6 @@ export function InstitutionDetailPage({
   search,
   onOpenProduction,
 }: InstitutionDetailPageProps) {
-  const router = useRouter();
-  const canGoBack = useCanGoBack();
   const navigate = useNavigate({ from: '/instituicoes/$id' });
 
   const { data: response } = useSuspenseQuery(
@@ -343,17 +335,10 @@ export function InstitutionDetailPage({
     });
   }
 
-  function handleBack() {
-    if (canGoBack) {
-      router.history.back();
-      return;
-    }
-    void router.navigate({ to: '/instituicoes' });
-  }
-
   function handleTabChange(nextValue: string) {
     if (!isInstitutionDetailTab(nextValue)) return;
-    const isProductionTab = nextValue !== 'researchers' && nextValue !== 'programs';
+    const isProductionTab =
+      nextValue !== 'researchers' && nextValue !== 'programs';
     updateSearch({
       tab: nextValue === 'researchers' ? undefined : nextValue,
       q: undefined,
@@ -390,25 +375,6 @@ export function InstitutionDetailPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="size-7 shrink-0"
-          onClick={handleBack}
-          aria-label="Voltar"
-        >
-          <ChevronLeft className="size-4" aria-hidden />
-        </Button>
-        <Link
-          to="/instituicoes"
-          className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Instituições
-        </Link>
-      </div>
-
       <Card className="overflow-hidden">
         <InstitutionCover cover={institution.cover} />
         <CardContent className="relative pt-0">
