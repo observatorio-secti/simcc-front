@@ -50,7 +50,7 @@ function OverlayError({ error }: { error: unknown }) {
 
 /**
  * Perfil do pesquisador como overlay sobre uma lista (ADR 0004 e 0010): o
- * mesmo `ResearcherProfilePage` da rota, num painel lateral. Quem abre
+ * mesmo `ResearcherProfilePage` da rota, num painel inferior. Quem abre
  * controla o estado pela URL; fechar é navegar.
  */
 export function ResearcherProfileOverlay({
@@ -75,9 +75,9 @@ export function ResearcherProfileOverlay({
       }}
     >
       <SheetContent
-        side="right"
+        side="bottom"
         showCloseButton={false}
-        className="w-full gap-0 overflow-y-auto bg-neutral-50 p-0 sm:max-w-[min(72rem,94vw)] dark:bg-neutral-900"
+        className="h-[92dvh] max-h-[92dvh] w-full gap-0 overflow-y-auto rounded-t-2xl bg-neutral-50 p-0 dark:bg-neutral-900"
       >
         <SheetHeader className="sticky top-0 z-10 flex-row items-center gap-2 border-b bg-neutral-50/85 pr-4 backdrop-blur dark:bg-neutral-900/85">
           <div className="min-w-0 flex-1">
@@ -111,7 +111,7 @@ export function ResearcherProfileOverlay({
           </SheetClose>
         </SheetHeader>
 
-        <div className="p-4 md:p-6">
+        <div className="mx-auto w-full max-w-7xl p-4 md:p-6">
           {shownId && (
             <CatchBoundary
               getResetKey={() => shownId}
