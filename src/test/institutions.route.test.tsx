@@ -136,7 +136,7 @@ describe('Rotas de instituições (T4)', () => {
       ),
     ).toBeInTheDocument();
   });
-  it('não exibe aba de painel nem sigla em Informações gerais, e lista produções da instituição na aba Produções', async () => {
+  it('não exibe aba de painel nem sigla em Informações gerais, e lista produções da instituição nas abas diretas', async () => {
     const capturedInstitutionIds: string[] = [];
 
     const { router, user } = await renderRoute(
@@ -165,13 +165,13 @@ describe('Rotas de instituições (T4)', () => {
     expect(aside).not.toHaveTextContent('Sigla');
     expect(screen.getByText('UESC')).toBeInTheDocument();
 
-    const productionsTab = await screen.findByRole('tab', {
-      name: 'Produções',
+    const articlesTab = await screen.findByRole('tab', {
+      name: 'Artigos',
     });
-    await user.click(productionsTab);
+    await user.click(articlesTab);
 
     await waitFor(() => {
-      expect(router.state.location.searchStr).toContain('tab=productions');
+      expect(router.state.location.searchStr).toContain('tab=articles');
     });
 
     await waitFor(() => {

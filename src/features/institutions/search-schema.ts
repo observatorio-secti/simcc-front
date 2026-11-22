@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { productionRefParam } from '@/entities/production/links';
-import { PRODUCTION_KINDS } from '@/entities/production/model';
 import { createListSearch } from '@/shared/lib/search-params';
 
 export const INSTITUTION_VIEW_MODES = ['grid', 'list'] as const;
@@ -24,7 +23,13 @@ export type InstitutionListSearch = z.output<
 export const INSTITUTION_DETAIL_TABS = [
   'researchers',
   'programs',
-  'productions',
+  'articles',
+  'books',
+  'technical',
+  'reports',
+  'guidance',
+  'events',
+  'projects',
 ] as const;
 export type InstitutionDetailTab = (typeof INSTITUTION_DETAIL_TABS)[number];
 
@@ -44,7 +49,6 @@ export const institutionDetailSearch = createListSearch({
   yearRange: true,
   extra: {
     tab: z.enum(INSTITUTION_DETAIL_TABS).optional().catch(undefined),
-    kind: z.enum(PRODUCTION_KINDS).optional().catch(undefined),
     view: z.enum(INSTITUTION_VIEW_MODES).optional().catch(undefined),
     production: productionRefParam,
   },

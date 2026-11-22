@@ -7,12 +7,17 @@ import {
   useRouter,
 } from '@tanstack/react-router';
 import {
+  BookOpen,
   Building2,
   ChevronLeft,
+  FileSpreadsheet,
   FileText,
+  FolderKanban,
   GraduationCap,
   Hash,
+  Lightbulb,
   MapPin,
+  Presentation,
   Search,
   Users,
   X,
@@ -48,6 +53,27 @@ import {
   type InstitutionDetailSearch,
   type InstitutionDetailTab,
 } from './search-schema';
+
+const PRODUCTION_TAB_KINDS: Record<
+  Exclude<InstitutionDetailTab, 'researchers' | 'programs'>,
+  readonly ProductionKind[]
+> = {
+  articles: ['article'],
+  books: ['book', 'book_chapter'],
+  technical: ['patent', 'software', 'brand'],
+  reports: ['report'],
+  guidance: ['guidance'],
+  events: ['event', 'event_work'],
+  projects: ['research_project'],
+};
+
+function isInstitutionDetailTab(value: string): value is InstitutionDetailTab {
+  return (
+    value === 'researchers' ||
+    value === 'programs' ||
+    value in PRODUCTION_TAB_KINDS
+  );
+}
 
 export interface InstitutionDetailPageProps {
   institutionId: string;
@@ -326,26 +352,21 @@ export function InstitutionDetailPage({
   }
 
   function handleTabChange(nextValue: string) {
-    if (
-      nextValue === 'researchers' ||
-      nextValue === 'programs' ||
-      nextValue === 'productions'
-    ) {
-      updateSearch({
-        tab: nextValue === 'researchers' ? undefined : nextValue,
-        q: undefined,
-        ...(nextValue !== 'productions'
-          ? {
-              kind: undefined,
-              year_start: undefined,
-              year_end: undefined,
-              sort_by: undefined,
-              sort_order: undefined,
-              view: undefined,
-            }
-          : {}),
-      });
-    }
+    if (!isInstitutionDetailTab(nextValue)) return;
+    const isProductionTab = nextValue !== 'researchers' && nextValue !== 'programs';
+    updateSearch({
+      tab: nextValue === 'researchers' ? undefined : nextValue,
+      q: undefined,
+      ...(!isProductionTab
+        ? {
+            year_start: undefined,
+            year_end: undefined,
+            sort_by: undefined,
+            sort_order: undefined,
+            view: undefined,
+          }
+        : {}),
+    });
   }
 
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
@@ -444,18 +465,42 @@ export function InstitutionDetailPage({
             onValueChange={handleTabChange}
             className="flex flex-col gap-4"
           >
-            <TabsList className="w-full justify-start overflow-x-auto bg-neutral-100 dark:bg-neutral-800">
-              <TabsTrigger value="researchers" className="gap-2">
-                <Users className="size-3.5" aria-hidden />
+            <TabsList variant="pills">
+              <TabsTrigger value="researchers">
+                <Users aria-hidden />
                 <span>Pesquisadores</span>
               </TabsTrigger>
-              <TabsTrigger value="programs" className="gap-2">
-                <GraduationCap className="size-3.5" aria-hidden />
+              <TabsTrigger value="programs">
+                <GraduationCap aria-hidden />
                 <span>Programas de pós-graduação</span>
               </TabsTrigger>
-              <TabsTrigger value="productions" className="gap-2">
-                <FileText className="size-3.5" aria-hidden />
-                <span>Produções</span>
+              <TabsTrigger value="articles">
+                <FileText aria-hidden />
+                <span>Artigos</span>
+              </TabsTrigger>
+              <TabsTrigger value="books">
+                <BookOpen aria-hidden />
+                <span>Livros e capítulos</span>
+              </TabsTrigger>
+              <TabsTrigger value="technical">
+                <Lightbulb aria-hidden />
+                <span>Produção técnica</span>
+              </TabsTrigger>
+              <TabsTrigger value="reports">
+                <FileSpreadsheet aria-hidden />
+                <span>Relatórios técnicos</span>
+              </TabsTrigger>
+              <TabsTrigger value="guidance">
+                <GraduationCap aria-hidden />
+                <span>Orientações</span>
+              </TabsTrigger>
+              <TabsTrigger value="events">
+                <Presentation aria-hidden />
+                <span>Eventos</span>
+              </TabsTrigger>
+              <TabsTrigger value="projects">
+                <FolderKanban aria-hidden />
+                <span>Projetos</span>
               </TabsTrigger>
             </TabsList>
 
@@ -536,15 +581,25 @@ export function InstitutionDetailPage({
               />
             </TabsContent>
 
-            <TabsContent value="productions" className="mt-0">
-              <InstitutionProductionsTab
-                institutionId={institution.id}
-                search={search}
-                onUpdateSearch={updateSearch}
-                onOpenProduction={onOpenProduction}
-                onClearQuery={handleClearQuery}
-              />
-            </TabsContent>
+            {(
+              Object.entries(PRODUCTION_TAB_KINDS) as Array<
+                [
+                  Exclude<InstitutionDetailTab, 'researchers' | 'programs'>,
+                  readonly ProductionKind[],
+                ]
+              >
+            ).map(([tabKey, kinds]) => (
+              <TabsContent key={tabKey} value={tabKey} className="mt-0">
+                <InstitutionProductionsTab
+                  institutionId={institution.id}
+                  kinds={kinds}
+                  search={search}
+                  onUpdateSearch={updateSearch}
+                  onOpenProduction={onOpenProduction}
+                  onClearQuery={handleClearQuery}
+                />
+              </TabsContent>
+            ))}
           </Tabs>
         </div>
 
