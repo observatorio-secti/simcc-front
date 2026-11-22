@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { oda, type ListAllOdaGroupsOptions } from '@/api/oda';
+import { oda } from '@/api/oda';
 
 export interface ResearchGroupListParams {
   page?: number;
@@ -32,16 +32,6 @@ export function researchGroupListQueryOptions(
   return queryOptions({
     queryKey: researchGroupKeys.list(params),
     queryFn: ({ signal }) => oda.listGroupsPage({ ...params, signal }),
-  });
-}
-
-/** Catálogo completo de grupos SIMCC na API ODA (pagina automaticamente). */
-export function researchGroupAllQueryOptions(
-  options: Omit<ListAllOdaGroupsOptions, 'signal'> = {},
-) {
-  return queryOptions({
-    queryKey: researchGroupKeys.list({ all: true }),
-    queryFn: ({ signal }) => oda.listAllGroups({ ...options, signal }),
   });
 }
 

@@ -5,7 +5,6 @@ vi.stubEnv('VITE_SIMCC_API_URL', 'http://api.test/simcc/api/');
 vi.stubEnv('VITE_ODA_API_URL', 'https://oda.test/oda/v1/');
 
 const {
-  researchGroupAllQueryOptions,
   researchGroupDetailQueryOptions,
   researchGroupKeys,
   researchGroupListQueryOptions,
@@ -83,7 +82,7 @@ describe('researchGroup queryOptions', () => {
     expect(fetchMock.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
   });
 
-  it('busca catálogo completo, detalhe e pesquisadores do grupo com `signal`', async () => {
+  it('busca detalhe e pesquisadores do grupo com `signal`', async () => {
     const fetchMock = vi.fn(
       async (input: RequestInfo | URL, _init?: RequestInit) => {
         const url = String(input);
@@ -93,21 +92,12 @@ describe('researchGroup queryOptions', () => {
             meta: { page: 1, size: 100, totalItems: 1, totalPages: 1 },
           });
         }
-        if (url.includes('grupos-pesquisa/simcc')) {
-          return json({
-            data: [{ id: 'grp-1', nome: 'Grupo 1' }],
-            meta: { page: 1, size: 10000, totalItems: 1, totalPages: 1 },
-          });
-        }
         return json({ id: 'grp-1', nome: 'Grupo 1' });
       },
     );
     vi.stubGlobal('fetch', fetchMock);
 
     const client = new QueryClient();
-    const all = await client.fetchQuery(researchGroupAllQueryOptions());
-    expect(all).toHaveLength(1);
-
     const detail = await client.fetchQuery(
       researchGroupDetailQueryOptions('grp-1'),
     );

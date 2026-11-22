@@ -58,19 +58,34 @@ const odaGroupsFixture = [
   },
 ];
 
-function createOdaHandlers() {
+function createOdaHandlers(options?: {
+  items?: typeof odaGroupsFixture;
+  onListRequest?: (params: { page: number; size: number }) => void;
+}) {
+  const sourceItems = options?.items ?? odaGroupsFixture;
+
   return [
-    http.get(`${ODA_TEST_BASE}/grupos-pesquisa/simcc`, () =>
-      HttpResponse.json({
-        data: odaGroupsFixture,
+    http.get(`${ODA_TEST_BASE}/grupos-pesquisa/simcc`, ({ request }) => {
+      const url = new URL(request.url);
+      const page = Number(url.searchParams.get('page') ?? '1');
+      const size = Number(url.searchParams.get('size') ?? '12');
+      options?.onListRequest?.({ page, size });
+
+      const start = (page - 1) * size;
+      const paged = sourceItems.slice(start, start + size);
+      const totalItems = sourceItems.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / size));
+
+      return HttpResponse.json({
+        data: paged,
         meta: {
-          page: 1,
-          size: 10000,
-          totalItems: odaGroupsFixture.length,
-          totalPages: 1,
+          page,
+          size,
+          totalItems,
+          totalPages,
         },
-      }),
-    ),
+      });
+    }),
     http.get(`${ODA_TEST_BASE}/grupos-pesquisa/:id`, ({ params }) => {
       const found = odaGroupsFixture.find((item) => item.id === params.id);
       if (!found) {
@@ -107,9 +122,12 @@ function createOdaHandlers() {
 }
 
 describe('Rotas de grupos de pesquisa (T6)', () => {
-  it('renderiza a listagem /grupos-pesquisa com KPIs, busca por URL e alternância de visão', async () => {
+  it('renderiza a listagem paginada /grupos-pesquisa sem size=10000 e alterna visão', async () => {
+    const requestedParams: Array<{ page: number; size: number }> = [];
     const { user, router } = await renderRoute('/grupos-pesquisa', {
-      handlers: createOdaHandlers(),
+      handlers: createOdaHandlers({
+        onListRequest: (params) => requestedParams.push(params),
+      }),
     });
 
     expect(
@@ -124,22 +142,8 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
     expect(
       screen.getByText('Laboratório de Saúde Coletiva'),
     ).toBeInTheDocument();
-
-    const searchInput = screen.getByRole('searchbox', {
-      name: 'Pesquisar grupos de pesquisa',
-    });
-    await user.type(searchInput, 'Saúde');
-    await user.click(screen.getByRole('button', { name: 'Buscar' }));
-
-    await waitFor(() => {
-      expect(router.state.location.searchStr).toContain('q=Sa');
-      expect(
-        screen.queryByText('Núcleo de Inteligência Artificial'),
-      ).not.toBeInTheDocument();
-    });
-    expect(
-      screen.getByText('Laboratório de Saúde Coletiva'),
-    ).toBeInTheDocument();
+    expect(requestedParams).toEqual([{ page: 1, size: 12 }]);
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('radio', { name: 'Exibir em lista' }));
     await waitFor(() => {
@@ -147,22 +151,13 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
     });
   }, 15000);
 
-  it('exibe estado vazio quando a busca não retorna resultados e permite limpar filtros', async () => {
-    const { user } = await renderRoute('/grupos-pesquisa?q=inexistente', {
-      handlers: createOdaHandlers(),
+  it('exibe estado vazio quando a API ODA não retorna grupos', async () => {
+    await renderRoute('/grupos-pesquisa', {
+      handlers: createOdaHandlers({ items: [] }),
     });
 
     expect(
       await screen.findByText('Nenhum grupo de pesquisa encontrado'),
-    ).toBeInTheDocument();
-
-    const clearButtons = screen.getAllByRole('button', {
-      name: 'Limpar filtros',
-    });
-    await user.click(clearButtons[0]!);
-
-    expect(
-      await screen.findByText('Núcleo de Inteligência Artificial'),
     ).toBeInTheDocument();
   }, 15000);
 

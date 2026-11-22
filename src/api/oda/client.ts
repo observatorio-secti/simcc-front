@@ -23,9 +23,6 @@ import {
 } from './schemas';
 
 const DEFAULT_PAGE_SIZE = 100;
-const SIMCC_SINGLE_SHOT_SIZE = 10000;
-const SIMCC_MAX_PAGES = 100;
-const SIMCC_BATCH_SIZE = 6;
 
 export const odaErrorCodes = {
   notConfigured: 'oda_not_configured',
@@ -80,13 +77,6 @@ export interface OdaClientOptions {
 export interface ListOdaGroupsParams {
   page?: number;
   size?: number;
-  signal?: AbortSignal;
-}
-
-export interface ListAllOdaGroupsOptions {
-  pageSize?: number;
-  maxPages?: number;
-  batchSize?: number;
   signal?: AbortSignal;
 }
 
@@ -184,70 +174,6 @@ export function createOdaClient(
     return adaptOdaGroupList(raw, page, size, normalizedBase);
   }
 
-  async function listAllGroups(
-    listOptions: ListAllOdaGroupsOptions = {},
-  ): Promise<ResearchGroup[]> {
-    const pageSize = listOptions.pageSize ?? SIMCC_SINGLE_SHOT_SIZE;
-    const maxPages = listOptions.maxPages ?? SIMCC_MAX_PAGES;
-    const batchSize = Math.max(1, listOptions.batchSize ?? SIMCC_BATCH_SIZE);
-
-    const first = await listGroupsPage({
-      page: 1,
-      size: pageSize,
-      signal: listOptions.signal,
-    });
-    if (first.items.length === 0) return [];
-    if (
-      first.meta.totalItems > 0 &&
-      first.items.length >= first.meta.totalItems
-    ) {
-      return first.items;
-    }
-
-    const actualSize = first.meta.size > 0 ? first.meta.size : pageSize;
-    const fromTotal =
-      first.meta.totalItems > 0
-        ? Math.ceil(first.meta.totalItems / actualSize)
-        : null;
-    const totalPages = Math.min(
-      fromTotal ?? first.meta.totalPages ?? 1,
-      maxPages,
-    );
-    if (totalPages <= 1) return first.items;
-
-    const byPage: ResearchGroup[][] = Array.from(
-      { length: totalPages },
-      (): ResearchGroup[] => [],
-    );
-    byPage[0] = first.items;
-
-    const remainingPages: number[] = [];
-    for (let page = 2; page <= totalPages; page += 1) {
-      remainingPages.push(page);
-    }
-
-    for (let index = 0; index < remainingPages.length; index += batchSize) {
-      const batch = remainingPages.slice(index, index + batchSize);
-      const results = await Promise.all(
-        batch.map((page) =>
-          listGroupsPage({
-            page,
-            size: actualSize,
-            signal: listOptions.signal,
-          }),
-        ),
-      );
-      results.forEach((result, offset) => {
-        const pageNumber = batch[offset];
-        if (pageNumber !== undefined) {
-          byPage[pageNumber - 1] = result.items;
-        }
-      });
-    }
-
-    return byPage.flat();
-  }
-
   async function getGroup(
     id: string,
     getOptions: GetOdaGroupOptions = {},
@@ -286,7 +212,6 @@ export function createOdaClient(
   return {
     isConfigured: Boolean(normalizedBase),
     listGroupsPage,
-    listAllGroups,
     getGroup,
     listGroupResearchers,
   };

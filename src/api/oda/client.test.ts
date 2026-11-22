@@ -75,35 +75,6 @@ describe('createOdaClient', () => {
     );
   });
 
-  it('pagina automaticamente em `listAllGroups` quando há múltiplas páginas', async () => {
-    const fetch = vi.fn(async (input: RequestInfo | URL) => {
-      const url = new URL(String(input));
-      const page = Number(url.searchParams.get('page'));
-      if (page === 1) {
-        return json({
-          data: [{ id: 'g-1', nome: 'Grupo 1' }],
-          meta: { page: 1, size: 1, totalItems: 3, totalPages: 3 },
-        });
-      }
-      if (page === 2) {
-        return json({
-          data: [{ id: 'g-2', nome: 'Grupo 2' }],
-          meta: { page: 2, size: 1, totalItems: 3, totalPages: 3 },
-        });
-      }
-      return json({
-        data: [{ id: 'g-3', nome: 'Grupo 3' }],
-        meta: { page: 3, size: 1, totalItems: 3, totalPages: 3 },
-      });
-    });
-
-    const client = createOdaClient('https://oda.test/oda/v1/', { fetch });
-    const all = await client.listAllGroups({ pageSize: 1, batchSize: 2 });
-
-    expect(all.map((group) => group.id)).toEqual(['g-1', 'g-2', 'g-3']);
-    expect(fetch).toHaveBeenCalledTimes(3);
-  });
-
   it('converte erro HTTP, HTML inesperado, falha Zod e erro de rede em ApiError', async () => {
     const httpErrorClient = createOdaClient('https://oda.test/oda/v1/', {
       fetch: async () => json({ detail: 'Grupo não encontrado' }, 404),

@@ -45,7 +45,6 @@ import { LoadingBlock } from '@/shared/ui/loading-block';
 import { Pagination } from '@/shared/ui/pagination';
 import { StatCard } from '@/shared/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import { normalizeSearchText } from './filter-groups';
 import {
   researchGroupDetailSearch,
   type GroupDetailTab,
@@ -53,6 +52,14 @@ import {
 } from './search';
 
 const PER_PAGE_OPTIONS = [12, 24, 48] as const;
+
+function normalizeSearchText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .trim();
+}
 
 interface UnifiedMember {
   id: string;

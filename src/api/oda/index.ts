@@ -25,7 +25,6 @@ export {
   odaBaseUrl,
   odaErrorCodes,
   type GetOdaGroupOptions,
-  type ListAllOdaGroupsOptions,
   type ListOdaGroupsParams,
   type OdaClientOptions,
 } from './client';
