@@ -87,7 +87,7 @@ function InstitutionCover({ cover }: { cover?: string | null }) {
   const showCover = src !== null && failedUrl !== src;
 
   return (
-    <div className="h-24 bg-neutral-100 sm:h-32 dark:bg-neutral-800">
+    <div className="h-40 bg-neutral-100 sm:h-52 md:h-64 dark:bg-neutral-800">
       {showCover && (
         <img
           src={src}
@@ -116,7 +116,7 @@ function InstitutionAvatar({
   return (
     <div
       className={cn(
-        'flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border-4 border-card bg-card p-2 text-muted-foreground shadow-md',
+        'relative z-10 -mt-12 flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border-4 border-card bg-card p-2.5 text-muted-foreground shadow-md sm:-mt-14 sm:size-28 md:-mt-16 md:size-32 md:p-3',
         localLogo?.lightSurface && 'dark:bg-white',
       )}
     >
@@ -412,15 +412,15 @@ export function InstitutionDetailPage({
       <Card className="overflow-hidden">
         <InstitutionCover cover={institution.cover} />
         <CardContent className="relative pt-0">
-          <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-col gap-4">
             <InstitutionAvatar institution={institution} />
-            <div className="min-w-0 flex-1 pb-1">
+            <div className="min-w-0">
               {showAcronym && (
                 <p className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                   {acronym}
                 </p>
               )}
-              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              <h1 className="text-[1.8rem] font-semibold tracking-tight sm:text-4xl">
                 {displayName}
               </h1>
             </div>
