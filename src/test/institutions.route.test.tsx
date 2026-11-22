@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 import { v2Fixtures } from '@/test/msw/fixtures';
@@ -155,5 +155,38 @@ describe('Rotas de instituições (T4)', () => {
     expect(
       screen.queryByRole('search', { name: /Filtrar/ }),
     ).not.toBeInTheDocument();
+  });
+
+  it('renderiza o cover quando válido e oculta a imagem se falhar ao carregar', async () => {
+    const coverUrl = 'https://cdn.example.org/covers/uesc.jpg';
+    const baseDetail = v2Fixtures['/institution/{institution_id}'];
+
+    const { container } = await renderRoute(
+      '/instituicoes/3f2a9c1e-5b7d-4e8a-9c21-7d4e5f6a8b90',
+      {
+        handlers: [
+          http.get(simccV2Url('/institution/{institution_id}'), () =>
+            HttpResponse.json({
+              ...baseDetail,
+              data: {
+                ...baseDetail.data,
+                cover: coverUrl,
+              },
+            }),
+          ),
+        ],
+      },
+    );
+
+    const coverImg = container.querySelector(`img[src="${coverUrl}"]`);
+    expect(coverImg).toBeInTheDocument();
+
+    fireEvent.error(coverImg!);
+
+    await waitFor(() => {
+      expect(
+        container.querySelector(`img[src="${coverUrl}"]`),
+      ).not.toBeInTheDocument();
+    });
   });
 });
