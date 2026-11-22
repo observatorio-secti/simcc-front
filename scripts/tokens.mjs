@@ -131,6 +131,10 @@ const tailwindTheme = [
   'Escala neutra para gráficos sem semântica',
   ...group('color.chart-neutral', '--color-chart-neutral-'),
 
+  'Paleta categórica para gráficos com várias séries (ordem fixa; validada para daltonismo)',
+  ...group('color.chart-categorical', '--color-chart-cat-'),
+  ...group('color.chart-categorical-dark', '--color-chart-cat-dark-'),
+
   'Nível do índice do pesquisador',
   ...group('color.index-level', '--color-index-'),
 
