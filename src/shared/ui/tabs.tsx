@@ -1,7 +1,14 @@
-import { createContext, useContext, type ComponentProps } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  type ComponentProps,
+  type Ref,
+} from 'react';
 import { Tabs as TabsPrimitive } from 'radix-ui';
 import { cn } from '@/shared/lib/cn';
 import { focusRing } from './focus-ring';
+import { useScrollableTabs } from './use-scrollable-tabs';
 
 // Tabs segmentadas do kit (`sc-tabs`): alternam conteúdo do MESMO objeto
 // (ex.: tipos de produção do pesquisador). Para trocar a visão de um resultado
@@ -25,23 +32,48 @@ export function Tabs({
   );
 }
 
+function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
+  if (typeof ref === 'function') {
+    ref(value);
+  } else if (ref) {
+    ref.current = value;
+  }
+}
+
 /** A lista rola dentro do próprio container quando não cabe (sem rolar a página). */
 export function TabsList({
   className,
+  style,
+  ref,
   variant = 'segmented',
   children,
   ...props
 }: ComponentProps<typeof TabsPrimitive.List> & {
   variant?: TabsVariant;
 }) {
+  const { listRef, fadeStyle, fadeDataAttrs } =
+    useScrollableTabs<HTMLDivElement>();
+
+  const mergedRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      listRef.current = node;
+      assignRef(ref, node);
+    },
+    [listRef, ref],
+  );
+
   return (
     <TabsVariantContext.Provider value={variant}>
       <TabsPrimitive.List
+        ref={mergedRef}
         data-slot="tabs-list"
         data-variant={variant}
+        {...fadeDataAttrs}
+        style={fadeStyle || style ? { ...fadeStyle, ...style } : undefined}
         className={cn(
+          '[scrollbar-width:none] data-[dragging=true]:cursor-grabbing data-[dragging=true]:select-none [&::-webkit-scrollbar]:hidden',
           variant === 'pills'
-            ? '-mx-1 flex h-auto w-full min-w-0 [scrollbar-width:none] items-center justify-start gap-2 overflow-x-auto px-1 py-0.5'
+            ? '-mx-1 flex h-auto w-full min-w-0 items-center justify-start gap-2 overflow-x-auto px-1 py-0.5'
             : 'inline-flex h-10 w-fit max-w-full items-center gap-0.5 overflow-x-auto rounded-md bg-secondary p-1 text-muted-foreground',
           className,
         )}
