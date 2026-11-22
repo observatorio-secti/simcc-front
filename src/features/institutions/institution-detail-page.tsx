@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Hash,
   MapPin,
+  PieChart,
   Search,
   Users,
   X,
@@ -38,8 +39,10 @@ import { EmptyState } from '@/shared/ui/empty-state';
 import { Input } from '@/shared/ui/input';
 import { LoadingBlock } from '@/shared/ui/loading-block';
 import { Pagination } from '@/shared/ui/pagination';
+import { PowerBiEmbed } from '@/shared/ui/power-bi-embed';
 import { StatCard } from '@/shared/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { INSTITUTION_PANEL } from './institution-panel';
 import {
   institutionDetailSearch,
   type InstitutionDetailSearch,
@@ -301,7 +304,11 @@ export function InstitutionDetailPage({
   }
 
   function handleTabChange(nextValue: string) {
-    if (nextValue === 'researchers' || nextValue === 'programs') {
+    if (
+      nextValue === 'researchers' ||
+      nextValue === 'programs' ||
+      nextValue === 'panel'
+    ) {
       updateSearch({
         tab: nextValue === 'researchers' ? undefined : nextValue,
         q: undefined,
@@ -429,53 +436,59 @@ export function InstitutionDetailPage({
                   {formatInstitutionCount(programsCount)}
                 </span>
               </TabsTrigger>
+              <TabsTrigger value="panel" className="gap-2">
+                <PieChart className="size-3.5" aria-hidden />
+                <span>Painel</span>
+              </TabsTrigger>
             </TabsList>
 
-            <form
-              role="search"
-              aria-label={
-                activeTab === 'researchers'
-                  ? 'Filtrar pesquisadores da instituição'
-                  : 'Filtrar programas da instituição'
-              }
-              onSubmit={handleSearchSubmit}
-              className="flex h-[52px] items-center gap-3 rounded-lg border bg-card px-4"
-            >
-              <Search
-                className="size-4 shrink-0 text-muted-foreground"
-                aria-hidden
-              />
-              <Input
-                type="search"
-                value={queryInput}
-                onChange={(event) => setQueryInput(event.target.value)}
-                placeholder={
-                  activeTab === 'researchers'
-                    ? 'Filtrar pesquisadores por nome ou termo'
-                    : 'Filtrar programas por nome ou sigla'
-                }
+            {activeTab !== 'panel' && (
+              <form
+                role="search"
                 aria-label={
                   activeTab === 'researchers'
-                    ? 'Filtrar pesquisadores por nome ou termo'
-                    : 'Filtrar programas por nome ou sigla'
+                    ? 'Filtrar pesquisadores da instituição'
+                    : 'Filtrar programas da instituição'
                 }
-                className="h-auto flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
-              />
-              {queryInput && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleClearQuery}
-                  aria-label="Limpar filtro"
-                >
-                  <X className="size-4" aria-hidden />
+                onSubmit={handleSearchSubmit}
+                className="flex h-[52px] items-center gap-3 rounded-lg border bg-card px-4"
+              >
+                <Search
+                  className="size-4 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
+                <Input
+                  type="search"
+                  value={queryInput}
+                  onChange={(event) => setQueryInput(event.target.value)}
+                  placeholder={
+                    activeTab === 'researchers'
+                      ? 'Filtrar pesquisadores por nome ou termo'
+                      : 'Filtrar programas por nome ou sigla'
+                  }
+                  aria-label={
+                    activeTab === 'researchers'
+                      ? 'Filtrar pesquisadores por nome ou termo'
+                      : 'Filtrar programas por nome ou sigla'
+                  }
+                  className="h-auto flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+                />
+                {queryInput && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={handleClearQuery}
+                    aria-label="Limpar filtro"
+                  >
+                    <X className="size-4" aria-hidden />
+                  </Button>
+                )}
+                <Button type="submit" size="sm">
+                  Filtrar
                 </Button>
-              )}
-              <Button type="submit" size="sm">
-                Filtrar
-              </Button>
-            </form>
+              </form>
+            )}
 
             <TabsContent value="researchers" className="mt-0">
               <InstitutionResearchersTab
@@ -500,6 +513,21 @@ export function InstitutionDetailPage({
                 onPerPageChange={(per_page) => updateSearch({ per_page })}
                 onClearQuery={handleClearQuery}
               />
+            </TabsContent>
+
+            <TabsContent value="panel" className="mt-0">
+              <section aria-label="Painel" className="flex flex-col gap-3">
+                <p className="text-sm text-muted-foreground">
+                  {INSTITUTION_PANEL.description}
+                </p>
+                <PowerBiEmbed
+                  src={INSTITUTION_PANEL.src}
+                  title={INSTITUTION_PANEL.title}
+                  description={INSTITUTION_PANEL.description}
+                  previewSrc={INSTITUTION_PANEL.previewSrc}
+                  unavailable={INSTITUTION_PANEL.unavailable}
+                />
+              </section>
             </TabsContent>
           </Tabs>
         </div>

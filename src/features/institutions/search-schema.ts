@@ -19,7 +19,11 @@ export type InstitutionListSearch = z.output<
   typeof institutionListSearch.schema
 >;
 
-export const INSTITUTION_DETAIL_TABS = ['researchers', 'programs'] as const;
+export const INSTITUTION_DETAIL_TABS = [
+  'researchers',
+  'programs',
+  'panel',
+] as const;
 export type InstitutionDetailTab = (typeof INSTITUTION_DETAIL_TABS)[number];
 
 export const institutionDetailSearch = createListSearch({
