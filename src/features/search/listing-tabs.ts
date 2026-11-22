@@ -20,6 +20,8 @@ const LEGACY_LISTING_TABS: Readonly<Record<string, SearchTabId>> = {
   orientacoes: 'guidances',
   speaker: 'events',
   'research-project': 'research_projects',
+  'texto-revista': 'magazine_texts',
+  'work-event': 'event_works',
   magazine: 'magazines',
 };
 
@@ -27,8 +29,8 @@ const CATALOG_TAB_SET: ReadonlySet<string> = new Set(CATALOG_TABS);
 
 /**
  * Aba de `/busca` para um `?tab=` de `/listagens`: aceita os ids do legado e
- * os novos. Sem correspondência (ex.: `tecnicos`, descontinuado pelo ADR 0007;
- * `texto-revista` e `work-event`, sem rota na v2) ou na aba padrão, não há aba.
+ * os novos. Sem correspondência (ex.: `tecnicos`, descontinuado pelo ADR 0007)
+ * ou na aba padrão, não há aba.
  */
 export function listingTabToSearchTab(
   tab: string | undefined,

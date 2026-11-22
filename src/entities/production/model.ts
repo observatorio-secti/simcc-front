@@ -29,6 +29,8 @@ export const PRODUCTION_KINDS = [
   'brand',
   'guidance',
   'report',
+  'magazine_text',
+  'event_work',
 ] as const;
 
 /** Enum único de tipo de produção da API v2 (`snake_case`). */
@@ -46,6 +48,8 @@ export type ProductionListPathByKind = {
   brand: '/production/brand';
   guidance: '/production/guidance';
   report: '/production/report';
+  magazine_text: '/production/magazine-text';
+  event_work: '/production/event-work';
 };
 
 /** Mapa de `ProductionKind` para o caminho de detalhe na API v2. */
@@ -60,6 +64,8 @@ export type ProductionDetailPathByKind = {
   brand: '/production/brand/{item_id}';
   guidance: '/production/guidance/{item_id}';
   report: '/production/report/{item_id}';
+  magazine_text: '/production/magazine-text/{item_id}';
+  event_work: '/production/event-work/{item_id}';
 };
 
 export interface ProductionEndpointConfig<
@@ -120,6 +126,16 @@ export const PRODUCTION_ENDPOINTS = {
   report: {
     listPath: '/production/report',
     detailPath: '/production/report/{item_id}',
+    idParam: 'item_id',
+  },
+  magazine_text: {
+    listPath: '/production/magazine-text',
+    detailPath: '/production/magazine-text/{item_id}',
+    idParam: 'item_id',
+  },
+  event_work: {
+    listPath: '/production/event-work',
+    detailPath: '/production/event-work/{item_id}',
     idParam: 'item_id',
   },
 } as const satisfies {
@@ -202,7 +218,7 @@ export type ProductionFacetResult = FacetResult;
 
 const PRODUCTION_KIND_SET: ReadonlySet<string> = new Set(PRODUCTION_KINDS);
 
-/** Converte slugs com hífen (`book-chapter`, `research-project`) ou caixa variada para `ProductionKind`. */
+/** Converte slugs com hífen (`book-chapter`, `magazine-text`) ou caixa variada para `ProductionKind`. */
 export function normalizeProductionKind(
   value: string | null | undefined,
 ): ProductionKind | null {
@@ -326,6 +342,26 @@ export function formatNatureLabel(
   if (!raw) return null;
   const normalized = normalizeKey(raw);
   return PROJECT_NATURE_LABELS[normalized] ?? raw;
+}
+
+/**
+ * Rótulo legível para valores de dicionário do Lattes em CAIXA_ALTA
+ * (`RESUMO_EXPANDIDO` → "Resumo expandido"). Texto já legível passa direto.
+ */
+export function formatLattesLabel(
+  value: string | null | undefined,
+): string | null {
+  const raw = value?.trim();
+  if (!raw) return null;
+  if (raw !== raw.toUpperCase()) return raw;
+  const words = raw.replace(/_+/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/** "Sim"/"Não" para os indicadores booleanos do Lattes (`null` some). */
+export function formatYesNo(value: boolean | null | undefined): string | null {
+  if (value == null) return null;
+  return value ? 'Sim' : 'Não';
 }
 
 /** Formata a lista de autores de publicação preferindo `authors[]` estruturado. */

@@ -15,7 +15,7 @@ import {
 } from './registry';
 
 describe('PRODUCTION_REGISTRY', () => {
-  it('registra todos os 10 tipos de produção da v2 com ícone, rótulos e sem CSV', () => {
+  it('registra todos os 12 tipos de produção da v2 com ícone, rótulos e sem CSV', () => {
     expect(Object.keys(PRODUCTION_REGISTRY)).toEqual([...PRODUCTION_KINDS]);
 
     for (const kind of PRODUCTION_KINDS) {
@@ -191,5 +191,70 @@ describe('PRODUCTION_REGISTRY', () => {
       'Concluída',
       'Orientador principal',
     ]);
+  });
+
+  it('texto em revista e trabalho em evento usam as cores e campos da v2 (V4.1)', () => {
+    const text = {
+      id: 't1',
+      title: 'Texto',
+      year: 2024,
+      nature: 'JORNAL_DE_NOTICIAS',
+      language: 'Português',
+      means_divulgation: 'MEIO_DIGITAL',
+    };
+    const textDef = PRODUCTION_REGISTRY.magazine_text;
+    expect(textDef.color).toBe(PRODUCTION_COLORS['texto-revista']);
+    expect(textDef.itemColor(text)).toBe(PRODUCTION_COLORS['texto-revista']);
+    expect(textDef.subtitle(text)).toBe('Jornal de noticias');
+    expect(textDef.tags(text).map((tag) => tag.label)).toEqual([
+      'Meio digital',
+      'Português',
+    ]);
+    expect(
+      textDef.details({
+        ...text,
+        homepage: 'https://exemplo.org/t1',
+        scientific_divulgation: true,
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        { label: 'Divulgação científica', value: 'Sim' },
+        {
+          label: 'Página do texto',
+          value: 'https://exemplo.org/t1',
+          href: 'https://exemplo.org/t1',
+        },
+      ]),
+    );
+
+    const work = {
+      id: 'w1',
+      title: 'Trabalho',
+      year: 2023,
+      nature: 'RESUMO_EXPANDIDO',
+      event_name: 'Congresso X',
+      event_classification: 'INTERNACIONAL',
+    };
+    const workDef = PRODUCTION_REGISTRY.event_work;
+    expect(workDef.itemColor(work)).toBe(PRODUCTION_COLORS['trabalho-evento']);
+    expect(workDef.subtitle(work)).toBe('Congresso X');
+    expect(workDef.tags(work).map((tag) => tag.label)).toEqual([
+      'Resumo expandido',
+      'Internacional',
+    ]);
+    expect(
+      workDef.details({
+        ...work,
+        proceedings_title: 'Anais X',
+        start_page: '10',
+        end_page: '14',
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        { label: 'Anais', value: 'Anais X' },
+        { label: 'Páginas', value: '10–14' },
+        { label: 'Classificação do evento', value: 'Internacional' },
+      ]),
+    );
   });
 });

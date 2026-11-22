@@ -30,6 +30,8 @@ describe('abas sem termo (D1.4)', () => {
         'brands',
         'guidances',
         'reports',
+        'magazine_texts',
+        'event_works',
         'magazines',
       ]),
     );
@@ -70,10 +72,58 @@ describe('abas sem termo (D1.4)', () => {
   });
 });
 
+describe('texto em revista e trabalho em evento (V4.1)', () => {
+  it('são abas de produção do catálogo, ligadas às rotas novas da v2', () => {
+    expect(resolveSearchTab('profile', 'magazine_texts', false)).toMatchObject({
+      source: 'production',
+      kind: 'magazine_text',
+      label: 'Textos em revista',
+    });
+    expect(resolveSearchTab('profile', 'event_works', false)).toMatchObject({
+      source: 'production',
+      kind: 'event_work',
+      label: 'Trabalhos em eventos',
+    });
+    // Com termo, saem das abas (a busca por perfil não cobre esses tipos).
+    expect(resolveSearchTab('profile', 'event_works', true).id).toBe(
+      'researchers',
+    );
+  });
+
+  it('montam a query de /v2/production/<kind> com os filtros comuns', () => {
+    const search = resultsSearch.parse(
+      'tab=event_works&institution_id=inst-1&qualis=A1&year_start=2020&sort_by=title',
+    );
+    expect(activeTab(search)).toMatchObject({ kind: 'event_work' });
+    expect(toProductionQuery('event_work', search)).toEqual({
+      page: 1,
+      per_page: 20,
+      year_start: 2020,
+      institution_id: ['inst-1'],
+      sort_by: 'title',
+      sort_order: 'asc',
+      facets: [
+        'year',
+        'area',
+        'institution',
+        'graduate_program',
+        'identity_territory',
+        'city',
+      ],
+    });
+    expect(
+      sortOptionsForTab(
+        { source: 'production', kind: 'magazine_text' },
+        false,
+      ).map((option) => option.value),
+    ).toEqual(['year', 'title']);
+  });
+});
+
 describe('bolsistas: URL ↔ /v2/scholarship', () => {
   it('faz o round-trip e converte para os parâmetros da v2', () => {
     const url =
-      'tab=scholarships&modality=Produtividade+em+Pesquisa+-+2&category_level=2&category_level=1A&sort_by=category_level&sort_order=desc&page=2';
+      'tab=scholarships&institution_id=inst-1&graduate_program_id=prog-1&modality=Produtividade+em+Pesquisa+-+2&category_level=2&category_level=1A&sort_by=category_level&sort_order=desc&page=2';
     const search = resultsSearch.parse(url);
     expect(search).toMatchObject({
       tab: 'scholarships',
@@ -87,21 +137,27 @@ describe('bolsistas: URL ↔ /v2/scholarship', () => {
     expect(roundTrip.getAll('category_level')).toEqual(['2', '1A']);
     expect(resultsSearch.parse(roundTrip)).toEqual(search);
 
-    expect(toScholarshipQuery(search)).toEqual({
+    const query = toScholarshipQuery(search);
+    expect(query).toEqual({
       page: 2,
       per_page: 20,
+      institution_id: ['inst-1'],
+      graduate_program_id: ['prog-1'],
       modality: ['Produtividade em Pesquisa - 2'],
       category_level: ['2', '1A'],
       sort_by: 'category_level',
       sort_order: 'desc',
-      facets: ['modality', 'category_level'],
+      facets: ['institution', 'graduate_program', 'modality', 'category_level'],
       facet_limit: 50,
     });
+    // A v2 recusa `facet_limit` acima de 100 (422).
+    expect(query.facet_limit).toBeLessThanOrEqual(100);
+    expect(countTabFilters(search, { source: 'scholarship' })).toBe(5);
   });
 
   it('ordena por nome do bolsista por padrão e ignora o que a rota não aceita', () => {
     const search = resultsSearch.parse(
-      'tab=scholarships&sort_by=year&area=SAUDE&year_start=2020&institution_id=x',
+      'tab=scholarships&sort_by=year&area=SAUDE&year_start=2020&city_id=x',
     );
     const query = toScholarshipQuery(search);
     expect(query).toMatchObject({
@@ -110,21 +166,23 @@ describe('bolsistas: URL ↔ /v2/scholarship', () => {
     });
     expect(query).not.toHaveProperty('area');
     expect(query).not.toHaveProperty('year_start');
-    expect(query).not.toHaveProperty('institution_id');
+    expect(query).not.toHaveProperty('city_id');
     expect(countTabFilters(search, { source: 'scholarship' })).toBe(0);
     expect(
       sortOptionsForTab({ source: 'scholarship' }, false).map((o) => o.value),
     ).toEqual(['researcher_name', 'modality', 'category_level']);
   });
 
-  it('a troca para bolsistas mantém a modalidade e descarta os demais filtros', () => {
+  it('a troca para bolsistas mantém instituição, programa e modalidade e descarta os demais filtros', () => {
     const researchers = resultsSearch.parse(
-      'modality=Produtividade+em+Pesquisa+-+2&area=SAUDE&graduation=Doutorado&page=4',
+      'modality=Produtividade+em+Pesquisa+-+2&institution_id=inst-1&graduate_program_id=prog-1&area=SAUDE&graduation=Doutorado&page=4',
     );
     const next = switchTab(researchers, 'scholarships');
     expect(next).toMatchObject({
       tab: 'scholarships',
       modality: ['Produtividade em Pesquisa - 2'],
+      institution_id: ['inst-1'],
+      graduate_program_id: ['prog-1'],
       page: 1,
     });
     expect(next.area).toBeUndefined();
@@ -180,13 +238,15 @@ describe('listingTabToSearchTab', () => {
     expect(listingTabToSearchTab('relatorio-tecnico')).toBe('reports');
     expect(listingTabToSearchTab('speaker')).toBe('events');
     expect(listingTabToSearchTab('brands')).toBe('brands');
+    expect(listingTabToSearchTab('texto-revista')).toBe('magazine_texts');
+    expect(listingTabToSearchTab('work-event')).toBe('event_works');
+    expect(listingTabToSearchTab('event_works')).toBe('event_works');
   });
 
-  it('descarta a aba padrão, as descontinuadas e as que não existem na v2', () => {
+  it('descarta a aba padrão, as descontinuadas e as que não existem', () => {
     expect(listingTabToSearchTab('pesquisadores')).toBeUndefined();
     expect(listingTabToSearchTab('tecnicos')).toBeUndefined();
-    expect(listingTabToSearchTab('texto-revista')).toBeUndefined();
-    expect(listingTabToSearchTab('work-event')).toBeUndefined();
+    expect(listingTabToSearchTab('nao-existe')).toBeUndefined();
     expect(listingTabToSearchTab(undefined)).toBeUndefined();
   });
 });

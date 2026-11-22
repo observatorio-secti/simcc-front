@@ -14,7 +14,7 @@ export type ProductionMetricPoint = ProductionMetricResponse['data'][number];
 
 type MetricPathKind = PathParamsOf<'/metrics/production/{kind}'>['kind'];
 
-// O path da métrica usa hífen (`book-chapter`); o enum do front, sublinhado.
+// O path da métrica usa hífen (`book-chapter`, `magazine-text`); o enum do front, sublinhado.
 const METRIC_PATH_KIND = {
   article: 'article',
   book: 'book',
@@ -26,6 +26,8 @@ const METRIC_PATH_KIND = {
   brand: 'brand',
   guidance: 'guidance',
   report: 'report',
+  magazine_text: 'magazine-text',
+  event_work: 'event-work',
 } as const satisfies Record<ProductionKind, MetricPathKind>;
 
 const EMPTY_QUERY: ProductionMetricQuery = {};

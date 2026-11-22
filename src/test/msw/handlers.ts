@@ -50,6 +50,8 @@ const productionMetricKinds = new Set<
   'brand',
   'guidance',
   'report',
+  'magazine_text',
+  'event_work',
 ]);
 
 function isProductionMetricKind(
@@ -84,7 +86,8 @@ export function createSimccHandlers(): RequestHandler[] {
   return [
     ...jsonPaths.map((path) => jsonRoute(path)),
     http.get(v2Route('/metrics/production/{kind}'), ({ params }) => {
-      const kind = String(params.kind ?? '');
+      // O path usa hífen (`book-chapter`); o `kind` da resposta, sublinhado.
+      const kind = String(params.kind ?? '').replaceAll('-', '_');
       if (!isProductionMetricKind(kind)) {
         return HttpResponse.json(openApiErrors.unknownParameter, {
           status: 422,

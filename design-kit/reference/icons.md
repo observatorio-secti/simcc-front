@@ -67,6 +67,8 @@ Traço sempre 2 (padrão). Cor herdada (`currentColor`); em cabeçalho de card/K
 | Marca | `Copyright` |
 | Relatório técnico | `FileSpreadsheet` |
 | Participação em evento | `Presentation` |
+| Texto em jornal ou revista | `BookOpenText` |
+| Trabalho em evento | `ScrollText` |
 | Orientação | `GraduationCap` |
 | Citações | `Quote` |
 | JCR / índice | `Hash` |

@@ -5,6 +5,7 @@ import {
   countTabFilters,
   resolveSort,
   resultsSearch,
+  searchInFor,
   switchTab,
   toProductionMetricQuery,
   toProductionQuery,
@@ -89,6 +90,45 @@ describe('results-search (T2)', () => {
     expect(catalog).toMatchObject({ sort_by: 'name', sort_order: 'asc' });
     expect(catalog.q).toBeUndefined();
     expect(catalog.include).toBeUndefined();
+  });
+
+  it('mapeia os tipos de busca nome e resumo para search_in de /v2/researcher', () => {
+    expect(searchInFor('name')).toBe('name');
+    expect(searchInFor('abstract')).toBe('abstract');
+    expect(searchInFor('profile')).toBeUndefined();
+    expect(searchInFor('article')).toBeUndefined();
+
+    const byName = toResearcherQuery(
+      resultsSearch.parse('q=silva&type=name&source_type=article'),
+    );
+    expect(byName).toMatchObject({ q: 'silva', search_in: 'name' });
+    // Nome e resumo não filtram por tipo de produção nem pedem a faceta.
+    expect(byName).not.toHaveProperty('source_type');
+    expect(byName.facets).not.toContain('source_type');
+
+    const byAbstract = toResearcherQuery(
+      resultsSearch.parse('q=solos&type=abstract'),
+    );
+    expect(byAbstract.search_in).toBe('abstract');
+    expect(
+      toResearcherRankingQuery(resultsSearch.parse('q=solos&type=abstract')),
+    ).toMatchObject({ search_in: 'abstract', sort_by: 'matches' });
+
+    // Perfil inteiro: o padrão da v2 (`all`), sem enviar o parâmetro.
+    expect(
+      toResearcherQuery(resultsSearch.parse('q=solos')),
+    ).not.toHaveProperty('search_in');
+    // Sem termo, não há campo de busca a restringir.
+    expect(
+      toResearcherQuery(resultsSearch.parse('type=name')),
+    ).not.toHaveProperty('search_in');
+  });
+
+  it('nova busca por nome limpa o filtro source_type', () => {
+    const search = resultsSearch.parse('q=solos&source_type=article');
+    expect(applyQuery(search, { q: 'silva', type: 'name' }).source_type).toBe(
+      undefined,
+    );
   });
 
   it('monta o ranking com o mesmo recorte, ordenado por ocorrências', () => {

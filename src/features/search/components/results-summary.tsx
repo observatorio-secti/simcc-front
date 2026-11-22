@@ -24,7 +24,11 @@ import { formatCountNoun } from '@/entities/production/model';
 import { getProductionDefinition } from '@/entities/production/registry';
 import { scholarshipModalityKey } from '@/entities/scholarship/model';
 import { cn } from '@/shared/lib/cn';
-import { SCHOLARSHIP_COLORS } from '@/shared/lib/design-tokens';
+import {
+  QUALIS_STATUS_COLORS,
+  qualisStatusKey,
+  SCHOLARSHIP_COLORS,
+} from '@/shared/lib/design-tokens';
 import { Dot, Tag } from '@/shared/ui/badge';
 import { StatCard } from '@/shared/ui/stat-card';
 import { sourceTypeLabel } from '../results-facets';
@@ -34,9 +38,9 @@ type FacetsRecord = Record<string, FacetResult> | null | undefined;
 
 const QUERY_CAPTIONS: Record<SearchType, string> = {
   profile: 'em todo o perfil de',
-  // A v2 não restringe a busca ao nome ou ao resumo: o recorte é o perfil.
-  name: 'em todo o perfil de',
-  abstract: 'em todo o perfil de',
+  // `search_in` da v2 (V4.1): a busca fica só no nome ou só no resumo.
+  name: 'com o nome contendo',
+  abstract: 'com o resumo contendo',
   article: 'com artigos relacionados a',
   book: 'com livros ou capítulos relacionados a',
   patent: 'com patentes relacionadas a',
@@ -373,9 +377,12 @@ export function MagazineSummary({
 }: MagazineSummaryProps) {
   const items = facetItemsInScope(facets, 'qualis', qualis);
   const ready = !loading && facets?.qualis !== undefined;
-  const rated = ready ? sumCounts(items) : undefined;
+  // A faceta traz também os motivos de ausência (`not_rated`,
+  // `not_applicable`), que não contam como estrato.
+  const strata = items.filter((item) => !qualisStatusKey(item.value));
+  const rated = ready ? sumCounts(strata) : undefined;
   const stratumA = ready
-    ? sumCounts(items.filter((item) => QUALIS_A.has(item.value)))
+    ? sumCounts(strata.filter((item) => QUALIS_A.has(item.value)))
     : undefined;
   const unrated =
     rated !== undefined && total !== undefined
@@ -408,11 +415,16 @@ export function MagazineSummary({
           caption="revistas nos estratos A no resultado"
         />
         <StatCard
-          title="Sem Qualis"
+          title={QUALIS_STATUS_COLORS.not_rated.label}
           icon={Newspaper}
           value={unrated}
           loading={loading}
-          caption="revistas sem estrato no resultado"
+          caption={
+            <span className="inline-flex items-center gap-1.5">
+              <Dot className={QUALIS_STATUS_COLORS.not_rated.bg} />
+              revistas sem estrato no resultado
+            </span>
+          }
         />
       </div>
     </>

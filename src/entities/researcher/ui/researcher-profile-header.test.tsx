@@ -10,10 +10,8 @@ const longBio =
 
 const sampleDetail: ResearcherDetail = {
   id: 'res-1',
-  researcher_id: 'legacy-ignored',
   name: 'Helena Duarte Ramos',
   image_url: 'https://exemplo.br/helena.jpg',
-  image: 'legacy-ignored',
   graduation: 'Pós-Doutorado',
   classification: 'A',
   lattes_update: '2026-10-22T03:00:00Z',

@@ -55,7 +55,7 @@ DefaultLayout
 | `/paines-dados-externos`               | `/paineis-dados-externos`                                           | D1.2             | feito         |
 | `/indice-pesquisador`                  | `/indice-pesquisador`                                               | D1.3             | feito         |
 | `/provimento-cargo`                    | —                                                                   | —                | descontinuada |
-| `/listagens`                           | `/busca` sem termo (`/listagens` redireciona, ADR 0011)             | D1.4             | em revisão    |
+| `/listagens`                           | `/busca` sem termo (`/listagens` redireciona, ADR 0011)             | D1.4, V4.1       | em revisão    |
 | `/console`, `/console/*`               | a definir na proposta                                               | T12 (reimaginar) | a fazer       |
 | `/termos-uso`, `/politica-privacidade` | —                                                                   | —                | descontinuada |
 | `/api-docs`, `/informacoes`            | —                                                                   | —                | descontinuada |
@@ -64,6 +64,14 @@ DefaultLayout
 | `/auth/callback`                       | `/auth/callback`                                                    | F1.4             | feito         |
 | `/observatorio`, `/tv`, `/sobre`       | —                                                                   | —                | descontinuada |
 | `*`                                    | `*`                                                                 | F1.3             | feito         |
+
+### Abas das listagens
+
+| Aba antiga (`/listagens?tab=`) | Aba nova em `/busca`                                   | Tarefa | Status        |
+| ------------------------------ | ------------------------------------------------------ | ------ | ------------- |
+| `texto-revista`                | `?tab=magazine_texts` (`/v2/production/magazine-text`) | V4.1   | em revisão    |
+| `work-event`                   | `?tab=event_works` (`/v2/production/event-work`)       | V4.1   | em revisão    |
+| `tecnicos`                     | —                                                      | —      | descontinuada |
 
 ## Funcionalidades descontinuadas
 

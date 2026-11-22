@@ -317,6 +317,46 @@ export function qualisColor(value: string | null | undefined): DictionaryColor {
   return key ? QUALIS_COLORS[key] : FALLBACK_COLOR;
 }
 
+/**
+ * Motivo de ausência de estrato da v2 (`qualis_status`), que também entra como
+ * valor da faceta e do filtro `qualis`. Usa a cor `qualis-SQ` do kit, com o
+ * rótulo do motivo.
+ */
+export const QUALIS_STATUS_COLORS = {
+  not_rated: {
+    label: 'Sem estrato',
+    bg: 'bg-qualis-SQ',
+    text: 'text-qualis-SQ',
+    borderLeft: 'border-l-qualis-SQ',
+  },
+  not_applicable: {
+    label: 'Não se aplica',
+    bg: 'bg-qualis-SQ',
+    text: 'text-qualis-SQ',
+    borderLeft: 'border-l-qualis-SQ',
+  },
+} as const satisfies Record<string, DictionaryColor>;
+
+export type QualisStatusKey = keyof typeof QUALIS_STATUS_COLORS;
+
+export function qualisStatusKey(
+  value: string | null | undefined,
+): QualisStatusKey | null {
+  const raw = (value ?? '').trim().toLowerCase();
+  return raw in QUALIS_STATUS_COLORS ? (raw as QualisStatusKey) : null;
+}
+
+/**
+ * Cor e rótulo de um valor da faceta `qualis`: estrato (`A1`…`C`) ou motivo
+ * de ausência (`not_rated` → "Sem estrato", `not_applicable`).
+ */
+export function qualisFacetColor(
+  value: string | null | undefined,
+): DictionaryColor {
+  const status = qualisStatusKey(value);
+  return status ? QUALIS_STATUS_COLORS[status] : qualisColor(value);
+}
+
 // ---------------------------------------------------------------------------
 // Tipo de produção (`prod-*`)
 // ---------------------------------------------------------------------------
@@ -396,6 +436,19 @@ export const PRODUCTION_COLORS = {
     borderLeft: 'border-l-prod-oficina',
     light: true,
   },
+  'texto-revista': {
+    label: 'Textos em revista',
+    bg: 'bg-prod-texto-revista',
+    text: 'text-prod-texto-revista',
+    borderLeft: 'border-l-prod-texto-revista',
+    light: true,
+  },
+  'trabalho-evento': {
+    label: 'Trabalhos em eventos',
+    bg: 'bg-prod-trabalho-evento',
+    text: 'text-prod-trabalho-evento',
+    borderLeft: 'border-l-prod-trabalho-evento',
+  },
 } as const satisfies Record<string, DictionaryColor>;
 
 export type ProductionKey = keyof typeof PRODUCTION_COLORS;
@@ -411,6 +464,8 @@ const PRODUCTION_KIND_KEYS: Record<string, ProductionKey> = {
   software: 'software',
   brand: 'marca',
   report: 'relatorio',
+  magazine_text: 'texto-revista',
+  event_work: 'trabalho-evento',
 };
 
 /** Aceita o `kind` da v2 (`book_chapter` ou `book-chapter`) ou a chave do kit. */

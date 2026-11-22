@@ -5,10 +5,8 @@ import { PersonCard } from './person-card';
 
 const baseResearcher: ResearcherSummary = {
   id: 'res-1',
-  researcher_id: 'legacy-ignored',
   name: 'Helena Duarte Ramos',
   image_url: 'https://exemplo.br/fotos/helena.jpg',
-  image: 'legacy-image-ignored',
   classification: 'A',
   graduation: 'Doutorado',
   affiliations: [

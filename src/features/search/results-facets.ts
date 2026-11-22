@@ -1,7 +1,12 @@
 import { normalizeProductionKind } from '@/entities/production/model';
 import { getProductionDefinition } from '@/entities/production/registry';
 import { scholarshipModalityColor } from '@/entities/scholarship/model';
-import { areaColor, areaKey, qualisColor } from '@/shared/lib/design-tokens';
+import {
+  areaColor,
+  areaKey,
+  qualisFacetColor,
+  qualisStatusKey,
+} from '@/shared/lib/design-tokens';
 import type { FacetFieldConfig } from '@/shared/ui/facet-panel';
 
 const LOWERCASE_WORDS = new Set(['de', 'da', 'do', 'das', 'dos', 'e']);
@@ -27,11 +32,6 @@ export function sourceTypeLabel(value: string): string {
   return kind ? getProductionDefinition(kind).title : value;
 }
 
-const QUALIS_LABELS: Record<string, string> = {
-  not_rated: 'Sem Qualis',
-  not_applicable: 'Não se aplica',
-};
-
 /** Apresentação das facetas de `/busca` (rótulos em pt-BR e cor por dado). */
 export const RESULTS_FACET_CONFIG: Record<string, FacetFieldConfig> = {
   source_type: {
@@ -48,8 +48,12 @@ export const RESULTS_FACET_CONFIG: Record<string, FacetFieldConfig> = {
   },
   qualis: {
     label: 'Qualis',
-    dotClassName: (value) => qualisColor(value).bg,
-    formatItemLabel: (item) => QUALIS_LABELS[item.value] ?? item.label,
+    // Estratos e motivos de ausência (`not_rated` → "Sem estrato").
+    dotClassName: (value) => qualisFacetColor(value).bg,
+    formatItemLabel: (item) =>
+      qualisStatusKey(item.value)
+        ? qualisFacetColor(item.value).label
+        : item.label,
   },
   year: { label: 'Ano de produção' },
   institution: { label: 'Instituições', searchable: true },

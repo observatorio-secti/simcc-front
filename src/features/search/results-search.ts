@@ -181,11 +181,13 @@ const ARTICLE_FILTERS = [
 ] as const satisfies readonly ResultsFilterKey[];
 
 /**
- * Bolsistas: `/v2/scholarship` só tem facetas de modalidade e nível. O filtro
- * `modality` tem os mesmos valores da faceta de pesquisadores e passa de uma
- * aba à outra.
+ * Bolsistas: `/v2/scholarship` filtra por instituição, programa, modalidade e
+ * nível. Instituição, programa e `modality` têm os mesmos valores das facetas
+ * de pesquisadores e passam de uma aba à outra.
  */
 const SCHOLARSHIP_FILTERS = [
+  'institution_id',
+  'graduate_program_id',
   'modality',
   'category_level',
 ] as const satisfies readonly ResultsFilterKey[];
@@ -246,8 +248,8 @@ export function countTabFilters(search: ResultsSearch, tab: TabSource): number {
 /**
  * `source_type` fixo de cada tipo de busca em `/v2/researcher`. Sem entrada,
  * a busca cobre o perfil inteiro (nome, resumo e produções) e o usuário pode
- * filtrar pela faceta `source_type`. A v2 não tem busca só por nome ou só
- * pelo resumo: esses tipos usam a busca no perfil, como no legado.
+ * filtrar pela faceta `source_type`. Nome e resumo não filtram por tipo de
+ * produção: restringem o campo da busca com `search_in` (`searchInFor`).
  */
 const SOURCE_TYPES_BY_SEARCH_TYPE: Partial<
   Record<SearchType, ResearcherSourceType[]>
@@ -264,6 +266,31 @@ export function fixedSourceTypes(
   type: SearchType = 'profile',
 ): ResearcherSourceType[] | undefined {
   return SOURCE_TYPES_BY_SEARCH_TYPE[type];
+}
+
+type ResearcherSearchIn = NonNullable<ResearcherSearch['search_in']>;
+
+/** Campo da busca textual de `/v2/researcher` por tipo de busca. */
+const SEARCH_IN_BY_SEARCH_TYPE: Partial<
+  Record<SearchType, ResearcherSearchIn>
+> = {
+  name: 'name',
+  abstract: 'abstract',
+};
+
+/**
+ * `search_in` de `/v2/researcher` para o tipo de busca: `name` (só o nome),
+ * `abstract` (só o resumo) ou `undefined` (o padrão da v2, `all`).
+ */
+export function searchInFor(
+  type: SearchType = 'profile',
+): ResearcherSearchIn | undefined {
+  return SEARCH_IN_BY_SEARCH_TYPE[type];
+}
+
+/** O tipo de busca restringe o resultado (por tipo de produção ou campo). */
+function narrowsSourceType(type: SearchType = 'profile'): boolean {
+  return Boolean(fixedSourceTypes(type) ?? searchInFor(type));
 }
 
 const RESEARCHER_FACETS_BASE = [
@@ -287,9 +314,12 @@ const PRODUCTION_FACETS_BASE = [
   'city',
 ] as const;
 
-/** Facetas pedidas a `/v2/researcher` (com `source_type` só quando não é fixo). */
+/**
+ * Facetas pedidas a `/v2/researcher`: `source_type` só na busca no perfil
+ * inteiro (sem tipo de produção fixo nem `search_in`).
+ */
 export function researcherFacets(type: SearchType = 'profile'): string[] {
-  return fixedSourceTypes(type)
+  return narrowsSourceType(type)
     ? [...RESEARCHER_FACETS_BASE]
     : [...RESEARCHER_FACETS_BASE, 'source_type'];
 }
@@ -301,7 +331,13 @@ export function productionFacets(kind: ProductionKind): string[] {
 }
 
 /** Facetas que `/v2/scholarship` aceita. */
-export const SCHOLARSHIP_FACETS = ['modality', 'category_level'] as const;
+export const SCHOLARSHIP_FACETS = [
+  'institution',
+  'graduate_program',
+  'modality',
+  'category_level',
+] as const;
+// A v2 aceita no máximo 100 (acima disso, 422).
 const SCHOLARSHIP_FACET_LIMIT = 50;
 
 /** Faceta que `/v2/magazine` aceita. */
@@ -402,10 +438,14 @@ export function toResearcherQuery(search: ResultsSearch): ResearcherSearch {
   const sort = resolveSort({ source: 'researcher' }, search);
   const filters = pickFilters(search, RESEARCHER_FILTERS);
   const fixed = fixedSourceTypes(search.type);
-  const sourceType = fixed ?? filters.source_type;
+  const searchIn = search.q ? searchInFor(search.type) : undefined;
+  // Com `search_in`, a busca é só no nome ou no resumo: não filtra por tipo.
+  const sourceType = searchIn ? undefined : (fixed ?? filters.source_type);
+  const { source_type: _sourceType, ...otherFilters } = filters;
   return {
     ...baseQuery(search),
-    ...filters,
+    ...otherFilters,
+    ...(searchIn ? { search_in: searchIn } : {}),
     ...(sourceType ? { source_type: sourceType } : {}),
     sort_by: sort.sort_by as ResearcherSortBy,
     sort_order: sort.sort_order,
@@ -534,6 +574,6 @@ export function applyQuery(
     tab: tab === DEFAULT_SEARCH_TAB ? undefined : tab,
     sort_by: undefined,
     sort_order: undefined,
-    ...(fixedSourceTypes(type) ? { source_type: undefined } : {}),
+    ...(narrowsSourceType(type) ? { source_type: undefined } : {}),
   });
 }

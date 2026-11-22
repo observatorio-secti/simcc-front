@@ -25,6 +25,8 @@ export const SEARCH_TAB_IDS = [
   'brands',
   'guidances',
   'reports',
+  'magazine_texts',
+  'event_works',
   'scholarships',
   'magazines',
 ] as const;
@@ -99,6 +101,8 @@ export const SEARCH_TABS: Record<SearchTabId, SearchTabDefinition> = {
   brands: productionTab('brands', 'brand'),
   guidances: productionTab('guidances', 'guidance'),
   reports: productionTab('reports', 'report'),
+  magazine_texts: productionTab('magazine_texts', 'magazine_text'),
+  event_works: productionTab('event_works', 'event_work'),
   scholarships: {
     id: 'scholarships',
     source: 'scholarship',
@@ -141,7 +145,8 @@ export const TABS_BY_SEARCH_TYPE: Record<SearchType, readonly SearchTabId[]> = {
 
 /**
  * Abas sem termo (listagens, D1.4): um catálogo da v2 por aba, na ordem das
- * listagens do legado. Bolsistas e revistas só existem aqui: `/v2/scholarship`
+ * listagens do legado (texto em revista e trabalho em evento entraram na
+ * V4.1, com as rotas novas da v2). Bolsistas e revistas só existem aqui: `/v2/scholarship`
  * não tem busca textual, e o `q` de `/v2/magazine` busca só o nome da revista.
  */
 export const CATALOG_TABS = [
@@ -152,6 +157,8 @@ export const CATALOG_TABS = [
   'brands',
   'guidances',
   'reports',
+  'magazine_texts',
+  'event_works',
   'magazines',
 ] as const satisfies readonly SearchTabId[];
 
