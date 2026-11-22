@@ -84,7 +84,7 @@ function renderShellAt(initialPath: string) {
     history: createMemoryHistory({ initialEntries: [initialPath] }),
   });
 
-  return render(<RouterProvider router={router} />);
+  return { ...render(<RouterProvider router={router} />), router };
 }
 
 function mockMatchMedia(matches: boolean) {
@@ -276,5 +276,39 @@ describe('PublicLayout e AppSidebar', () => {
       expect(sidebar).toHaveAttribute('data-state', 'expanded');
     });
     expect(readStorage<boolean>(SIDEBAR_STORAGE_KEY, true)).toBe(false);
+  });
+
+  it('contrai a sidebar ao realizar uma busca e preserva expansão ao paginar/filtrar', async () => {
+    const user = userEvent.setup();
+    const { router } = renderShellAt('/');
+
+    const sidebar = await waitFor(() => {
+      const el = document.querySelector<HTMLElement>('[data-slot="sidebar"]');
+      expect(el).not.toBeNull();
+      return el!;
+    });
+
+    expect(sidebar).toHaveAttribute('data-state', 'expanded');
+
+    // Simula submissão de busca a partir da página inicial (/ -> /busca?q=energia).
+    await router.navigate({ href: '/busca?q=energia' });
+    await waitFor(() => {
+      expect(sidebar).toHaveAttribute('data-state', 'collapsed');
+    });
+    expect(readStorage<boolean>(SIDEBAR_STORAGE_KEY, false)).toBe(true);
+
+    // Usuário expande manualmente na página de resultados e pagina (?page=2): continua expandida.
+    await user.click(screen.getByRole('button', { name: 'Expandir menu' }));
+    expect(sidebar).toHaveAttribute('data-state', 'expanded');
+
+    await router.navigate({ href: '/busca?q=energia&page=2' });
+    expect(sidebar).toHaveAttribute('data-state', 'expanded');
+
+    // Nova busca em /busca (alterando q) contrai a sidebar novamente.
+    await router.navigate({ href: '/busca?q=agua' });
+    await waitFor(() => {
+      expect(sidebar).toHaveAttribute('data-state', 'collapsed');
+    });
+    expect(readStorage<boolean>(SIDEBAR_STORAGE_KEY, false)).toBe(true);
   });
 });
