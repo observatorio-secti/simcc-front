@@ -46,15 +46,15 @@ No `Dockerfile`, o estágio `builder` declara cada `VITE_*` como `ARG` sem valor
 
 #### Build args de produção (conforme `Dockerfile`, `.env.example` e `deploy-obs.yaml`)
 
-| Variável / Build Arg     | Obrigatória | Origem no deploy atual         | Valor em produção                                       |
-| ------------------------ | ----------- | ------------------------------ | ------------------------------------------------------- |
-| `VITE_BASE_PATH`         | Sim         | `--build-arg` / padrão `Dockerfile` | `/simcc/`                                               |
-| `VITE_SIMCC_API_URL`     | Sim         | `--build-arg` (`deploy-obs.yaml`) | `https://observatoriocti.secti.ba.gov.br/simcc/api/`    |
-| `VITE_ODA_API_URL`       | Opcional    | `--build-arg` (`deploy-obs.yaml`) | `https://observatoriocti.secti.ba.gov.br/oda/v1/`       |
-| `VITE_ADMIN_API_URL`     | Opcional\*  | `--build-arg` (`deploy-obs.yaml`) | `https://observatoriocti.secti.ba.gov.br/simcc/admin/`  |
-| `VITE_IDP_URL`           | Opcional\*  | `--build-arg` (`deploy-obs.yaml`) | `https://observatoriocti.secti.ba.gov.br/idp/`          |
-| `VITE_MARIA_API_URL`     | Opcional    | `--build-arg` (`deploy-obs.yaml`) | `https://observatoriocti.secti.ba.gov.br/api-maria/`    |
-| `VITE_GA_MEASUREMENT_ID` | Opcional    | `.env` do servidor             | `<PREENCHER_NO_SERVIDOR>` (ex.: `G-XXXXXXXXXX`, se usar) |
+| Variável / Build Arg     | Obrigatória | Origem no deploy atual              | Valor em produção                                        |
+| ------------------------ | ----------- | ----------------------------------- | -------------------------------------------------------- |
+| `VITE_BASE_PATH`         | Sim         | `--build-arg` / padrão `Dockerfile` | `/simcc/`                                                |
+| `VITE_SIMCC_API_URL`     | Sim         | `--build-arg` (`deploy-obs.yaml`)   | `https://observatoriocti.secti.ba.gov.br/simcc/api/`     |
+| `VITE_ODA_API_URL`       | Opcional    | `--build-arg` (`deploy-obs.yaml`)   | `https://observatoriocti.secti.ba.gov.br/oda/v1/`        |
+| `VITE_ADMIN_API_URL`     | Opcional\*  | `--build-arg` (`deploy-obs.yaml`)   | `https://observatoriocti.secti.ba.gov.br/simcc/admin/`   |
+| `VITE_IDP_URL`           | Opcional\*  | `--build-arg` (`deploy-obs.yaml`)   | `https://observatoriocti.secti.ba.gov.br/idp/`           |
+| `VITE_MARIA_API_URL`     | Opcional    | `--build-arg` (`deploy-obs.yaml`)   | `https://observatoriocti.secti.ba.gov.br/api-maria/`     |
+| `VITE_GA_MEASUREMENT_ID` | Opcional    | `.env` do servidor                  | `<PREENCHER_NO_SERVIDOR>` (ex.: `G-XXXXXXXXXX`, se usar) |
 
 \* Opcionais no schema de `src/config/env.ts`, mas necessárias em produção para o console administrativo (`/console`) e login PKCE.
 
@@ -88,13 +88,13 @@ Conferir no `.env` do servidor antes do deploy da `main`:
 
 Conferir no `.env` do servidor:
 
-| Variável               | Descrição                                                                 | Valor esperado                         |
-| ---------------------- | ------------------------------------------------------------------------- | -------------------------------------- |
-| `ADMIN_BOOTSTRAP_SUBS` | Lista de `sub`s do IdP que recebem acesso inicial de admin na tabela `admins` | `<PREENCHER_NO_SERVIDOR>`              |
-| `X-ETL-API-Key` (env)  | Chave secreta usada pelo `simcc-admin` no header `X-ETL-API-Key` ao chamar o ETL | `<PREENCHER_NO_SERVIDOR_APOS_ROTACAO>` |
-| URL do ETL             | Endereço interno/privado ou público do serviço ETL (`simcc.uesc.br/etl/`) | `<PREENCHER_NO_SERVIDOR>`              |
-| URL / JWKS do IdP      | Emissor do JWT para validação de assinatura RS256 e `aud: "simcc"`        | `https://observatoriocti.secti.ba.gov.br/idp/` |
-| Banco do admin         | String de conexão do banco da API de admin                                | `<PREENCHER_NO_SERVIDOR>`              |
+| Variável               | Descrição                                                                        | Valor esperado                                 |
+| ---------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `ADMIN_BOOTSTRAP_SUBS` | Lista de `sub`s do IdP que recebem acesso inicial de admin na tabela `admins`    | `<PREENCHER_NO_SERVIDOR>`                      |
+| `X-ETL-API-Key` (env)  | Chave secreta usada pelo `simcc-admin` no header `X-ETL-API-Key` ao chamar o ETL | `<PREENCHER_NO_SERVIDOR_APOS_ROTACAO>`         |
+| URL do ETL             | Endereço interno/privado ou público do serviço ETL (`simcc.uesc.br/etl/`)        | `<PREENCHER_NO_SERVIDOR>`                      |
+| URL / JWKS do IdP      | Emissor do JWT para validação de assinatura RS256 e `aud: "simcc"`               | `https://observatoriocti.secti.ba.gov.br/idp/` |
+| Banco do admin         | String de conexão do banco da API de admin                                       | `<PREENCHER_NO_SERVIDOR>`                      |
 
 ---
 
@@ -158,43 +158,43 @@ Após validar localmente, publique na `develop` e faça o merge `develop` → `m
 
 Referência gerada com `git log --first-parent --merges --oneline origin/main..origin/develop` (do mais recente para o mais antigo). Use `git revert -m 1 <hash>` caso seja necessário isolar e reverter um PR específico:
 
-| Hash      | Mensagem                                                                          |
-| --------- | --------------------------------------------------------------------------------- |
-| `f7dad1d` | `Merge feat/t12.2-console-academico`                                              |
-| `5282364` | `Merge feat/t12.3-console-etl`                                                    |
-| `5f7df85` | `Merge pull request #58 from observatorio-secti/feat/t10-maria`                   |
-| `a158022` | `Merge pull request #59 from observatorio-secti/feat/t12.1-console-base`          |
-| `acff7f8` | `Merge pull request #56 from observatorio-secti/feat/v2-redirects`                |
-| `e9cf425` | `Merge pull request #57 from observatorio-secti/feat/t13-detalhe-producao`        |
-| `049fbfc` | `Merge pull request #55 from observatorio-secti/feat/v3-ambiente-producao`        |
-| `9e4bff1` | `Merge pull request #54 from observatorio-secti/feat/v4.1-contrato-final`         |
-| `933fdc9` | `Merge pull request #53 from observatorio-secti/feat/t7-paineis-power-bi`         |
-| `0c39b3d` | `Merge pull request #52 from observatorio-secti/feat/d1.4-listagens`              |
-| `c620d19` | `Merge pull request #51 from observatorio-secti/feat/t2-busca-resultados`         |
-| `8f6514a` | `Merge pull request #48 from observatorio-secti/feat/t7-indicadores`              |
-| `b638b59` | `Merge pull request #44 from observatorio-secti/feat/t3-perfil-pesquisador`       |
-| `3b8e351` | `Merge pull request #47 from observatorio-secti/feat/t6-grupos-pesquisa`          |
-| `3d906ae` | `Merge pull request #45 from observatorio-secti/feat/t4-instituicoes`             |
-| `37793fa` | `Merge pull request #49 from observatorio-secti/feat/d1.2-paineis-externos`       |
-| `b4ee3f5` | `Merge pull request #42 from observatorio-secti/feat/d1.1-incites`                |
-| `cf7d9a4` | `Merge pull request #50 from observatorio-secti/feat/d1.3-indice-pesquisador`     |
-| `becbf36` | `Merge pull request #43 from observatorio-secti/feat/t1-busca-home`               |
-| `a0fa4f7` | `Merge pull request #46 from observatorio-secti/feat/t5-pos-graduacao`            |
-| `8cf4f1d` | `Merge pull request #31 from observatorio-secti/feat/t12-console-proposta`        |
-| `6c8b935` | `Merge pull request #41 from observatorio-secti/feat/e6-entidade-revista`         |
-| `610e326` | `Merge pull request #39 from observatorio-secti/feat/e5-entidade-grupo-oda`       |
-| `180ffd3` | `Merge pull request #40 from observatorio-secti/feat/e4-entidade-programa`        |
-| `5f22513` | `Merge pull request #36 from observatorio-secti/feat/e3-entidade-instituicao`     |
-| `e0f63f3` | `Merge pull request #37 from observatorio-secti/feat/e2-entidade-producao`        |
-| `9f3ec0e` | `Merge pull request #35 from observatorio-secti/feat/e1-entidade-pesquisador`     |
-| `8081855` | `Merge pull request #33 from observatorio-secti/feat/f1.5-motor-listagem`         |
-| `dba340c` | `Merge pull request #38 from observatorio-secti/feat/f1.4-sessao-autenticacao`    |
-| `9b2aee2` | `Merge pull request #34 from observatorio-secti/feat/f1.3-moldura-navegacao`      |
+| Hash      | Mensagem                                                                             |
+| --------- | ------------------------------------------------------------------------------------ |
+| `f7dad1d` | `Merge feat/t12.2-console-academico`                                                 |
+| `5282364` | `Merge feat/t12.3-console-etl`                                                       |
+| `5f7df85` | `Merge pull request #58 from observatorio-secti/feat/t10-maria`                      |
+| `a158022` | `Merge pull request #59 from observatorio-secti/feat/t12.1-console-base`             |
+| `acff7f8` | `Merge pull request #56 from observatorio-secti/feat/v2-redirects`                   |
+| `e9cf425` | `Merge pull request #57 from observatorio-secti/feat/t13-detalhe-producao`           |
+| `049fbfc` | `Merge pull request #55 from observatorio-secti/feat/v3-ambiente-producao`           |
+| `9e4bff1` | `Merge pull request #54 from observatorio-secti/feat/v4.1-contrato-final`            |
+| `933fdc9` | `Merge pull request #53 from observatorio-secti/feat/t7-paineis-power-bi`            |
+| `0c39b3d` | `Merge pull request #52 from observatorio-secti/feat/d1.4-listagens`                 |
+| `c620d19` | `Merge pull request #51 from observatorio-secti/feat/t2-busca-resultados`            |
+| `8f6514a` | `Merge pull request #48 from observatorio-secti/feat/t7-indicadores`                 |
+| `b638b59` | `Merge pull request #44 from observatorio-secti/feat/t3-perfil-pesquisador`          |
+| `3b8e351` | `Merge pull request #47 from observatorio-secti/feat/t6-grupos-pesquisa`             |
+| `3d906ae` | `Merge pull request #45 from observatorio-secti/feat/t4-instituicoes`                |
+| `37793fa` | `Merge pull request #49 from observatorio-secti/feat/d1.2-paineis-externos`          |
+| `b4ee3f5` | `Merge pull request #42 from observatorio-secti/feat/d1.1-incites`                   |
+| `cf7d9a4` | `Merge pull request #50 from observatorio-secti/feat/d1.3-indice-pesquisador`        |
+| `becbf36` | `Merge pull request #43 from observatorio-secti/feat/t1-busca-home`                  |
+| `a0fa4f7` | `Merge pull request #46 from observatorio-secti/feat/t5-pos-graduacao`               |
+| `8cf4f1d` | `Merge pull request #31 from observatorio-secti/feat/t12-console-proposta`           |
+| `6c8b935` | `Merge pull request #41 from observatorio-secti/feat/e6-entidade-revista`            |
+| `610e326` | `Merge pull request #39 from observatorio-secti/feat/e5-entidade-grupo-oda`          |
+| `180ffd3` | `Merge pull request #40 from observatorio-secti/feat/e4-entidade-programa`           |
+| `5f22513` | `Merge pull request #36 from observatorio-secti/feat/e3-entidade-instituicao`        |
+| `e0f63f3` | `Merge pull request #37 from observatorio-secti/feat/e2-entidade-producao`           |
+| `9f3ec0e` | `Merge pull request #35 from observatorio-secti/feat/e1-entidade-pesquisador`        |
+| `8081855` | `Merge pull request #33 from observatorio-secti/feat/f1.5-motor-listagem`            |
+| `dba340c` | `Merge pull request #38 from observatorio-secti/feat/f1.4-sessao-autenticacao`       |
+| `9b2aee2` | `Merge pull request #34 from observatorio-secti/feat/f1.3-moldura-navegacao`         |
 | `00d8b05` | `Merge pull request #32 from observatorio-secti/feat/f1.6-infraestrutura-testes-msw` |
-| `6f8f558` | `Merge pull request #26 from observatorio-secti/docs/adr-0008-admin-unico`        |
-| `37e305f` | `Merge pull request #22 from observatorio-secti/feat/f1.1-cliente-api-v2`         |
-| `4236a80` | `Merge pull request #23 from observatorio-secti/feat/k1-tokens-gerados`           |
-| `6cb62a4` | `Merge pull request #24 from observatorio-secti/feat/f1.2-primitivos-ui`          |
+| `6f8f558` | `Merge pull request #26 from observatorio-secti/docs/adr-0008-admin-unico`           |
+| `37e305f` | `Merge pull request #22 from observatorio-secti/feat/f1.1-cliente-api-v2`            |
+| `4236a80` | `Merge pull request #23 from observatorio-secti/feat/k1-tokens-gerados`              |
+| `6cb62a4` | `Merge pull request #24 from observatorio-secti/feat/f1.2-primitivos-ui`             |
 
 ---
 
