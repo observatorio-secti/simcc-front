@@ -8,6 +8,7 @@ import {
   adminKeys,
   createAdminMutationOptions,
 } from '@/entities/admin/queries';
+import { errorMessage } from '@/shared/lib/error-message';
 import { Button } from '@/shared/ui/button';
 import {
   Dialog,
@@ -18,7 +19,6 @@ import {
   DialogTitle,
 } from '@/shared/ui/dialog';
 import { Input } from '@/shared/ui/input';
-import { errorMessage } from '@/shared/lib/error-message';
 
 type FieldName = 'sub' | 'name' | 'email';
 type FieldErrors = Partial<Record<FieldName, string>>;

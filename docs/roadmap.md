@@ -84,7 +84,7 @@ graph LR
 | T10   | MarIA                                             | F1.3, E1, E2     | —                 | em revisão            | t10-maria      |
 | T12   | Console (proposta aprovada)                       | F1.4, F1.2       | —                 | em andamento (T12.1+) |                |
 | T12.1 | Console: base e admins                            | T12              | —                 | em revisão            | t12-1-console  |
-| T12.2 | Console: cadastro acadêmico                       | T12.1            | —                 | a fazer               |                |
+| T12.2 | Console: cadastro acadêmico                       | T12.1            | —                 | feito                 |                |
 | T12.3 | Console: sincronização (ETL)                      | T12.1            | —                 | feito                 |                |
 | T13   | Detalhe de produção (rota com overlay)            | E2, T2           | —                 | em revisão            | t13-producao   |
 | D1.1  | InCites                                           | F1.3             | —                 | feito                 | d1-1-incites   |

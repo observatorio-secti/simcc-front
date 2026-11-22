@@ -28,6 +28,7 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthSemAcessoRouteImport } from './routes/auth.sem-acesso'
 import { Route as ConsoleIndexRouteImport } from './routes/console/index'
 import { Route as ConsoleAdminsRouteImport } from './routes/console/admins'
+import { Route as ConsoleColecoesRouteImport } from './routes/console/colecoes'
 import { Route as DevVitrineRouteImport } from './routes/dev/vitrine'
 import { Route as PublicGruposPesquisaIndexRouteImport } from './routes/_public/grupos-pesquisa/index'
 import { Route as PublicGruposPesquisaIdRouteImport } from './routes/_public/grupos-pesquisa/$id'
@@ -42,6 +43,10 @@ import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/po
 import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
 import { Route as ConsoleEtlIndexRouteImport } from './routes/console/etl/index'
 import { Route as ConsoleEtlRunIdRouteImport } from './routes/console/etl/$runId'
+import { Route as ConsoleInstituicoesIndexRouteImport } from './routes/console/instituicoes/index'
+import { Route as ConsoleInstituicoesInstitutionIdRouteImport } from './routes/console/instituicoes/$institutionId'
+import { Route as ConsolePesquisadoresIndexRouteImport } from './routes/console/pesquisadores/index'
+import { Route as ConsolePesquisadoresResearcherIdRouteImport } from './routes/console/pesquisadores/$researcherId'
 import { Route as PublicProducoesKindIdRouteImport } from './routes/_public/producoes/$kind/$id'
 
 const PublicRoute = PublicRouteImport.update({
@@ -140,6 +145,11 @@ const ConsoleAdminsRoute = ConsoleAdminsRouteImport.update({
   path: '/admins',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const ConsoleColecoesRoute = ConsoleColecoesRouteImport.update({
+  id: '/colecoes',
+  path: '/colecoes',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const DevVitrineRoute = DevVitrineRouteImport.update({
   id: '/dev/vitrine',
   path: '/dev/vitrine',
@@ -213,6 +223,30 @@ const ConsoleEtlRunIdRoute = ConsoleEtlRunIdRouteImport.update({
   path: '/etl/$runId',
   getParentRoute: () => ConsoleRoute,
 } as any)
+const ConsoleInstituicoesIndexRoute =
+  ConsoleInstituicoesIndexRouteImport.update({
+    id: '/instituicoes/',
+    path: '/instituicoes/',
+    getParentRoute: () => ConsoleRoute,
+  } as any)
+const ConsoleInstituicoesInstitutionIdRoute =
+  ConsoleInstituicoesInstitutionIdRouteImport.update({
+    id: '/instituicoes/$institutionId',
+    path: '/instituicoes/$institutionId',
+    getParentRoute: () => ConsoleRoute,
+  } as any)
+const ConsolePesquisadoresIndexRoute =
+  ConsolePesquisadoresIndexRouteImport.update({
+    id: '/pesquisadores/',
+    path: '/pesquisadores/',
+    getParentRoute: () => ConsoleRoute,
+  } as any)
+const ConsolePesquisadoresResearcherIdRoute =
+  ConsolePesquisadoresResearcherIdRouteImport.update({
+    id: '/pesquisadores/$researcherId',
+    path: '/pesquisadores/$researcherId',
+    getParentRoute: () => ConsoleRoute,
+  } as any)
 const PublicProducoesKindIdRoute = PublicProducoesKindIdRouteImport.update({
   id: '/producoes/$kind/$id',
   path: '/producoes/$kind/$id',
@@ -237,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/console/admins': typeof ConsoleAdminsRoute
+  '/console/colecoes': typeof ConsoleColecoesRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/console/': typeof ConsoleIndexRoute
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
@@ -246,12 +281,16 @@ export interface FileRoutesByFullPath {
   '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/console/etl/$runId': typeof ConsoleEtlRunIdRoute
+  '/console/instituicoes/$institutionId': typeof ConsoleInstituicoesInstitutionIdRoute
+  '/console/pesquisadores/$researcherId': typeof ConsolePesquisadoresResearcherIdRoute
   '/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/instituicao/': typeof PublicInstituicaoIndexRoute
   '/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/maria/': typeof PublicMariaIndexRoute
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
   '/console/etl/': typeof ConsoleEtlIndexRoute
+  '/console/instituicoes/': typeof ConsoleInstituicoesIndexRoute
+  '/console/pesquisadores/': typeof ConsolePesquisadoresIndexRoute
   '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRoutesByTo {
@@ -269,6 +308,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/console/admins': typeof ConsoleAdminsRoute
+  '/console/colecoes': typeof ConsoleColecoesRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/': typeof PublicIndexRoute
   '/console': typeof ConsoleIndexRoute
@@ -279,12 +319,16 @@ export interface FileRoutesByTo {
   '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/console/etl/$runId': typeof ConsoleEtlRunIdRoute
+  '/console/instituicoes/$institutionId': typeof ConsoleInstituicoesInstitutionIdRoute
+  '/console/pesquisadores/$researcherId': typeof ConsolePesquisadoresResearcherIdRoute
   '/grupos-pesquisa': typeof PublicGruposPesquisaIndexRoute
   '/instituicao': typeof PublicInstituicaoIndexRoute
   '/instituicoes': typeof PublicInstituicoesIndexRoute
   '/maria': typeof PublicMariaIndexRoute
   '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
   '/console/etl': typeof ConsoleEtlIndexRoute
+  '/console/instituicoes': typeof ConsoleInstituicoesIndexRoute
+  '/console/pesquisadores': typeof ConsolePesquisadoresIndexRoute
   '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRoutesById {
@@ -306,6 +350,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/auth/sem-acesso': typeof AuthSemAcessoRoute
   '/console/admins': typeof ConsoleAdminsRoute
+  '/console/colecoes': typeof ConsoleColecoesRoute
   '/dev/vitrine': typeof DevVitrineRoute
   '/_public/': typeof PublicIndexRoute
   '/console/': typeof ConsoleIndexRoute
@@ -316,12 +361,16 @@ export interface FileRoutesById {
   '/_public/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/console/etl/$runId': typeof ConsoleEtlRunIdRoute
+  '/console/instituicoes/$institutionId': typeof ConsoleInstituicoesInstitutionIdRoute
+  '/console/pesquisadores/$researcherId': typeof ConsolePesquisadoresResearcherIdRoute
   '/_public/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/_public/instituicao/': typeof PublicInstituicaoIndexRoute
   '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/_public/maria/': typeof PublicMariaIndexRoute
   '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
   '/console/etl/': typeof ConsoleEtlIndexRoute
+  '/console/instituicoes/': typeof ConsoleInstituicoesIndexRoute
+  '/console/pesquisadores/': typeof ConsolePesquisadoresIndexRoute
   '/_public/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRouteTypes {
@@ -344,6 +393,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/console/admins'
+    | '/console/colecoes'
     | '/dev/vitrine'
     | '/console/'
     | '/grupos-pesquisa/$id'
@@ -353,12 +403,16 @@ export interface FileRouteTypes {
     | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
     | '/console/etl/$runId'
+    | '/console/instituicoes/$institutionId'
+    | '/console/pesquisadores/$researcherId'
     | '/grupos-pesquisa/'
     | '/instituicao/'
     | '/instituicoes/'
     | '/maria/'
     | '/pos-graduacao/'
     | '/console/etl/'
+    | '/console/instituicoes/'
+    | '/console/pesquisadores/'
     | '/producoes/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -376,6 +430,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/console/admins'
+    | '/console/colecoes'
     | '/dev/vitrine'
     | '/'
     | '/console'
@@ -386,12 +441,16 @@ export interface FileRouteTypes {
     | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
     | '/console/etl/$runId'
+    | '/console/instituicoes/$institutionId'
+    | '/console/pesquisadores/$researcherId'
     | '/grupos-pesquisa'
     | '/instituicao'
     | '/instituicoes'
     | '/maria'
     | '/pos-graduacao'
     | '/console/etl'
+    | '/console/instituicoes'
+    | '/console/pesquisadores'
     | '/producoes/$kind/$id'
   id:
     | '__root__'
@@ -412,6 +471,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/auth/sem-acesso'
     | '/console/admins'
+    | '/console/colecoes'
     | '/dev/vitrine'
     | '/_public/'
     | '/console/'
@@ -422,12 +482,16 @@ export interface FileRouteTypes {
     | '/_public/pesquisadores/$id'
     | '/_public/pos-graduacao/$id'
     | '/console/etl/$runId'
+    | '/console/instituicoes/$institutionId'
+    | '/console/pesquisadores/$researcherId'
     | '/_public/grupos-pesquisa/'
     | '/_public/instituicao/'
     | '/_public/instituicoes/'
     | '/_public/maria/'
     | '/_public/pos-graduacao/'
     | '/console/etl/'
+    | '/console/instituicoes/'
+    | '/console/pesquisadores/'
     | '/_public/producoes/$kind/$id'
   fileRoutesById: FileRoutesById
 }
@@ -574,6 +638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleAdminsRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/console/colecoes': {
+      id: '/console/colecoes'
+      path: '/colecoes'
+      fullPath: '/console/colecoes'
+      preLoaderRoute: typeof ConsoleColecoesRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/dev/vitrine': {
       id: '/dev/vitrine'
       path: '/dev/vitrine'
@@ -672,6 +743,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsoleEtlRunIdRouteImport
       parentRoute: typeof ConsoleRoute
     }
+    '/console/instituicoes/': {
+      id: '/console/instituicoes/'
+      path: '/instituicoes'
+      fullPath: '/console/instituicoes/'
+      preLoaderRoute: typeof ConsoleInstituicoesIndexRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/instituicoes/$institutionId': {
+      id: '/console/instituicoes/$institutionId'
+      path: '/instituicoes/$institutionId'
+      fullPath: '/console/instituicoes/$institutionId'
+      preLoaderRoute: typeof ConsoleInstituicoesInstitutionIdRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/pesquisadores/': {
+      id: '/console/pesquisadores/'
+      path: '/pesquisadores'
+      fullPath: '/console/pesquisadores/'
+      preLoaderRoute: typeof ConsolePesquisadoresIndexRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/pesquisadores/$researcherId': {
+      id: '/console/pesquisadores/$researcherId'
+      path: '/pesquisadores/$researcherId'
+      fullPath: '/console/pesquisadores/$researcherId'
+      preLoaderRoute: typeof ConsolePesquisadoresResearcherIdRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/_public/producoes/$kind/$id': {
       id: '/_public/producoes/$kind/$id'
       path: '/producoes/$kind/$id'
@@ -752,16 +851,26 @@ const PublicRouteWithChildren =
 
 interface ConsoleRouteChildren {
   ConsoleAdminsRoute: typeof ConsoleAdminsRoute
+  ConsoleColecoesRoute: typeof ConsoleColecoesRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
   ConsoleEtlRunIdRoute: typeof ConsoleEtlRunIdRoute
+  ConsoleInstituicoesInstitutionIdRoute: typeof ConsoleInstituicoesInstitutionIdRoute
+  ConsolePesquisadoresResearcherIdRoute: typeof ConsolePesquisadoresResearcherIdRoute
   ConsoleEtlIndexRoute: typeof ConsoleEtlIndexRoute
+  ConsoleInstituicoesIndexRoute: typeof ConsoleInstituicoesIndexRoute
+  ConsolePesquisadoresIndexRoute: typeof ConsolePesquisadoresIndexRoute
 }
 
 const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleAdminsRoute: ConsoleAdminsRoute,
+  ConsoleColecoesRoute: ConsoleColecoesRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
   ConsoleEtlRunIdRoute: ConsoleEtlRunIdRoute,
+  ConsoleInstituicoesInstitutionIdRoute: ConsoleInstituicoesInstitutionIdRoute,
+  ConsolePesquisadoresResearcherIdRoute: ConsolePesquisadoresResearcherIdRoute,
   ConsoleEtlIndexRoute: ConsoleEtlIndexRoute,
+  ConsoleInstituicoesIndexRoute: ConsoleInstituicoesIndexRoute,
+  ConsolePesquisadoresIndexRoute: ConsolePesquisadoresIndexRoute,
 }
 
 const ConsoleRouteWithChildren =

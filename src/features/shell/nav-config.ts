@@ -7,6 +7,7 @@ import {
   GraduationCap,
   Home,
   Landmark,
+  Layers,
   LayoutDashboard,
   Link2,
   MoreHorizontal,
@@ -87,10 +88,8 @@ export const PLATFORM_NAV_SECTIONS: readonly NavSection[] = [
 ];
 
 /**
- * Menu do console (`/console/*`). Pesquisadores, Instituições, Coleções e
- * Sincronização entram quando as rotas da T12.2 e da T12.3 existirem: o
- * `Link` tipado do router não aceita rota que ainda não existe, e o `href`
- * solto levaria ao 404.
+ * Menu do console (`/console/*`). Sincronização entra quando a rota da T12.3
+ * existir: o `Link` tipado do router não aceita rota que ainda não existe.
  */
 export const CONSOLE_NAV_ITEMS: readonly NavItem[] = [
   {
@@ -99,6 +98,9 @@ export const CONSOLE_NAV_ITEMS: readonly NavItem[] = [
     icon: LayoutDashboard,
     exact: true,
   },
+  { title: 'Pesquisadores', url: '/console/pesquisadores', icon: Users },
+  { title: 'Instituições', url: '/console/instituicoes', icon: Building2 },
+  { title: 'Coleções', url: '/console/colecoes', icon: Layers },
   { title: 'Sincronização', url: '/console/etl', icon: RefreshCw },
   { title: 'Administradores', url: '/console/admins', icon: ShieldCheck },
 ];
