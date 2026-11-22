@@ -18,7 +18,7 @@ import {
   DialogTitle,
 } from '@/shared/ui/dialog';
 import { Input } from '@/shared/ui/input';
-import { errorMessage } from './error-message';
+import { errorMessage } from '@/shared/lib/error-message';
 
 type FieldName = 'sub' | 'name' | 'email';
 type FieldErrors = Partial<Record<FieldName, string>>;

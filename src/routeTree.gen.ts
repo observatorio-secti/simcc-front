@@ -40,6 +40,8 @@ import { Route as PublicMariaConversationIdRouteImport } from './routes/_public/
 import { Route as PublicPesquisadoresIdRouteImport } from './routes/_public/pesquisadores/$id'
 import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
 import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
+import { Route as ConsoleEtlIndexRouteImport } from './routes/console/etl/index'
+import { Route as ConsoleEtlRunIdRouteImport } from './routes/console/etl/$runId'
 import { Route as PublicProducoesKindIdRouteImport } from './routes/_public/producoes/$kind/$id'
 
 const PublicRoute = PublicRouteImport.update({
@@ -201,6 +203,16 @@ const PublicPosGraduacaoIdRoute = PublicPosGraduacaoIdRouteImport.update({
   path: '/pos-graduacao/$id',
   getParentRoute: () => PublicRoute,
 } as any)
+const ConsoleEtlIndexRoute = ConsoleEtlIndexRouteImport.update({
+  id: '/etl/',
+  path: '/etl/',
+  getParentRoute: () => ConsoleRoute,
+} as any)
+const ConsoleEtlRunIdRoute = ConsoleEtlRunIdRouteImport.update({
+  id: '/etl/$runId',
+  path: '/etl/$runId',
+  getParentRoute: () => ConsoleRoute,
+} as any)
 const PublicProducoesKindIdRoute = PublicProducoesKindIdRouteImport.update({
   id: '/producoes/$kind/$id',
   path: '/producoes/$kind/$id',
@@ -233,11 +245,13 @@ export interface FileRoutesByFullPath {
   '/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/console/etl/$runId': typeof ConsoleEtlRunIdRoute
   '/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/instituicao/': typeof PublicInstituicaoIndexRoute
   '/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/maria/': typeof PublicMariaIndexRoute
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
+  '/console/etl/': typeof ConsoleEtlIndexRoute
   '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRoutesByTo {
@@ -264,11 +278,13 @@ export interface FileRoutesByTo {
   '/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/console/etl/$runId': typeof ConsoleEtlRunIdRoute
   '/grupos-pesquisa': typeof PublicGruposPesquisaIndexRoute
   '/instituicao': typeof PublicInstituicaoIndexRoute
   '/instituicoes': typeof PublicInstituicoesIndexRoute
   '/maria': typeof PublicMariaIndexRoute
   '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
+  '/console/etl': typeof ConsoleEtlIndexRoute
   '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRoutesById {
@@ -299,11 +315,13 @@ export interface FileRoutesById {
   '/_public/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/_public/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
+  '/console/etl/$runId': typeof ConsoleEtlRunIdRoute
   '/_public/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/_public/instituicao/': typeof PublicInstituicaoIndexRoute
   '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
   '/_public/maria/': typeof PublicMariaIndexRoute
   '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
+  '/console/etl/': typeof ConsoleEtlIndexRoute
   '/_public/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
 export interface FileRouteTypes {
@@ -334,11 +352,13 @@ export interface FileRouteTypes {
     | '/maria/$conversationId'
     | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
+    | '/console/etl/$runId'
     | '/grupos-pesquisa/'
     | '/instituicao/'
     | '/instituicoes/'
     | '/maria/'
     | '/pos-graduacao/'
+    | '/console/etl/'
     | '/producoes/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -365,11 +385,13 @@ export interface FileRouteTypes {
     | '/maria/$conversationId'
     | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
+    | '/console/etl/$runId'
     | '/grupos-pesquisa'
     | '/instituicao'
     | '/instituicoes'
     | '/maria'
     | '/pos-graduacao'
+    | '/console/etl'
     | '/producoes/$kind/$id'
   id:
     | '__root__'
@@ -399,11 +421,13 @@ export interface FileRouteTypes {
     | '/_public/maria/$conversationId'
     | '/_public/pesquisadores/$id'
     | '/_public/pos-graduacao/$id'
+    | '/console/etl/$runId'
     | '/_public/grupos-pesquisa/'
     | '/_public/instituicao/'
     | '/_public/instituicoes/'
     | '/_public/maria/'
     | '/_public/pos-graduacao/'
+    | '/console/etl/'
     | '/_public/producoes/$kind/$id'
   fileRoutesById: FileRoutesById
 }
@@ -634,6 +658,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPosGraduacaoIdRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/console/etl/': {
+      id: '/console/etl/'
+      path: '/etl'
+      fullPath: '/console/etl/'
+      preLoaderRoute: typeof ConsoleEtlIndexRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
+    '/console/etl/$runId': {
+      id: '/console/etl/$runId'
+      path: '/etl/$runId'
+      fullPath: '/console/etl/$runId'
+      preLoaderRoute: typeof ConsoleEtlRunIdRouteImport
+      parentRoute: typeof ConsoleRoute
+    }
     '/_public/producoes/$kind/$id': {
       id: '/_public/producoes/$kind/$id'
       path: '/producoes/$kind/$id'
@@ -715,11 +753,15 @@ const PublicRouteWithChildren =
 interface ConsoleRouteChildren {
   ConsoleAdminsRoute: typeof ConsoleAdminsRoute
   ConsoleIndexRoute: typeof ConsoleIndexRoute
+  ConsoleEtlRunIdRoute: typeof ConsoleEtlRunIdRoute
+  ConsoleEtlIndexRoute: typeof ConsoleEtlIndexRoute
 }
 
 const ConsoleRouteChildren: ConsoleRouteChildren = {
   ConsoleAdminsRoute: ConsoleAdminsRoute,
   ConsoleIndexRoute: ConsoleIndexRoute,
+  ConsoleEtlRunIdRoute: ConsoleEtlRunIdRoute,
+  ConsoleEtlIndexRoute: ConsoleEtlIndexRoute,
 }
 
 const ConsoleRouteWithChildren =

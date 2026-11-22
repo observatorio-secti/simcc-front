@@ -40,9 +40,9 @@ import {
 } from '@/shared/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 import { AddAdminDialog } from './add-admin-dialog';
-import { formatDate } from './format';
-import { errorMessage } from './error-message';
-import { SectionError } from './section-error';
+import { errorMessage } from '@/shared/lib/error-message';
+import { formatDate } from '@/shared/lib/format';
+import { SectionError } from '@/shared/ui/section-error';
 
 export interface AdminsPageProps {
   search: AdminListSearch;
