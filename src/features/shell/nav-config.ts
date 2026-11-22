@@ -11,6 +11,7 @@ import {
   Link2,
   MoreHorizontal,
   PanelsTopLeft,
+  RefreshCw,
   SearchCheck,
   ShieldCheck,
   Sparkles,
@@ -98,6 +99,7 @@ export const CONSOLE_NAV_ITEMS: readonly NavItem[] = [
     icon: LayoutDashboard,
     exact: true,
   },
+  { title: 'Sincronização', url: '/console/etl', icon: RefreshCw },
   { title: 'Administradores', url: '/console/admins', icon: ShieldCheck },
 ];
 
