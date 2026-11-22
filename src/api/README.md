@@ -9,6 +9,7 @@
 - `types.ts`: helpers de tipo sobre o contrato gerado (envelopes de lista e de detalhe, query e parâmetros de caminho).
 - `oda/`: cliente e adaptador da API ODA (grupos de pesquisa), com schema zod na borda (tarefa E5).
 - `idp.ts`: fluxo PKCE com o IdP (tarefa F1.4). O IdP só autentica.
+- `maria.ts`: API da MarIA (`VITE_MARIA_API_URL`), com tipos em `generated/maria.d.ts` (`npm run api:types -- maria`). Usa só `/conversations/{id}`, as mensagens e o stream SSE (`parseSse`); a listagem `GET /conversations` traz as conversas de todo mundo e não é usada (tarefa T10).
 - `admin.ts`: API de admin, com o token do IdP. Cliente `openapi-fetch` tipado por `simcc-admin.d.ts` (`adminApi().GET('/admins')`), com renovação em 401, aviso de 403 à sessão e erros `{ detail }` como `ApiError`. Permissões (`/me`), admins, cadastro acadêmico e ações do ETL; o front não chama o ETL ([ADR 0008](../../docs/decisoes/0008-autenticacao.md)).
 
 Componentes não importam daqui diretamente: quem chama a API são as `queries.ts` de cada entidade.

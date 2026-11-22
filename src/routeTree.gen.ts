@@ -17,6 +17,7 @@ import { Route as PublicIncitesRouteImport } from './routes/_public/incites'
 import { Route as PublicIndicadoresRouteImport } from './routes/_public/indicadores'
 import { Route as PublicIndicePesquisadorRouteImport } from './routes/_public/indice-pesquisador'
 import { Route as PublicListagensRouteImport } from './routes/_public/listagens'
+import { Route as PublicMariaRouteRouteImport } from './routes/_public/maria/route'
 import { Route as PublicPaineisDadosExternosRouteImport } from './routes/_public/paineis-dados-externos'
 import { Route as PublicPainesDadosExternosRouteImport } from './routes/_public/paines-dados-externos'
 import { Route as PublicResearcherRouteImport } from './routes/_public/researcher'
@@ -34,6 +35,8 @@ import { Route as PublicInstituicaoIndexRouteImport } from './routes/_public/ins
 import { Route as PublicInstituicaoAcronymRouteImport } from './routes/_public/instituicao/$acronym'
 import { Route as PublicInstituicoesIndexRouteImport } from './routes/_public/instituicoes/index'
 import { Route as PublicInstituicoesIdRouteImport } from './routes/_public/instituicoes/$id'
+import { Route as PublicMariaIndexRouteImport } from './routes/_public/maria/index'
+import { Route as PublicMariaConversationIdRouteImport } from './routes/_public/maria/$conversationId'
 import { Route as PublicPesquisadoresIdRouteImport } from './routes/_public/pesquisadores/$id'
 import { Route as PublicPosGraduacaoIndexRouteImport } from './routes/_public/pos-graduacao/index'
 import { Route as PublicPosGraduacaoIdRouteImport } from './routes/_public/pos-graduacao/$id'
@@ -76,6 +79,11 @@ const PublicIndicePesquisadorRoute = PublicIndicePesquisadorRouteImport.update({
 const PublicListagensRoute = PublicListagensRouteImport.update({
   id: '/listagens',
   path: '/listagens',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicMariaRouteRoute = PublicMariaRouteRouteImport.update({
+  id: '/maria',
+  path: '/maria',
   getParentRoute: () => PublicRoute,
 } as any)
 const PublicPaineisDadosExternosRoute =
@@ -167,6 +175,17 @@ const PublicInstituicoesIdRoute = PublicInstituicoesIdRouteImport.update({
   path: '/instituicoes/$id',
   getParentRoute: () => PublicRoute,
 } as any)
+const PublicMariaIndexRoute = PublicMariaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PublicMariaRouteRoute,
+} as any)
+const PublicMariaConversationIdRoute =
+  PublicMariaConversationIdRouteImport.update({
+    id: '/$conversationId',
+    path: '/$conversationId',
+    getParentRoute: () => PublicMariaRouteRoute,
+  } as any)
 const PublicPesquisadoresIdRoute = PublicPesquisadoresIdRouteImport.update({
   id: '/pesquisadores/$id',
   path: '/pesquisadores/$id',
@@ -191,6 +210,7 @@ const PublicProducoesKindIdRoute = PublicProducoesKindIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/console': typeof ConsoleRouteWithChildren
+  '/maria': typeof PublicMariaRouteRouteWithChildren
   '/busca': typeof PublicBuscaRoute
   '/incites': typeof PublicIncitesRoute
   '/indicadores': typeof PublicIndicadoresRoute
@@ -210,11 +230,13 @@ export interface FileRoutesByFullPath {
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/instituicao/': typeof PublicInstituicaoIndexRoute
   '/instituicoes/': typeof PublicInstituicoesIndexRoute
+  '/maria/': typeof PublicMariaIndexRoute
   '/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
   '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
@@ -239,11 +261,13 @@ export interface FileRoutesByTo {
   '/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/grupos-pesquisa': typeof PublicGruposPesquisaIndexRoute
   '/instituicao': typeof PublicInstituicaoIndexRoute
   '/instituicoes': typeof PublicInstituicoesIndexRoute
+  '/maria': typeof PublicMariaIndexRoute
   '/pos-graduacao': typeof PublicPosGraduacaoIndexRoute
   '/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
@@ -251,6 +275,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_public': typeof PublicRouteWithChildren
   '/console': typeof ConsoleRouteWithChildren
+  '/_public/maria': typeof PublicMariaRouteRouteWithChildren
   '/_public/busca': typeof PublicBuscaRoute
   '/_public/incites': typeof PublicIncitesRoute
   '/_public/indicadores': typeof PublicIndicadoresRoute
@@ -271,11 +296,13 @@ export interface FileRoutesById {
   '/_public/grupos-pesquisa/$id': typeof PublicGruposPesquisaIdRoute
   '/_public/instituicao/$acronym': typeof PublicInstituicaoAcronymRoute
   '/_public/instituicoes/$id': typeof PublicInstituicoesIdRoute
+  '/_public/maria/$conversationId': typeof PublicMariaConversationIdRoute
   '/_public/pesquisadores/$id': typeof PublicPesquisadoresIdRoute
   '/_public/pos-graduacao/$id': typeof PublicPosGraduacaoIdRoute
   '/_public/grupos-pesquisa/': typeof PublicGruposPesquisaIndexRoute
   '/_public/instituicao/': typeof PublicInstituicaoIndexRoute
   '/_public/instituicoes/': typeof PublicInstituicoesIndexRoute
+  '/_public/maria/': typeof PublicMariaIndexRoute
   '/_public/pos-graduacao/': typeof PublicPosGraduacaoIndexRoute
   '/_public/producoes/$kind/$id': typeof PublicProducoesKindIdRoute
 }
@@ -284,6 +311,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/console'
+    | '/maria'
     | '/busca'
     | '/incites'
     | '/indicadores'
@@ -303,11 +331,13 @@ export interface FileRouteTypes {
     | '/grupos-pesquisa/$id'
     | '/instituicao/$acronym'
     | '/instituicoes/$id'
+    | '/maria/$conversationId'
     | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
     | '/grupos-pesquisa/'
     | '/instituicao/'
     | '/instituicoes/'
+    | '/maria/'
     | '/pos-graduacao/'
     | '/producoes/$kind/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -332,17 +362,20 @@ export interface FileRouteTypes {
     | '/grupos-pesquisa/$id'
     | '/instituicao/$acronym'
     | '/instituicoes/$id'
+    | '/maria/$conversationId'
     | '/pesquisadores/$id'
     | '/pos-graduacao/$id'
     | '/grupos-pesquisa'
     | '/instituicao'
     | '/instituicoes'
+    | '/maria'
     | '/pos-graduacao'
     | '/producoes/$kind/$id'
   id:
     | '__root__'
     | '/_public'
     | '/console'
+    | '/_public/maria'
     | '/_public/busca'
     | '/_public/incites'
     | '/_public/indicadores'
@@ -363,11 +396,13 @@ export interface FileRouteTypes {
     | '/_public/grupos-pesquisa/$id'
     | '/_public/instituicao/$acronym'
     | '/_public/instituicoes/$id'
+    | '/_public/maria/$conversationId'
     | '/_public/pesquisadores/$id'
     | '/_public/pos-graduacao/$id'
     | '/_public/grupos-pesquisa/'
     | '/_public/instituicao/'
     | '/_public/instituicoes/'
+    | '/_public/maria/'
     | '/_public/pos-graduacao/'
     | '/_public/producoes/$kind/$id'
   fileRoutesById: FileRoutesById
@@ -436,6 +471,13 @@ declare module '@tanstack/react-router' {
       path: '/listagens'
       fullPath: '/listagens'
       preLoaderRoute: typeof PublicListagensRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/maria': {
+      id: '/_public/maria'
+      path: '/maria'
+      fullPath: '/maria'
+      preLoaderRoute: typeof PublicMariaRouteRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/paineis-dados-externos': {
@@ -557,6 +599,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicInstituicoesIdRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/maria/': {
+      id: '/_public/maria/'
+      path: '/'
+      fullPath: '/maria/'
+      preLoaderRoute: typeof PublicMariaIndexRouteImport
+      parentRoute: typeof PublicMariaRouteRoute
+    }
+    '/_public/maria/$conversationId': {
+      id: '/_public/maria/$conversationId'
+      path: '/$conversationId'
+      fullPath: '/maria/$conversationId'
+      preLoaderRoute: typeof PublicMariaConversationIdRouteImport
+      parentRoute: typeof PublicMariaRouteRoute
+    }
     '/_public/pesquisadores/$id': {
       id: '/_public/pesquisadores/$id'
       path: '/pesquisadores/$id'
@@ -588,7 +644,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PublicMariaRouteRouteChildren {
+  PublicMariaConversationIdRoute: typeof PublicMariaConversationIdRoute
+  PublicMariaIndexRoute: typeof PublicMariaIndexRoute
+}
+
+const PublicMariaRouteRouteChildren: PublicMariaRouteRouteChildren = {
+  PublicMariaConversationIdRoute: PublicMariaConversationIdRoute,
+  PublicMariaIndexRoute: PublicMariaIndexRoute,
+}
+
+const PublicMariaRouteRouteWithChildren =
+  PublicMariaRouteRoute._addFileChildren(PublicMariaRouteRouteChildren)
+
 interface PublicRouteChildren {
+  PublicMariaRouteRoute: typeof PublicMariaRouteRouteWithChildren
   PublicBuscaRoute: typeof PublicBuscaRoute
   PublicIncitesRoute: typeof PublicIncitesRoute
   PublicIndicadoresRoute: typeof PublicIndicadoresRoute
@@ -614,6 +684,7 @@ interface PublicRouteChildren {
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
+  PublicMariaRouteRoute: PublicMariaRouteRouteWithChildren,
   PublicBuscaRoute: PublicBuscaRoute,
   PublicIncitesRoute: PublicIncitesRoute,
   PublicIndicadoresRoute: PublicIndicadoresRoute,

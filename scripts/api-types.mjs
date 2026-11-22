@@ -29,6 +29,12 @@ const specs = [
     path: 'openapi.json',
     output: 'src/api/generated/simcc-admin.d.ts',
   },
+  {
+    name: 'maria',
+    envVar: 'VITE_MARIA_API_URL',
+    path: 'openapi.json',
+    output: 'src/api/generated/maria.d.ts',
+  },
 ];
 
 const env = {

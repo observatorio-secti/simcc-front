@@ -178,9 +178,9 @@ describe('Outros redirects do legado (V2)', () => {
     expect(router.state.location.pathname).toBe('/paineis-dados-externos');
   }, 15000);
 
-  it('/resultados-ia vai para a home enquanto /maria não existe (T10)', async () => {
+  it('/resultados-ia vai para /maria (T10)', async () => {
     const { router } = await finalLocation('/resultados-ia?q=solos');
-    expect(router.state.location.pathname).toBe('/');
+    expect(router.state.location.pathname).toBe('/maria');
     expect(router.state.location.search).toEqual({});
   }, 15000);
 });
