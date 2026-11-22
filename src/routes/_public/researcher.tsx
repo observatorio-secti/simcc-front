@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { z } from 'zod';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import {
   firstParam,
@@ -8,6 +9,13 @@ import {
   matchByName,
 } from '../-redirects/legacy-params';
 
+const researcherRedirectSearchSchema = z
+  .object({
+    name: z.string().optional(),
+    researcher_name: z.string().optional(),
+  })
+  .passthrough();
+
 /**
  * `/researcher` do legado (V2) → `/pesquisadores/$id`. O legado abria o
  * pesquisador por `researcher_name` (links e compartilhamento) ou
@@ -16,6 +24,7 @@ import {
  * `lattes_id` sem nome vai para `/busca`.
  */
 export const Route = createFileRoute('/_public/researcher')({
+  validateSearch: researcherRedirectSearchSchema,
   beforeLoad: async ({ context, location }) => {
     const params = legacyParams(location.search);
     const profileSearch = legacyResearcherProfileSearch(params);

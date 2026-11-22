@@ -1,6 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
+  Link,
   useCanGoBack,
   useNavigate,
   useParams,
@@ -41,6 +42,7 @@ import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { EmptyState } from '@/shared/ui/empty-state';
+import { focusRing } from '@/shared/ui/focus-ring';
 import { LoadingBlock } from '@/shared/ui/loading-block';
 import { Pagination } from '@/shared/ui/pagination';
 import { StatCard } from '@/shared/ui/stat-card';
@@ -572,9 +574,16 @@ export function ResearchGroupDetailPage() {
                           )}
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <p className="truncate text-sm font-semibold text-foreground">
+                              <Link
+                                to="/researcher"
+                                search={{ name: member.name }}
+                                className={cn(
+                                  'truncate rounded-sm text-sm font-semibold text-foreground underline-offset-4 transition-colors hover:text-eng-blue hover:underline',
+                                  focusRing,
+                                )}
+                              >
                                 {member.name}
-                              </p>
+                              </Link>
                               {member.isLeader && (
                                 <Tag variant="brand">Líder</Tag>
                               )}

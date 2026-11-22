@@ -8,6 +8,8 @@ vi.stubEnv('VITE_SIMCC_API_URL', 'http://localhost:8088/');
 vi.stubEnv('VITE_ODA_API_URL', `${ODA_TEST_BASE}/`);
 
 const { renderRoute } = await import('@/test/render-route');
+const { v2Fixtures } = await import('@/test/msw/fixtures');
+const { simccV2Url } = await import('@/test/msw/handlers');
 
 const odaGroupsFixture = [
   {
@@ -184,7 +186,43 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
     });
     expect(await screen.findByText('Ana Souza')).toBeInTheDocument();
     expect(
+      screen.getByRole('link', { name: 'Ana Souza' }),
+    ).toHaveAttribute('href', '/researcher?name=Ana+Souza');
+    expect(
       screen.getByText('Doutorado em Ciência da Computação'),
     ).toBeInTheDocument();
+  }, 15000);
+
+  it('navega para o perfil do pesquisador no SimCC ao clicar no nome na aba Pesquisadores', async () => {
+    const baseResearcher = v2Fixtures['/researcher'].data[0]!;
+    const anaResearcher = {
+      ...baseResearcher,
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Ana Souza',
+    };
+
+    const { user, router } = await renderRoute('/grupos-pesquisa/grp-1?tab=pesquisadores', {
+      handlers: [
+        ...createOdaHandlers(),
+        http.get(simccV2Url('/researcher'), () =>
+          HttpResponse.json({
+            ...v2Fixtures['/researcher'],
+            data: [anaResearcher],
+          }),
+        ),
+        http.get(simccV2Url('/researcher/:researcher_id'), () =>
+          HttpResponse.json(anaResearcher),
+        ),
+      ],
+    });
+
+    const link = await screen.findByRole('link', { name: 'Ana Souza' });
+    await user.click(link);
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe(
+        `/pesquisadores/${anaResearcher.id}`,
+      );
+    });
   }, 15000);
 });
