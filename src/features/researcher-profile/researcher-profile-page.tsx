@@ -10,7 +10,6 @@ import {
   Presentation,
 } from 'lucide-react';
 import type { ProductionKind } from '@/entities/production/model';
-import { formatCount } from '@/entities/researcher/model';
 import {
   researcherDetailQueryOptions,
   researcherTermsQueryOptions,
@@ -44,15 +43,6 @@ export interface ResearcherProfilePageProps {
   hideHeaderIdentity?: boolean;
 }
 
-function renderTabCount(count: number | undefined) {
-  if (!count || count <= 0) return null;
-  return (
-    <span className="text-xs text-muted-foreground tabular-nums group-data-[state=active]:text-white/80">
-      ({formatCount(count)})
-    </span>
-  );
-}
-
 /**
  * Tela de perfil do pesquisador (T3, Template E de `DESIGN.md`).
  */
@@ -80,7 +70,6 @@ export function ResearcherProfilePage({
 
   const terms = termsResponse?.data ?? [];
   const scholarships = scholarshipsResponse?.data ?? [];
-  const counts = researcher.counts;
 
   function handleOpenProduction(kind: ProductionKind, itemId: string) {
     onOpenProduction(kind, itemId);
@@ -92,10 +81,6 @@ export function ResearcherProfilePage({
       page: 1,
     });
   }
-
-  const booksCount = (counts?.books ?? 0) + (counts?.book_chapters ?? 0);
-  const technicalCount =
-    (counts?.patents ?? 0) + (counts?.software ?? 0) + (counts?.brands ?? 0);
 
   return (
     <div className="flex flex-col gap-6 pb-8">
@@ -118,27 +103,22 @@ export function ResearcherProfilePage({
               <TabsTrigger value="articles">
                 <FileText aria-hidden />
                 <span>Artigos</span>
-                {renderTabCount(counts?.articles)}
               </TabsTrigger>
               <TabsTrigger value="books">
                 <BookOpen aria-hidden />
                 <span>Livros e capítulos</span>
-                {renderTabCount(booksCount)}
               </TabsTrigger>
               <TabsTrigger value="technical">
                 <Lightbulb aria-hidden />
                 <span>Produção técnica</span>
-                {renderTabCount(technicalCount)}
               </TabsTrigger>
               <TabsTrigger value="reports">
                 <FileSpreadsheet aria-hidden />
                 <span>Relatórios técnicos</span>
-                {renderTabCount(counts?.reports)}
               </TabsTrigger>
               <TabsTrigger value="guidance">
                 <GraduationCap aria-hidden />
                 <span>Orientações</span>
-                {renderTabCount(counts?.guidance)}
               </TabsTrigger>
               <TabsTrigger value="events">
                 <Presentation aria-hidden />

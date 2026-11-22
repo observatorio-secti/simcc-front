@@ -425,16 +425,10 @@ export function InstitutionDetailPage({
               <TabsTrigger value="researchers" className="gap-2">
                 <Users className="size-3.5" aria-hidden />
                 <span>Pesquisadores</span>
-                <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-bold text-foreground tabular-nums dark:bg-neutral-700">
-                  {formatInstitutionCount(researchersCount)}
-                </span>
               </TabsTrigger>
               <TabsTrigger value="programs" className="gap-2">
                 <GraduationCap className="size-3.5" aria-hidden />
                 <span>Programas de pós-graduação</span>
-                <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-bold text-foreground tabular-nums dark:bg-neutral-700">
-                  {formatInstitutionCount(programsCount)}
-                </span>
               </TabsTrigger>
               <TabsTrigger value="panel" className="gap-2">
                 <PieChart className="size-3.5" aria-hidden />

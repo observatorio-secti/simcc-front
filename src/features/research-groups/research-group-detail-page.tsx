@@ -485,18 +485,8 @@ export function ResearchGroupDetailPage() {
             }}
           >
             <TabsList>
-              <TabsTrigger value="linhas">
-                Linhas de pesquisa
-                <Tag variant="neutral">
-                  {filteredLines.length.toLocaleString('pt-BR')}
-                </Tag>
-              </TabsTrigger>
-              <TabsTrigger value="pesquisadores">
-                Pesquisadores
-                <Tag variant="neutral">
-                  {filteredMembers.length.toLocaleString('pt-BR')}
-                </Tag>
-              </TabsTrigger>
+              <TabsTrigger value="linhas">Linhas de pesquisa</TabsTrigger>
+              <TabsTrigger value="pesquisadores">Pesquisadores</TabsTrigger>
             </TabsList>
 
             <TabsContent value="linhas" className="flex flex-col gap-3">
