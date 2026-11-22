@@ -21,6 +21,7 @@ import {
 } from '@/shared/ui/table';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/ui/toggle-group';
 import type { ProfileViewMode } from '../search-schema';
+import { GroupedMetricYearChart } from './production-year-charts';
 
 export interface GuidanceTabProps {
   researcherId: string;
@@ -61,7 +62,17 @@ export function GuidanceTab({
   const totalPages = data?.pagination.total_pages ?? 1;
 
   return (
-    <section className="flex flex-col gap-3">
+    <div className="flex flex-col gap-6">
+      <GroupedMetricYearChart
+        title="Gráfico de orientações por natureza ao longo dos anos"
+        researcherId={researcherId}
+        kind="guidance"
+        groupBy="nature"
+        yearStart={yearStart}
+        yearEnd={yearEnd}
+      />
+
+      <section className="flex flex-col gap-3">
       <SectionHeader
         title={
           <span className="inline-flex items-center gap-2">
@@ -181,6 +192,7 @@ export function GuidanceTab({
           onPageChange={onPageChange}
         />
       )}
-    </section>
+      </section>
+    </div>
   );
 }

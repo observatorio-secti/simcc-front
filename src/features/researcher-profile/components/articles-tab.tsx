@@ -28,7 +28,7 @@ import type {
   QualisStratum,
   ResearcherProfileSearch,
 } from '../search-schema';
-import { QualisChart } from './qualis-chart';
+import { ArticlesQualisYearChart } from './production-year-charts';
 import { YearFilter } from './year-filter';
 
 const QUALIS_OPTIONS: ReadonlyArray<{ value: QualisStratum; label: string }> = [
@@ -92,20 +92,6 @@ export function ArticlesTab({
   const items = data?.data ?? [];
   const total = data?.pagination.total_items ?? items.length;
   const totalPages = data?.pagination.total_pages ?? 1;
-
-  // Constrói o mapa de contagem por Qualis a partir das facetas ou dos itens.
-  const qualisCounts: Record<string, number> = {};
-  const facetItems = data?.facets?.qualis?.items;
-  if (facetItems && facetItems.length > 0) {
-    for (const entry of facetItems) {
-      qualisCounts[entry.value] = entry.count;
-    }
-  } else {
-    for (const article of items) {
-      const key = article.magazine?.qualis ?? 'not_rated';
-      qualisCounts[key] = (qualisCounts[key] ?? 0) + 1;
-    }
-  }
 
   function handleToggleQualis(stratum: QualisStratum) {
     const exists = selectedQualis.includes(stratum);
@@ -222,8 +208,10 @@ export function ArticlesTab({
         />
       </div>
 
-      <QualisChart
-        counts={qualisCounts}
+      <ArticlesQualisYearChart
+        researcherId={researcherId}
+        yearStart={search.year_start}
+        yearEnd={search.year_end}
         selectedQualis={selectedQualis}
         onToggleQualis={handleToggleQualis}
       />

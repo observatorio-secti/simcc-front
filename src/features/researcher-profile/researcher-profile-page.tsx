@@ -33,6 +33,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { ArticlesTab } from './components/articles-tab';
 import { GuidanceTab } from './components/guidance-tab';
 import { ProductionListSection } from './components/production-list-section';
+import {
+  GroupedMetricYearChart,
+  MultiKindYearChart,
+} from './components/production-year-charts';
 import { ProfileSidebar } from './components/profile-sidebar';
 import { TrajectoryTab } from './components/trajectory-tab';
 import { YearFilter } from './components/year-filter';
@@ -247,6 +251,16 @@ export function ResearcherProfilePage({
                   })
                 }
               />
+              <MultiKindYearChart
+                title="Gráfico de livros e capítulos por ano"
+                researcherId={researcherId}
+                yearStart={search.year_start}
+                yearEnd={search.year_end}
+                kinds={[
+                  { kind: 'book', label: 'Livros' },
+                  { kind: 'book_chapter', label: 'Capítulos de livros' },
+                ]}
+              />
               <ProductionListSection
                 researcherId={researcherId}
                 kind="book"
@@ -279,6 +293,17 @@ export function ResearcherProfilePage({
                     page: 1,
                   })
                 }
+              />
+              <MultiKindYearChart
+                title="Gráfico de produção técnica por ano"
+                researcherId={researcherId}
+                yearStart={search.year_start}
+                yearEnd={search.year_end}
+                kinds={[
+                  { kind: 'patent', label: 'Patentes' },
+                  { kind: 'software', label: 'Softwares' },
+                  { kind: 'brand', label: 'Marcas' },
+                ]}
               />
               <ProductionListSection
                 researcherId={researcherId}
@@ -321,6 +346,14 @@ export function ResearcherProfilePage({
                     page: 1,
                   })
                 }
+              />
+              <GroupedMetricYearChart
+                title="Gráfico de relatórios técnicos por ano"
+                researcherId={researcherId}
+                kind="report"
+                groupBy="none"
+                yearStart={search.year_start}
+                yearEnd={search.year_end}
               />
               <ProductionListSection
                 researcherId={researcherId}
@@ -371,6 +404,14 @@ export function ResearcherProfilePage({
                   })
                 }
               />
+              <GroupedMetricYearChart
+                title="Gráfico de participação em eventos por ano"
+                researcherId={researcherId}
+                kind="event"
+                groupBy="nature"
+                yearStart={search.year_start}
+                yearEnd={search.year_end}
+              />
               <ProductionListSection
                 researcherId={researcherId}
                 kind="event"
@@ -395,6 +436,14 @@ export function ResearcherProfilePage({
                     page: 1,
                   })
                 }
+              />
+              <GroupedMetricYearChart
+                title="Gráfico de projetos por ano de início"
+                researcherId={researcherId}
+                kind="research_project"
+                groupBy="status"
+                yearStart={search.year_start}
+                yearEnd={search.year_end}
               />
               <ProductionListSection
                 researcherId={researcherId}

@@ -42,11 +42,17 @@ describe('Rota /pesquisadores/$id (T3)', () => {
       `/pesquisadores/${RESEARCHER_ID}`,
     );
 
-    const qualisA2Button = await findByRole('button', { name: /A2:/i });
+    const qualisA2Button = await findByRole('button', { name: 'Qualis A2' });
     await user.click(qualisA2Button);
     await waitFor(() => {
       expect(router.state.location.search.qualis).toEqual(['A2']);
     });
+
+    const guidanceTab = await findByRole('tab', { name: /Orientações/i });
+    await user.click(guidanceTab);
+    expect(
+      await findByText('Gráfico de orientações por natureza ao longo dos anos'),
+    ).toBeInTheDocument();
 
     const trajectoryTab = await findByRole('tab', { name: /Trajetória/i });
     await user.click(trajectoryTab);

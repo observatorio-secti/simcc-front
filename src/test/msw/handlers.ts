@@ -85,7 +85,7 @@ const jsonPaths = Object.keys(v2Fixtures).filter(
 export function createSimccHandlers(): RequestHandler[] {
   return [
     ...jsonPaths.map((path) => jsonRoute(path)),
-    http.get(v2Route('/metrics/production/{kind}'), ({ params }) => {
+    http.get(v2Route('/metrics/production/{kind}'), ({ params, request }) => {
       // O path usa hífen (`book-chapter`); o `kind` da resposta, sublinhado.
       const kind = String(params.kind ?? '').replaceAll('-', '_');
       if (!isProductionMetricKind(kind)) {
@@ -93,9 +93,56 @@ export function createSimccHandlers(): RequestHandler[] {
           status: 422,
         });
       }
+      const url = new URL(request.url);
+      const groupBy = url.searchParams.get('group_by');
+      const base = v2Fixtures['/metrics/production/{kind}'];
+      if (!groupBy) {
+        return HttpResponse.json({
+          ...base,
+          kind,
+        });
+      }
+
+      const groupedData =
+        kind === 'article' && groupBy === 'qualis'
+          ? [
+              { period: 2022, value: 4, groups: { A1: 1, A2: 2, B1: 1 } },
+              {
+                period: 2023,
+                value: 6,
+                groups: { A1: 2, A2: 2, A3: 1, not_rated: 1 },
+              },
+              { period: 2024, value: 3, groups: { A1: 2, A4: 1 } },
+            ]
+          : kind === 'guidance' && groupBy === 'nature'
+            ? [
+                {
+                  period: 2022,
+                  value: 3,
+                  groups: {
+                    'Iniciação Científica': 2,
+                    'Dissertação de Mestrado': 1,
+                  },
+                },
+                {
+                  period: 2023,
+                  value: 4,
+                  groups: {
+                    'Dissertação de Mestrado': 2,
+                    'Tese de Doutorado': 2,
+                  },
+                },
+              ]
+            : base.data.map((point) => ({
+                ...point,
+                groups: { Geral: point.value },
+              }));
+
       return HttpResponse.json({
-        ...v2Fixtures['/metrics/production/{kind}'],
+        ...base,
         kind,
+        group_by: groupBy,
+        data: groupedData,
       });
     }),
     http.get(

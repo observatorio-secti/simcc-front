@@ -3652,6 +3652,11 @@ export interface components {
              */
             kind: "article" | "book" | "book_chapter" | "software" | "patent" | "event" | "research_project" | "brand" | "guidance" | "report" | "magazine_text" | "event_work";
             /**
+             * Group By
+             * @description Dimensão de agrupamento aplicada na série
+             */
+            group_by?: string | null;
+            /**
              * Data
              * @description Série anual, ano crescente
              */
@@ -4584,6 +4589,13 @@ export interface components {
              * @description Quantidade de produções no ano
              */
             value: number;
+            /**
+             * Groups
+             * @description Contagem por categoria quando `group_by` é informado
+             */
+            groups?: {
+                [key: string]: number;
+            } | null;
         };
         /**
          * SoftwareDetail
@@ -6733,6 +6745,26 @@ export interface operations {
                 area?: string[];
                 /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
                 collection?: string[];
+                /** @description Dimensão de agrupamento por ano (ex.: qualis, nature, status, type_participation) */
+                group_by?: string | null;
+                /** @description Estrato Qualis (article) */
+                qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "not_rated" | "not_applicable")[];
+                /** @description Filtrar apenas artigos com PDF em acesso aberto (article) */
+                has_open_access?: boolean | null;
+                /** @description Nome da revista/periódico (article) */
+                magazine_name?: string[];
+                /** @description ISSN do periódico (article) */
+                issn?: string[];
+                /** @description Natureza (guidance, event, research-project) */
+                nature?: string[];
+                /** @description Situação (guidance, research-project) */
+                status?: string[];
+                /** @description Tipo (guidance) */
+                type?: string[];
+                /** @description Tipo de participação (event) */
+                type_participation?: string[];
+                /** @description Forma de participação (event) */
+                form_participation?: string[];
             };
             header?: never;
             path: {
