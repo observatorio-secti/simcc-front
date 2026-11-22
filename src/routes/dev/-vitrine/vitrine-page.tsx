@@ -9,6 +9,7 @@ import { PrimitivesShowcase } from './primitives';
 import { ProductionShowcase } from './production';
 import { ResearchGroupShowcase } from './research-group';
 import { ResearcherShowcase } from './researcher';
+import { ScholarshipShowcase } from './scholarship';
 
 const SECTIONS = [
   ['botao', 'Botão'],
@@ -32,6 +33,7 @@ const SECTIONS = [
   ['programa', 'Programa'],
   ['grupo-pesquisa', 'Grupo de pesquisa'],
   ['revista', 'Revista'],
+  ['bolsa', 'Bolsa'],
 ] as const;
 
 /** Vitrine do kit (só em desenvolvimento). Ver src/routes/dev/vitrine.tsx. */
@@ -81,6 +83,7 @@ export function VitrinePage() {
         <GraduateProgramShowcase />
         <ResearchGroupShowcase />
         <MagazineShowcase />
+        <ScholarshipShowcase />
       </main>
       <Toaster />
     </div>

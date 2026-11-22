@@ -54,6 +54,8 @@ Traço sempre 2 (padrão). Cor herdada (`currentColor`); em cabeçalho de card/K
 | Território / cidade | `MapPin` |
 | Mapa (visão) | `Map` |
 | Rede de colaboração / coautores | `Network` |
+| Bolsa / bolsista (fomento) | `HandCoins` |
+| Revista (aba e total do catálogo) | `Newspaper` |
 
 ### Produção
 | Conceito | Ícone |

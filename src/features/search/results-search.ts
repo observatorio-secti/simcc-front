@@ -1,5 +1,10 @@
 import { stripSearchParams } from '@tanstack/react-router';
 import { z } from 'zod';
+import {
+  MAGAZINE_SORT_OPTIONS,
+  type MagazineQuery,
+  type MagazineSortBy,
+} from '@/entities/magazine/model';
 import type { ProductionMetricQuery } from '@/entities/production/metric-queries';
 import type {
   ProductionKind,
@@ -15,6 +20,11 @@ import type {
   ResearcherSourceType,
 } from '@/entities/researcher/model';
 import {
+  SCHOLARSHIP_SORT_OPTIONS,
+  type ScholarshipQuery,
+  type ScholarshipSortBy,
+} from '@/entities/scholarship/model';
+import {
   createListSearch,
   searchEnumArrayParam,
   searchStringArrayParam,
@@ -26,7 +36,7 @@ import {
   DEFAULT_SEARCH_TAB,
   resolveSearchTab,
   SEARCH_TAB_IDS,
-  TABS_BY_SEARCH_TYPE,
+  tabIdsFor,
   type SearchTabDefinition,
   type SearchTabId,
 } from './search-tabs';
@@ -85,6 +95,11 @@ export const RESULTS_SORT_VALUES = [
   'year',
   'citations',
   'title',
+  // Bolsistas (`/v2/scholarship`) e revistas (`/v2/magazine`), D1.4.
+  'researcher_name',
+  'modality',
+  'category_level',
+  'jcr',
 ] as const;
 
 export const RESULTS_VIEW_MODES = ['grid', 'list'] as const;
@@ -102,6 +117,7 @@ export const resultsSearch = createListSearch({
     graduation: searchStringArrayParam(),
     classification: searchEnumArrayParam(RESEARCHER_CLASSIFICATIONS),
     modality: searchStringArrayParam(),
+    category_level: searchStringArrayParam(),
     source_type: searchEnumArrayParam(RESEARCHER_SOURCE_TYPES),
     qualis: searchEnumArrayParam(ARTICLE_QUALIS),
   },
@@ -139,6 +155,7 @@ export type ResultsFilterKey =
   | 'graduation'
   | 'classification'
   | 'modality'
+  | 'category_level'
   | 'source_type'
   | 'qualis';
 
@@ -163,19 +180,51 @@ const ARTICLE_FILTERS = [
   'qualis',
 ] as const satisfies readonly ResultsFilterKey[];
 
+/**
+ * Bolsistas: `/v2/scholarship` só tem facetas de modalidade e nível. O filtro
+ * `modality` tem os mesmos valores da faceta de pesquisadores e passa de uma
+ * aba à outra.
+ */
+const SCHOLARSHIP_FILTERS = [
+  'modality',
+  'category_level',
+] as const satisfies readonly ResultsFilterKey[];
+
+/** Revistas: `/v2/magazine` filtra por Qualis (mesmo enum dos artigos). */
+const MAGAZINE_FILTERS = [
+  'qualis',
+] as const satisfies readonly ResultsFilterKey[];
+
 const ALL_FILTERS: readonly ResultsFilterKey[] = [
   ...RESEARCHER_FILTERS,
   'qualis',
+  'category_level',
 ];
 
 /** O que define a lista de uma aba: a origem e, nas produções, o tipo. */
 export type TabSource =
-  { source: 'researcher' } | { source: 'production'; kind: ProductionKind };
+  | { source: 'researcher' }
+  | { source: 'production'; kind: ProductionKind }
+  | { source: 'scholarship' }
+  | { source: 'magazine' };
 
 /** Filtros que a aba envia à API (e mantém ao trocar de aba). */
 export function filterKeysForTab(tab: TabSource): readonly ResultsFilterKey[] {
-  if (tab.source === 'researcher') return RESEARCHER_FILTERS;
-  return tab.kind === 'article' ? ARTICLE_FILTERS : COMMON_FILTERS;
+  switch (tab.source) {
+    case 'researcher':
+      return RESEARCHER_FILTERS;
+    case 'scholarship':
+      return SCHOLARSHIP_FILTERS;
+    case 'magazine':
+      return MAGAZINE_FILTERS;
+    case 'production':
+      return tab.kind === 'article' ? ARTICLE_FILTERS : COMMON_FILTERS;
+  }
+}
+
+/** Bolsas e revistas não têm ano na v2. */
+export function tabSupportsYear(tab: TabSource): boolean {
+  return tab.source === 'researcher' || tab.source === 'production';
 }
 
 /** Quantidade de filtros aplicados que valem para a aba (o intervalo de anos conta 1). */
@@ -185,7 +234,10 @@ export function countTabFilters(search: ResultsSearch, tab: TabSource): number {
     const value = search[key];
     if (Array.isArray(value)) count += value.length;
   }
-  if (search.year_start !== undefined || search.year_end !== undefined) {
+  if (
+    tabSupportsYear(tab) &&
+    (search.year_start !== undefined || search.year_end !== undefined)
+  ) {
     count += 1;
   }
   return count;
@@ -248,6 +300,13 @@ export function productionFacets(kind: ProductionKind): string[] {
     : [...PRODUCTION_FACETS_BASE];
 }
 
+/** Facetas que `/v2/scholarship` aceita. */
+export const SCHOLARSHIP_FACETS = ['modality', 'category_level'] as const;
+const SCHOLARSHIP_FACET_LIMIT = 50;
+
+/** Faceta que `/v2/magazine` aceita. */
+export const MAGAZINE_FACETS = ['qualis'] as const;
+
 /** Ordem de exibição das facetas no painel. */
 export const RESULTS_FACET_ORDER = [
   'source_type',
@@ -261,6 +320,7 @@ export const RESULTS_FACET_ORDER = [
   'graduation',
   'classification',
   'modality',
+  'category_level',
 ] as const;
 
 const RESEARCHER_SORT_OPTIONS: readonly SortOption<ResearcherSortBy>[] = [
@@ -279,6 +339,8 @@ export function sortOptionsForTab(
       ? RESEARCHER_SORT_OPTIONS
       : RESEARCHER_SORT_OPTIONS.filter((option) => option.value === 'name');
   }
+  if (tab.source === 'scholarship') return SCHOLARSHIP_SORT_OPTIONS;
+  if (tab.source === 'magazine') return MAGAZINE_SORT_OPTIONS;
   return getProductionSortOptions(tab.kind, hasQuery).map((value) => ({
     value,
     label: PRODUCTION_SORT_LABELS[value],
@@ -309,7 +371,7 @@ export function resolveSort(
 
 /** Aba ativa do estado da URL. */
 export function activeTab(search: ResultsSearch): SearchTabDefinition {
-  return resolveSearchTab(search.type, search.tab);
+  return resolveSearchTab(search.type, search.tab, Boolean(search.q));
 }
 
 function pickFilters(
@@ -384,6 +446,42 @@ export function toProductionQuery<K extends ProductionKind>(
   } as ProductionQuery<K>;
 }
 
+/**
+ * Parâmetros de `/v2/scholarship` para a aba de bolsistas. A rota não tem
+ * busca textual nem ano: a aba só existe sem termo.
+ */
+export function toScholarshipQuery(search: ResultsSearch): ScholarshipQuery {
+  const sort = resolveSort({ source: 'scholarship' }, search);
+  const { page, per_page } = baseQuery(search);
+  return {
+    page,
+    per_page,
+    ...pickFilters(search, SCHOLARSHIP_FILTERS),
+    sort_by: sort.sort_by as ScholarshipSortBy,
+    sort_order: sort.sort_order,
+    facets: [...SCHOLARSHIP_FACETS],
+    // Os KPIs somam PQ e DT pela faceta de modalidade: traz todas.
+    facet_limit: SCHOLARSHIP_FACET_LIMIT,
+  };
+}
+
+/**
+ * Parâmetros de `/v2/magazine` para a aba de revistas. O `q` da rota busca
+ * só o nome da revista; a aba só existe sem termo, então ele não é enviado.
+ */
+export function toMagazineQuery(search: ResultsSearch): MagazineQuery {
+  const sort = resolveSort({ source: 'magazine' }, search);
+  const { page, per_page } = baseQuery(search);
+  return {
+    page,
+    per_page,
+    ...pickFilters(search, MAGAZINE_FILTERS),
+    sort_by: sort.sort_by as MagazineSortBy,
+    sort_order: sort.sort_order,
+    facets: [...MAGAZINE_FACETS],
+  };
+}
+
 /** Parâmetros de `/v2/metrics/production/{kind}` com o mesmo recorte da aba. */
 export function toProductionMetricQuery(
   search: ResultsSearch,
@@ -402,7 +500,7 @@ export function switchTab(
   search: ResultsSearch,
   tabId: SearchTabId,
 ): ResultsSearch {
-  const next = resolveSearchTab(search.type, tabId);
+  const next = resolveSearchTab(search.type, tabId, Boolean(search.q));
   const allowed = new Set<string>(filterKeysForTab(next));
   const patch: Record<string, unknown> = {
     tab: next.id === DEFAULT_SEARCH_TAB ? undefined : next.id,
@@ -427,7 +525,7 @@ export function applyQuery(
   const type = next.type ?? search.type ?? 'profile';
   const q = next.q?.trim() || undefined;
   const tab =
-    search.tab && TABS_BY_SEARCH_TYPE[type].includes(search.tab)
+    search.tab && tabIdsFor(type, Boolean(q)).includes(search.tab)
       ? search.tab
       : undefined;
   return resultsSearch.update(search, {

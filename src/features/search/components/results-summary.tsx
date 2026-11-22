@@ -4,8 +4,12 @@ import {
   BarChart3,
   Building2,
   Calendar,
+  CheckCircle2,
   GraduationCap,
+  HandCoins,
+  Layers,
   MapPin,
+  Newspaper,
   User,
   type LucideIcon,
 } from 'lucide-react';
@@ -18,8 +22,10 @@ import {
 import type { ProductionKind } from '@/entities/production/model';
 import { formatCountNoun } from '@/entities/production/model';
 import { getProductionDefinition } from '@/entities/production/registry';
+import { scholarshipModalityKey } from '@/entities/scholarship/model';
 import { cn } from '@/shared/lib/cn';
-import { Tag } from '@/shared/ui/badge';
+import { SCHOLARSHIP_COLORS } from '@/shared/lib/design-tokens';
+import { Dot, Tag } from '@/shared/ui/badge';
 import { StatCard } from '@/shared/ui/stat-card';
 import { sourceTypeLabel } from '../results-facets';
 import { searchTypeBgClass, type SearchType } from '../search-schema';
@@ -261,6 +267,152 @@ export function ProductionSummary({
           value={recent}
           loading={metricLoading}
           caption={`${plural} de ${since} a ${currentYear}`}
+        />
+      </div>
+    </>
+  );
+}
+
+/**
+ * Itens da faceta dentro do recorte. As facetas da v2 ignoram o próprio
+ * filtro (mostram as outras opções): com filtro, valem só as selecionadas.
+ */
+function facetItemsInScope(
+  facets: FacetsRecord,
+  key: string,
+  selected: readonly string[] | undefined,
+) {
+  const items = facets?.[key]?.items ?? [];
+  if (!selected?.length) return items;
+  const chosen = new Set(selected);
+  return items.filter((item) => chosen.has(item.value));
+}
+
+function sumCounts(items: readonly { count: number }[]): number {
+  return items.reduce((total, item) => total + item.count, 0);
+}
+
+export interface ScholarshipSummaryProps {
+  total: number | undefined;
+  facets: FacetsRecord;
+  loading: boolean;
+  /** Filtro `modality` aplicado (a faceta não se filtra a si mesma). */
+  modality?: readonly string[];
+}
+
+/** Card de total + 3 KPIs da aba de bolsistas (`/v2/scholarship`, D1.4). */
+export function ScholarshipSummary({
+  total,
+  facets,
+  loading,
+  modality,
+}: ScholarshipSummaryProps) {
+  const items = facetItemsInScope(facets, 'modality', modality);
+  const ready = !loading && facets?.modality !== undefined;
+  const byKey = (key: 'PQ' | 'DT') =>
+    ready
+      ? sumCounts(
+          items.filter((item) => scholarshipModalityKey(item.value) === key),
+        )
+      : undefined;
+
+  return (
+    <>
+      <TotalCard
+        title="Total de bolsas"
+        icon={HandCoins}
+        value={total}
+        loading={loading}
+        caption="de pesquisadores cadastrados na plataforma"
+      />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        {(['PQ', 'DT'] as const).map((key) => (
+          <StatCard
+            key={key}
+            title={SCHOLARSHIP_COLORS[key].label}
+            icon={HandCoins}
+            value={byKey(key)}
+            loading={loading}
+            caption={
+              <span className="inline-flex items-center gap-1.5">
+                <Dot className={SCHOLARSHIP_COLORS[key].bg} />
+                bolsas {key} no resultado
+              </span>
+            }
+          />
+        ))}
+        <StatCard
+          title="Modalidades"
+          icon={Layers}
+          value={ready ? items.length : undefined}
+          loading={loading}
+          caption="modalidades e níveis no resultado"
+        />
+      </div>
+    </>
+  );
+}
+
+const QUALIS_A = new Set(['A1', 'A2', 'A3', 'A4']);
+
+export interface MagazineSummaryProps {
+  total: number | undefined;
+  facets: FacetsRecord;
+  loading: boolean;
+  /** Filtro `qualis` aplicado (a faceta não se filtra a si mesma). */
+  qualis?: readonly string[];
+}
+
+/** Card de total + 3 KPIs da aba de revistas (`/v2/magazine`, D1.4). */
+export function MagazineSummary({
+  total,
+  facets,
+  loading,
+  qualis,
+}: MagazineSummaryProps) {
+  const items = facetItemsInScope(facets, 'qualis', qualis);
+  const ready = !loading && facets?.qualis !== undefined;
+  const rated = ready ? sumCounts(items) : undefined;
+  const stratumA = ready
+    ? sumCounts(items.filter((item) => QUALIS_A.has(item.value)))
+    : undefined;
+  const unrated =
+    rated !== undefined && total !== undefined
+      ? Math.max(0, total - rated)
+      : undefined;
+
+  return (
+    <>
+      <TotalCard
+        title="Total de revistas"
+        icon={Newspaper}
+        value={total}
+        loading={loading}
+        caption="cadastradas na plataforma"
+      />
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard
+          title="Com Qualis"
+          icon={CheckCircle2}
+          value={rated}
+          loading={loading}
+          caption="revistas com estrato no resultado"
+        />
+        <StatCard
+          title="Qualis A1 a A4"
+          icon={CheckCircle2}
+          value={stratumA}
+          loading={loading}
+          caption="revistas nos estratos A no resultado"
+        />
+        <StatCard
+          title="Sem Qualis"
+          icon={Newspaper}
+          value={unrated}
+          loading={loading}
+          caption="revistas sem estrato no resultado"
         />
       </div>
     </>

@@ -8,10 +8,8 @@ import {
   researcherTermsQueryOptions,
 } from '@/entities/researcher/queries';
 import { NotFoundPage } from '@/features/errors/not-found-page';
-import {
-  isNotFoundApiError,
-  researcherScholarshipsQueryOptions,
-} from '@/features/researcher-profile/queries';
+import { researcherScholarshipsQueryOptions } from '@/entities/scholarship/queries';
+import { isNotFoundApiError } from '@/features/researcher-profile/queries';
 import { ResearcherProfilePage } from '@/features/researcher-profile/researcher-profile-page';
 import {
   cleanProfileSearch,

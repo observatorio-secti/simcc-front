@@ -1,5 +1,6 @@
 import { normalizeProductionKind } from '@/entities/production/model';
 import { getProductionDefinition } from '@/entities/production/registry';
+import { scholarshipModalityColor } from '@/entities/scholarship/model';
 import { areaColor, areaKey, qualisColor } from '@/shared/lib/design-tokens';
 import type { FacetFieldConfig } from '@/shared/ui/facet-panel';
 
@@ -65,5 +66,10 @@ export const RESULTS_FACET_CONFIG: Record<string, FacetFieldConfig> = {
   city: { label: 'Cidades', searchable: true },
   graduation: { label: 'Maior titulação' },
   classification: { label: 'Classificação do pesquisador' },
-  modality: { label: 'Bolsas de produtividade', searchable: true },
+  modality: {
+    label: 'Bolsas de produtividade',
+    searchable: true,
+    dotClassName: (value) => scholarshipModalityColor(value).bg,
+  },
+  category_level: { label: 'Nível da bolsa' },
 };

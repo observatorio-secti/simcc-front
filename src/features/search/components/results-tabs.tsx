@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link } from '@tanstack/react-router';
 import { cn } from '@/shared/lib/cn';
 import { focusRing } from '@/shared/ui/focus-ring';
@@ -15,8 +16,26 @@ export interface ResultsTabsProps {
  * aba é navegar, e a aba fica na URL. Tabs longas rolam no próprio container.
  */
 export function ResultsTabs({ search, tabs, active }: ResultsTabsProps) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // Com muitas abas (listagens sem termo, D1.4), a ativa pode ficar fora da
+  // área visível no mobile: rola só o container, sem mexer na página.
+  useEffect(() => {
+    const list = listRef.current;
+    const selected = list?.querySelector('[aria-selected="true"]');
+    if (!list || !selected) return;
+    const listBox = list.getBoundingClientRect();
+    const tabBox = selected.getBoundingClientRect();
+    if (tabBox.left < listBox.left) {
+      list.scrollLeft -= listBox.left - tabBox.left;
+    } else if (tabBox.right > listBox.right) {
+      list.scrollLeft += tabBox.right - listBox.right;
+    }
+  }, [active.id]);
+
   return (
     <div
+      ref={listRef}
       role="tablist"
       aria-label="Visão do resultado"
       className="-mx-1 flex min-w-0 flex-1 [scrollbar-width:none] gap-2 overflow-x-auto px-1 py-0.5"

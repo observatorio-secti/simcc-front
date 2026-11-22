@@ -1,14 +1,17 @@
 import type { LucideIcon } from 'lucide-react';
-import { Users } from 'lucide-react';
+import { HandCoins, Newspaper, Users } from 'lucide-react';
 import type { ProductionKind } from '@/entities/production/model';
 import { getProductionDefinition } from '@/entities/production/registry';
 import type { SearchType } from './search-schema';
 
 // Abas de resultado de `/busca` (tabs de visão, `sc-viewtabs`). Cada aba diz
-// de qual catálogo da v2 vem a lista (`source`). Para uma aba nova (ex.:
-// bolsistas, revistas na D1.4): acrescente o id em `SEARCH_TAB_IDS`, a
-// definição em `SEARCH_TABS` com um `source` novo, o id nos tipos em
-// `TABS_BY_SEARCH_TYPE` e o ramo do `source` em `results-page.tsx`.
+// de qual catálogo da v2 vem a lista (`source`). Para uma aba nova:
+// acrescente o id em `SEARCH_TAB_IDS`, a definição em `SEARCH_TABS` com um
+// `source` novo, o id em `TABS_BY_SEARCH_TYPE` (com termo) e/ou em
+// `CATALOG_TABS` (sem termo) e o ramo do `source` em `results-page.tsx`.
+//
+// Sem termo (`q`), `/busca` é a tela de listagens (D1.4, ADR 0011): uma aba
+// por catálogo da v2, qualquer que seja o tipo de busca.
 
 export const SEARCH_TAB_IDS = [
   'researchers',
@@ -18,6 +21,12 @@ export const SEARCH_TAB_IDS = [
   'patents',
   'software',
   'events',
+  'research_projects',
+  'brands',
+  'guidances',
+  'reports',
+  'scholarships',
+  'magazines',
 ] as const;
 
 export type SearchTabId = (typeof SEARCH_TAB_IDS)[number];
@@ -35,15 +44,29 @@ export interface ResearcherSearchTab extends SearchTabBase<'researchers'> {
   source: 'researcher';
 }
 
+/** Aba listada por `/v2/scholarship` (bolsistas, só sem termo). */
+export interface ScholarshipSearchTab extends SearchTabBase<'scholarships'> {
+  source: 'scholarship';
+}
+
+/** Aba listada por `/v2/magazine` (revistas, só sem termo). */
+export interface MagazineSearchTab extends SearchTabBase<'magazines'> {
+  source: 'magazine';
+}
+
 /** Aba listada por `/v2/production/<kind>`. */
 export interface ProductionSearchTab extends SearchTabBase<
-  Exclude<SearchTabId, 'researchers'>
+  Exclude<SearchTabId, 'researchers' | 'scholarships' | 'magazines'>
 > {
   source: 'production';
   kind: ProductionKind;
 }
 
-export type SearchTabDefinition = ResearcherSearchTab | ProductionSearchTab;
+export type SearchTabDefinition =
+  | ResearcherSearchTab
+  | ScholarshipSearchTab
+  | ProductionSearchTab
+  | MagazineSearchTab;
 
 function productionTab(
   id: ProductionSearchTab['id'],
@@ -72,6 +95,22 @@ export const SEARCH_TABS: Record<SearchTabId, SearchTabDefinition> = {
   patents: productionTab('patents', 'patent'),
   software: productionTab('software', 'software'),
   events: productionTab('events', 'event'),
+  research_projects: productionTab('research_projects', 'research_project'),
+  brands: productionTab('brands', 'brand'),
+  guidances: productionTab('guidances', 'guidance'),
+  reports: productionTab('reports', 'report'),
+  scholarships: {
+    id: 'scholarships',
+    source: 'scholarship',
+    label: 'Bolsistas',
+    icon: HandCoins,
+  },
+  magazines: {
+    id: 'magazines',
+    source: 'magazine',
+    label: 'Revistas',
+    icon: Newspaper,
+  },
 };
 
 const ALL_PRODUCTION_TABS = [
@@ -100,18 +139,44 @@ export const TABS_BY_SEARCH_TYPE: Record<SearchType, readonly SearchTabId[]> = {
   abstract: ['researchers'],
 };
 
+/**
+ * Abas sem termo (listagens, D1.4): um catálogo da v2 por aba, na ordem das
+ * listagens do legado. Bolsistas e revistas só existem aqui: `/v2/scholarship`
+ * não tem busca textual, e o `q` de `/v2/magazine` busca só o nome da revista.
+ */
+export const CATALOG_TABS = [
+  'researchers',
+  'scholarships',
+  ...ALL_PRODUCTION_TABS,
+  'research_projects',
+  'brands',
+  'guidances',
+  'reports',
+  'magazines',
+] as const satisfies readonly SearchTabId[];
+
+/** Ids das abas disponíveis: por tipo com termo; o catálogo inteiro sem termo. */
+export function tabIdsFor(
+  type: SearchType = 'profile',
+  hasQuery = true,
+): readonly SearchTabId[] {
+  return hasQuery ? TABS_BY_SEARCH_TYPE[type] : CATALOG_TABS;
+}
+
 export function tabsForSearchType(
   type: SearchType = 'profile',
+  hasQuery = true,
 ): readonly SearchTabDefinition[] {
-  return TABS_BY_SEARCH_TYPE[type].map((id) => SEARCH_TABS[id]);
+  return tabIdsFor(type, hasQuery).map((id) => SEARCH_TABS[id]);
 }
 
 /** Aba efetiva: a da URL, se o tipo de busca a oferece; senão, a padrão. */
 export function resolveSearchTab(
   type: SearchType = 'profile',
   tab: SearchTabId | undefined,
+  hasQuery = true,
 ): SearchTabDefinition {
-  const available = TABS_BY_SEARCH_TYPE[type];
+  const available = tabIdsFor(type, hasQuery);
   const id = tab && available.includes(tab) ? tab : DEFAULT_SEARCH_TAB;
   return SEARCH_TABS[id];
 }
