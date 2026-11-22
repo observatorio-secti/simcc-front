@@ -5,6 +5,14 @@ import { v2Fixtures } from '@/test/msw/fixtures';
 import { simccV2Url } from '@/test/msw/handlers';
 import { renderRoute } from '@/test/render-route';
 
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 describe('Rotas de instituições (T4)', () => {
   it('renderiza a listagem de instituições com total e busca navegável na URL', async () => {
     const capturedQueries: string[] = [];
@@ -118,6 +126,27 @@ describe('Rotas de instituições (T4)', () => {
     ).toBeInTheDocument();
     expect(screen.getAllByText('412').length).toBeGreaterThan(0);
     expect(screen.getAllByText('18').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('64').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('53').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('21').length).toBeGreaterThan(0);
+
+    // Tooltip de detalhamento de bolsistas ao passar o mouse
+    const scholarshipCardTrigger = screen.getByLabelText(
+      /Bolsistas de produtividade: 64/i,
+    );
+    await user.hover(scholarshipCardTrigger);
+    expect(
+      await screen.findByText('Detalhamento por tipo'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText('Produtividade em Pesquisa — Nível 2').length,
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByText('48').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText('Produtividade em Pesquisa — Nível 1A').length,
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByText('16').length).toBeGreaterThan(0);
+    await user.unhover(scholarshipCardTrigger);
 
     expect(await screen.findByText('Ana Maria Silva')).toBeInTheDocument();
 

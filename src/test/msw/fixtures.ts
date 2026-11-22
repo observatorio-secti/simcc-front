@@ -484,7 +484,22 @@ const institutionDetail: Schema<'InstitutionDetail'> = {
   counts: {
     researchers: 412,
     graduate_programs: 18,
+    scholarship_holders: 64,
+    research_groups: 53,
+    labs: 21,
   },
+  scholarships: [
+    {
+      modality: 'Produtividade em Pesquisa',
+      category_level: '2',
+      researchers: 48,
+    },
+    {
+      modality: 'Produtividade em Pesquisa',
+      category_level: '1A',
+      researchers: 16,
+    },
+  ],
 };
 
 const graduateProgramSummary: Schema<'GraduateProgramSummary'> = {

@@ -1,16 +1,19 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import {
+  Award,
   BookOpen,
   Building2,
   FileSpreadsheet,
   FileText,
+  FlaskConical,
   FolderKanban,
   GraduationCap,
   Hash,
   Lightbulb,
   MapPin,
+  Microscope,
   Presentation,
   Search,
   Users,
@@ -21,10 +24,12 @@ import { ProgramCard } from '@/entities/graduate-program/ui/program-card';
 import {
   formatInstitutionCount,
   formatInstitutionName,
+  formatInstitutionScholarshipLabel,
   getInstitutionLogo,
   resolveInstitutionAcronym,
   stripAcronymFromName,
   type InstitutionDetail,
+  type InstitutionScholarshipCount,
 } from '@/entities/institution/model';
 import { institutionDetailQueryOptions } from '@/entities/institution/queries';
 import type { ProductionKind } from '@/entities/production/model';
@@ -36,11 +41,13 @@ import { Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { EmptyState } from '@/shared/ui/empty-state';
+import { focusRing } from '@/shared/ui/focus-ring';
 import { Input } from '@/shared/ui/input';
 import { LoadingBlock } from '@/shared/ui/loading-block';
 import { Pagination } from '@/shared/ui/pagination';
 import { StatCard } from '@/shared/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
 import { InstitutionProductionsTab } from './institution-productions-tab';
 import {
   institutionDetailSearch,
@@ -296,6 +303,38 @@ function InstitutionProgramsTab({
   );
 }
 
+function ScholarshipBreakdownTooltip({
+  breakdown,
+  children,
+}: {
+  breakdown: readonly InstitutionScholarshipCount[];
+  children: ReactNode;
+}) {
+  if (breakdown.length === 0) return children;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent className="max-w-sm p-3">
+        <p className="mb-1.5 font-medium">Detalhamento por tipo</p>
+        <ul className="flex flex-col gap-1">
+          {breakdown.map((item, index) => (
+            <li
+              key={`${item.modality ?? 'none'}-${item.category_level ?? 'none'}-${index}`}
+              className="flex items-center justify-between gap-4"
+            >
+              <span>{formatInstitutionScholarshipLabel(item)}</span>
+              <span className="font-semibold tabular-nums">
+                {formatInstitutionCount(item.researchers)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 export function InstitutionDetailPage({
   institutionId,
   search,
@@ -369,6 +408,10 @@ export function InstitutionDetailPage({
 
   const researchersCount = institution.counts?.researchers ?? 0;
   const programsCount = institution.counts?.graduate_programs ?? 0;
+  const scholarshipHoldersCount = institution.counts?.scholarship_holders ?? 0;
+  const researchGroupsCount = institution.counts?.research_groups ?? 0;
+  const labsCount = institution.counts?.labs ?? 0;
+  const scholarshipsBreakdown = institution.scholarships ?? [];
   const hasCoordinates =
     typeof institution.latitude === 'number' &&
     typeof institution.longitude === 'number';
@@ -411,7 +454,7 @@ export function InstitutionDetailPage({
 
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_320px]">
         <div className="flex min-w-0 flex-col gap-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             <StatCard
               title="Pesquisadores"
               value={researchersCount}
@@ -423,6 +466,39 @@ export function InstitutionDetailPage({
               value={programsCount}
               caption="ofertados pela instituição"
               icon={GraduationCap}
+            />
+            <ScholarshipBreakdownTooltip breakdown={scholarshipsBreakdown}>
+              <div
+                tabIndex={scholarshipsBreakdown.length > 0 ? 0 : undefined}
+                aria-label={
+                  scholarshipsBreakdown.length > 0
+                    ? `Bolsistas de produtividade: ${formatInstitutionCount(scholarshipHoldersCount)}. Passe o mouse ou foque para ver o detalhamento por tipo.`
+                    : undefined
+                }
+                className={cn(
+                  'rounded-xl',
+                  scholarshipsBreakdown.length > 0 && focusRing,
+                )}
+              >
+                <StatCard
+                  title="Bolsistas de produtividade"
+                  value={scholarshipHoldersCount}
+                  caption="pesquisadores bolsistas distintos"
+                  icon={Award}
+                />
+              </div>
+            </ScholarshipBreakdownTooltip>
+            <StatCard
+              title="Grupos de pesquisa"
+              value={researchGroupsCount}
+              caption="vinculados à instituição"
+              icon={FlaskConical}
+            />
+            <StatCard
+              title="Laboratórios"
+              value={labsCount}
+              caption="vinculados à instituição"
+              icon={Microscope}
             />
           </div>
 
@@ -589,6 +665,37 @@ export function InstitutionDetailPage({
                 </span>
                 <span className="font-medium tabular-nums">
                   {formatInstitutionCount(programsCount)}
+                </span>
+              </div>
+              <div className="flex items-start justify-between gap-2 border-b pb-2">
+                <span className="text-muted-foreground">
+                  Bolsistas de produtividade
+                </span>
+                <ScholarshipBreakdownTooltip breakdown={scholarshipsBreakdown}>
+                  <span
+                    tabIndex={scholarshipsBreakdown.length > 0 ? 0 : undefined}
+                    className={cn(
+                      'font-medium tabular-nums',
+                      scholarshipsBreakdown.length > 0 &&
+                        'cursor-help underline decoration-dotted underline-offset-4',
+                    )}
+                  >
+                    {formatInstitutionCount(scholarshipHoldersCount)}
+                  </span>
+                </ScholarshipBreakdownTooltip>
+              </div>
+              <div className="flex items-start justify-between gap-2 border-b pb-2">
+                <span className="text-muted-foreground">
+                  Grupos de pesquisa
+                </span>
+                <span className="font-medium tabular-nums">
+                  {formatInstitutionCount(researchGroupsCount)}
+                </span>
+              </div>
+              <div className="flex items-start justify-between gap-2 border-b pb-2">
+                <span className="text-muted-foreground">Laboratórios</span>
+                <span className="font-medium tabular-nums">
+                  {formatInstitutionCount(labsCount)}
                 </span>
               </div>
               {institution.lattes_id && (

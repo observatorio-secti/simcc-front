@@ -31,6 +31,7 @@ import logoUneb from './assets/logo-uneb.png';
 export type InstitutionSummary = ListItem<'/institution'>;
 export type InstitutionDetail = DetailData<'/institution/{institution_id}'>;
 export type InstitutionCounts = Schema<'InstitutionCounts'>;
+export type InstitutionScholarshipCount = Schema<'InstitutionScholarshipCount'>;
 export type InstitutionQuery = QueryOf<'/institution'>;
 export type InstitutionFilters = ListFilters<'/institution'>;
 export type InstitutionListResponse = ListResponse<'/institution'>;
@@ -220,6 +221,29 @@ export function formatInstitutionCount(
 ): string {
   if (value === null || value === undefined || Number.isNaN(value)) return '—';
   return value.toLocaleString('pt-BR');
+}
+
+/**
+ * Formata o rótulo de uma entrada de `InstitutionDetail.scholarships`
+ * (ex.: `"Produtividade em Pesquisa — Nível 2"`).
+ */
+export function formatInstitutionScholarshipLabel(
+  item: Pick<InstitutionScholarshipCount, 'modality' | 'category_level'>,
+): string {
+  const rawModality = item.modality?.trim() ?? '';
+  const level = item.category_level?.trim() ?? '';
+
+  let modality = rawModality;
+  if (modality && level) {
+    const suffix = new RegExp(`\\s*[-–]\\s*${escapeRegExp(level)}$`, 'i');
+    const stripped = modality.replace(suffix, '').trim();
+    if (stripped) modality = stripped;
+  }
+
+  if (modality && level) return `${modality} — Nível ${level}`;
+  if (modality) return modality;
+  if (level) return `Nível ${level}`;
+  return 'Outra modalidade';
 }
 
 // TODO(T4): migrar para <Link to="/instituicoes/$id"> quando a rota existir.

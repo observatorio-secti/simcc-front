@@ -2889,6 +2889,43 @@ export interface components {
              * @default 0
              */
             graduate_programs: number;
+            /**
+             * Scholarship Holders
+             * @description Pesquisadores bolsistas distintos vinculados à instituição
+             * @default 0
+             */
+            scholarship_holders?: number;
+            /**
+             * Research Groups
+             * @description Grupos de pesquisa vinculados à instituição
+             * @default 0
+             */
+            research_groups?: number;
+            /**
+             * Labs
+             * @description Laboratórios vinculados à instituição
+             * @default 0
+             */
+            labs?: number;
+        };
+        /** InstitutionScholarshipCount */
+        InstitutionScholarshipCount: {
+            /**
+             * Modality
+             * @description Modalidade da bolsa
+             */
+            modality?: string | null;
+            /**
+             * Category Level
+             * @description Nível/categoria da bolsa
+             */
+            category_level?: string | null;
+            /**
+             * Researchers
+             * @description Quantidade de bolsistas distintos
+             * @default 0
+             */
+            researchers: number;
         };
         /** InstitutionDetail */
         InstitutionDetail: {
@@ -2939,6 +2976,11 @@ export interface components {
              */
             longitude?: number | null;
             counts?: components["schemas"]["InstitutionCounts"];
+            /**
+             * Scholarships
+             * @description Detalhamento de bolsistas por modalidade e nível
+             */
+            scholarships?: components["schemas"]["InstitutionScholarshipCount"][];
         };
         /** InstitutionFilter */
         InstitutionFilter: {

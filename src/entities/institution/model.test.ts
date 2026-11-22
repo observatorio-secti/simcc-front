@@ -5,6 +5,7 @@ import {
   INSTITUTION_SORT_OPTIONS,
   formatInstitutionCount,
   formatInstitutionName,
+  formatInstitutionScholarshipLabel,
   getInstitutionLogo,
   institutionPath,
   resolveInstitutionAcronym,
@@ -12,6 +13,7 @@ import {
   type InstitutionCounts,
   type InstitutionDetail,
   type InstitutionFilters,
+  type InstitutionScholarshipCount,
   type InstitutionSummary,
 } from './model';
 
@@ -28,6 +30,9 @@ describe('tipos derivados do OpenAPI', () => {
     >();
     expectTypeOf<InstitutionFilters>().toEqualTypeOf<
       Schemas['InstitutionFilter']
+    >();
+    expectTypeOf<InstitutionScholarshipCount>().toEqualTypeOf<
+      Schemas['InstitutionScholarshipCount']
     >();
   });
 });
@@ -185,5 +190,38 @@ describe('formatadores de instituição', () => {
     expect(institutionPath('inst 1/2')).toMatch(
       /\/instituicoes\/inst%201%2F2$/,
     );
+  });
+
+  it('formata o rótulo do detalhamento de bolsas por modalidade e nível', () => {
+    expect(
+      formatInstitutionScholarshipLabel({
+        modality: 'Produtividade em Pesquisa',
+        category_level: '2',
+      }),
+    ).toBe('Produtividade em Pesquisa — Nível 2');
+    expect(
+      formatInstitutionScholarshipLabel({
+        modality: 'Produtividade em Pesquisa - 1A',
+        category_level: '1A',
+      }),
+    ).toBe('Produtividade em Pesquisa — Nível 1A');
+    expect(
+      formatInstitutionScholarshipLabel({
+        modality: 'Iniciação Científica',
+        category_level: null,
+      }),
+    ).toBe('Iniciação Científica');
+    expect(
+      formatInstitutionScholarshipLabel({
+        modality: null,
+        category_level: '1B',
+      }),
+    ).toBe('Nível 1B');
+    expect(
+      formatInstitutionScholarshipLabel({
+        modality: null,
+        category_level: null,
+      }),
+    ).toBe('Outra modalidade');
   });
 });
