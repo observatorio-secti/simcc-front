@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useLocation } from '@tanstack/react-router';
 import { ConsoleShortcut } from './console-shortcut';
 import { Crumbbar } from './crumbbar';
+import type { NavItem } from './nav-config';
 import { AppSidebar, type AppSidebarProps } from './sidebar';
 import { readSidebarCollapsed, writeSidebarCollapsed } from './sidebar-storage';
 import { Topbar } from './topbar';
@@ -26,6 +28,8 @@ export function PublicLayout({
   mobileNavDescription,
 }: PublicLayoutProps) {
   const isMobile = useIsMobile();
+  const { pathname } = useLocation();
+  const prevPathnameRef = useRef(pathname);
   const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -41,6 +45,22 @@ export function PublicLayout({
       return next;
     });
   }, [isMobile]);
+
+  const handleDesktopNavigate = useCallback((item: NavItem) => {
+    if (item.url === '/') return;
+    setCollapsed(true);
+    writeSidebarCollapsed(true);
+  }, []);
+
+  useEffect(() => {
+    const prevPathname = prevPathnameRef.current;
+    prevPathnameRef.current = pathname;
+
+    if (prevPathname !== '/' && pathname === '/') {
+      setCollapsed(false);
+      writeSidebarCollapsed(false);
+    }
+  }, [pathname]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia?.(MOBILE_MEDIA_QUERY);
@@ -85,6 +105,7 @@ export function PublicLayout({
         collapsed={collapsed}
         mobileOpen={isMobile && mobileOpen}
         onMobileOpenChange={setMobileOpen}
+        onDesktopNavigate={handleDesktopNavigate}
         renderNav={renderNav}
         mobileDescription={mobileNavDescription}
       />

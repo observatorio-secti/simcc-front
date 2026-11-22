@@ -26,13 +26,15 @@ import {
 export type SidebarNavRenderProps = {
   pathname: string;
   collapsed: boolean;
-  onNavigate?: () => void;
+  onNavigate?: (item: NavItem) => void;
 };
 
 export type AppSidebarProps = {
   collapsed: boolean;
   mobileOpen: boolean;
   onMobileOpenChange: (open: boolean) => void;
+  /** Callback disparado ao clicar em um item do menu no desktop. */
+  onDesktopNavigate?: (item: NavItem) => void;
   /** Navegação própria (ex.: menu do console); padrão: menu público. */
   renderNav?: (props: SidebarNavRenderProps) => ReactNode;
   /** Descrição do menu no sheet do mobile, para leitores de tela. */
@@ -53,7 +55,7 @@ export function SidebarLink({
   item: NavItem;
   pathname: string;
   collapsed: boolean;
-  onNavigate?: () => void;
+  onNavigate?: (item: NavItem) => void;
 }) {
   const active = isActive(item.url, pathname, { exact: item.exact });
   const Icon = item.icon;
@@ -66,7 +68,7 @@ export function SidebarLink({
       inactiveProps={{}}
       aria-label={collapsed ? item.title : undefined}
       aria-current={active ? 'page' : undefined}
-      onClick={onNavigate}
+      onClick={() => onNavigate?.(item)}
       className={cn(
         'flex h-8 items-center rounded-md text-sm transition-colors',
         focusRing,
@@ -96,7 +98,7 @@ function SidebarNavContent({
 }: {
   pathname: string;
   collapsed: boolean;
-  onNavigate?: () => void;
+  onNavigate?: (item: NavItem) => void;
 }) {
   const baseId = useId();
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
@@ -245,6 +247,7 @@ export function AppSidebar({
   collapsed,
   mobileOpen,
   onMobileOpenChange,
+  onDesktopNavigate,
   renderNav = PublicSidebarNav,
   mobileDescription = 'Menu principal da plataforma Simcc',
 }: AppSidebarProps) {
@@ -261,7 +264,7 @@ export function AppSidebar({
           collapsed ? 'w-[3rem]' : 'w-[16rem]',
         )}
       >
-        {renderNav({ pathname, collapsed })}
+        {renderNav({ pathname, collapsed, onNavigate: onDesktopNavigate })}
       </aside>
 
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>

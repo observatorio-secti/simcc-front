@@ -53,6 +53,20 @@ function renderShellAt(initialPath: string) {
     component: () => <div>Conteúdo inicial</div>,
   });
 
+  const searchRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/busca',
+    staticData: { crumb: 'Pesquisar' },
+    component: () => <div>Conteúdo de busca</div>,
+  });
+
+  const institutionsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/instituicoes',
+    staticData: { crumb: 'Instituições' },
+    component: () => <div>Conteúdo de instituições</div>,
+  });
+
   const institutionDetailRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/instituicoes/$id',
@@ -61,7 +75,12 @@ function renderShellAt(initialPath: string) {
   });
 
   const router = createRouter({
-    routeTree: rootRoute.addChildren([indexRoute, institutionDetailRoute]),
+    routeTree: rootRoute.addChildren([
+      indexRoute,
+      searchRoute,
+      institutionsRoute,
+      institutionDetailRoute,
+    ]),
     history: createMemoryHistory({ initialEntries: [initialPath] }),
   });
 
@@ -196,5 +215,66 @@ describe('PublicLayout e AppSidebar', () => {
     expect(
       within(dialog).getByRole('link', { name: 'Instituições' }),
     ).toBeInTheDocument();
+  });
+
+  it('contrai a sidebar ao clicar em um item do menu e expande ao voltar para a página inicial', async () => {
+    const user = userEvent.setup();
+    renderShellAt('/');
+
+    const sidebar = await waitFor(() => {
+      const el = document.querySelector<HTMLElement>('[data-slot="sidebar"]');
+      expect(el).not.toBeNull();
+      return el!;
+    });
+
+    expect(sidebar).toHaveAttribute('data-state', 'expanded');
+
+    // Clicar em "Página inicial" já estando em "/" mantém expandida.
+    await user.click(
+      within(sidebar).getByRole('link', { name: 'Página inicial' }),
+    );
+    expect(sidebar).toHaveAttribute('data-state', 'expanded');
+
+    // Clicar em outro item do menu contrai a sidebar.
+    await user.click(
+      within(sidebar).getByRole('link', { name: 'Instituições' }),
+    );
+    await waitFor(() => {
+      expect(sidebar).toHaveAttribute('data-state', 'collapsed');
+    });
+    expect(readStorage<boolean>(SIDEBAR_STORAGE_KEY, false)).toBe(true);
+
+    // Voltar para a página inicial pelo item do menu expande a sidebar.
+    await user.click(
+      within(sidebar).getByRole('link', { name: 'Página inicial' }),
+    );
+    await waitFor(() => {
+      expect(sidebar).toHaveAttribute('data-state', 'expanded');
+    });
+    expect(readStorage<boolean>(SIDEBAR_STORAGE_KEY, true)).toBe(false);
+  });
+
+  it('expande a sidebar ao voltar para a página inicial por outro link (ex.: topbar)', async () => {
+    const user = userEvent.setup();
+    renderShellAt('/');
+
+    const sidebar = await waitFor(() => {
+      const el = document.querySelector<HTMLElement>('[data-slot="sidebar"]');
+      expect(el).not.toBeNull();
+      return el!;
+    });
+
+    await user.click(within(sidebar).getByRole('link', { name: 'Pesquisar' }));
+    await waitFor(() => {
+      expect(sidebar).toHaveAttribute('data-state', 'collapsed');
+    });
+
+    await user.click(
+      screen.getByRole('link', { name: 'Página inicial do Simcc' }),
+    );
+    await waitFor(() => {
+      expect(sidebar).toHaveAttribute('data-state', 'expanded');
+    });
+    expect(readStorage<boolean>(SIDEBAR_STORAGE_KEY, true)).toBe(false);
   });
 });
