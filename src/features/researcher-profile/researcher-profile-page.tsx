@@ -32,7 +32,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { ArticlesTab } from './components/articles-tab';
 import { GuidanceTab } from './components/guidance-tab';
-import { ProductionDetailDialog } from './components/production-detail-dialog';
 import { ProductionListSection } from './components/production-list-section';
 import { ProfileSidebar } from './components/profile-sidebar';
 import { TrajectoryTab } from './components/trajectory-tab';
@@ -43,6 +42,11 @@ export interface ResearcherProfilePageProps {
   researcherId: string;
   search: ResearcherProfileSearch;
   onUpdateSearch: (patch: Partial<ResearcherProfileSearch>) => void;
+  /**
+   * Abre o detalhe da produção (T13). Quem monta a rota decide a navegação:
+   * overlay mascarado como `/producoes/<slug>/<id>` (ADR 0010).
+   */
+  onOpenProduction: (kind: ProductionKind, id: string) => void;
 }
 
 async function copyText(text: string, label: string) {
@@ -61,6 +65,7 @@ export function ResearcherProfilePage({
   researcherId,
   search,
   onUpdateSearch,
+  onOpenProduction,
 }: ResearcherProfilePageProps) {
   const { data: detailResponse } = useSuspenseQuery(
     researcherDetailQueryOptions(researcherId),
@@ -85,7 +90,7 @@ export function ResearcherProfilePage({
   const lattesId = researcher.identifiers.lattes_id?.trim() || null;
 
   function handleOpenProduction(kind: ProductionKind, itemId: string) {
-    onUpdateSearch({ prod_kind: kind, prod_id: itemId });
+    onOpenProduction(kind, itemId);
   }
 
   function handleTabChange(nextTab: string) {
@@ -429,14 +434,6 @@ export function ResearcherProfilePage({
           termsError={termsError}
         />
       </div>
-
-      <ProductionDetailDialog
-        kind={search.prod_kind}
-        id={search.prod_id}
-        onClose={() =>
-          onUpdateSearch({ prod_kind: undefined, prod_id: undefined })
-        }
-      />
     </div>
   );
 }

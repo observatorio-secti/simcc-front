@@ -194,9 +194,14 @@ describe('ProductionCard', () => {
     expect(screen.getByText('Pesquisa')).toBeInTheDocument();
     expect(screen.getByText('+1')).toBeInTheDocument();
 
-    await user.click(
-      screen.getByRole('button', { name: 'Rede de sensores marinhos' }),
+    const titleLink = screen.getByRole('link', {
+      name: 'Rede de sensores marinhos',
+    });
+    expect(titleLink).toHaveAttribute(
+      'href',
+      '/producoes/projeto-de-pesquisa/proj-1',
     );
+    await user.click(titleLink);
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 

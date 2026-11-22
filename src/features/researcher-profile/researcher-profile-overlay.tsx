@@ -1,6 +1,7 @@
 import { Suspense, useState } from 'react';
 import { CatchBoundary, Link } from '@tanstack/react-router';
 import { AlertTriangle, Maximize2, UserX, X } from 'lucide-react';
+import type { ProductionKind } from '@/entities/production/model';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { LoadingBlock } from '@/shared/ui/loading-block';
@@ -23,6 +24,8 @@ export interface ResearcherProfileOverlayProps {
   /** Search params da página completa (`/pesquisadores/$id`). */
   routeSearch: Partial<ResearcherProfileSearch>;
   onUpdateSearch: (patch: Partial<ResearcherProfileSearch>) => void;
+  /** Abre a produção sobre o perfil (T13); quem monta a rota decide a navegação. */
+  onOpenProduction: (kind: ProductionKind, id: string) => void;
   onClose: () => void;
 }
 
@@ -55,6 +58,7 @@ export function ResearcherProfileOverlay({
   search,
   routeSearch,
   onUpdateSearch,
+  onOpenProduction,
   onClose,
 }: ResearcherProfileOverlayProps) {
   // Mantém o último pesquisador durante a animação de saída do painel.
@@ -118,6 +122,7 @@ export function ResearcherProfileOverlay({
                   researcherId={shownId}
                   search={search}
                   onUpdateSearch={onUpdateSearch}
+                  onOpenProduction={onOpenProduction}
                 />
               </Suspense>
             </CatchBoundary>
