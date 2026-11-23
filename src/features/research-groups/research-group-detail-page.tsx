@@ -42,6 +42,7 @@ import {
   researchGroupDetailQueryOptions,
   researchGroupResearchersQueryOptions,
 } from '@/entities/research-group/queries';
+import { researcherImageUrl } from '@/entities/researcher/queries';
 import { ResearcherAvatar } from '@/entities/researcher/ui/researcher-avatar';
 import { cn } from '@/shared/lib/cn';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
@@ -135,6 +136,15 @@ function resolveGroupLeaders(
   }
 
   return leaders.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+}
+
+function resolveMemberImageUrl(member: {
+  imageUrl: string | null;
+  lattesId: string | null;
+}): string | null {
+  if (member.imageUrl) return member.imageUrl;
+  if (member.lattesId) return researcherImageUrl(member.lattesId);
+  return null;
 }
 
 function MemberNameLink({
@@ -584,7 +594,7 @@ export function ResearchGroupDetailPage() {
                     >
                       <ResearcherAvatar
                         name={leader.name}
-                        imageUrl={leader.imageUrl}
+                        imageUrl={resolveMemberImageUrl(leader)}
                         size="md"
                         decorative
                         className="size-12 rounded-lg"
@@ -739,7 +749,7 @@ export function ResearchGroupDetailPage() {
                         <CardContent className="flex items-start gap-3 p-4">
                           <ResearcherAvatar
                             name={member.name}
-                            imageUrl={member.imageUrl}
+                            imageUrl={resolveMemberImageUrl(member)}
                             size="md"
                             decorative
                           />

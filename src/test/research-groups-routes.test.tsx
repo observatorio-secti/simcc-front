@@ -188,6 +188,14 @@ function createOdaHandlers(options?: {
                 imageUrl: 'https://oda.test/fotos/ana.jpg',
                 eLider: true,
               },
+              {
+                id: 'r-2',
+                nome: 'Bruno Costa',
+                formacaoAcademica: null,
+                lattesId: '9876543210987654',
+                imageUrl: null,
+                eLider: true,
+              },
             ],
             meta: { page: 1, size: 100, totalItems: 1, totalPages: 1 },
           });
@@ -321,7 +329,7 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
     ).toHaveAttribute('href', 'https://dgp.cnpq.br/dgp/espelhogrupo/1001');
 
     expect(
-      await screen.findByText('Liderança do grupo'),
+      await screen.findByText(/Lideranças? do grupo/),
     ).toBeInTheDocument();
     const leaderLink = await screen.findByRole('link', { name: 'Ana Souza' });
     expect(leaderLink).toHaveAttribute(
@@ -333,6 +341,11 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
     ).toBeInTheDocument();
     expect(
       document.querySelector('img[src="https://oda.test/fotos/ana.jpg"]'),
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector(
+        'img[src="http://localhost:8088/v2/researcher/9876543210987654/image"]',
+      ),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('tab', { name: /Pesquisadores/i }));
