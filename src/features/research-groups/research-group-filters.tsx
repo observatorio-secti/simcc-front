@@ -84,8 +84,8 @@ function SingleSelectFilterSection({
   return (
     <AccordionItem value={sectionKey}>
       <AccordionTrigger className="py-3 text-sm font-semibold hover:no-underline">
-        <span className="flex items-center gap-2">
-          <span>{title}</span>
+        <span className="flex min-w-0 flex-1 items-center gap-2">
+          <span className="min-w-0 break-words">{title}</span>
           {selected && (
             <span className="rounded-full bg-eng-blue px-1.5 text-[10px] leading-4 font-bold text-white">
               1

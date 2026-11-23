@@ -295,4 +295,32 @@ describe('FacetPanel', () => {
     const { container } = render(<FacetPanel loading />);
     expect(container.querySelector('[aria-busy="true"]')).toBeInTheDocument();
   });
+
+  it('quebra rótulos longos sem truncar com reticências em listas curtas e com rolagem', () => {
+    const longLabel =
+      'Instituto Federal de Educação, Ciência e Tecnologia da Bahia';
+    const manyItems = Array.from({ length: 10 }, (_, index) => ({
+      value: `inst-${index}`,
+      label: index === 0 ? longLabel : `Instituição ${index + 1}`,
+      count: 100 - index,
+    }));
+
+    render(
+      <FacetPanel
+        facets={{
+          institution: {
+            param: 'institution_id',
+            total: manyItems.length,
+            items: manyItems,
+          },
+        }}
+        defaultOpen={['institution']}
+      />,
+    );
+
+    const labelEl = screen.getByText(longLabel);
+    expect(labelEl).toHaveClass('break-words');
+    expect(labelEl).not.toHaveClass('truncate');
+    expect(labelEl.parentElement).toHaveClass('items-start');
+  });
 });

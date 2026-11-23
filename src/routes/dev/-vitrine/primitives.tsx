@@ -383,13 +383,13 @@ export function PrimitivesShowcase() {
                 {FILTER_OPTIONS.map((option) => (
                   <label
                     key={option.id}
-                    className="flex cursor-pointer items-center gap-2.5"
+                    className="flex cursor-pointer items-start gap-2.5"
                   >
-                    <Checkbox />
-                    <span className="min-w-0 flex-1 truncate">
+                    <Checkbox className="mt-0.5 shrink-0" />
+                    <span className="min-w-0 flex-1 leading-snug break-words">
                       {option.label}
                     </span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
+                    <span className="mt-0.5 shrink-0 text-xs text-muted-foreground tabular-nums">
                       {numberFormat.format(option.count)}
                     </span>
                   </label>
