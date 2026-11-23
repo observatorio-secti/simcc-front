@@ -29,7 +29,7 @@ describe('results-search (T2)', () => {
       qualis: ['A1'],
       year_start: 2020,
       page: 2,
-      per_page: 20,
+      per_page: 30,
     });
     const roundTrip = resultsSearch.toURLSearchParams(search);
     expect(Object.fromEntries(roundTrip)).toEqual(
@@ -58,7 +58,7 @@ describe('results-search (T2)', () => {
     expect(toResearcherQuery(search)).toEqual({
       q: 'solos',
       page: 3,
-      per_page: 20,
+      per_page: 30,
       area: ['ENGENHARIAS'],
       graduation: ['Doutorado'],
       sort_by: 'matches',
@@ -154,7 +154,7 @@ describe('results-search (T2)', () => {
     expect(toProductionQuery('article', search)).toEqual({
       q: 'solos',
       page: 1,
-      per_page: 20,
+      per_page: 30,
       city_id: ['c'],
       qualis: ['A2'],
       sort_by: 'citations',

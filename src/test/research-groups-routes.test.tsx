@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -184,6 +184,16 @@ function createOdaHandlers(options?: {
                 id: 'r-1',
                 nome: 'Ana Souza',
                 formacaoAcademica: 'Doutorado em Ciência da Computação',
+                lattesId: '1234567890123456',
+                imageUrl: 'https://oda.test/fotos/ana.jpg',
+                eLider: true,
+              },
+              {
+                id: 'r-2',
+                nome: 'Bruno Costa',
+                formacaoAcademica: null,
+                lattesId: '9876543210987654',
+                imageUrl: null,
                 eLider: true,
               },
             ],
@@ -318,54 +328,93 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       screen.getByRole('link', { name: /Espelho DGP CNPq/i }),
     ).toHaveAttribute('href', 'https://dgp.cnpq.br/dgp/espelhogrupo/1001');
 
+    expect(
+      await screen.findByText(/Lideranças? do grupo/),
+    ).toBeInTheDocument();
+    const leaderLink = await screen.findByRole('link', { name: 'Ana Souza' });
+    expect(leaderLink).toHaveAttribute(
+      'href',
+      '/pesquisadores/1234567890123456',
+    );
+    expect(
+      await screen.findByText('Doutorado em Ciência da Computação'),
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('img[src="https://oda.test/fotos/ana.jpg"]'),
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector(
+        'img[src="http://localhost:8088/v2/researcher/9876543210987654/image"]',
+      ),
+    ).toBeInTheDocument();
+
     await user.click(screen.getByRole('tab', { name: /Pesquisadores/i }));
 
     await waitFor(() => {
       expect(router.state.location.searchStr).toContain('tab=pesquisadores');
     });
-    expect(await screen.findByText('Ana Souza')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Ana Souza' })).toHaveAttribute(
-      'href',
-      '/researcher?name=Ana+Souza',
-    );
+    const researchersPanel = screen.getByRole('tabpanel', {
+      name: /Pesquisadores/i,
+    });
+    expect(within(researchersPanel).getByText('Ana Souza')).toBeInTheDocument();
     expect(
-      screen.getByText('Doutorado em Ciência da Computação'),
+      within(researchersPanel).getByRole('link', { name: 'Ana Souza' }),
+    ).toHaveAttribute('href', '/pesquisadores/1234567890123456');
+    expect(
+      within(researchersPanel).getByText('Doutorado em Ciência da Computação'),
     ).toBeInTheDocument();
   }, 15000);
 
-  it('navega para o perfil do pesquisador no SimCC ao clicar no nome na aba Pesquisadores', async () => {
-    const baseResearcher = v2Fixtures['/researcher'].data[0]!;
+  it('exibe liderança pelo fallback de membros quando /pesquisadores retorna vazio e abre busca sem lattesId', async () => {
+    await renderRoute('/grupos-pesquisa/grp-2', {
+      handlers: createOdaHandlers(),
+    });
+
+    expect(
+      await screen.findByRole('heading', {
+        level: 2,
+        name: 'Laboratório de Saúde Coletiva',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Liderança do grupo')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Carlos Lima' }),
+    ).toHaveAttribute('href', '/busca?q=Carlos+Lima&type=name');
+  }, 15000);
+
+  it('navega direto para /pesquisadores/$lattesId ao clicar no nome sem buscar por nome', async () => {
+    const baseResearcher = v2Fixtures['/researcher/{researcher_id}'].data;
     const anaResearcher = {
       ...baseResearcher,
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Ana Souza',
     };
+    const requestedIds: string[] = [];
 
     const { user, router } = await renderRoute(
       '/grupos-pesquisa/grp-1?tab=pesquisadores',
       {
         handlers: [
           ...createOdaHandlers(),
-          http.get(simccV2Url('/researcher'), () =>
-            HttpResponse.json({
-              ...v2Fixtures['/researcher'],
-              data: [anaResearcher],
-            }),
-          ),
-          http.get(simccV2Url('/researcher/:researcher_id'), () =>
-            HttpResponse.json(anaResearcher),
-          ),
+          http.get(simccV2Url('/researcher/:researcher_id'), ({ params }) => {
+            requestedIds.push(String(params.researcher_id));
+            return HttpResponse.json({
+              ...v2Fixtures['/researcher/{researcher_id}'],
+              data: anaResearcher,
+            });
+          }),
         ],
       },
     );
 
-    const link = await screen.findByRole('link', { name: 'Ana Souza' });
-    await user.click(link);
+    const links = await screen.findAllByRole('link', { name: 'Ana Souza' });
+    await user.click(links[0]!);
 
     await waitFor(() => {
       expect(router.state.location.pathname).toBe(
-        `/pesquisadores/${anaResearcher.id}`,
+        '/pesquisadores/1234567890123456',
       );
+      expect(requestedIds).toContain('1234567890123456');
     });
   }, 15000);
 });

@@ -1,35 +1,36 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
-import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import {
   firstParam,
   isUuid,
   legacyParams,
   legacyResearcherProfileSearch,
-  matchByName,
 } from '../-redirects/legacy-params';
+
+const LATTES_ID_RE = /^\d{16}$/;
 
 const researcherRedirectSearchSchema = z
   .object({
     name: z.string().optional(),
     researcher_name: z.string().optional(),
+    lattes_id: z.string().optional(),
   })
   .passthrough();
 
 /**
  * `/researcher` do legado (V2) → `/pesquisadores/$id`. O legado abria o
- * pesquisador por `researcher_name` (links e compartilhamento) ou
- * `lattes_id`. O nome é resolvido em `/v2/researcher?search_in=name`; sem
- * correspondência exata, cai na busca por nome. A v2 não procura por Lattes:
- * `lattes_id` sem nome vai para `/busca`.
+ * pesquisador por `id` (UUID), `lattes_id` ou `researcher_name`. Como
+ * `GET /v2/researcher/{id}` aceita UUID e `lattes_id`, ambos seguem direto
+ * para `/pesquisadores/$id`; URLs legadas apenas com nome seguem para
+ * `/busca?q=<nome>&type=name` (sem tentar resolver uma pessoa por nome).
  */
 export const Route = createFileRoute('/_public/researcher')({
   validateSearch: researcherRedirectSearchSchema,
-  beforeLoad: async ({ context, location }) => {
+  beforeLoad: ({ location }) => {
     const params = legacyParams(location.search);
     const profileSearch = legacyResearcherProfileSearch(params);
     const id = firstParam(params, 'id', 'researcher_id');
-    if (id && isUuid(id)) {
+    if (id && (isUuid(id) || LATTES_ID_RE.test(id))) {
       throw redirect({
         to: '/pesquisadores/$id',
         params: { id },
@@ -38,34 +39,25 @@ export const Route = createFileRoute('/_public/researcher')({
       });
     }
 
-    const name = firstParam(params, 'researcher_name', 'name');
-    if (!name) {
-      throw redirect({ to: '/busca', search: {}, replace: true });
-    }
-
-    const found = await context.queryClient
-      .fetchQuery(
-        researcherListQueryOptions({
-          q: name,
-          search_in: 'name',
-          per_page: 10,
-        }),
-      )
-      .then((response) => matchByName(response.data, name))
-      .catch(() => undefined);
-
-    if (found) {
+    const lattesId = firstParam(params, 'lattes_id');
+    if (lattesId && LATTES_ID_RE.test(lattesId)) {
       throw redirect({
         to: '/pesquisadores/$id',
-        params: { id: found.id },
+        params: { id: lattesId },
         search: profileSearch,
         replace: true,
       });
     }
-    throw redirect({
-      to: '/busca',
-      search: { q: name, type: 'name' },
-      replace: true,
-    });
+
+    const name = firstParam(params, 'researcher_name', 'name');
+    if (name) {
+      throw redirect({
+        to: '/busca',
+        search: { q: name, type: 'name' },
+        replace: true,
+      });
+    }
+
+    throw redirect({ to: '/busca', search: {}, replace: true });
   },
 });

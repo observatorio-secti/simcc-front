@@ -58,15 +58,16 @@ export function ResearcherProfilePage({
     researcherDetailQueryOptions(researcherId),
   );
   const researcher = detailResponse.data;
+  const canonicalId = researcher.id;
 
   const {
     data: termsResponse,
     isLoading: termsLoading,
     isError: termsError,
-  } = useQuery(researcherTermsQueryOptions(researcherId, { limit: 18 }));
+  } = useQuery(researcherTermsQueryOptions(canonicalId, { limit: 18 }));
 
   const { data: scholarshipsResponse } = useQuery(
-    researcherScholarshipsQueryOptions(researcherId),
+    researcherScholarshipsQueryOptions(canonicalId),
   );
 
   const terms = termsResponse?.data ?? [];
@@ -74,7 +75,7 @@ export function ResearcherProfilePage({
 
   // Recorte dos gráficos por ano: o pesquisador e o intervalo de anos da aba.
   const chartQuery = {
-    researcher_id: [researcherId],
+    researcher_id: [canonicalId],
     ...(search.year_start !== undefined
       ? { year_start: search.year_start }
       : {}),
@@ -146,7 +147,7 @@ export function ResearcherProfilePage({
 
             <TabsContent value="articles" className="mt-4">
               <ArticlesTab
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 search={search}
                 onUpdateSearch={onUpdateSearch}
                 onOpenItem={(item) => handleOpenProduction('article', item.id)}
@@ -174,7 +175,7 @@ export function ResearcherProfilePage({
                 ]}
               />
               <ProductionListSection
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 kind="book"
                 yearStart={search.year_start}
                 yearEnd={search.year_end}
@@ -184,7 +185,7 @@ export function ResearcherProfilePage({
                 onOpenItem={(kind, item) => handleOpenProduction(kind, item.id)}
               />
               <ProductionListSection
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 kind="book_chapter"
                 yearStart={search.year_start}
                 yearEnd={search.year_end}
@@ -216,7 +217,7 @@ export function ResearcherProfilePage({
                 ]}
               />
               <ProductionListSection
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 kind="patent"
                 yearStart={search.year_start}
                 yearEnd={search.year_end}
@@ -226,7 +227,7 @@ export function ResearcherProfilePage({
                 onOpenItem={(kind, item) => handleOpenProduction(kind, item.id)}
               />
               <ProductionListSection
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 kind="software"
                 yearStart={search.year_start}
                 yearEnd={search.year_end}
@@ -235,7 +236,7 @@ export function ResearcherProfilePage({
                 onOpenItem={(kind, item) => handleOpenProduction(kind, item.id)}
               />
               <ProductionListSection
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 kind="brand"
                 yearStart={search.year_start}
                 yearEnd={search.year_end}
@@ -263,7 +264,7 @@ export function ResearcherProfilePage({
                 kind="report"
               />
               <ProductionListSection
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 kind="report"
                 yearStart={search.year_start}
                 yearEnd={search.year_end}
@@ -288,7 +289,7 @@ export function ResearcherProfilePage({
                 }
               />
               <GuidanceTab
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 yearStart={search.year_start}
                 yearEnd={search.year_end}
                 page={search.page}
@@ -318,7 +319,7 @@ export function ResearcherProfilePage({
                 groupBy="nature"
               />
               <ProductionListSection
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 kind="event"
                 yearStart={search.year_start}
                 yearEnd={search.year_end}
@@ -349,7 +350,7 @@ export function ResearcherProfilePage({
                 groupBy="status"
               />
               <ProductionListSection
-                researcherId={researcherId}
+                researcherId={canonicalId}
                 kind="research_project"
                 yearStart={search.year_start}
                 yearEnd={search.year_end}

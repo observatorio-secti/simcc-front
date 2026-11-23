@@ -4,6 +4,7 @@ import { useNavigate } from '@tanstack/react-router';
 import {
   Award,
   Building2,
+  ExternalLink,
   FlaskConical,
   GraduationCap,
   Hash,
@@ -194,7 +195,7 @@ function InstitutionResearchersTab({
 
   return (
     <div aria-busy={isFetching || undefined} className="flex flex-col gap-4">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {researchers.map((researcher) => (
           <PersonCard
             key={researcher.id}
@@ -433,7 +434,12 @@ export function InstitutionDetailPage({
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div
+        className={cn(
+          'grid gap-4 sm:grid-cols-2 md:grid-cols-3',
+          labsCount > 0 ? 'lg:grid-cols-5' : 'lg:grid-cols-4',
+        )}
+      >
         <StatCard
           title="Pesquisadores"
           value={researchersCount}
@@ -473,12 +479,28 @@ export function InstitutionDetailPage({
           caption="vinculados à instituição"
           icon={FlaskConical}
         />
-        <StatCard
-          title="Laboratórios"
-          value={labsCount}
-          caption="vinculados à instituição"
-          icon={Microscope}
-        />
+        {labsCount > 0 && (
+          <a
+            href="https://vip.uesc.br/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn('group block rounded-xl', focusRing)}
+          >
+            <StatCard
+              title="Laboratórios"
+              value={labsCount}
+              caption={
+                <span className="inline-flex items-center gap-1">
+                  <span>vinculados à instituição · Acessar VIP</span>
+                  <ExternalLink className="size-3 shrink-0" aria-hidden />
+                  <span className="sr-only"> (abre em nova aba)</span>
+                </span>
+              }
+              icon={Microscope}
+              className="h-full transition-colors group-hover:border-eng-blue"
+            />
+          </a>
+        )}
       </div>
 
       <Tabs

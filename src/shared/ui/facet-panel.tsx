@@ -351,21 +351,21 @@ function CheckboxFacetList({
         const dotClass = resolveDotClass(item);
 
         return (
-          <div key={item.value} className="flex items-center gap-2.5 text-sm">
+          <div key={item.value} className="flex items-start gap-2.5 text-sm">
             <Checkbox
               id={checkboxId}
               checked={checked}
               onCheckedChange={() => onToggle(item.value)}
+              className="mt-0.5 shrink-0"
             />
-            {dotClass && <Dot className={dotClass} />}
+            {dotClass && <Dot className={cn('mt-1.5 shrink-0', dotClass)} />}
             <label
               htmlFor={checkboxId}
-              className="min-w-0 flex-1 cursor-pointer truncate"
-              title={displayLabel}
+              className="min-w-0 flex-1 cursor-pointer leading-snug break-words"
             >
               {displayLabel}
             </label>
-            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+            <span className="mt-0.5 shrink-0 text-xs text-muted-foreground tabular-nums">
               {NUMBER_FORMAT.format(item.count)}
             </span>
           </div>
@@ -618,7 +618,7 @@ export function FacetPanel({
               return (
                 <AccordionItem key={facetKey} value={facetKey}>
                   <AccordionTrigger>
-                    <span className="min-w-0 flex-1 truncate">
+                    <span className="min-w-0 flex-1 break-words">
                       {sectionLabel}
                     </span>
                     {hasActiveRange && (
@@ -658,7 +658,7 @@ export function FacetPanel({
             return (
               <AccordionItem key={facetKey} value={facetKey}>
                 <AccordionTrigger>
-                  <span className="min-w-0 flex-1 truncate">
+                  <span className="min-w-0 flex-1 break-words">
                     {sectionLabel}
                   </span>
                   {selectedValues.length > 0 && (

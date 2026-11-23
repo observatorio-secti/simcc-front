@@ -56,11 +56,12 @@ export const Route = createFileRoute('/_public/pesquisadores/$id')({
       const detail = await context.queryClient.ensureQueryData(
         researcherDetailQueryOptions(params.id),
       );
+      const canonicalId = detail.data.id;
       void context.queryClient.prefetchQuery(
-        researcherTermsQueryOptions(params.id, { limit: 25 }),
+        researcherTermsQueryOptions(canonicalId, { limit: 25 }),
       );
       void context.queryClient.prefetchQuery(
-        researcherScholarshipsQueryOptions(params.id),
+        researcherScholarshipsQueryOptions(canonicalId),
       );
       return detail;
     } catch (error) {
