@@ -4,6 +4,11 @@ import { cn } from '@/shared/lib/cn';
 import { chartNeutralBg } from '@/shared/lib/design-tokens';
 import { Card } from '@/shared/ui/card';
 import { SectionHeader } from '@/shared/ui/section-header';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/ui/tooltip';
 
 export interface StackedYearSeries {
   /** Chave do grupo presente em `groups` (ex.: `A1`, `book`, `CONCLUIDO`). */
@@ -39,72 +44,13 @@ export interface StackedYearChartProps {
 }
 
 const CHART_HEIGHT_PX = 144;
-const MAX_SINGLE_YEAR_BARS = 20;
 
-interface DisplayBucket {
-  key: string;
-  label: string;
-  tooltipPeriod: string;
-  value: number;
-  groups: Record<string, number>;
-}
-
-function groupPointsByPeriod(
-  points: readonly StackedYearPoint[],
-): DisplayBucket[] {
-  if (points.length <= MAX_SINGLE_YEAR_BARS) {
-    return points.map((p) => ({
-      key: String(p.period),
-      label: String(p.period),
-      tooltipPeriod: String(p.period),
-      value: p.value,
-      groups: p.groups ?? {},
-    }));
-  }
-
-  const minYear = points[0]!.period;
-  const maxYear = points[points.length - 1]!.period;
-  const span = maxYear - minYear + 1;
-  const step =
-    [2, 3, 5, 10].find((s) => Math.ceil(span / s) <= MAX_SINGLE_YEAR_BARS) ??
-    Math.ceil(span / MAX_SINGLE_YEAR_BARS);
-
-  const buckets = new Map<number, DisplayBucket>();
-
-  for (const point of points) {
-    const bucketIdx = Math.floor((point.period - minYear) / step);
-    const startYear = minYear + bucketIdx * step;
-    const endYear = Math.min(maxYear, startYear + step - 1);
-
-    let bucket = buckets.get(bucketIdx);
-    if (!bucket) {
-      const label =
-        startYear === endYear
-          ? String(startYear)
-          : `${startYear}–${String(endYear).slice(-2)}`;
-      const tooltipPeriod =
-        startYear === endYear ? String(startYear) : `${startYear}–${endYear}`;
-      bucket = {
-        key: `${startYear}-${endYear}`,
-        label,
-        tooltipPeriod,
-        value: 0,
-        groups: {},
-      };
-      buckets.set(bucketIdx, bucket);
-    }
-
-    bucket.value += point.value;
-    if (point.groups) {
-      for (const [groupKey, count] of Object.entries(point.groups)) {
-        if (count > 0) {
-          bucket.groups[groupKey] = (bucket.groups[groupKey] ?? 0) + count;
-        }
-      }
-    }
-  }
-
-  return [...buckets.values()];
+/** Define o intervalo de exibição dos rótulos no eixo X para evitar sobreposição. */
+export function getYearLabelStep(total: number): number {
+  if (total <= 14) return 1;
+  if (total <= 28) return 2;
+  if (total <= 45) return 3;
+  return Math.ceil(total / 12);
 }
 
 function resolveSeriesList(
@@ -168,8 +114,15 @@ export function StackedYearChart({
   }
 
   const activeSeries = resolveSeriesList(sortedPoints, series);
-  const displayBuckets = groupPointsByPeriod(sortedPoints);
-  const maxValue = Math.max(1, ...displayBuckets.map((b) => b.value));
+  const maxValue = Math.max(1, ...sortedPoints.map((p) => p.value));
+  const labelStep = getYearLabelStep(sortedPoints.length);
+  const isDense = sortedPoints.length > 14;
+  const gapClass =
+    sortedPoints.length > 35
+      ? 'gap-px sm:gap-0.5'
+      : sortedPoints.length > 20
+        ? 'gap-0.5 sm:gap-1'
+        : 'gap-1 sm:gap-1.5';
 
   return (
     <section className="flex flex-col gap-3">
@@ -202,98 +155,129 @@ export function StackedYearChart({
               <div
                 role="img"
                 aria-label={ariaLabel ?? title}
-                className="flex w-full items-end justify-center gap-1 pt-2 sm:gap-1.5"
+                className={cn(
+                  'flex w-full items-end justify-center overflow-hidden px-3 pt-2',
+                  gapClass,
+                )}
               >
-                {displayBuckets.map((bucket) => {
+                {sortedPoints.map((point, idx) => {
+                  const groups = point.groups ?? {};
                   const segments = activeSeries
                     .map((s) => ({
                       series: s,
-                      count: bucket.groups[s.key] ?? 0,
+                      count: groups[s.key] ?? 0,
                     }))
                     .filter((seg) => seg.count > 0);
 
                   const totalPx = Math.max(
                     10,
-                    Math.round((bucket.value / maxValue) * CHART_HEIGHT_PX),
+                    Math.round((point.value / maxValue) * CHART_HEIGHT_PX),
                   );
 
-                  const summary = segments
-                    .map((seg) => `${seg.series.label}: ${seg.count}`)
-                    .join(', ');
-
-                  const isDense = displayBuckets.length > 14;
+                  const showLabel = idx % labelStep === 0;
 
                   return (
-                    <div
-                      key={bucket.key}
-                      title={
-                        summary
-                          ? `${bucket.tooltipPeriod} — Total: ${bucket.value} (${summary})`
-                          : `${bucket.tooltipPeriod} — Total: ${bucket.value}`
-                      }
-                      className="flex max-w-12 min-w-0 flex-1 flex-col items-center gap-1.5"
-                    >
-                      <div
-                        className="flex w-full max-w-8 flex-col-reverse items-center gap-0.5"
-                        style={{ height: `${CHART_HEIGHT_PX + 20}px` }}
-                      >
-                        {segments.length > 0 ? (
-                          segments.map((seg) => {
-                            const segPx = Math.max(
-                              4,
-                              Math.round((seg.count / bucket.value) * totalPx),
-                            );
-                            const isSelected = selectedKeys.includes(
-                              seg.series.key,
-                            );
-                            const isDimmed =
-                              selectedKeys.length > 0 && !isSelected;
+                    <Tooltip key={point.period}>
+                      <TooltipTrigger asChild>
+                        <div
+                          tabIndex={onToggleKey ? undefined : 0}
+                          className="flex max-w-12 min-w-0 flex-1 flex-col items-center gap-1.5 rounded-t-sm transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden"
+                        >
+                          <div
+                            className="flex w-full max-w-8 flex-col-reverse items-center gap-0.5"
+                            style={{ height: `${CHART_HEIGHT_PX}px` }}
+                          >
+                            {segments.length > 0 ? (
+                              segments.map((seg) => {
+                                const segPx = Math.max(
+                                  4,
+                                  Math.round(
+                                    (seg.count / point.value) * totalPx,
+                                  ),
+                                );
+                                const isSelected = selectedKeys.includes(
+                                  seg.series.key,
+                                );
+                                const isDimmed =
+                                  selectedKeys.length > 0 && !isSelected;
 
-                            return onToggleKey ? (
-                              <button
-                                key={seg.series.key}
-                                type="button"
-                                onClick={() => onToggleKey(seg.series.key)}
-                                aria-label={`${bucket.tooltipPeriod} ${seg.series.label}: ${seg.count}`}
-                                className={cn(
-                                  'w-full cursor-pointer rounded-[3px] transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden',
-                                  seg.series.bgClassName,
-                                  isDimmed && 'opacity-35',
-                                  isSelected &&
-                                    'ring-1 ring-foreground/60 ring-offset-1',
-                                )}
-                                style={{ height: `${segPx}px` }}
-                              />
+                                return onToggleKey ? (
+                                  <button
+                                    key={seg.series.key}
+                                    type="button"
+                                    onClick={() => onToggleKey(seg.series.key)}
+                                    aria-label={`${point.period} ${seg.series.label}: ${seg.count}`}
+                                    className={cn(
+                                      'w-full cursor-pointer rounded-[3px] transition-opacity focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden',
+                                      seg.series.bgClassName,
+                                      isDimmed && 'opacity-35',
+                                      isSelected &&
+                                        'ring-1 ring-foreground/60 ring-offset-1',
+                                    )}
+                                    style={{ height: `${segPx}px` }}
+                                  />
+                                ) : (
+                                  <div
+                                    key={seg.series.key}
+                                    className={cn(
+                                      'w-full rounded-[3px]',
+                                      seg.series.bgClassName,
+                                    )}
+                                    style={{ height: `${segPx}px` }}
+                                  />
+                                );
+                              })
                             ) : (
                               <div
-                                key={seg.series.key}
-                                className={cn(
-                                  'w-full rounded-[3px]',
-                                  seg.series.bgClassName,
-                                )}
-                                style={{ height: `${segPx}px` }}
+                                className="w-full rounded-[3px] bg-chart-neutral-1"
+                                style={{ height: `${totalPx}px` }}
                               />
-                            );
-                          })
-                        ) : (
-                          <div
-                            className="w-full rounded-[3px] bg-chart-neutral-1"
-                            style={{ height: `${totalPx}px` }}
-                          />
+                            )}
+                          </div>
+                          <div className="relative h-3.5 w-full">
+                            {showLabel && (
+                              <span
+                                className={cn(
+                                  'pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 leading-none font-medium whitespace-nowrap text-muted-foreground tabular-nums',
+                                  isDense
+                                    ? 'text-[9px] sm:text-[10px]'
+                                    : 'text-[11px]',
+                                )}
+                              >
+                                {point.period}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-left">
+                        <div className="font-semibold tabular-nums">
+                          {point.period} — Total: {point.value}
+                        </div>
+                        {!hideLegend && segments.length > 0 && (
+                          <div className="mt-1 flex flex-col gap-0.5 text-[11px] opacity-90">
+                            {segments.map((seg) => (
+                              <div
+                                key={seg.series.key}
+                                className="flex items-center justify-between gap-3 tabular-nums"
+                              >
+                                <span className="inline-flex items-center gap-1.5">
+                                  <span
+                                    className={cn(
+                                      'size-2 shrink-0 rounded-[2px]',
+                                      seg.series.bgClassName,
+                                    )}
+                                    aria-hidden
+                                  />
+                                  <span>{seg.series.label}</span>
+                                </span>
+                                <span className="font-medium">{seg.count}</span>
+                              </div>
+                            ))}
+                          </div>
                         )}
-                        <span className="mb-1 text-center text-[11px] leading-none font-semibold text-foreground tabular-nums sm:text-xs">
-                          {bucket.value}
-                        </span>
-                      </div>
-                      <span
-                        className={cn(
-                          'h-3.5 text-center leading-none font-medium whitespace-nowrap text-muted-foreground tabular-nums',
-                          isDense ? 'text-[9px] sm:text-[10px]' : 'text-[11px]',
-                        )}
-                      >
-                        {bucket.label}
-                      </span>
-                    </div>
+                      </TooltipContent>
+                    </Tooltip>
                   );
                 })}
               </div>
