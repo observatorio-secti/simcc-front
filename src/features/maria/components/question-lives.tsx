@@ -11,8 +11,8 @@ export interface QuestionLivesProps {
 
 /**
  * Perguntas restantes como vidas de videogame: um bloco azul por pergunta,
- * com um brilho de gota escorrendo, que se apaga quando ela é usada (da
- * direita para a esquerda).
+ * em duas linhas, com uma onda sutil de dentro para fora. O bloco se apaga
+ * quando a pergunta é usada (do fim para o começo).
  */
 export function QuestionLives({
   used,
@@ -26,7 +26,11 @@ export function QuestionLives({
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <ol
-        className="flex gap-1"
+        className="grid gap-1.5"
+        // Duas linhas, qualquer que seja o limite.
+        style={{
+          gridTemplateColumns: `repeat(${Math.ceil(limit / 2)}, minmax(0, 1fr))`,
+        }}
         role="img"
         aria-label={`${shown} de ${limit} perguntas restantes`}
       >
@@ -38,21 +42,17 @@ export function QuestionLives({
               key={index}
               aria-hidden
               className={cn(
-                'relative h-3 flex-1 overflow-hidden rounded-[3px] transition-all duration-500 ease-out',
-                alive ? 'bg-eng-blue' : 'scale-y-75 bg-muted-foreground/20',
+                'relative h-6 overflow-hidden rounded-sm transition-all duration-500 ease-out',
+                alive ? 'bg-eng-blue' : 'scale-90 bg-muted-foreground/20',
                 spending && 'animate-pulse',
               )}
             >
               {alive && (
-                <>
-                  {/* Reflexo no topo, como numa gota. */}
-                  <span className="absolute inset-x-0 top-0 h-1/2 rounded-t-[3px] bg-gradient-to-b from-white/35 to-transparent" />
-                  {/* Brilho que passa de um bloco ao outro. */}
-                  <span
-                    className="absolute inset-0 animate-[maria-drop_4.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                    style={{ animationDelay: `${index * 110}ms` }}
-                  />
-                </>
+                // Onda de gota: um anel que nasce no centro e se abre até a borda.
+                <span
+                  className="absolute top-1/2 left-1/2 aspect-square w-full animate-[maria-ripple_3.6s_ease-out_infinite] rounded-full border border-white/50 opacity-0"
+                  style={{ animationDelay: `${(index * 700) % 3600}ms` }}
+                />
               )}
             </li>
           );
