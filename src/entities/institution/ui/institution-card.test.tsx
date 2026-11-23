@@ -10,7 +10,7 @@ describe('InstitutionCard', () => {
           id: 'f1ac00a8-15d9-4306-a893-c611636601d6',
           name: 'UFBA - Universidade Federal Da Bahia',
           acronym: 'UFBA',
-          counts: { researchers: 2450, graduate_programs: 84 },
+          counts: { researchers: 2450, graduate_programs: 84, labs: 183 },
         }}
         researchGroupsCount={412}
       />,
@@ -34,6 +34,7 @@ describe('InstitutionCard', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('2.450')).toBeInTheDocument();
     expect(screen.getByText('84')).toBeInTheDocument();
+    expect(screen.getByText('183')).toBeInTheDocument();
     expect(screen.getByText('412')).toBeInTheDocument();
   });
 
