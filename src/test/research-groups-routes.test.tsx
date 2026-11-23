@@ -2,6 +2,14 @@ import { screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 const ODA_TEST_BASE = 'https://oda.test/oda/v1';
 
 vi.stubEnv('VITE_SIMCC_API_URL', 'http://localhost:8088/');
@@ -62,16 +70,84 @@ const odaGroupsFixture = [
 
 function createOdaHandlers(options?: {
   items?: typeof odaGroupsFixture;
-  onListRequest?: (params: { page: number; size: number }) => void;
+  onListRequest?: (params: {
+    page: number;
+    size: number;
+    q: string | null;
+    modoBusca: string | null;
+    uf: string | null;
+    areaConhecimentoId: string | null;
+    situacao: string | null;
+    instituicaoId: string | null;
+    cidade: string | null;
+    anoFormacao: string | null;
+    ordenarPor: string | null;
+    ordem: string | null;
+  }) => void;
 }) {
   const sourceItems = options?.items ?? odaGroupsFixture;
 
   return [
+    http.get(`${ODA_TEST_BASE}/uf`, () =>
+      HttpResponse.json([
+        { id: 'uf-ba', sigla: 'BA', nome: 'Bahia', regiao: 'Nordeste' },
+        { id: 'uf-pe', sigla: 'PE', nome: 'Pernambuco', regiao: 'Nordeste' },
+      ]),
+    ),
+    http.get(`${ODA_TEST_BASE}/area-conhecimento`, () =>
+      HttpResponse.json({
+        data: [
+          {
+            id: 'area-exatas',
+            nome: 'Ciências Exatas e da Terra',
+            tipo: 'GRANDE_AREA',
+          },
+          {
+            id: 'area-saude',
+            nome: 'Ciências da Saúde',
+            tipo: 'GRANDE_AREA',
+          },
+        ],
+        meta: { page: 1, size: 100, totalItems: 2, totalPages: 1 },
+      }),
+    ),
+    http.get(`${ODA_TEST_BASE}/instituicao`, () =>
+      HttpResponse.json({
+        data: [
+          {
+            id: 'inst-1',
+            nome: 'Universidade Estadual de Santa Cruz',
+            sigla: 'UESC',
+            estado: { sigla: 'BA' },
+          },
+          {
+            id: 'inst-2',
+            nome: 'Universidade Federal da Bahia',
+            sigla: 'UFBA',
+            estado: { sigla: 'BA' },
+          },
+        ],
+        meta: { page: 1, size: 100, totalItems: 2, totalPages: 1 },
+      }),
+    ),
     http.get(`${ODA_TEST_BASE}/grupos-pesquisa/simcc`, ({ request }) => {
       const url = new URL(request.url);
       const page = Number(url.searchParams.get('page') ?? '1');
       const size = Number(url.searchParams.get('size') ?? '12');
-      options?.onListRequest?.({ page, size });
+      options?.onListRequest?.({
+        page,
+        size,
+        q: url.searchParams.get('q'),
+        modoBusca: url.searchParams.get('modoBusca'),
+        uf: url.searchParams.get('uf'),
+        areaConhecimentoId: url.searchParams.get('areaConhecimentoId'),
+        situacao: url.searchParams.get('situacao'),
+        instituicaoId: url.searchParams.get('instituicaoId'),
+        cidade: url.searchParams.get('cidade'),
+        anoFormacao: url.searchParams.get('anoFormacao'),
+        ordenarPor: url.searchParams.get('ordenarPor'),
+        ordem: url.searchParams.get('ordem'),
+      });
 
       const start = (page - 1) * size;
       const paged = sourceItems.slice(start, start + size);
@@ -128,7 +204,8 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
     const requestedParams: Array<{ page: number; size: number }> = [];
     const { user, router } = await renderRoute('/grupos-pesquisa', {
       handlers: createOdaHandlers({
-        onListRequest: (params) => requestedParams.push(params),
+        onListRequest: (params) =>
+          requestedParams.push({ page: params.page, size: params.size }),
       }),
     });
 
@@ -145,11 +222,73 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       screen.getByText('Laboratório de Saúde Coletiva'),
     ).toBeInTheDocument();
     expect(requestedParams).toEqual([{ page: 1, size: 12 }]);
-    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('searchbox', {
+        name: /Pesquisar grupos por nome, área ou palavra-chave/i,
+      }),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole('radio', { name: 'Exibir em lista' }));
     await waitFor(() => {
       expect(router.state.location.searchStr).toContain('view=list');
+    });
+  }, 15000);
+
+  it('envia busca textual com modoBusca=textual e aplica filtros laterais na URL', async () => {
+    const calls: Array<Record<string, string | number | null>> = [];
+    const { user, router } = await renderRoute('/grupos-pesquisa', {
+      handlers: createOdaHandlers({
+        onListRequest: (params) => calls.push(params),
+      }),
+    });
+
+    const searchInput = await screen.findByRole('searchbox', {
+      name: /Pesquisar grupos por nome, área ou palavra-chave/i,
+    });
+    await user.type(searchInput, 'computação');
+    await user.click(screen.getByRole('button', { name: 'Buscar' }));
+
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('q=computa');
+      expect(calls.at(-1)).toMatchObject({
+        q: 'computação',
+        modoBusca: 'textual',
+      });
+    });
+
+    const ufCheckbox = await screen.findByRole('checkbox', {
+      name: /BA — Bahia/i,
+    });
+    await user.click(ufCheckbox);
+
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('uf=BA');
+      expect(calls.at(-1)).toMatchObject({
+        q: 'computação',
+        modoBusca: 'textual',
+        uf: 'BA',
+      });
+    });
+
+    const areaCheckbox = await screen.findByRole('checkbox', {
+      name: 'Ciências Exatas e da Terra',
+    });
+    await user.click(areaCheckbox);
+
+    await waitFor(() => {
+      expect(router.state.location.searchStr).toContain('area=area-exatas');
+      expect(calls.at(-1)).toMatchObject({
+        areaConhecimentoId: 'area-exatas',
+        uf: 'BA',
+      });
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Limpar filtros' }));
+
+    await waitFor(() => {
+      expect(router.state.location.searchStr).not.toContain('uf=');
+      expect(router.state.location.searchStr).not.toContain('area=');
+      expect(router.state.location.searchStr).toContain('q=computa');
     });
   }, 15000);
 

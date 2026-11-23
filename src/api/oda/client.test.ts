@@ -139,4 +139,96 @@ describe('createOdaClient', () => {
       code: 'bad_request',
     });
   });
+
+  it('envia busca textual (q + modoBusca=textual), filtros e ordenação em listGroupsPage', async () => {
+    const fetch = vi.fn(async () =>
+      json({
+        data: [{ id: 'grp-1', nome: 'Grupo IA' }],
+        meta: { page: 1, size: 12, totalItems: 1, totalPages: 1 },
+      }),
+    );
+    const client = createOdaClient('https://oda.test/oda/v1/', { fetch });
+
+    await client.listGroupsPage({
+      page: 1,
+      size: 12,
+      q: '  inteligência artificial  ',
+      situacao: 'CERTIFICADO',
+      areaConhecimentoId: 'area-1',
+      uf: 'ba',
+      instituicaoId: 'inst-1',
+      cidade: 'Salvador',
+      anoFormacao: 2020,
+      ordenarPor: 'anoFormacao',
+      ordem: 'desc',
+    });
+
+    const calledUrl = new URL(String(fetch.mock.calls[0]?.[0]));
+    expect(calledUrl.searchParams.get('q')).toBe('inteligência artificial');
+    expect(calledUrl.searchParams.get('modoBusca')).toBe('textual');
+    expect(calledUrl.searchParams.get('situacao')).toBe('CERTIFICADO');
+    expect(calledUrl.searchParams.get('areaConhecimentoId')).toBe('area-1');
+    expect(calledUrl.searchParams.get('uf')).toBe('BA');
+    expect(calledUrl.searchParams.get('instituicaoId')).toBe('inst-1');
+    expect(calledUrl.searchParams.get('cidade')).toBe('Salvador');
+    expect(calledUrl.searchParams.get('anoFormacao')).toBe('2020');
+    expect(calledUrl.searchParams.get('ordenarPor')).toBe('anoFormacao');
+    expect(calledUrl.searchParams.get('ordem')).toBe('desc');
+  });
+
+  it('busca endpoints auxiliares de UF, áreas de conhecimento e instituições', async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes('/uf')) {
+        return json([
+          { id: 'uf-ba', sigla: 'BA', nome: 'Bahia', regiao: 'Nordeste' },
+        ]);
+      }
+      if (url.includes('/area-conhecimento')) {
+        return json({
+          data: [
+            {
+              id: 'area-1',
+              nome: 'Engenharias',
+              tipo: 'GRANDE_AREA',
+            },
+            { id: 'area-dot', nome: '.', tipo: 'SUBAREA' },
+          ],
+        });
+      }
+      return json({
+        data: [
+          {
+            id: 'inst-1',
+            nome: 'Universidade Federal da Bahia',
+            sigla: 'UFBA',
+            estado: { sigla: 'BA' },
+          },
+        ],
+      });
+    });
+
+    const client = createOdaClient('https://oda.test/oda/v1/', { fetch });
+
+    const states = await client.listStates();
+    expect(states).toEqual([
+      { id: 'uf-ba', acronym: 'BA', name: 'Bahia', region: 'Nordeste' },
+    ]);
+
+    const areas = await client.listKnowledgeAreas({ tipo: 'GRANDE_AREA' });
+    expect(areas).toEqual([
+      { id: 'area-1', name: 'Engenharias', type: 'GRANDE_AREA' },
+    ]);
+
+    const institutions = await client.listInstitutions({ uf: 'ba' });
+    expect(institutions).toEqual([
+      {
+        id: 'inst-1',
+        name: 'Universidade Federal da Bahia',
+        acronym: 'UFBA',
+        label: 'UFBA - Universidade Federal da Bahia',
+        stateAcronym: 'BA',
+      },
+    ]);
+  });
 });
