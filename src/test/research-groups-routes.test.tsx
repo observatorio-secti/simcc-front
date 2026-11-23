@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -184,6 +184,7 @@ function createOdaHandlers(options?: {
                 id: 'r-1',
                 nome: 'Ana Souza',
                 formacaoAcademica: 'Doutorado em Ciência da Computação',
+                imageUrl: 'https://oda.test/fotos/ana.jpg',
                 eLider: true,
               },
             ],
@@ -318,19 +319,50 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       screen.getByRole('link', { name: /Espelho DGP CNPq/i }),
     ).toHaveAttribute('href', 'https://dgp.cnpq.br/dgp/espelhogrupo/1001');
 
+    expect(
+      await screen.findByText('Liderança do grupo'),
+    ).toBeInTheDocument();
+    const leaderLink = await screen.findByRole('link', { name: 'Ana Souza' });
+    expect(leaderLink).toHaveAttribute('href', '/researcher?name=Ana+Souza');
+    expect(
+      await screen.findByText('Doutorado em Ciência da Computação'),
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('img[src="https://oda.test/fotos/ana.jpg"]'),
+    ).toBeInTheDocument();
+
     await user.click(screen.getByRole('tab', { name: /Pesquisadores/i }));
 
     await waitFor(() => {
       expect(router.state.location.searchStr).toContain('tab=pesquisadores');
     });
-    expect(await screen.findByText('Ana Souza')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Ana Souza' })).toHaveAttribute(
-      'href',
-      '/researcher?name=Ana+Souza',
-    );
+    const researchersPanel = screen.getByRole('tabpanel', {
+      name: /Pesquisadores/i,
+    });
+    expect(within(researchersPanel).getByText('Ana Souza')).toBeInTheDocument();
     expect(
-      screen.getByText('Doutorado em Ciência da Computação'),
+      within(researchersPanel).getByRole('link', { name: 'Ana Souza' }),
+    ).toHaveAttribute('href', '/researcher?name=Ana+Souza');
+    expect(
+      within(researchersPanel).getByText('Doutorado em Ciência da Computação'),
     ).toBeInTheDocument();
+  }, 15000);
+
+  it('exibe liderança pelo fallback de membros quando /pesquisadores retorna vazio', async () => {
+    await renderRoute('/grupos-pesquisa/grp-2', {
+      handlers: createOdaHandlers(),
+    });
+
+    expect(
+      await screen.findByRole('heading', {
+        level: 2,
+        name: 'Laboratório de Saúde Coletiva',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Liderança do grupo')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Carlos Lima' }),
+    ).toHaveAttribute('href', '/researcher?name=Carlos+Lima');
   }, 15000);
 
   it('navega para o perfil do pesquisador no SimCC ao clicar no nome na aba Pesquisadores', async () => {
@@ -359,8 +391,8 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       },
     );
 
-    const link = await screen.findByRole('link', { name: 'Ana Souza' });
-    await user.click(link);
+    const links = await screen.findAllByRole('link', { name: 'Ana Souza' });
+    await user.click(links[0]!);
 
     await waitFor(() => {
       expect(router.state.location.pathname).toBe(

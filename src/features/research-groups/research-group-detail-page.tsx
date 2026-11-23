@@ -10,6 +10,7 @@ import {
 } from '@tanstack/react-router';
 import {
   AlertTriangle,
+  Award,
   BookOpen,
   Building2,
   Calendar,
@@ -25,6 +26,10 @@ import {
   X,
 } from 'lucide-react';
 import { isApiError } from '@/api/errors';
+import type {
+  ResearchGroupMember,
+  ResearchGroupResearcher,
+} from '@/api/oda';
 import {
   formatGroupLocation,
   formatGroupStatus,
@@ -37,6 +42,7 @@ import {
   researchGroupDetailQueryOptions,
   researchGroupResearchersQueryOptions,
 } from '@/entities/research-group/queries';
+import { ResearcherAvatar } from '@/entities/researcher/ui/researcher-avatar';
 import { cn } from '@/shared/lib/cn';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
@@ -87,11 +93,84 @@ function formatFullAddress(address: ResearchGroupAddress): string | null {
   return parts.length > 0 ? parts.join(' · ') : null;
 }
 
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return '?';
-  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
-  return `${parts[0]!.charAt(0)}${parts[parts.length - 1]!.charAt(0)}`.toUpperCase();
+function resolveGroupLeaders(
+  apiResearchers: ReadonlyArray<ResearchGroupResearcher>,
+  fallbackLeaders: ReadonlyArray<ResearchGroupMember>,
+): UnifiedMember[] {
+  const leaders: UnifiedMember[] = [];
+  const seenIds = new Set<string>();
+  const seenLattes = new Set<string>();
+  const seenNames = new Set<string>();
+
+  const register = (member: UnifiedMember) => {
+    leaders.push(member);
+    seenIds.add(member.id);
+    if (member.lattesId) seenLattes.add(member.lattesId);
+    seenNames.add(normalizeSearchText(member.name));
+  };
+
+  for (const researcher of apiResearchers) {
+    if (!researcher.isLeader) continue;
+    register(researcher);
+  }
+
+  for (const leader of fallbackLeaders) {
+    const normalizedName = normalizeSearchText(leader.name);
+    if (
+      seenIds.has(leader.id) ||
+      (leader.lattesId && seenLattes.has(leader.lattesId)) ||
+      seenNames.has(normalizedName)
+    ) {
+      continue;
+    }
+    register({
+      id: leader.id,
+      name: leader.name,
+      isLeader: true,
+      graduation: null,
+      lattesId: leader.lattesId,
+      orcid: null,
+      imageUrl: null,
+    });
+  }
+
+  return leaders.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+}
+
+function MemberProfileLinks({
+  lattesId,
+  orcid,
+}: {
+  lattesId: string | null;
+  orcid: string | null;
+}) {
+  if (!lattesId && !orcid) return null;
+  return (
+    <div className="mt-1.5 flex flex-wrap gap-2 text-xs text-muted-foreground">
+      {lattesId && (
+        <a
+          href={`https://lattes.cnpq.br/${encodeURIComponent(lattesId)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 hover:text-eng-blue hover:underline"
+        >
+          Lattes
+          <ExternalLink className="size-3" aria-hidden />
+        </a>
+      )}
+      {orcid && (
+        <a
+          href={`https://orcid.org/${encodeURIComponent(orcid)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 hover:text-eng-blue hover:underline"
+        >
+          ORCID
+          <ExternalLink className="size-3" aria-hidden />
+        </a>
+      )}
+    </div>
+  );
 }
 
 function InstitutionItem({
@@ -174,6 +253,15 @@ export function ResearchGroupDetailPage() {
         return a.name.localeCompare(b.name, 'pt-BR');
       });
   }, [researchersQuery.data, group?.members]);
+
+  const groupLeaders = useMemo(
+    () =>
+      resolveGroupLeaders(
+        researchersQuery.data?.items ?? [],
+        group?.leaders ?? [],
+      ),
+    [researchersQuery.data?.items, group?.leaders],
+  );
 
   const normalizedQuery = search.q ? normalizeSearchText(search.q) : '';
 
@@ -438,6 +526,68 @@ export function ResearchGroupDetailPage() {
             </Card>
           )}
 
+          {groupLeaders.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="size-4 text-eng-blue" aria-hidden />
+                  <span>
+                    {groupLeaders.length === 1
+                      ? 'Liderança do grupo'
+                      : 'Lideranças do grupo'}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div
+                  className={cn(
+                    'grid gap-3',
+                    groupLeaders.length > 1 && 'sm:grid-cols-2',
+                  )}
+                >
+                  {groupLeaders.map((leader) => (
+                    <div
+                      key={leader.id}
+                      className="flex items-start gap-3.5 rounded-lg border border-eng-blue/25 bg-eng-blue/[0.03] p-4"
+                    >
+                      <ResearcherAvatar
+                        name={leader.name}
+                        imageUrl={leader.imageUrl}
+                        size="md"
+                        decorative
+                        className="size-12 rounded-lg"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <Link
+                            to="/researcher"
+                            search={{ name: leader.name }}
+                            className={cn(
+                              'truncate rounded-sm text-sm font-semibold text-foreground underline-offset-4 transition-colors hover:text-eng-blue hover:underline',
+                              focusRing,
+                            )}
+                          >
+                            {leader.name}
+                          </Link>
+                          <Tag variant="brand">Líder</Tag>
+                        </div>
+                        {leader.graduation && (
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            {leader.graduation}
+                          </p>
+                        )}
+                        <MemberProfileLinks
+                          lattesId={leader.lattesId}
+                          orcid={leader.orcid}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Busca interna nas abas */}
           <form
             onSubmit={handleQuerySubmit}
@@ -561,17 +711,12 @@ export function ResearchGroupDetailPage() {
                     {pagedMembers.map((member) => (
                       <Card key={member.id}>
                         <CardContent className="flex items-start gap-3 p-4">
-                          {member.imageUrl ? (
-                            <img
-                              src={member.imageUrl}
-                              alt=""
-                              className="size-11 shrink-0 rounded-full border object-cover"
-                            />
-                          ) : (
-                            <div className="grid size-11 shrink-0 place-items-center rounded-full bg-eng-blue text-xs font-bold text-white">
-                              {getInitials(member.name)}
-                            </div>
-                          )}
+                          <ResearcherAvatar
+                            name={member.name}
+                            imageUrl={member.imageUrl}
+                            size="md"
+                            decorative
+                          />
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-1.5">
                               <Link
@@ -593,38 +738,10 @@ export function ResearchGroupDetailPage() {
                                 {member.graduation}
                               </p>
                             )}
-                            {(member.lattesId || member.orcid) && (
-                              <div className="mt-1.5 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                                {member.lattesId && (
-                                  <a
-                                    href={`https://lattes.cnpq.br/${encodeURIComponent(member.lattesId)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 hover:text-eng-blue hover:underline"
-                                  >
-                                    Lattes
-                                    <ExternalLink
-                                      className="size-3"
-                                      aria-hidden
-                                    />
-                                  </a>
-                                )}
-                                {member.orcid && (
-                                  <a
-                                    href={`https://orcid.org/${encodeURIComponent(member.orcid)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 hover:text-eng-blue hover:underline"
-                                  >
-                                    ORCID
-                                    <ExternalLink
-                                      className="size-3"
-                                      aria-hidden
-                                    />
-                                  </a>
-                                )}
-                              </div>
-                            )}
+                            <MemberProfileLinks
+                              lattesId={member.lattesId}
+                              orcid={member.orcid}
+                            />
                           </div>
                         </CardContent>
                       </Card>
