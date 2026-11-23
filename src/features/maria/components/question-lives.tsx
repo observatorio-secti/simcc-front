@@ -1,4 +1,3 @@
-import { Heart } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 
 export interface QuestionLivesProps {
@@ -11,8 +10,9 @@ export interface QuestionLivesProps {
 }
 
 /**
- * Perguntas restantes como vidas de videogame: um coração por pergunta, que
- * se apaga quando ela é usada (da direita para a esquerda).
+ * Perguntas restantes como vidas de videogame: um bloco azul por pergunta,
+ * com um brilho de gota escorrendo, que se apaga quando ela é usada (da
+ * direita para a esquerda).
  */
 export function QuestionLives({
   used,
@@ -26,7 +26,7 @@ export function QuestionLives({
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <ol
-        className="flex flex-wrap gap-1"
+        className="flex gap-1"
         role="img"
         aria-label={`${shown} de ${limit} perguntas restantes`}
       >
@@ -34,16 +34,26 @@ export function QuestionLives({
           const alive = index < remaining;
           const spending = pending && index === remaining - 1;
           return (
-            <li key={index} aria-hidden>
-              <Heart
-                className={cn(
-                  'size-4 transition-all duration-500 ease-out',
-                  alive
-                    ? 'scale-100 fill-rose-500 text-rose-500'
-                    : 'scale-75 fill-transparent text-muted-foreground/40',
-                  spending && 'animate-pulse',
-                )}
-              />
+            <li
+              key={index}
+              aria-hidden
+              className={cn(
+                'relative h-3 flex-1 overflow-hidden rounded-[3px] transition-all duration-500 ease-out',
+                alive ? 'bg-eng-blue' : 'scale-y-75 bg-muted-foreground/20',
+                spending && 'animate-pulse',
+              )}
+            >
+              {alive && (
+                <>
+                  {/* Reflexo no topo, como numa gota. */}
+                  <span className="absolute inset-x-0 top-0 h-1/2 rounded-t-[3px] bg-gradient-to-b from-white/35 to-transparent" />
+                  {/* Brilho que passa de um bloco ao outro. */}
+                  <span
+                    className="absolute inset-0 animate-[maria-drop_4.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    style={{ animationDelay: `${index * 110}ms` }}
+                  />
+                </>
+              )}
             </li>
           );
         })}
