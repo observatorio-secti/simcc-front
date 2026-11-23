@@ -11,11 +11,28 @@ import {
   type ResearcherSummary,
 } from '../model';
 
+/**
+ * O que o cartão lê de um pesquisador. Além do item de lista da v2, aceita
+ * pesquisadores citados por outras fontes (ex.: MarIA), que trazem só o
+ * básico e passam instituição e evidências já prontas.
+ */
+export type PersonCardResearcher = Pick<ResearcherSummary, 'id' | 'name'> &
+  Partial<
+    Pick<
+      ResearcherSummary,
+      'image_url' | 'classification' | 'matches' | 'affiliations'
+    >
+  >;
+
 export interface PersonCardProps extends Omit<
   ComponentProps<'a'>,
   'href' | 'children'
 > {
-  researcher: ResearcherSummary;
+  researcher: PersonCardResearcher;
+  /** Sobrepõe as siglas montadas de `affiliations`. */
+  institutionLabel?: string;
+  /** Sobrepõe `matches.total`. */
+  evidenceTotal?: number;
   /** Tipo de busca para colorir o badge de evidências (`bg-search-*`). */
   searchType?: string | null;
   /** Disposição em grade (`aspect-[3/4]`) ou em lista (`min-h-24`). */
@@ -30,6 +47,8 @@ export function PersonCard({
   researcher,
   searchType = 'profile',
   layout = 'grid',
+  institutionLabel: institutionOverride,
+  evidenceTotal: evidenceOverride,
   className,
   ...props
 }: PersonCardProps) {
@@ -38,8 +57,9 @@ export function PersonCard({
   const showImage = src !== null && failedSrc !== src;
 
   const classification = researcher.classification?.trim() || null;
-  const evidenceTotal = researcher.matches?.total ?? 0;
-  const institutionLabel = formatAffiliationAcronyms(researcher.affiliations);
+  const evidenceTotal = evidenceOverride ?? researcher.matches?.total ?? 0;
+  const institutionLabel =
+    institutionOverride ?? formatAffiliationAcronyms(researcher.affiliations);
   const evidenceColor = searchTypeColor(searchType);
   const isList = layout === 'list';
 

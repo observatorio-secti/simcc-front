@@ -5,7 +5,6 @@ import { isApiError } from '@/api/errors';
 import { removeBrowserConversation } from '@/entities/conversation/browser-conversations';
 import {
   conversationTitle,
-  formatConversationDate,
   remainingQuestions,
 } from '@/entities/conversation/model';
 import {
@@ -17,6 +16,7 @@ import { EmptyState } from '@/shared/ui/empty-state';
 import { LoadingBlock } from '@/shared/ui/loading-block';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Composer } from './components/composer';
+import { ContextPanel } from './components/context-panel';
 import { MariaLayout } from './components/maria-layout';
 import { MessageList } from './components/message-list';
 import {
@@ -98,15 +98,36 @@ export function ConversationPage({
   const notFound =
     isApiError(detail.error) && detail.error.status === 404 && !stream;
 
+  const lastAnswer = [...(messages.data ?? [])]
+    .reverse()
+    .find((message) => message.role === 'assistant');
+  const questions =
+    detail.data?.questions_limit != null
+      ? {
+          used: detail.data.questions_asked,
+          limit: detail.data.questions_limit,
+        }
+      : null;
+  const aside = notFound ? undefined : stream ? (
+    <ContextPanel
+      blocks={stream.blocks}
+      activities={stream.activities}
+      streaming={streaming}
+      questions={questions}
+    />
+  ) : (
+    <ContextPanel blocks={lastAnswer?.content ?? []} questions={questions} />
+  );
+
   return (
-    <MariaLayout activeId={conversationId}>
+    <MariaLayout activeId={conversationId} aside={aside}>
       {notFound ? (
         <ConversationNotFound conversationId={conversationId} />
       ) : (
         <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col gap-6">
-          <header className="flex flex-col gap-1 border-b pb-4">
+          <header className="flex items-start justify-between gap-4 border-b pb-4">
             {detail.data ? (
-              <h1 className="text-lg font-semibold tracking-tight md:text-xl">
+              <h1 className="min-w-0 text-lg font-semibold tracking-tight md:text-xl">
                 {conversationTitle(detail.data)}
               </h1>
             ) : detail.isError ? (
@@ -116,12 +137,14 @@ export function ConversationPage({
             ) : (
               <Skeleton className="h-7 w-2/3" aria-label="Carregando título" />
             )}
-            {detail.data && (
-              <p className="text-xs text-muted-foreground">
-                {formatConversationDate(detail.data.created_at)}
-                {detail.data.questions_limit != null &&
-                  ` · ${detail.data.questions_asked} de ${detail.data.questions_limit} perguntas`}
-              </p>
+            {detail.data?.questions_limit != null && (
+              <span
+                className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground tabular-nums @5xl:hidden"
+                title="Perguntas usadas nesta conversa"
+              >
+                {detail.data.questions_asked + (streaming ? 1 : 0)} de{' '}
+                {detail.data.questions_limit} perguntas
+              </span>
             )}
           </header>
 

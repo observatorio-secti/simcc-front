@@ -5,6 +5,7 @@ import { GraduateProgramShowcase } from './graduate-program';
 import { InstitutionShowcase } from './institution';
 import { KitComponentsShowcase } from './kit-components';
 import { MagazineShowcase } from './magazine';
+import { MariaChartsShowcase } from './maria-charts';
 import { PrimitivesShowcase } from './primitives';
 import { ProductionShowcase } from './production';
 import { ResearchGroupShowcase } from './research-group';
@@ -34,6 +35,7 @@ const SECTIONS = [
   ['grupo-pesquisa', 'Grupo de pesquisa'],
   ['revista', 'Revista'],
   ['bolsa', 'Bolsa'],
+  ['maria-graficos', 'Gráficos da MarIA'],
 ] as const;
 
 /** Vitrine do kit (só em desenvolvimento). Ver src/routes/dev/vitrine.tsx. */
@@ -84,6 +86,7 @@ export function VitrinePage() {
         <ResearchGroupShowcase />
         <MagazineShowcase />
         <ScholarshipShowcase />
+        <MariaChartsShowcase />
       </main>
       <Toaster />
     </div>

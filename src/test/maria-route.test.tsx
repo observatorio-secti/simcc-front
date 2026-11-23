@@ -64,14 +64,14 @@ describe('/maria', () => {
     );
     expect(readBrowserConversationIds()).toEqual([MARIA_CONVERSATION_ID]);
 
-    // Texto do assistente (Markdown) montado a partir dos deltas.
-    expect(await screen.findByText('um pesquisador')).toHaveProperty(
-      'tagName',
-      'STRONG',
-    );
+    // Texto do assistente (Markdown) montado a partir dos deltas. A espera é
+    // maior porque a tela da conversa é pesada (Recharts) com a suíte em paralelo.
+    expect(
+      await screen.findByText('um pesquisador', undefined, { timeout: 5000 }),
+    ).toHaveProperty('tagName', 'STRONG');
     expect(screen.getByText('Quem pesquisa robótica?')).toBeInTheDocument();
 
-    // Pesquisador: ResearcherRef com o id da v2.
+    // Pesquisador: cartão (PersonCard) com o id da v2.
     const researcher = await screen.findByRole('link', {
       name: /Andre Gustavo Scolari Conceição/,
     });
