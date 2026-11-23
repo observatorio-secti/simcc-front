@@ -1,7 +1,10 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { researchGroupListQueryOptions } from '@/entities/research-group/queries';
 import { ResearchGroupsPage } from '@/features/research-groups/research-groups-page';
-import { researchGroupsSearch } from '@/features/research-groups/search';
+import {
+  researchGroupsSearch,
+  toOdaGroupQueryParams,
+} from '@/features/research-groups/search';
 import { firstParam, legacyParams } from '../../-redirects/legacy-params';
 
 export const Route = createFileRoute('/_public/grupos-pesquisa/')({
@@ -10,10 +13,7 @@ export const Route = createFileRoute('/_public/grupos-pesquisa/')({
   search: {
     middlewares: researchGroupsSearch.middlewares,
   },
-  loaderDeps: ({ search }) => ({
-    page: search.page,
-    per_page: search.per_page,
-  }),
+  loaderDeps: ({ search }) => toOdaGroupQueryParams(search),
   // Legado (V2): `/grupos-pesquisa?group_id=…` abria o grupo.
   beforeLoad: ({ location }) => {
     const id = firstParam(legacyParams(location.search), 'group_id');
@@ -27,11 +27,6 @@ export const Route = createFileRoute('/_public/grupos-pesquisa/')({
     }
   },
   loader: ({ context, deps }) =>
-    context.queryClient.prefetchQuery(
-      researchGroupListQueryOptions({
-        page: deps.page,
-        size: deps.per_page,
-      }),
-    ),
+    context.queryClient.prefetchQuery(researchGroupListQueryOptions(deps)),
   component: ResearchGroupsPage,
 });

@@ -124,6 +124,58 @@ export const odaGroupResearchersResponseSchema = z.union([
   z.array(odaGroupResearcherSchema),
 ]);
 
+export const odaStateSchema = z.object({
+  id: z.string().min(1),
+  sigla: z.string().min(1),
+  nome: z.string().min(1),
+  regiao: z.string().nullish(),
+});
+
+export const odaStateListResponseSchema = z.union([
+  z.array(odaStateSchema),
+  z.object({
+    data: z.array(odaStateSchema),
+    meta: odaPaginationMetaSchema.nullish(),
+  }),
+]);
+
+export const odaKnowledgeAreaOptionSchema = z.object({
+  id: z.string().min(1),
+  nome: z.string().min(1),
+  nomeNormalizado: z.string().nullish(),
+  tipo: z.string().nullish(),
+  areaPaiId: z.string().nullish(),
+});
+
+export const odaKnowledgeAreaListResponseSchema = z.union([
+  z.object({
+    data: z.array(odaKnowledgeAreaOptionSchema),
+    meta: odaPaginationMetaSchema.nullish(),
+  }),
+  z.array(odaKnowledgeAreaOptionSchema),
+]);
+
+export const odaInstitutionOptionSchema = z.object({
+  id: z.string().min(1),
+  nome: z.string().min(1),
+  sigla: z.string().nullish(),
+  estado: z
+    .object({
+      id: z.string().nullish(),
+      sigla: z.string().nullish(),
+      nome: z.string().nullish(),
+    })
+    .nullish(),
+});
+
+export const odaInstitutionListResponseSchema = z.union([
+  z.object({
+    data: z.array(odaInstitutionOptionSchema),
+    meta: odaPaginationMetaSchema.nullish(),
+  }),
+  z.array(odaInstitutionOptionSchema),
+]);
+
 export type OdaInstitutionRaw = z.infer<typeof odaInstitutionSchema>;
 export type OdaKnowledgeAreaRaw = z.infer<typeof odaKnowledgeAreaSchema>;
 export type OdaMemberRaw = z.infer<typeof odaMemberSchema>;
@@ -139,4 +191,18 @@ export type OdaGroupDetailResponseRaw = z.infer<
 export type OdaGroupResearcherRaw = z.infer<typeof odaGroupResearcherSchema>;
 export type OdaGroupResearchersResponseRaw = z.infer<
   typeof odaGroupResearchersResponseSchema
+>;
+export type OdaStateRaw = z.infer<typeof odaStateSchema>;
+export type OdaStateListResponseRaw = z.infer<typeof odaStateListResponseSchema>;
+export type OdaKnowledgeAreaOptionRaw = z.infer<
+  typeof odaKnowledgeAreaOptionSchema
+>;
+export type OdaKnowledgeAreaListResponseRaw = z.infer<
+  typeof odaKnowledgeAreaListResponseSchema
+>;
+export type OdaInstitutionOptionRaw = z.infer<
+  typeof odaInstitutionOptionSchema
+>;
+export type OdaInstitutionListResponseRaw = z.infer<
+  typeof odaInstitutionListResponseSchema
 >;
