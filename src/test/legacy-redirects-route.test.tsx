@@ -10,7 +10,6 @@ import { createTestQueryClient, renderRoute } from './render-route';
 // Redirects das URLs do legado (V2, `src/routes/-redirects/`). Cada teste abre a URL antiga e confere
 // o caminho final e os search params preservados.
 
-const researcher = v2Fixtures['/researcher'].data[0]!;
 const institution = v2Fixtures['/institution'].data[0]!;
 const program = v2Fixtures['/graduate-program'].data[0]!;
 
@@ -76,44 +75,28 @@ describe('Redirect /resultados e /resultados-perfil (V2)', () => {
 });
 
 describe('Redirect /researcher (V2)', () => {
-  it('resolve researcher_name pela v2 e preserva termo e tipo', async () => {
-    const list = captureList('/researcher', [researcher]);
+  it('redireciona lattes_id direto para /pesquisadores/$id e preserva termo e tipo', async () => {
     const { router } = await finalLocation(
-      `/researcher?researcher_name=${encodeURIComponent(researcher.name.toUpperCase())}` +
-        '&search_type=article&terms=solos',
-      { handlers: [list.handler] },
+      '/researcher?lattes_id=0273462762077753&search_type=article&terms=solos',
     );
     expect(router.state.location.pathname).toBe(
-      `/pesquisadores/${researcher.id}`,
+      '/pesquisadores/0273462762077753',
     );
     expect(router.state.location.search).toEqual({
       q: 'solos',
       search_type: 'article',
     });
-    const call = list.calls[0]!;
-    expect(call.get('q')).toBe(researcher.name.toUpperCase());
-    expect(call.get('search_in')).toBe('name');
   }, 15000);
 
-  it('sem correspondência exata, cai na busca por nome', async () => {
-    const list = captureList('/researcher', [researcher]);
+  it('redireciona researcher_name para a busca por nome', async () => {
     const { router } = await finalLocation(
       '/researcher?researcher_name=Fulano%20de%20Tal&terms=',
-      { handlers: [list.handler] },
     );
     expect(router.state.location.pathname).toBe('/busca');
     expect(router.state.location.search).toEqual({
       q: 'Fulano de Tal',
       type: 'name',
     });
-  }, 15000);
-
-  it('lattes_id sem nome (a v2 não procura por Lattes) vai para /busca', async () => {
-    const { router } = await finalLocation(
-      '/researcher?lattes_id=0273462762077753',
-    );
-    expect(router.state.location.pathname).toBe('/busca');
-    expect(router.state.location.search).toEqual({});
   }, 15000);
 });
 

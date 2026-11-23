@@ -184,6 +184,7 @@ function createOdaHandlers(options?: {
                 id: 'r-1',
                 nome: 'Ana Souza',
                 formacaoAcademica: 'Doutorado em Ciência da Computação',
+                lattesId: '1234567890123456',
                 imageUrl: 'https://oda.test/fotos/ana.jpg',
                 eLider: true,
               },
@@ -323,7 +324,10 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       await screen.findByText('Liderança do grupo'),
     ).toBeInTheDocument();
     const leaderLink = await screen.findByRole('link', { name: 'Ana Souza' });
-    expect(leaderLink).toHaveAttribute('href', '/researcher?name=Ana+Souza');
+    expect(leaderLink).toHaveAttribute(
+      'href',
+      '/pesquisadores/1234567890123456',
+    );
     expect(
       await screen.findByText('Doutorado em Ciência da Computação'),
     ).toBeInTheDocument();
@@ -342,13 +346,13 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
     expect(within(researchersPanel).getByText('Ana Souza')).toBeInTheDocument();
     expect(
       within(researchersPanel).getByRole('link', { name: 'Ana Souza' }),
-    ).toHaveAttribute('href', '/researcher?name=Ana+Souza');
+    ).toHaveAttribute('href', '/pesquisadores/1234567890123456');
     expect(
       within(researchersPanel).getByText('Doutorado em Ciência da Computação'),
     ).toBeInTheDocument();
   }, 15000);
 
-  it('exibe liderança pelo fallback de membros quando /pesquisadores retorna vazio', async () => {
+  it('exibe liderança pelo fallback de membros quando /pesquisadores retorna vazio e abre busca sem lattesId', async () => {
     await renderRoute('/grupos-pesquisa/grp-2', {
       handlers: createOdaHandlers(),
     });
@@ -362,31 +366,30 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
     expect(screen.getByText('Liderança do grupo')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Carlos Lima' }),
-    ).toHaveAttribute('href', '/researcher?name=Carlos+Lima');
+    ).toHaveAttribute('href', '/busca?q=Carlos+Lima&type=name');
   }, 15000);
 
-  it('navega para o perfil do pesquisador no SimCC ao clicar no nome na aba Pesquisadores', async () => {
-    const baseResearcher = v2Fixtures['/researcher'].data[0]!;
+  it('navega direto para /pesquisadores/$lattesId ao clicar no nome sem buscar por nome', async () => {
+    const baseResearcher = v2Fixtures['/researcher/{researcher_id}'].data;
     const anaResearcher = {
       ...baseResearcher,
       id: '11111111-1111-4111-8111-111111111111',
       name: 'Ana Souza',
     };
+    const requestedIds: string[] = [];
 
     const { user, router } = await renderRoute(
       '/grupos-pesquisa/grp-1?tab=pesquisadores',
       {
         handlers: [
           ...createOdaHandlers(),
-          http.get(simccV2Url('/researcher'), () =>
-            HttpResponse.json({
-              ...v2Fixtures['/researcher'],
-              data: [anaResearcher],
-            }),
-          ),
-          http.get(simccV2Url('/researcher/:researcher_id'), () =>
-            HttpResponse.json(anaResearcher),
-          ),
+          http.get(simccV2Url('/researcher/:researcher_id'), ({ params }) => {
+            requestedIds.push(String(params.researcher_id));
+            return HttpResponse.json({
+              ...v2Fixtures['/researcher/{researcher_id}'],
+              data: anaResearcher,
+            });
+          }),
         ],
       },
     );
@@ -396,8 +399,9 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
 
     await waitFor(() => {
       expect(router.state.location.pathname).toBe(
-        `/pesquisadores/${anaResearcher.id}`,
+        '/pesquisadores/1234567890123456',
       );
+      expect(requestedIds).toContain('1234567890123456');
     });
   }, 15000);
 });

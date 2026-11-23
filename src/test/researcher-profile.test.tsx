@@ -62,6 +62,45 @@ describe('Rota /pesquisadores/$id (T3)', () => {
     ).toBeInTheDocument();
   }, 15000);
 
+  it('aceita lattes_id na URL e usa o UUID retornado nos sub-endpoints', async () => {
+    const LATTES_ID = '0273462762077753';
+    const researcher = v2Fixtures['/researcher/{researcher_id}'].data;
+    const requestedTermsIds: string[] = [];
+    const requestedScholarshipResearcherIds: Array<string | null> = [];
+
+    const { findByRole } = await renderRoute(`/pesquisadores/${LATTES_ID}`, {
+      handlers: [
+        http.get(simccV2Url('/researcher/{researcher_id}'), ({ params }) => {
+          expect(params.researcher_id).toBe(LATTES_ID);
+          return HttpResponse.json(v2Fixtures['/researcher/{researcher_id}']);
+        }),
+        http.get(
+          simccV2Url('/researcher/{researcher_id}/terms'),
+          ({ params }) => {
+            requestedTermsIds.push(String(params.researcher_id));
+            return HttpResponse.json(
+              v2Fixtures['/researcher/{researcher_id}/terms'],
+            );
+          },
+        ),
+        http.get(simccV2Url('/scholarship'), ({ request }) => {
+          requestedScholarshipResearcherIds.push(
+            new URL(request.url).searchParams.get('researcher_id'),
+          );
+          return HttpResponse.json(v2Fixtures['/scholarship']);
+        }),
+      ],
+    });
+
+    expect(
+      await findByRole('heading', { name: researcher.name }),
+    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(requestedTermsIds).toContain(researcher.id);
+      expect(requestedScholarshipResearcherIds).toContain(researcher.id);
+    });
+  }, 15000);
+
   it('exibe página 404 quando o pesquisador não existe', async () => {
     const { findByText } = await renderRoute(
       '/pesquisadores/00000000-0000-0000-0000-000000000404',

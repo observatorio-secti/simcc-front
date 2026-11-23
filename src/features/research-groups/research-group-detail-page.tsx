@@ -137,6 +137,38 @@ function resolveGroupLeaders(
   return leaders.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
 }
 
+function MemberNameLink({
+  name,
+  lattesId,
+}: {
+  name: string;
+  lattesId: string | null;
+}) {
+  const linkClassName = cn(
+    'truncate rounded-sm text-sm font-semibold text-foreground underline-offset-4 transition-colors hover:text-eng-blue hover:underline',
+    focusRing,
+  );
+
+  if (lattesId) {
+    return (
+      <Link
+        to="/pesquisadores/$id"
+        params={{ id: lattesId }}
+        search={{} as never}
+        className={linkClassName}
+      >
+        {name}
+      </Link>
+    );
+  }
+
+  return (
+    <Link to="/busca" search={{ q: name, type: 'name' }} className={linkClassName}>
+      {name}
+    </Link>
+  );
+}
+
 function MemberProfileLinks({
   lattesId,
   orcid,
@@ -559,16 +591,10 @@ export function ResearchGroupDetailPage() {
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <Link
-                            to="/researcher"
-                            search={{ name: leader.name }}
-                            className={cn(
-                              'truncate rounded-sm text-sm font-semibold text-foreground underline-offset-4 transition-colors hover:text-eng-blue hover:underline',
-                              focusRing,
-                            )}
-                          >
-                            {leader.name}
-                          </Link>
+                          <MemberNameLink
+                            name={leader.name}
+                            lattesId={leader.lattesId}
+                          />
                           <Tag variant="brand">Líder</Tag>
                         </div>
                         {leader.graduation && (
@@ -719,16 +745,10 @@ export function ResearchGroupDetailPage() {
                           />
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <Link
-                                to="/researcher"
-                                search={{ name: member.name }}
-                                className={cn(
-                                  'truncate rounded-sm text-sm font-semibold text-foreground underline-offset-4 transition-colors hover:text-eng-blue hover:underline',
-                                  focusRing,
-                                )}
-                              >
-                                {member.name}
-                              </Link>
+                              <MemberNameLink
+                                name={member.name}
+                                lattesId={member.lattesId}
+                              />
                               {member.isLeader && (
                                 <Tag variant="brand">Líder</Tag>
                               )}
