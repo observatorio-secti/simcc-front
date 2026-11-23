@@ -141,7 +141,7 @@ describe('createOdaClient', () => {
   });
 
   it('envia busca textual (q + modoBusca=textual), filtros e ordenação em listGroupsPage', async () => {
-    const fetch = vi.fn(async () =>
+    const fetch = vi.fn(async (_input: RequestInfo | URL) =>
       json({
         data: [{ id: 'grp-1', nome: 'Grupo IA' }],
         meta: { page: 1, size: 12, totalItems: 1, totalPages: 1 },
