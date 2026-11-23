@@ -195,7 +195,7 @@ function InstitutionResearchersTab({
 
   return (
     <div aria-busy={isFetching || undefined} className="flex flex-col gap-4">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {researchers.map((researcher) => (
           <PersonCard
             key={researcher.id}
