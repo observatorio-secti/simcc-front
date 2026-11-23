@@ -97,7 +97,7 @@ describe('texto em revista e trabalho em evento (V4.1)', () => {
     expect(activeTab(search)).toMatchObject({ kind: 'event_work' });
     expect(toProductionQuery('event_work', search)).toEqual({
       page: 1,
-      per_page: 20,
+      per_page: 30,
       year_start: 2020,
       institution_id: ['inst-1'],
       sort_by: 'title',
@@ -140,7 +140,7 @@ describe('bolsistas: URL ↔ /v2/scholarship', () => {
     const query = toScholarshipQuery(search);
     expect(query).toEqual({
       page: 2,
-      per_page: 20,
+      per_page: 30,
       institution_id: ['inst-1'],
       graduate_program_id: ['prog-1'],
       modality: ['Produtividade em Pesquisa - 2'],
@@ -205,7 +205,7 @@ describe('revistas: URL ↔ /v2/magazine', () => {
 
     expect(toMagazineQuery(search)).toEqual({
       page: 1,
-      per_page: 20,
+      per_page: 30,
       qualis: ['A1', 'A2'],
       sort_by: 'jcr',
       sort_order: 'desc',

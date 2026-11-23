@@ -56,7 +56,7 @@ export type PaginationProps = PaginationBaseProps &
 
 type PageToken = number | 'ellipsis-start' | 'ellipsis-end';
 
-const DEFAULT_PER_PAGE_OPTIONS = [10, 20, 50, 100] as const;
+const DEFAULT_PER_PAGE_OPTIONS = [10, 20, 30, 50, 100] as const;
 const NUMBER_FORMAT = new Intl.NumberFormat('pt-BR');
 
 function buildPageTokens(

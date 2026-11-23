@@ -112,7 +112,7 @@ export type ResultsViewMode = (typeof RESULTS_VIEW_MODES)[number];
 
 export const resultsSearch = createListSearch({
   sortBy: RESULTS_SORT_VALUES,
-  defaultPerPage: 20,
+  defaultPerPage: 30,
   filters: {
     area: searchStringArrayParam(),
     institution_id: searchStringArrayParam(),
