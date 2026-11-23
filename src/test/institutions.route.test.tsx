@@ -130,6 +130,11 @@ describe('Rotas de instituições (T4)', () => {
     expect(screen.getAllByText('53').length).toBeGreaterThan(0);
     expect(screen.getAllByText('21').length).toBeGreaterThan(0);
 
+    const labsLink = screen.getByRole('link', { name: /Laboratórios/i });
+    expect(labsLink).toHaveAttribute('href', 'https://vip.uesc.br/');
+    expect(labsLink).toHaveAttribute('target', '_blank');
+    expect(labsLink).toHaveAttribute('rel', 'noopener noreferrer');
+
     // Tooltip de detalhamento de bolsistas ao passar o mouse
     const scholarshipCardTrigger = screen.getByLabelText(
       /Bolsistas de produtividade: 64/i,
@@ -250,5 +255,31 @@ describe('Rotas de instituições (T4)', () => {
         container.querySelector(`img[src="${coverUrl}"]`),
       ).not.toBeInTheDocument();
     });
+  });
+
+  it('oculta o cartão de laboratórios e o link para o VIP quando não há laboratórios cadastrados', async () => {
+    const baseDetail = v2Fixtures['/institution/{institution_id}'];
+
+    await renderRoute('/instituicoes/3f2a9c1e-5b7d-4e8a-9c21-7d4e5f6a8b90', {
+      handlers: [
+        http.get(simccV2Url('/institution/{institution_id}'), () =>
+          HttpResponse.json({
+            ...baseDetail,
+            data: {
+              ...baseDetail.data,
+              counts: {
+                ...baseDetail.data.counts,
+                labs: 0,
+              },
+            },
+          }),
+        ),
+      ],
+    });
+
+    expect(screen.queryByText('Laboratórios')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /Laboratórios/i }),
+    ).not.toBeInTheDocument();
   });
 });
