@@ -144,7 +144,7 @@ function resolveSeriesList(
 
 /**
  * Gráfico de colunas empilhadas por ano (`period`), com total no topo e
- * legenda inferior interativa. Usado nas abas do perfil do pesquisador.
+ * legenda inferior interativa. Usado no perfil do pesquisador e na `/busca`.
  */
 export function StackedYearChart({
   title,

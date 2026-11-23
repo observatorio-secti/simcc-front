@@ -81,6 +81,32 @@ describe('Rota /busca (T2)', () => {
     expect(articles.calls.at(-1)!.get('q')).toBe('solos');
   }, 15000);
 
+  it('mostra o gráfico por ano da aba de produção e filtra pelo Qualis clicado', async () => {
+    const metricCalls: URLSearchParams[] = [];
+    const metricSpy = http.get(
+      simccV2Url('/metrics/production/{kind}'),
+      ({ request }) => {
+        metricCalls.push(new URL(request.url).searchParams);
+        return undefined;
+      },
+    );
+    const { findByRole, router, user } = await renderRoute(
+      '/busca?q=solos&type=article&tab=articles',
+      { handlers: [metricSpy] },
+    );
+
+    expect(
+      await findByRole('heading', { name: 'Artigos por ano e Qualis' }),
+    ).toBeInTheDocument();
+    expect(metricCalls.at(-1)!.get('group_by')).toBe('qualis');
+    expect(metricCalls.at(-1)!.get('q')).toBe('solos');
+
+    await user.click(await findByRole('button', { name: 'Qualis A1' }));
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({ qualis: ['A1'] });
+    });
+  }, 15000);
+
   it('filtra por faceta usando o param da v2 e volta à página 1', async () => {
     const researchers = captureList('/researcher');
     const { findAllByRole, router, user } = await renderRoute(

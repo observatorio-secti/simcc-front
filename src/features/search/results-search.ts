@@ -6,7 +6,10 @@ import {
   type MagazineQuery,
   type MagazineSortBy,
 } from '@/entities/magazine/model';
-import type { ProductionMetricQuery } from '@/entities/production/metric-queries';
+import {
+  defaultMetricGroupBy,
+  type ProductionMetricQuery,
+} from '@/entities/production/metric-queries';
 import type {
   ProductionKind,
   ProductionQuery,
@@ -526,17 +529,39 @@ export function toMagazineQuery(search: ResultsSearch): MagazineQuery {
   };
 }
 
-/** Parâmetros de `/v2/metrics/production/{kind}` com o mesmo recorte da aba. */
+/**
+ * Parâmetros de `/v2/metrics/production/{kind}` com o mesmo recorte da aba e
+ * o agrupamento padrão do tipo: a mesma série alimenta os KPIs (pelo total
+ * do ano) e o gráfico por ano. O Qualis fica de fora do recorte, como no
+ * perfil: no gráfico, o estrato selecionado é destacado, não filtrado.
+ */
 export function toProductionMetricQuery(
+  kind: ProductionKind,
   search: ResultsSearch,
 ): ProductionMetricQuery {
   const { q, year_start, year_end } = baseQuery(search);
+  const groupBy = defaultMetricGroupBy(kind);
   return {
     ...(q !== undefined ? { q } : {}),
     ...(year_start !== undefined ? { year_start } : {}),
     ...(year_end !== undefined ? { year_end } : {}),
     ...pickFilters(search, COMMON_FILTERS),
+    ...(groupBy ? { group_by: groupBy } : {}),
   };
+}
+
+/** Liga ou desliga um estrato do filtro `qualis` (clique no gráfico de artigos). */
+export function toggleQualisFilter(
+  search: ResultsSearch,
+  stratum: string,
+): Pick<ResultsSearch, 'qualis'> {
+  const current = search.qualis ?? [];
+  const isQualis = (ARTICLE_QUALIS as readonly string[]).includes(stratum);
+  if (!isQualis) return { qualis: search.qualis };
+  const next = current.includes(stratum as ArticleQualis)
+    ? current.filter((item) => item !== stratum)
+    : [...current, stratum as ArticleQualis];
+  return { qualis: next.length > 0 ? next : undefined };
 }
 
 /** Troca de aba: zera página e ordenação e descarta filtros que a aba não aceita. */

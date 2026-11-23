@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { magazineListQueryOptions } from '@/entities/magazine/queries';
-import { productionMetricQueryOptions } from '@/entities/production/metric-queries';
+import {
+  defaultMetricGroupBy,
+  productionMetricQueryOptions,
+} from '@/entities/production/metric-queries';
 import type { ProductionKind } from '@/entities/production/model';
 import { productionListQueryOptions } from '@/entities/production/queries';
+import { ProductionYearChart } from '@/entities/production/ui/production-year-charts';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { scholarshipListQueryOptions } from '@/entities/scholarship/queries';
 import {
@@ -44,11 +48,12 @@ import {
   toResearcherQuery,
   toResearcherRankingQuery,
   toScholarshipQuery,
+  toggleQualisFilter,
   type ResultsSearch,
   type ResultsViewMode,
 } from './results-search';
 import { SearchBar } from './search-bar';
-import { tabsForSearchType } from './search-tabs';
+import { productionChartTitle, tabsForSearchType } from './search-tabs';
 
 export interface SearchResultsPageProps {
   search: ResultsSearch;
@@ -114,7 +119,7 @@ export function SearchResultsPage({
   const metricQuery = useQuery({
     ...productionMetricQueryOptions(
       productionKind,
-      toProductionMetricQuery(search),
+      toProductionMetricQuery(productionKind, search),
     ),
     enabled: isProductionTab,
   });
@@ -321,6 +326,20 @@ export function SearchResultsPage({
               loading={productionQuery.isPending}
               metric={metricQuery.data?.data}
               metricLoading={metricQuery.isPending}
+            />
+            <ProductionYearChart
+              title={productionChartTitle(tab.kind)}
+              kind={tab.kind}
+              groupBy={defaultMetricGroupBy(tab.kind)}
+              metric={metricQuery.data?.data}
+              isLoading={metricQuery.isPending}
+              {...(tab.kind === 'article'
+                ? {
+                    selectedKeys: search.qualis,
+                    onToggleKey: (stratum: string) =>
+                      update(toggleQualisFilter(search, stratum)),
+                  }
+                : {})}
             />
             <ProductionResults
               {...listCallbacks}

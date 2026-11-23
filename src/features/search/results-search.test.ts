@@ -7,6 +7,7 @@ import {
   resultsSearch,
   searchInFor,
   switchTab,
+  toggleQualisFilter,
   toProductionMetricQuery,
   toProductionQuery,
   toResearcherQuery,
@@ -174,10 +175,23 @@ describe('results-search (T2)', () => {
       sort_order: 'desc',
     });
     expect(toProductionQuery('book', search)).not.toHaveProperty('qualis');
-    expect(toProductionMetricQuery(search)).toEqual({
+    expect(toProductionMetricQuery('book', search)).toEqual({
       q: 'solos',
       city_id: ['c'],
     });
+    // Artigos agrupam por Qualis; o filtro de Qualis não entra na série.
+    expect(toProductionMetricQuery('article', search)).toEqual({
+      q: 'solos',
+      city_id: ['c'],
+      group_by: 'qualis',
+    });
+  });
+
+  it('liga e desliga estratos do filtro de Qualis a partir do gráfico', () => {
+    const search = resultsSearch.parse('tab=articles&qualis=A2');
+    expect(toggleQualisFilter(search, 'A1')).toEqual({ qualis: ['A2', 'A1'] });
+    expect(toggleQualisFilter(search, 'A2')).toEqual({ qualis: undefined });
+    expect(toggleQualisFilter(search, 'qualquer')).toEqual({ qualis: ['A2'] });
   });
 
   it('resolve aba e ordenação válidas para o tipo de busca', () => {

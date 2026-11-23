@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { HandCoins, Newspaper, Users } from 'lucide-react';
 import type { ProductionKind } from '@/entities/production/model';
+import { defaultMetricGroupBy } from '@/entities/production/metric-queries';
 import { getProductionDefinition } from '@/entities/production/registry';
 import type { SearchType } from './search-schema';
 
@@ -186,4 +187,18 @@ export function resolveSearchTab(
   const available = tabIdsFor(type, hasQuery);
   const id = tab && available.includes(tab) ? tab : DEFAULT_SEARCH_TAB;
   return SEARCH_TABS[id];
+}
+
+const CHART_GROUP_SUFFIX = {
+  qualis: ' e Qualis',
+  nature: ' e natureza',
+  status: ' e situação',
+  type_participation: ' e tipo de participação',
+} as const;
+
+/** Título do gráfico por ano de uma aba de produção (ex.: "Artigos por ano e Qualis"). */
+export function productionChartTitle(kind: ProductionKind): string {
+  const groupBy = defaultMetricGroupBy(kind);
+  const suffix = groupBy ? CHART_GROUP_SUFFIX[groupBy] : '';
+  return `${getProductionDefinition(kind).title} por ano${suffix}`;
 }

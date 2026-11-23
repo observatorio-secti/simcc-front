@@ -14,16 +14,16 @@ import {
   researcherDetailQueryOptions,
   researcherTermsQueryOptions,
 } from '@/entities/researcher/queries';
+import {
+  MultiKindYearChart,
+  ProductionMetricYearChart,
+} from '@/entities/production/ui/production-year-charts';
 import { ResearcherProfileHeader } from '@/entities/researcher/ui/researcher-profile-header';
 import { researcherScholarshipsQueryOptions } from '@/entities/scholarship/queries';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { ArticlesTab } from './components/articles-tab';
 import { GuidanceTab } from './components/guidance-tab';
 import { ProductionListSection } from './components/production-list-section';
-import {
-  GroupedMetricYearChart,
-  MultiKindYearChart,
-} from './components/production-year-charts';
 import { ProfileSidebar } from './components/profile-sidebar';
 import { ResearcherProfileActions } from './components/researcher-profile-actions';
 import { TrajectoryTab } from './components/trajectory-tab';
@@ -70,6 +70,15 @@ export function ResearcherProfilePage({
 
   const terms = termsResponse?.data ?? [];
   const scholarships = scholarshipsResponse?.data ?? [];
+
+  // Recorte dos gráficos por ano: o pesquisador e o intervalo de anos da aba.
+  const chartQuery = {
+    researcher_id: [researcherId],
+    ...(search.year_start !== undefined
+      ? { year_start: search.year_start }
+      : {}),
+    ...(search.year_end !== undefined ? { year_end: search.year_end } : {}),
+  };
 
   function handleOpenProduction(kind: ProductionKind, itemId: string) {
     onOpenProduction(kind, itemId);
@@ -157,9 +166,7 @@ export function ResearcherProfilePage({
               />
               <MultiKindYearChart
                 title="Gráfico de livros e capítulos por ano"
-                researcherId={researcherId}
-                yearStart={search.year_start}
-                yearEnd={search.year_end}
+                query={chartQuery}
                 kinds={[
                   { kind: 'book', label: 'Livros' },
                   { kind: 'book_chapter', label: 'Capítulos de livros' },
@@ -200,9 +207,7 @@ export function ResearcherProfilePage({
               />
               <MultiKindYearChart
                 title="Gráfico de produção técnica por ano"
-                researcherId={researcherId}
-                yearStart={search.year_start}
-                yearEnd={search.year_end}
+                query={chartQuery}
                 kinds={[
                   { kind: 'patent', label: 'Patentes' },
                   { kind: 'software', label: 'Softwares' },
@@ -251,13 +256,10 @@ export function ResearcherProfilePage({
                   })
                 }
               />
-              <GroupedMetricYearChart
+              <ProductionMetricYearChart
                 title="Gráfico de relatórios técnicos por ano"
-                researcherId={researcherId}
+                query={chartQuery}
                 kind="report"
-                groupBy="none"
-                yearStart={search.year_start}
-                yearEnd={search.year_end}
               />
               <ProductionListSection
                 researcherId={researcherId}
@@ -308,13 +310,11 @@ export function ResearcherProfilePage({
                   })
                 }
               />
-              <GroupedMetricYearChart
+              <ProductionMetricYearChart
                 title="Gráfico de participação em eventos por ano"
-                researcherId={researcherId}
+                query={chartQuery}
                 kind="event"
                 groupBy="nature"
-                yearStart={search.year_start}
-                yearEnd={search.year_end}
               />
               <ProductionListSection
                 researcherId={researcherId}
@@ -341,13 +341,11 @@ export function ResearcherProfilePage({
                   })
                 }
               />
-              <GroupedMetricYearChart
+              <ProductionMetricYearChart
                 title="Gráfico de projetos por ano de início"
-                researcherId={researcherId}
+                query={chartQuery}
                 kind="research_project"
                 groupBy="status"
-                yearStart={search.year_start}
-                yearEnd={search.year_end}
               />
               <ProductionListSection
                 researcherId={researcherId}

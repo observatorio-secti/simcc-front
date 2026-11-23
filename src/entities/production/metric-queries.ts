@@ -30,6 +30,26 @@ const METRIC_PATH_KIND = {
   event_work: 'event-work',
 } as const satisfies Record<ProductionKind, MetricPathKind>;
 
+/** Dimensões de `group_by` usadas nos gráficos por ano. */
+export type ProductionMetricGroupBy =
+  'qualis' | 'nature' | 'status' | 'type_participation';
+
+const DEFAULT_METRIC_GROUP_BY: Partial<
+  Record<ProductionKind, ProductionMetricGroupBy>
+> = {
+  article: 'qualis',
+  event: 'nature',
+  guidance: 'nature',
+  research_project: 'status',
+};
+
+/** Agrupamento padrão do gráfico por ano de um tipo (sem agrupamento: só o total). */
+export function defaultMetricGroupBy(
+  kind: ProductionKind,
+): ProductionMetricGroupBy | undefined {
+  return DEFAULT_METRIC_GROUP_BY[kind];
+}
+
 const EMPTY_QUERY: ProductionMetricQuery = {};
 
 export const productionMetricKeys = {

@@ -10,6 +10,7 @@ import {
 import type { ProductionItem } from '@/entities/production/model';
 import { productionListQueryOptions } from '@/entities/production/queries';
 import { ProductionCard } from '@/entities/production/ui/production-card';
+import { ProductionMetricYearChart } from '@/entities/production/ui/production-year-charts';
 import { formatCount } from '@/entities/researcher/model';
 import { qualisColor } from '@/shared/lib/design-tokens';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
@@ -28,7 +29,6 @@ import type {
   QualisStratum,
   ResearcherProfileSearch,
 } from '../search-schema';
-import { ArticlesQualisYearChart } from './production-year-charts';
 import { YearFilter } from './year-filter';
 
 const QUALIS_OPTIONS: ReadonlyArray<{ value: QualisStratum; label: string }> = [
@@ -208,12 +208,22 @@ export function ArticlesTab({
         />
       </div>
 
-      <ArticlesQualisYearChart
-        researcherId={researcherId}
-        yearStart={search.year_start}
-        yearEnd={search.year_end}
-        selectedQualis={selectedQualis}
-        onToggleQualis={handleToggleQualis}
+      <ProductionMetricYearChart
+        title="Gráfico de quantidade total por Qualis"
+        ariaLabel="Distribuição anual de artigos por estrato Qualis"
+        kind="article"
+        groupBy="qualis"
+        query={{
+          researcher_id: [researcherId],
+          ...(search.year_start !== undefined
+            ? { year_start: search.year_start }
+            : {}),
+          ...(search.year_end !== undefined
+            ? { year_end: search.year_end }
+            : {}),
+        }}
+        selectedKeys={selectedQualis}
+        onToggleKey={(key) => handleToggleQualis(key as QualisStratum)}
       />
 
       <section className="flex flex-col gap-3">

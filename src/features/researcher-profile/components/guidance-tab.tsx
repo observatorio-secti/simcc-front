@@ -3,6 +3,7 @@ import { GraduationCap, LayoutGrid, Rows3 } from 'lucide-react';
 import type { ProductionItem } from '@/entities/production/model';
 import { productionListQueryOptions } from '@/entities/production/queries';
 import { ProductionCard } from '@/entities/production/ui/production-card';
+import { ProductionMetricYearChart } from '@/entities/production/ui/production-year-charts';
 import { formatCount } from '@/entities/researcher/model';
 import { orientationColor, statusColor } from '@/shared/lib/design-tokens';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
@@ -21,7 +22,6 @@ import {
 } from '@/shared/ui/table';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/ui/toggle-group';
 import type { ProfileViewMode } from '../search-schema';
-import { GroupedMetricYearChart } from './production-year-charts';
 
 export interface GuidanceTabProps {
   researcherId: string;
@@ -63,13 +63,15 @@ export function GuidanceTab({
 
   return (
     <div className="flex flex-col gap-6">
-      <GroupedMetricYearChart
+      <ProductionMetricYearChart
         title="Gráfico de orientações por natureza ao longo dos anos"
-        researcherId={researcherId}
         kind="guidance"
         groupBy="nature"
-        yearStart={yearStart}
-        yearEnd={yearEnd}
+        query={{
+          researcher_id: [researcherId],
+          ...(yearStart !== undefined ? { year_start: yearStart } : {}),
+          ...(yearEnd !== undefined ? { year_end: yearEnd } : {}),
+        }}
       />
 
       <section className="flex flex-col gap-3">
