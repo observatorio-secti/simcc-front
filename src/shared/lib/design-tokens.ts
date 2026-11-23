@@ -630,6 +630,25 @@ export function statusColor(value: string | null | undefined): DictionaryColor {
   return key ? STATUS_COLORS[key] : FALLBACK_COLOR;
 }
 
+/**
+ * Situação da patente (`granted` da v2): concedida ou só depositada. Reusa as
+ * cores de status (concluída / em andamento).
+ */
+export const PATENT_GRANT_COLORS = {
+  granted: {
+    label: 'Concedidas',
+    bg: 'bg-status-concluida',
+    text: 'text-status-concluida',
+    borderLeft: 'border-l-status-concluida',
+  },
+  filed: {
+    label: 'Depositadas',
+    bg: 'bg-status-andamento',
+    text: 'text-status-andamento',
+    borderLeft: 'border-l-status-andamento',
+  },
+} as const satisfies Record<string, DictionaryColor>;
+
 // ---------------------------------------------------------------------------
 // Estado de execução (`run-*`): runs e etapas do ETL no console
 // ---------------------------------------------------------------------------

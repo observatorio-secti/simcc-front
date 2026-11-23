@@ -107,6 +107,36 @@ describe('Rota /busca (T2)', () => {
     });
   }, 15000);
 
+  it('divide o gráfico de patentes em concedidas e depositadas', async () => {
+    const metricCalls: URLSearchParams[] = [];
+    const metricSpy = http.get(
+      simccV2Url('/metrics/production/{kind}'),
+      ({ request }) => {
+        metricCalls.push(new URL(request.url).searchParams);
+        return undefined;
+      },
+    );
+    const { findByRole } = await renderRoute(
+      '/busca?q=solos&type=patent&tab=patents',
+      { handlers: [metricSpy] },
+    );
+
+    expect(
+      await findByRole('heading', {
+        name: 'Patentes por ano: concedidas e depositadas',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      await findByRole('img', {
+        name: 'Patentes por ano: concedidas e depositadas',
+      }),
+    ).toBeInTheDocument();
+    const granted = metricCalls
+      .filter((params) => params.get('q') === 'solos')
+      .map((params) => params.get('granted'));
+    expect(granted).toEqual(expect.arrayContaining(['true', 'false']));
+  }, 15000);
+
   it('filtra por faceta usando o param da v2 e volta à página 1', async () => {
     const researchers = captureList('/researcher');
     const { findAllByRole, router, user } = await renderRoute(

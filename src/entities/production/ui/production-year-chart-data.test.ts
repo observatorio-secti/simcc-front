@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { productionYearChartData } from './production-year-chart-data';
+import {
+  patentGrantSeries,
+  productionYearChartData,
+} from './production-year-chart-data';
 
 describe('productionYearChartData', () => {
   it('sem agrupamento, usa uma série única com a cor do tipo', () => {
@@ -33,5 +36,13 @@ describe('productionYearChartData', () => {
     );
     expect(series).toHaveLength(2);
     expect(series.find((item) => item.key === 'OUTRA')!.label).toBe('OUTRA');
+  });
+
+  it('divide patentes em concedidas e depositadas pelo filtro granted', () => {
+    const series = patentGrantSeries('Patentes');
+    expect(series.map((item) => [item.key, item.label, item.filter])).toEqual([
+      ['patent_granted', 'Patentes concedidas', { granted: true }],
+      ['patent_filed', 'Patentes depositadas', { granted: false }],
+    ]);
   });
 });

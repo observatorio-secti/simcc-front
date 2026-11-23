@@ -3,10 +3,15 @@ import { simcc, unwrap } from '@/api/simcc';
 import type { PathParamsOf, QueryOf, ResponseOf } from '@/api/types';
 import type { ProductionKind } from './model';
 
-/** Query params aceitos por `/v2/metrics/production/{kind}`. */
+/**
+ * Query params aceitos por `/v2/metrics/production/{kind}`. `granted`
+ * (patentes concedidas ou não) já é aceito pela rota e está no OpenAPI do
+ * backend, mas ainda não nos tipos gerados: sai daqui quando
+ * `npm run api:types` o trouxer.
+ */
 export type ProductionMetricQuery = NonNullable<
   QueryOf<'/metrics/production/{kind}'>
->;
+> & { granted?: boolean };
 
 export type ProductionMetricResponse = ResponseOf<'/metrics/production/{kind}'>;
 

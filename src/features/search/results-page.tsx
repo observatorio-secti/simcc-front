@@ -8,7 +8,11 @@ import {
 } from '@/entities/production/metric-queries';
 import type { ProductionKind } from '@/entities/production/model';
 import { productionListQueryOptions } from '@/entities/production/queries';
-import { ProductionYearChart } from '@/entities/production/ui/production-year-charts';
+import { patentGrantSeries } from '@/entities/production/ui/production-year-chart-data';
+import {
+  MultiKindYearChart,
+  ProductionYearChart,
+} from '@/entities/production/ui/production-year-charts';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { scholarshipListQueryOptions } from '@/entities/scholarship/queries';
 import {
@@ -327,20 +331,28 @@ export function SearchResultsPage({
               metric={metricQuery.data?.data}
               metricLoading={metricQuery.isPending}
             />
-            <ProductionYearChart
-              title={productionChartTitle(tab.kind)}
-              kind={tab.kind}
-              groupBy={defaultMetricGroupBy(tab.kind)}
-              metric={metricQuery.data?.data}
-              isLoading={metricQuery.isPending}
-              {...(tab.kind === 'article'
-                ? {
-                    selectedKeys: search.qualis,
-                    onToggleKey: (stratum: string) =>
-                      update(toggleQualisFilter(search, stratum)),
-                  }
-                : {})}
-            />
+            {tab.kind === 'patent' ? (
+              <MultiKindYearChart
+                title={productionChartTitle(tab.kind)}
+                query={toProductionMetricQuery(tab.kind, search)}
+                kinds={patentGrantSeries()}
+              />
+            ) : (
+              <ProductionYearChart
+                title={productionChartTitle(tab.kind)}
+                kind={tab.kind}
+                groupBy={defaultMetricGroupBy(tab.kind)}
+                metric={metricQuery.data?.data}
+                isLoading={metricQuery.isPending}
+                {...(tab.kind === 'article'
+                  ? {
+                      selectedKeys: search.qualis,
+                      onToggleKey: (stratum: string) =>
+                        update(toggleQualisFilter(search, stratum)),
+                    }
+                  : {})}
+              />
+            )}
             <ProductionResults
               {...listCallbacks}
               onOpenProduction={onOpenProduction}
