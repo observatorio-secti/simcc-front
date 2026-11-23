@@ -1,5 +1,11 @@
 import { useState, type ComponentProps } from 'react';
-import { Building2, FlaskConical, GraduationCap, Users } from 'lucide-react';
+import {
+  Building2,
+  FlaskConical,
+  GraduationCap,
+  Microscope,
+  Users,
+} from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 import { focusRing } from '@/shared/ui/focus-ring';
 import {
@@ -147,6 +153,18 @@ export function InstitutionCard({
                 </span>
                 <span className="sr-only"> programas de pós-graduação</span>
               </span>
+              {resolvedCounts.labs != null && resolvedCounts.labs > 0 && (
+                <span
+                  className="inline-flex items-center gap-1"
+                  title="Laboratórios"
+                >
+                  <Microscope className="size-3 shrink-0" aria-hidden />
+                  <span className="tabular-nums">
+                    {formatInstitutionCount(resolvedCounts.labs)}
+                  </span>
+                  <span className="sr-only"> laboratórios</span>
+                </span>
+              )}
             </>
           )}
           {researchGroupsCount != null && (
