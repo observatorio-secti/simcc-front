@@ -201,6 +201,19 @@ const RESEARCHERS: ResearchersBlock = {
   })) as ResearchersBlock['researchers'],
 };
 
+// Texto como a MarIA escreve (tabela GFM com coluna numérica à direita).
+const MARKDOWN_TEXT = [
+  'Segue a lista com a **instituição sede** e o número de bolsistas de produtividade (PQ/DT), conforme o Simcc:',
+  '',
+  '| Programa de pós-graduação | Instituição | Bolsistas |',
+  '|---|---|---:|',
+  '| Química | Universidade Federal da Bahia (UFBA) | 17 |',
+  '| Ecologia e Conservação da Biodiversidade | Universidade Estadual de Santa Cruz (UESC) | 14 |',
+  '| Desenvolvimento e Meio Ambiente — UFPI-UFRN-FUFSE-UESC-UFPB/JP-UFERSA | Universidade Federal do Ceará (UFC) | 8 |',
+  '',
+  'Fonte completa em https://observatoriocti.secti.ba.gov.br. ~~Dado antigo~~ corrigido.',
+].join('\n');
+
 export function MariaChartsShowcase() {
   return (
     <Showcase
@@ -211,9 +224,11 @@ export function MariaChartsShowcase() {
     >
       <>
         <div className="flex max-w-[640px] flex-col gap-4">
-          <QuestionLives used={3} limit={10} />
-          <QuestionLives used={3} limit={10} pending />
-          <MessageBlocks blocks={[RESEARCHERS]} />
+          <QuestionLives used={3} limit={10} className="w-60" />
+          <QuestionLives used={3} limit={10} pending className="w-60" />
+          <MessageBlocks
+            blocks={[{ type: 'text', text: MARKDOWN_TEXT }, RESEARCHERS]}
+          />
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
           {CHARTS.map((block) => (
