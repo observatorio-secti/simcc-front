@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Link,
@@ -16,6 +16,8 @@ import {
   LayoutGrid,
   List,
   MapPin,
+  Search,
+  Trash2,
   User,
   Users,
 } from 'lucide-react';
@@ -36,13 +38,23 @@ import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import { EmptyState } from '@/shared/ui/empty-state';
+import { FacetSidebar } from '@/shared/ui/facet-panel';
 import { focusRing } from '@/shared/ui/focus-ring';
+import { Input } from '@/shared/ui/input';
 import { LoadingBlock } from '@/shared/ui/loading-block';
 import { Pagination } from '@/shared/ui/pagination';
+import { ResultToolbar } from '@/shared/ui/result-toolbar';
 import { SectionHeader } from '@/shared/ui/section-header';
+import { SortSelect } from '@/shared/ui/sort-select';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/ui/toggle-group';
 import {
+  ResearchGroupFilterSheet,
+  ResearchGroupFilters,
+} from './research-group-filters';
+import {
+  GROUP_SORT_OPTIONS,
   researchGroupsSearch,
+  toOdaGroupQueryParams,
   type GroupViewMode,
   type ResearchGroupsSearch,
 } from './search';
@@ -157,13 +169,18 @@ export function ResearchGroupsPage() {
   const navigate = useNavigate({ from: '/grupos-pesquisa/' });
   const search = useSearch({ from: '/_public/grupos-pesquisa/' });
 
+  const [prevSearchQ, setPrevSearchQ] = useState(search.q);
+  const [queryInput, setQueryInput] = useState(search.q ?? '');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [listOpen, setListOpen] = useState(true);
 
+  if (prevSearchQ !== search.q) {
+    setPrevSearchQ(search.q);
+    setQueryInput(search.q ?? '');
+  }
+
   const groupsQuery = useQuery(
-    researchGroupListQueryOptions({
-      page: search.page,
-      size: search.per_page,
-    }),
+    researchGroupListQueryOptions(toOdaGroupQueryParams(search)),
   );
 
   const groups = groupsQuery.data?.items ?? [];
@@ -175,16 +192,46 @@ export function ResearchGroupsPage() {
   );
   const currentPage = Math.min(search.page, totalPages);
   const viewMode: GroupViewMode = search.view ?? 'grid';
+  const activeFiltersCount = researchGroupsSearch.countActiveFilters(search);
+  const hasAnyFilterOrQuery = activeFiltersCount > 0 || Boolean(search.q);
+
+  function commitSearch(next: ResearchGroupsSearch) {
+    void navigate({
+      search: () => researchGroupsSearch.clean(next),
+      replace: false,
+    });
+  }
 
   function updateSearch(
     patch: Partial<ResearchGroupsSearch> | Record<string, unknown>,
     options?: { resetPage?: boolean },
   ) {
-    const next = researchGroupsSearch.update(search, patch, options);
-    void navigate({
-      search: () => next,
-      replace: false,
-    });
+    commitSearch(researchGroupsSearch.update(search, patch, options));
+  }
+
+  function handleQuerySubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmed = queryInput.trim();
+    updateSearch({ q: trimmed.length > 0 ? trimmed : undefined });
+  }
+
+  function handleClearQuery() {
+    setQueryInput('');
+    updateSearch({ q: undefined });
+  }
+
+  function handleClearFilters() {
+    commitSearch(researchGroupsSearch.clearFilters(search));
+  }
+
+  function handleClearAll() {
+    setQueryInput('');
+    commitSearch(
+      researchGroupsSearch.update(
+        researchGroupsSearch.clearFilters(search),
+        { q: undefined },
+      ),
+    );
   }
 
   function handleBack() {
@@ -201,46 +248,63 @@ export function ResearchGroupsPage() {
       : 'Não foi possível carregar os grupos de pesquisa da ODA.'
     : null;
 
+  const filterProps = {
+    search,
+    onUpdateSearch: updateSearch,
+    onClearFilters: handleClearFilters,
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-7 shrink-0"
+          onClick={handleBack}
+          aria-label="Voltar"
+        >
+          <ChevronLeft className="size-4" aria-hidden />
+        </Button>
+        <h1 className="text-xl font-semibold tracking-tight">
+          Grupos de pesquisa
+        </h1>
+      </div>
+
+      <form
+        onSubmit={handleQuerySubmit}
+        role="search"
+        aria-label="Buscar grupos de pesquisa"
+        className="flex h-[52px] items-center gap-2 rounded-lg border bg-card px-4"
+      >
+        <Search
+          className="size-4 shrink-0 text-muted-foreground"
+          aria-hidden
+        />
+        <Input
+          type="search"
+          value={queryInput}
+          onChange={(event) => setQueryInput(event.target.value)}
+          placeholder="Pesquisar grupos por nome, área ou palavra-chave"
+          aria-label="Pesquisar grupos por nome, área ou palavra-chave"
+          className="h-full flex-1 border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+        />
+        {queryInput.length > 0 && (
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             size="icon"
-            className="size-7 shrink-0"
-            onClick={handleBack}
-            aria-label="Voltar"
+            onClick={handleClearQuery}
+            aria-label="Limpar busca"
           >
-            <ChevronLeft className="size-4" aria-hidden />
+            <Trash2 aria-hidden />
           </Button>
-          <h1 className="text-xl font-semibold tracking-tight">
-            Grupos de pesquisa
-          </h1>
-        </div>
-
-        <ToggleGroup
-          type="single"
-          value={viewMode}
-          onValueChange={(value) => {
-            if (value === 'grid' || value === 'list') {
-              updateSearch(
-                { view: value === 'grid' ? undefined : value },
-                { resetPage: false },
-              );
-            }
-          }}
-          aria-label="Modo de exibição"
-        >
-          <ToggleGroupItem value="grid" aria-label="Exibir em grade">
-            <LayoutGrid className="size-4" aria-hidden />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="list" aria-label="Exibir em lista">
-            <List className="size-4" aria-hidden />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
+        )}
+        <Button type="submit" size="sm">
+          Buscar
+        </Button>
+      </form>
 
       {errorMessage && (
         <div
@@ -262,62 +326,126 @@ export function ResearchGroupsPage() {
         </div>
       )}
 
-      <section className="flex flex-col gap-4">
-        <SectionHeader
-          title={
-            <span className="inline-flex items-center gap-2">
-              <span>Grupos encontrados</span>
-              {!groupsQuery.isLoading && (
-                <Tag>{totalItems.toLocaleString('pt-BR')}</Tag>
-              )}
-            </span>
-          }
-          icon={FlaskConical}
-          open={listOpen}
-          onOpenChange={setListOpen}
-          controls="grupos-lista"
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <FacetSidebar>
+          <ResearchGroupFilters {...filterProps} />
+        </FacetSidebar>
+
+        <ResearchGroupFilterSheet
+          open={filtersOpen}
+          onOpenChange={setFiltersOpen}
+          {...filterProps}
         />
 
-        {listOpen && (
-          <div id="grupos-lista" className="flex flex-col gap-4">
-            {groupsQuery.isLoading ? (
-              <LoadingBlock />
-            ) : groups.length === 0 ? (
-              <EmptyState
-                title="Nenhum grupo de pesquisa encontrado"
-                description="Nenhum grupo de pesquisa foi retornado pela API ODA."
-              />
-            ) : viewMode === 'grid' ? (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {groups.map((group) => (
-                  <ResearchGroupCard key={group.id} group={group} />
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {groups.map((group) => (
-                  <ResearchGroupListRow key={group.id} group={group} />
-                ))}
-              </div>
-            )}
+        <section className="flex min-w-0 flex-col gap-4">
+          <SectionHeader
+            title={
+              <span className="inline-flex items-center gap-2">
+                <span>Grupos encontrados</span>
+                {!groupsQuery.isLoading && (
+                  <Tag>{totalItems.toLocaleString('pt-BR')}</Tag>
+                )}
+              </span>
+            }
+            icon={FlaskConical}
+            open={listOpen}
+            onOpenChange={setListOpen}
+            controls="grupos-lista"
+          />
 
-            {totalItems > 0 && (
-              <Pagination
-                page={currentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                perPage={search.per_page}
-                perPageOptions={PER_PAGE_OPTIONS}
-                onPageChange={(page) =>
-                  updateSearch({ page }, { resetPage: false })
-                }
-                onPerPageChange={(per_page) => updateSearch({ per_page })}
-                hideOnSinglePage={false}
-              />
-            )}
-          </div>
-        )}
-      </section>
+          <ResultToolbar
+            filtersCount={activeFiltersCount}
+            onFiltersClick={() => setFiltersOpen(true)}
+            actions={
+              <div className="flex items-center gap-2">
+                <SortSelect
+                  options={GROUP_SORT_OPTIONS}
+                  value={search.sort_by}
+                  order={search.sort_order}
+                  showOrderToggle
+                  onChange={(next) => updateSearch(next)}
+                />
+                <ToggleGroup
+                  type="single"
+                  value={viewMode}
+                  onValueChange={(value) => {
+                    if (value === 'grid' || value === 'list') {
+                      updateSearch(
+                        { view: value === 'grid' ? undefined : value },
+                        { resetPage: false },
+                      );
+                    }
+                  }}
+                  aria-label="Modo de exibição"
+                >
+                  <ToggleGroupItem value="grid" aria-label="Exibir em grade">
+                    <LayoutGrid className="size-4" aria-hidden />
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="list" aria-label="Exibir em lista">
+                    <List className="size-4" aria-hidden />
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+            }
+          />
+
+          {listOpen && (
+            <div id="grupos-lista" className="flex flex-col gap-4">
+              {groupsQuery.isLoading ? (
+                <LoadingBlock />
+              ) : groups.length === 0 ? (
+                <EmptyState
+                  title="Nenhum grupo de pesquisa encontrado"
+                  description={
+                    hasAnyFilterOrQuery
+                      ? 'Nenhum grupo corresponde aos filtros ou termos informados.'
+                      : 'Nenhum grupo de pesquisa foi retornado pela API ODA.'
+                  }
+                  action={
+                    hasAnyFilterOrQuery ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleClearAll}
+                      >
+                        Limpar filtros
+                      </Button>
+                    ) : undefined
+                  }
+                />
+              ) : viewMode === 'grid' ? (
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {groups.map((group) => (
+                    <ResearchGroupCard key={group.id} group={group} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {groups.map((group) => (
+                    <ResearchGroupListRow key={group.id} group={group} />
+                  ))}
+                </div>
+              )}
+
+              {totalItems > 0 && (
+                <Pagination
+                  page={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  perPage={search.per_page}
+                  perPageOptions={PER_PAGE_OPTIONS}
+                  onPageChange={(page) =>
+                    updateSearch({ page }, { resetPage: false })
+                  }
+                  onPerPageChange={(per_page) => updateSearch({ per_page })}
+                  hideOnSinglePage={false}
+                />
+              )}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

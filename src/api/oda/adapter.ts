@@ -4,8 +4,11 @@ import type {
   OdaGroupRaw,
   OdaGroupResearcherRaw,
   OdaGroupResearchersResponseRaw,
+  OdaInstitutionListResponseRaw,
   OdaInstitutionRaw,
+  OdaKnowledgeAreaListResponseRaw,
   OdaPaginationMetaRaw,
+  OdaStateListResponseRaw,
 } from './schemas';
 
 export interface OdaPaginationMeta {
@@ -100,6 +103,27 @@ export interface ResearchGroupResearcher {
 export interface ResearchGroupResearchersResult {
   items: ResearchGroupResearcher[];
   meta: OdaPaginationMeta;
+}
+
+export interface OdaStateOption {
+  id: string;
+  acronym: string;
+  name: string;
+  region: string | null;
+}
+
+export interface OdaKnowledgeAreaOption {
+  id: string;
+  name: string;
+  type: string | null;
+}
+
+export interface OdaInstitutionOption {
+  id: string;
+  name: string;
+  acronym: string | null;
+  label: string;
+  stateAcronym: string | null;
 }
 
 const PLACEHOLDER_TEXTS = new Set(['null', 'nan', 'none', 'undefined']);
@@ -389,4 +413,52 @@ export function adaptOdaGroupResearchers(
     items,
     meta: normalizeMeta(rawMeta, items.length, fallbackPage, fallbackSize),
   };
+}
+
+/** Converte a lista de UFs retornada pela ODA. */
+export function adaptOdaStates(raw: OdaStateListResponseRaw): OdaStateOption[] {
+  const items = Array.isArray(raw) ? raw : raw.data;
+  return items
+    .map((item) => ({
+      id: item.id.trim(),
+      acronym: item.sigla.trim().toUpperCase(),
+      name: item.nome.trim(),
+      region: cleanOdaText(item.regiao),
+    }))
+    .sort((a, b) => a.acronym.localeCompare(b.acronym, 'pt-BR'));
+}
+
+/** Converte a lista de áreas de conhecimento retornada pela ODA. */
+export function adaptOdaKnowledgeAreas(
+  raw: OdaKnowledgeAreaListResponseRaw,
+): OdaKnowledgeAreaOption[] {
+  const items = Array.isArray(raw) ? raw : raw.data;
+  return items
+    .map((item) => ({
+      id: item.id.trim(),
+      name: item.nome.trim(),
+      type: cleanOdaText(item.tipo),
+    }))
+    .filter((item) => item.name.length > 0 && item.name !== '.')
+    .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+}
+
+/** Converte a lista de instituições retornada pela ODA. */
+export function adaptOdaInstitutions(
+  raw: OdaInstitutionListResponseRaw,
+): OdaInstitutionOption[] {
+  const items = Array.isArray(raw) ? raw : raw.data;
+  return items
+    .map((item) => {
+      const name = item.nome.trim();
+      const acronym = cleanOdaText(item.sigla);
+      return {
+        id: item.id.trim(),
+        name,
+        acronym,
+        label: formatInstitutionLabel(acronym, name) || name,
+        stateAcronym: cleanOdaText(item.estado?.sigla)?.toUpperCase() ?? null,
+      };
+    })
+    .sort((a, b) => a.label.localeCompare(b.label, 'pt-BR'));
 }

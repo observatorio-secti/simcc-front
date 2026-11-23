@@ -1,9 +1,25 @@
 import { queryOptions } from '@tanstack/react-query';
-import { oda } from '@/api/oda';
+import {
+  oda,
+  type OdaGroupSortField,
+  type OdaSortOrder,
+} from '@/api/oda';
+
+const REFERENCE_STALE_TIME_MS = 1000 * 60 * 30;
 
 export interface ResearchGroupListParams {
   page?: number;
   size?: number;
+  q?: string;
+  situacao?: string;
+  areaConhecimentoId?: string;
+  estadoId?: string;
+  uf?: string;
+  instituicaoId?: string;
+  cidade?: string;
+  anoFormacao?: number;
+  ordenarPor?: OdaGroupSortField;
+  ordem?: OdaSortOrder;
   all?: boolean;
 }
 
@@ -23,6 +39,10 @@ export const researchGroupKeys = {
       'detail',
       { id, relation: 'researchers', ...params },
     ] as const,
+  states: () => ['research-group', 'filters', 'states'] as const,
+  areas: () => ['research-group', 'filters', 'areas'] as const,
+  institutions: (params: { uf?: string; nome?: string } = {}) =>
+    ['research-group', 'filters', 'institutions', params] as const,
 };
 
 /** Página de grupos de pesquisa SIMCC na API ODA. */
@@ -54,5 +74,36 @@ export function researchGroupResearchersQueryOptions(
     queryFn: ({ signal }) =>
       oda.listGroupResearchers(id, { ...params, signal }),
     enabled: id.trim().length > 0,
+  });
+}
+
+/** Estados (UF) disponíveis na API ODA para filtro de grupos de pesquisa. */
+export function researchGroupStatesQueryOptions() {
+  return queryOptions({
+    queryKey: researchGroupKeys.states(),
+    queryFn: ({ signal }) => oda.listStates({ signal }),
+    staleTime: REFERENCE_STALE_TIME_MS,
+  });
+}
+
+/** Grandes áreas do conhecimento disponíveis na API ODA. */
+export function researchGroupAreasQueryOptions() {
+  return queryOptions({
+    queryKey: researchGroupKeys.areas(),
+    queryFn: ({ signal }) =>
+      oda.listKnowledgeAreas({ tipo: 'GRANDE_AREA', size: 100, signal }),
+    staleTime: REFERENCE_STALE_TIME_MS,
+  });
+}
+
+/** Instituições disponíveis na API ODA, opcionalmente filtradas por UF ou nome. */
+export function researchGroupInstitutionsQueryOptions(
+  params: { uf?: string; nome?: string } = {},
+) {
+  return queryOptions({
+    queryKey: researchGroupKeys.institutions(params),
+    queryFn: ({ signal }) =>
+      oda.listInstitutions({ ...params, size: 100, signal }),
+    staleTime: REFERENCE_STALE_TIME_MS,
   });
 }

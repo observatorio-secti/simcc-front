@@ -12,6 +12,12 @@ import {
   adaptOdaGroupDetail,
   adaptOdaGroupList,
   adaptOdaGroupResearchers,
+  adaptOdaInstitutions,
+  adaptOdaKnowledgeAreas,
+  adaptOdaStates,
+  type OdaInstitutionOption,
+  type OdaKnowledgeAreaOption,
+  type OdaStateOption,
   type ResearchGroup,
   type ResearchGroupListResult,
   type ResearchGroupResearchersResult,
@@ -20,6 +26,9 @@ import {
   odaGroupDetailResponseSchema,
   odaGroupListResponseSchema,
   odaGroupResearchersResponseSchema,
+  odaInstitutionListResponseSchema,
+  odaKnowledgeAreaListResponseSchema,
+  odaStateListResponseSchema,
 } from './schemas';
 
 const DEFAULT_PAGE_SIZE = 100;
@@ -74,9 +83,38 @@ export interface OdaClientOptions {
   fetch?: typeof fetch;
 }
 
+export type OdaGroupSortField = 'nome' | 'anoFormacao' | 'situacao';
+export type OdaSortOrder = 'asc' | 'desc';
+
 export interface ListOdaGroupsParams {
   page?: number;
   size?: number;
+  q?: string;
+  situacao?: string;
+  areaConhecimentoId?: string;
+  estadoId?: string;
+  uf?: string;
+  instituicaoId?: string;
+  cidade?: string;
+  anoFormacao?: number;
+  ordenarPor?: OdaGroupSortField;
+  ordem?: OdaSortOrder;
+  signal?: AbortSignal;
+}
+
+export interface ListOdaKnowledgeAreasParams {
+  page?: number;
+  size?: number;
+  nome?: string;
+  tipo?: 'GRANDE_AREA' | 'AREA' | 'SUBAREA' | 'TOPICO';
+  signal?: AbortSignal;
+}
+
+export interface ListOdaInstitutionsParams {
+  page?: number;
+  size?: number;
+  nome?: string;
+  uf?: string;
   signal?: AbortSignal;
 }
 
@@ -163,11 +201,27 @@ export function createOdaClient(
   ): Promise<ResearchGroupListResult> {
     const page = params.page ?? 1;
     const size = params.size ?? DEFAULT_PAGE_SIZE;
+    const trimmedQuery = params.q?.trim();
     const raw = await requestJson(
       'grupos-pesquisa/simcc',
       odaGroupListResponseSchema,
       {
-        query: { page, size },
+        query: {
+          page,
+          size,
+          ...(trimmedQuery
+            ? { q: trimmedQuery, modoBusca: 'textual' }
+            : undefined),
+          situacao: params.situacao?.trim() || undefined,
+          areaConhecimentoId: params.areaConhecimentoId?.trim() || undefined,
+          estadoId: params.estadoId?.trim() || undefined,
+          uf: params.uf?.trim().toUpperCase() || undefined,
+          instituicaoId: params.instituicaoId?.trim() || undefined,
+          cidade: params.cidade?.trim() || undefined,
+          anoFormacao: params.anoFormacao,
+          ordenarPor: params.ordenarPor,
+          ordem: params.ordem,
+        },
         signal: params.signal,
       },
     );
@@ -209,11 +263,61 @@ export function createOdaClient(
     return adaptOdaGroupResearchers(raw, page, size, normalizedBase);
   }
 
+  async function listStates(
+    options: GetOdaGroupOptions = {},
+  ): Promise<OdaStateOption[]> {
+    const raw = await requestJson('uf', odaStateListResponseSchema, {
+      signal: options.signal,
+    });
+    return adaptOdaStates(raw);
+  }
+
+  async function listKnowledgeAreas(
+    params: ListOdaKnowledgeAreasParams = {},
+  ): Promise<OdaKnowledgeAreaOption[]> {
+    const raw = await requestJson(
+      'area-conhecimento',
+      odaKnowledgeAreaListResponseSchema,
+      {
+        query: {
+          page: params.page ?? 1,
+          size: params.size ?? 100,
+          nome: params.nome?.trim() || undefined,
+          tipo: params.tipo,
+        },
+        signal: params.signal,
+      },
+    );
+    return adaptOdaKnowledgeAreas(raw);
+  }
+
+  async function listInstitutions(
+    params: ListOdaInstitutionsParams = {},
+  ): Promise<OdaInstitutionOption[]> {
+    const raw = await requestJson(
+      'instituicao',
+      odaInstitutionListResponseSchema,
+      {
+        query: {
+          page: params.page ?? 1,
+          size: params.size ?? 100,
+          nome: params.nome?.trim() || undefined,
+          uf: params.uf?.trim().toUpperCase() || undefined,
+        },
+        signal: params.signal,
+      },
+    );
+    return adaptOdaInstitutions(raw);
+  }
+
   return {
     isConfigured: Boolean(normalizedBase),
     listGroupsPage,
     getGroup,
     listGroupResearchers,
+    listStates,
+    listKnowledgeAreas,
+    listInstitutions,
   };
 }
 
