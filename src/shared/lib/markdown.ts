@@ -7,7 +7,10 @@ export type MarkdownBlock =
   | { kind: 'list'; ordered: boolean; start: number; items: string[] }
   | { kind: 'quote'; lines: string[] }
   | { kind: 'code'; text: string }
+  | { kind: 'table'; align: TableAlign[]; header: string[]; rows: string[][] }
   | { kind: 'rule' };
+
+export type TableAlign = 'left' | 'center' | 'right' | null;
 
 const HEADING = /^(#{1,6})\s+(.*)$/;
 const BULLET = /^\s*[-*+]\s+(.*)$/;
@@ -15,6 +18,53 @@ const ORDERED = /^\s*(\d+)[.)]\s+(.*)$/;
 const QUOTE = /^>\s?(.*)$/;
 const RULE = /^\s*([-*_])(\s*\1){2,}\s*$/;
 const FENCE = /^\s*```/;
+// Linha separadora de tabela GFM: `|---|:---:|---:|`.
+const TABLE_SEPARATOR = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+
+/**
+ * Células de uma linha de tabela GFM. `\|` e `|` dentro de código em linha
+ * não separam colunas; as bordas `|` do começo e do fim são opcionais.
+ */
+export function splitTableRow(line: string): string[] {
+  const cells: string[] = [];
+  let current = '';
+  let inCode = false;
+  const text = line.trim().replace(/^\|/, '');
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (char === '\\' && text[index + 1] === '|') {
+      current += '|';
+      index += 1;
+    } else if (char === '`') {
+      inCode = !inCode;
+      current += char;
+    } else if (char === '|' && !inCode) {
+      cells.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  // Sem `|` no fim, a última célula ainda conta (inclusive no streaming).
+  if (current.trim() !== '') cells.push(current.trim());
+  return cells;
+}
+
+function tableAlign(cell: string): TableAlign {
+  const left = cell.startsWith(':');
+  const right = cell.endsWith(':');
+  if (left && right) return 'center';
+  if (right) return 'right';
+  if (left) return 'left';
+  return null;
+}
+
+/** Começa uma tabela: linha com `|` seguida da linha separadora. */
+function isTableStart(lines: readonly string[], index: number): boolean {
+  const line = lines[index] ?? '';
+  const next = lines[index + 1] ?? '';
+  return line.includes('|') && next.includes('-') && TABLE_SEPARATOR.test(next);
+}
 
 export function parseMarkdownBlocks(source: string): MarkdownBlock[] {
   const lines = source.replace(/\r\n?/g, '\n').split('\n');
@@ -38,6 +88,28 @@ export function parseMarkdownBlocks(source: string): MarkdownBlock[] {
       }
       index += 1;
       blocks.push({ kind: 'code', text: code.join('\n') });
+      continue;
+    }
+
+    if (isTableStart(lines, index)) {
+      const header = splitTableRow(line);
+      const align = splitTableRow(lines[index + 1] ?? '').map(tableAlign);
+      index += 2;
+      const rows: string[][] = [];
+      while (index < lines.length) {
+        const current = lines[index] ?? '';
+        if (current.trim() === '' || !current.includes('|')) break;
+        const cells = splitTableRow(current);
+        // Cada linha fica com o número de colunas do cabeçalho.
+        rows.push(header.map((_, column) => cells[column] ?? ''));
+        index += 1;
+      }
+      blocks.push({
+        kind: 'table',
+        align: header.map((_, column) => align[column] ?? null),
+        header,
+        rows,
+      });
       continue;
     }
 
@@ -111,7 +183,8 @@ export function parseMarkdownBlocks(source: string): MarkdownBlock[] {
         BULLET.test(current) ||
         ORDERED.test(current) ||
         QUOTE.test(current) ||
-        FENCE.test(current)
+        FENCE.test(current) ||
+        isTableStart(lines, index)
       ) {
         break;
       }

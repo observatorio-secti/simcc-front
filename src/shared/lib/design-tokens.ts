@@ -630,6 +630,25 @@ export function statusColor(value: string | null | undefined): DictionaryColor {
   return key ? STATUS_COLORS[key] : FALLBACK_COLOR;
 }
 
+/**
+ * Situação da patente (`granted` da v2): concedida ou só depositada. Reusa as
+ * cores de status (concluída / em andamento).
+ */
+export const PATENT_GRANT_COLORS = {
+  granted: {
+    label: 'Concedidas',
+    bg: 'bg-status-concluida',
+    text: 'text-status-concluida',
+    borderLeft: 'border-l-status-concluida',
+  },
+  filed: {
+    label: 'Depositadas',
+    bg: 'bg-status-andamento',
+    text: 'text-status-andamento',
+    borderLeft: 'border-l-status-andamento',
+  },
+} as const satisfies Record<string, DictionaryColor>;
+
 // ---------------------------------------------------------------------------
 // Estado de execução (`run-*`): runs e etapas do ETL no console
 // ---------------------------------------------------------------------------
@@ -867,4 +886,58 @@ export function indexLevelColor(
 ): DictionaryColor {
   const key = indexLevelKey(value);
   return key ? INDEX_LEVEL_COLORS[key] : FALLBACK_COLOR;
+}
+
+// Territórios de identidade (mapa Leaflet, T2.3). O Leaflet pinta o SVG com
+// valores de cor, não com classes do tema: por isso esta paleta é hex. Tons
+// pastéis do mapa oficial da SEI (2021, Lei nº 14.172/2019), pelo código SEI.
+export const TERRITORY_FILL_COLORS: Record<string, string> = {
+  '1': '#ead091',
+  '2': '#bbda92',
+  '3': '#c9c0ed',
+  '4': '#cfe195',
+  '5': '#eaca7f',
+  '6': '#daac69',
+  '7': '#c1dd94',
+  '8': '#cec3ab',
+  '9': '#c5dc92',
+  '10': '#f2aed2',
+  '11': '#e9c67d',
+  '12': '#f6acd2',
+  '13': '#ead493',
+  '14': '#ebd798',
+  '15': '#f3aac5',
+  '16': '#e7db8d',
+  '17': '#e8ce8c',
+  '18': '#ecc17c',
+  '19': '#ecdcb0',
+  '20': '#e6d789',
+  '21': '#b0cae5',
+  '22': '#e8b2cd',
+  '23': '#f5aac4',
+  '24': '#e8df91',
+  '25': '#b8c5d3',
+  '26': '#e9bb78',
+  '27': '#c7bdec',
+};
+
+/** Traços e preenchimentos do mapa que não dependem do território. */
+export const TERRITORY_MAP_COLORS = {
+  /** Território ou município sem resultado. */
+  empty: '#e5e7eb',
+  /** Contorno do que está no filtro (`eng-blue`). */
+  selected: '#024a60',
+  /** Contorno do município sob o cursor. */
+  hover: '#171717',
+  /** Divisas entre territórios e municípios. */
+  border: '#ffffff',
+} as const;
+
+/** Preenchimento do território pelo código SEI (1 a 27). */
+export function territoryFill(
+  code: string | number | null | undefined,
+): string {
+  return (
+    TERRITORY_FILL_COLORS[String(code ?? '')] ?? TERRITORY_MAP_COLORS.empty
+  );
 }

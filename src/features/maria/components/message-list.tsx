@@ -4,7 +4,6 @@ import {
   CircleStop,
   Loader2,
   RotateCw,
-  Search,
   Sparkles,
   X,
 } from 'lucide-react';
@@ -23,30 +22,15 @@ const mariaColor = searchTypeColor('maria');
 
 function UserBubble({ text, time }: { text: string; time?: string }) {
   return (
-    <li data-slot="maria-user-message" className="flex justify-end">
-      <div className="flex max-w-[85%] flex-col items-end gap-1">
-        <p className="rounded-lg rounded-br-sm bg-eng-blue px-3.5 py-2 text-sm whitespace-pre-wrap text-white">
-          {text}
-        </p>
-        {time && (
-          <span className="text-[11px] text-muted-foreground">{time}</span>
-        )}
-      </div>
-    </li>
-  );
-}
-
-function AssistantAvatar() {
-  return (
-    <span
-      aria-hidden
-      className={cn(
-        'mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-white',
-        mariaColor.bg,
-      )}
+    <li
+      data-slot="maria-user-message"
+      className="flex flex-col gap-1 rounded-r-lg border-l-2 border-eng-blue bg-muted/60 px-4 py-3"
     >
-      <Sparkles className="size-4" />
-    </span>
+      <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{text}</p>
+      {time && (
+        <span className="text-[11px] text-muted-foreground">{time}</span>
+      )}
+    </li>
   );
 }
 
@@ -62,50 +46,45 @@ function AssistantMessage({
   return (
     <li
       data-slot="maria-assistant-message"
-      className="flex gap-3"
+      className="flex min-w-0 flex-col gap-3"
       aria-busy={busy || undefined}
     >
-      <AssistantAvatar />
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <span className="text-xs font-semibold text-foreground">
-          MarIA
-          {time && (
-            <span className="ml-2 font-normal text-muted-foreground">
-              {time}
-            </span>
+      <span className="flex items-center gap-2 text-sm font-semibold">
+        <span
+          aria-hidden
+          className={cn(
+            'grid size-6 shrink-0 place-items-center rounded-full text-white',
+            mariaColor.bg,
           )}
+        >
+          <Sparkles className="size-3.5" />
         </span>
-        {children}
-      </div>
+        MarIA
+        {time && (
+          <span className="text-xs font-normal text-muted-foreground">
+            {time}
+          </span>
+        )}
+      </span>
+      {children}
     </li>
   );
 }
 
+/** Linha "o que a MarIA está fazendo", só enquanto nada da resposta chegou. */
 function Activities({ stream }: { stream: ConversationStreamState }) {
-  const last = stream.activities.at(-1);
   const waiting = stream.status === 'streaming' && stream.blocks.length === 0;
-  if (!waiting && stream.activities.length === 0) return null;
-
+  if (!waiting) return null;
+  const last = stream.activities.at(-1);
   return (
-    <div
+    <p
       role="status"
       aria-live="polite"
-      className="flex flex-col gap-1 text-xs text-muted-foreground"
+      className="inline-flex items-center gap-1.5 text-sm text-muted-foreground"
     >
-      {waiting ? (
-        <span className="inline-flex items-center gap-1.5">
-          <Loader2 className="size-3.5 animate-spin" aria-hidden />
-          {last ? last.description : 'Pensando na resposta…'}
-        </span>
-      ) : (
-        <span className="inline-flex items-center gap-1.5">
-          <Search className="size-3.5" aria-hidden />
-          {stream.activities.length === 1
-            ? '1 consulta aos dados'
-            : `${stream.activities.length} consultas aos dados`}
-        </span>
-      )}
-    </div>
+      <Loader2 className="size-4 animate-spin text-eng-blue" aria-hidden />
+      {last ? last.description : 'Pensando…'}
+    </p>
   );
 }
 
@@ -139,7 +118,7 @@ function StreamOutcome({
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
         )}
         {stopped
-          ? 'Resposta interrompida. A pergunta não foi gravada na conversa.'
+          ? 'Resposta interrompida. Nada foi gravado.'
           : (stream.error?.message ?? 'Não foi possível obter a resposta.')}
       </span>
       <span className="flex gap-2">

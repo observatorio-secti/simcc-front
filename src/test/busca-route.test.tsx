@@ -19,6 +19,82 @@ function captureList(path: '/researcher' | '/production/article') {
   return { calls, handler };
 }
 
+const territoryGeoJson = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: {
+        id: '2913606',
+        name: 'Ilhéus',
+        territorio_id: '5',
+        territorio_identidade: 'LITORAL SUL',
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-39.1, -14.8],
+            [-39.0, -14.8],
+            [-39.0, -14.7],
+            [-39.1, -14.7],
+            [-39.1, -14.8],
+          ],
+        ],
+      },
+    },
+  ],
+};
+
+/** `/researcher` com a faceta `territory_city` quando a query pede o mapa. */
+function captureResearchersWithMap() {
+  const calls: URLSearchParams[] = [];
+  const handler = http.get(simccV2Url('/researcher'), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    calls.push(params);
+    const fixture = v2Fixtures['/researcher'];
+    if (!params.getAll('facets').includes('territory_city')) {
+      return HttpResponse.json(fixture);
+    }
+    return HttpResponse.json({
+      ...fixture,
+      facets: {
+        territory_city: {
+          param: ['identity_territory', 'city_code'],
+          total: 2,
+          covered: 5,
+          items: [
+            {
+              value: '5',
+              code: 5,
+              label: 'LITORAL SUL',
+              count: 4,
+              selected: params.getAll('identity_territory').includes('5'),
+              children: [
+                {
+                  value: '2913606',
+                  code: 2913606,
+                  label: 'Ilhéus',
+                  count: 4,
+                  selected: false,
+                },
+              ],
+            },
+            {
+              value: null,
+              code: null,
+              label: 'Sem território',
+              count: 1,
+              selected: false,
+            },
+          ],
+        },
+      },
+    });
+  });
+  return { calls, handler };
+}
+
 describe('Rota /busca (T2)', () => {
   it('busca pesquisadores com termo, KPIs, ranking e parâmetros da v2', async () => {
     const researchers = captureList('/researcher');
@@ -105,6 +181,36 @@ describe('Rota /busca (T2)', () => {
     await waitFor(() => {
       expect(router.state.location.search).toMatchObject({ qualis: ['A1'] });
     });
+  }, 15000);
+
+  it('divide o gráfico de patentes em concedidas e depositadas', async () => {
+    const metricCalls: URLSearchParams[] = [];
+    const metricSpy = http.get(
+      simccV2Url('/metrics/production/{kind}'),
+      ({ request }) => {
+        metricCalls.push(new URL(request.url).searchParams);
+        return undefined;
+      },
+    );
+    const { findByRole } = await renderRoute(
+      '/busca?q=solos&type=patent&tab=patents',
+      { handlers: [metricSpy] },
+    );
+
+    expect(
+      await findByRole('heading', {
+        name: 'Patentes por ano: concedidas e depositadas',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      await findByRole('img', {
+        name: 'Patentes por ano: concedidas e depositadas',
+      }),
+    ).toBeInTheDocument();
+    const granted = metricCalls
+      .filter((params) => params.get('q') === 'solos')
+      .map((params) => params.get('granted'));
+    expect(granted).toEqual(expect.arrayContaining(['true', 'false']));
   }, 15000);
 
   it('filtra por faceta usando o param da v2 e volta à página 1', async () => {
@@ -243,5 +349,58 @@ describe('Rota /busca (T2)', () => {
     });
     expect(router.state.location.pathname).toBe('/busca');
     expect(router.state.location.search).not.toHaveProperty('researcher');
+  }, 20000);
+
+  it('mostra o mapa por território e filtra pelo território clicado (T2.3)', async () => {
+    const researchers = captureResearchersWithMap();
+    const { findByRole, findByText, queryByText, router, user } =
+      await renderRoute('/busca?q=solos', {
+        handlers: [
+          researchers.handler,
+          http.get('*/territorio_relacionado.json', () =>
+            HttpResponse.json(territoryGeoJson),
+          ),
+        ],
+      });
+
+    expect(
+      await findByText('Pesquisadores com mais ocorrências'),
+    ).toBeInTheDocument();
+    await user.click(await findByRole('radio', { name: 'Ver no mapa' }));
+
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({ view: 'map' });
+    });
+    // O mapa é carregado sob demanda (Leaflet em chunk à parte).
+    const territory = await findByRole(
+      'button',
+      { name: /Litoral Sul/ },
+      { timeout: 5000 },
+    );
+    expect(
+      await findByText('1 pesquisador fora dos territórios da Bahia'),
+    ).toBeInTheDocument();
+    expect(queryByText('Pesquisadores com mais ocorrências')).toBeNull();
+
+    const mapCall = researchers.calls.find((params) =>
+      params.getAll('facets').includes('territory_city'),
+    )!;
+    expect(mapCall.get('q')).toBe('solos');
+    expect(mapCall.get('per_page')).toBe('1');
+    expect(mapCall.get('facet_limit')).toBe('100');
+    expect(mapCall.getAll('facets')).toEqual(['territory_city']);
+
+    await user.click(territory);
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({
+        view: 'map',
+        identity_territory: ['5'],
+      });
+    });
+    await waitFor(() => {
+      expect(researchers.calls.at(-1)!.getAll('identity_territory')).toEqual([
+        '5',
+      ]);
+    });
   }, 20000);
 });

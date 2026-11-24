@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { lazy, Suspense, useState, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import graduateBackground from '@kit/assets/backgrounds/graduate.png';
@@ -22,6 +22,11 @@ import {
 import { graduateProgramListQueryOptions } from '@/entities/graduate-program/queries';
 import { ProgramCard } from '@/entities/graduate-program/ui/program-card';
 import { ProgramRef } from '@/entities/graduate-program/ui/program-ref';
+import {
+  formatTerritoryName,
+  splitTerritoryFacet,
+  toggleCode,
+} from '@/entities/territory/model';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
@@ -39,6 +44,7 @@ import { Pagination } from '@/shared/ui/pagination';
 import { PillLink } from '@/shared/ui/pill-link';
 import { ResultToolbar } from '@/shared/ui/result-toolbar';
 import { SectionHeader } from '@/shared/ui/section-header';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { SortSelect } from '@/shared/ui/sort-select';
 import { StatCard } from '@/shared/ui/stat-card';
 import {
@@ -58,7 +64,12 @@ import {
   type GraduateProgramListSearchState,
   type GraduateProgramViewMode,
 } from './search';
-import { TerritoryMap } from './territory-map';
+
+const TerritoryMap = lazy(
+  () => import('@/entities/territory/ui/territory-map'),
+);
+
+const MAP_NOUN = ['programa', 'programas'] as const;
 
 const FACET_CONFIG: Record<string, FacetFieldConfig> = {
   area: {
@@ -77,6 +88,11 @@ const FACET_CONFIG: Record<string, FacetFieldConfig> = {
   institution: {
     label: 'Instituição',
     searchable: true,
+  },
+  identity_territory: {
+    label: 'Território de identidade',
+    searchable: true,
+    formatItemLabel: (item) => formatTerritoryName(item.label),
   },
   city: {
     label: 'Município',
@@ -110,7 +126,6 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
   const listQuery = useQuery(
     graduateProgramListQueryOptions(toGraduateProgramQueryParams(search)),
   );
-  const mapQuery = useQuery(graduateProgramListQueryOptions({ per_page: 100 }));
 
   function commitSearch(next: GraduateProgramListSearchState) {
     void navigate({
@@ -160,10 +175,27 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
     );
   }
 
-  function handleSelectMapCities(cities: string[]) {
+  function handleToggleTerritory(code: string) {
     commitSearch(
       graduateProgramListSearch.update(search, {
-        city: cities.length > 0 ? cities : undefined,
+        identity_territory: toggleCode(search.identity_territory, code),
+      }),
+    );
+  }
+
+  function handleToggleCity(ibge: string) {
+    commitSearch(
+      graduateProgramListSearch.update(search, {
+        city_code: toggleCode(search.city_code, ibge),
+      }),
+    );
+  }
+
+  function handleClearMap() {
+    commitSearch(
+      graduateProgramListSearch.update(search, {
+        identity_territory: undefined,
+        city_code: undefined,
       }),
     );
   }
@@ -175,9 +207,10 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
 
   const items = (listQuery.data?.data ?? []) as GraduateProgramSummary[];
   const pagination = listQuery.data?.pagination;
-  const facets = (listQuery.data?.facets ?? undefined) as FacetsMap | undefined;
-  const mapPrograms = (mapQuery.data?.data ??
-    items) as GraduateProgramSummary[];
+  const { territoryCity, rest: panelFacets } = splitTerritoryFacet(
+    listQuery.data?.facets,
+  );
+  const facets = panelFacets as FacetsMap | undefined;
 
   const facetPanelProps = {
     facets,
@@ -231,11 +264,21 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
               Clique em um território ou município para filtrar o catálogo
             </p>
           </div>
-          <TerritoryMap
-            programs={mapPrograms}
-            selectedCities={search.city ?? []}
-            onSelectCities={handleSelectMapCities}
-          />
+          <Suspense
+            fallback={<Skeleton className="h-[380px] w-full rounded-lg" />}
+          >
+            <TerritoryMap
+              facet={territoryCity}
+              loading={listQuery.isFetching}
+              selectedTerritories={search.identity_territory}
+              selectedCities={search.city_code}
+              onToggleTerritory={handleToggleTerritory}
+              onToggleCity={handleToggleCity}
+              onClear={handleClearMap}
+              noun={MAP_NOUN}
+              listTitle="Territórios com oferta"
+            />
+          </Suspense>
         </Card>
       </section>
 

@@ -3,6 +3,7 @@ import {
   activeTab,
   applyQuery,
   countTabFilters,
+  isMapView,
   resolveSort,
   resultsSearch,
   searchInFor,
@@ -10,6 +11,7 @@ import {
   toggleQualisFilter,
   toProductionMetricQuery,
   toProductionQuery,
+  toResearcherMapQuery,
   toResearcherQuery,
   toResearcherRankingQuery,
 } from './results-search';
@@ -145,6 +147,37 @@ describe('results-search (T2)', () => {
       sort_order: 'desc',
     });
     expect(ranking.facets).toBeUndefined();
+  });
+
+  it('pede só territory_city no mapa, com o mesmo recorte e limite por nível', () => {
+    const search = resultsSearch.parse(
+      'q=solos&view=map&identity_territory=5&city_code=2913606&page=3',
+    );
+    expect(isMapView(search)).toBe(true);
+    const map = toResearcherMapQuery(search);
+    expect(map).toMatchObject({
+      q: 'solos',
+      identity_territory: ['5'],
+      city_code: ['2913606'],
+      page: 1,
+      per_page: 1,
+      facets: ['territory_city'],
+      facet_limit: 100,
+    });
+    expect(map.include).toBeUndefined();
+    expect(map.matches_limit).toBeUndefined();
+    // A lista recebe os mesmos filtros de território e de município.
+    expect(toResearcherQuery(search)).toMatchObject({
+      identity_territory: ['5'],
+      city_code: ['2913606'],
+    });
+  });
+
+  it('a visão de mapa só vale nas abas de pesquisadores', () => {
+    expect(
+      isMapView(resultsSearch.parse('q=solos&tab=articles&view=map')),
+    ).toBe(false);
+    expect(isMapView(resultsSearch.parse('q=solos&view=list'))).toBe(false);
   });
 
   it('converte o estado em parâmetros de /v2/production/<kind> e de /v2/metrics', () => {

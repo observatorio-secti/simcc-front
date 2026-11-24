@@ -14,6 +14,7 @@ import {
   researcherDetailQueryOptions,
   researcherTermsQueryOptions,
 } from '@/entities/researcher/queries';
+import { patentGrantSeries } from '@/entities/production/ui/production-year-chart-data';
 import {
   MultiKindYearChart,
   ProductionMetricYearChart,
@@ -210,7 +211,7 @@ export function ResearcherProfilePage({
                 title="Gráfico de produção técnica por ano"
                 query={chartQuery}
                 kinds={[
-                  { kind: 'patent', label: 'Patentes' },
+                  ...patentGrantSeries('Patentes'),
                   { kind: 'software', label: 'Softwares' },
                   { kind: 'brand', label: 'Marcas' },
                 ]}

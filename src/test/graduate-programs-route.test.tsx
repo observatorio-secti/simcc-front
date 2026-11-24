@@ -8,7 +8,7 @@ import type {
 import { renderRoute } from './render-route';
 import { v2Fixtures } from './msw/fixtures';
 import { simccV2Url } from './msw/handlers';
-import type { TerritoryGeoJson } from '@/features/graduate-programs/territory-geo';
+import type { TerritoryGeoJson } from '@/entities/territory/geo';
 
 const testGeoJson: TerritoryGeoJson = {
   type: 'FeatureCollection',
@@ -16,9 +16,10 @@ const testGeoJson: TerritoryGeoJson = {
     {
       type: 'Feature',
       properties: {
+        id: '2927408',
         name: 'Salvador',
         territorio_id: '26',
-        territorio_identidade: 'METROPOLITANO DE SALVADOR',
+        territorio_identidade: 'METROPOLITANA DE SALVADOR',
       },
       geometry: {
         type: 'Polygon',
@@ -87,9 +88,13 @@ const programDetail: GraduateProgramDetail = {
   ],
 };
 
-function makeListHandler(items: GraduateProgramSummary[]) {
+function makeListHandler(
+  items: GraduateProgramSummary[],
+  calls: URLSearchParams[] = [],
+) {
   return http.get(simccV2Url('/graduate-program'), ({ request }) => {
     const url = new URL(request.url);
+    calls.push(url.searchParams);
     const q = url.searchParams.get('q')?.toLowerCase();
     const filtered = q
       ? items.filter(
@@ -128,6 +133,29 @@ function makeListHandler(items: GraduateProgramSummary[]) {
           total: 1,
           items: [{ value: 'Salvador', label: 'Salvador', count: 2 }],
         },
+        territory_city: {
+          param: ['identity_territory', 'city_code'],
+          total: 1,
+          covered: 2,
+          items: [
+            {
+              value: '26',
+              code: 26,
+              label: 'METROPOLITANA DE SALVADOR',
+              count: 2,
+              selected: url.searchParams.has('identity_territory'),
+              children: [
+                {
+                  value: '2927408',
+                  code: 2927408,
+                  label: 'Salvador',
+                  count: 2,
+                  selected: false,
+                },
+              ],
+            },
+          ],
+        },
       },
       meta: {
         took_ms: 5,
@@ -141,9 +169,10 @@ function makeListHandler(items: GraduateProgramSummary[]) {
 
 describe('Rotas de Pós-graduação (T5)', () => {
   it('renderiza landing com mapa, KPIs e catálogo em /pos-graduacao', async () => {
+    const calls: URLSearchParams[] = [];
     const { user, router } = await renderRoute('/pos-graduacao', {
       handlers: [
-        makeListHandler([programA, programB]),
+        makeListHandler([programA, programB], calls),
         http.get('*/territorio_relacionado.json', () =>
           HttpResponse.json(testGeoJson),
         ),
@@ -159,10 +188,37 @@ describe('Rotas de Pós-graduação (T5)', () => {
       screen.getByText('Programa de Pós-Graduação em Saúde Coletiva'),
     ).toBeInTheDocument();
 
-    // Mapa e legenda de territórios
-    expect(
-      await screen.findByText('METROPOLITANO DE SALVADOR'),
-    ).toBeInTheDocument();
+    // Mapa alimentado pela faceta territory_city, numa query só
+    // O mapa é carregado sob demanda (Leaflet em chunk à parte).
+    const territory = await screen.findByRole(
+      'button',
+      { name: /Metropolitana de Salvador/ },
+      { timeout: 5000 },
+    );
+    expect(calls.every((params) => params.get('per_page') !== '100')).toBe(
+      true,
+    );
+    expect(calls.at(-1)!.getAll('facets')).toContain('territory_city');
+    expect(calls.at(-1)!.get('facet_limit')).toBe('100');
+    // A faceta hierárquica não vira bloco do painel de filtros
+    expect(screen.queryByText('territory_city')).not.toBeInTheDocument();
+
+    // Clicar no território filtra por código SEI
+    await user.click(territory);
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({
+        identity_territory: ['26'],
+      });
+    });
+    expect(calls.at(-1)!.getAll('identity_territory')).toEqual(['26']);
+    await user.click(
+      await screen.findByRole('button', { name: /Metropolitana de Salvador/ }),
+    );
+    await waitFor(() => {
+      expect(router.state.location.search).not.toHaveProperty(
+        'identity_territory',
+      );
+    });
 
     // Busca textual atualiza URL e filtra resultados
     const searchInput = screen.getByPlaceholderText(
@@ -181,7 +237,7 @@ describe('Rotas de Pós-graduação (T5)', () => {
     expect(
       screen.queryByText('Programa de Pós-Graduação em Saúde Coletiva'),
     ).not.toBeInTheDocument();
-  });
+  }, 20000);
 
   it('alterna entre grade e tabela persistindo view na URL', async () => {
     const { user, router } = await renderRoute('/pos-graduacao', {

@@ -3,6 +3,7 @@ import {
   isUuid,
   legacyInstitutionTab,
   legacyParams,
+  legacyResultsToBusca,
   matchByAcronymOrName,
   matchByName,
   termsToQuery,
@@ -66,5 +67,24 @@ describe('resolução de identificadores', () => {
     expect(legacyInstitutionTab('programas_pos')).toBe('programs');
     expect(legacyInstitutionTab('docentes')).toBeUndefined();
     expect(legacyInstitutionTab('bolsistas')).toBeUndefined();
+  });
+});
+
+describe('legacyResultsToBusca: territórios', () => {
+  it('troca o nome do território pelo código SEI e mantém o desconhecido', () => {
+    const search = legacyResultsToBusca(
+      new URLSearchParams(
+        'terms=solos&identity_territory=EXTREMO SUL&identity_territory=Atlântida',
+      ),
+    );
+    expect(search.identity_territory).toEqual(['7', 'Atlântida']);
+  });
+
+  it('`tab=mapa` abre a visão de mapa da aba de pesquisadores', () => {
+    const search = legacyResultsToBusca(
+      new URLSearchParams('terms=solos&tab=mapa'),
+    );
+    expect(search.view).toBe('map');
+    expect(search.tab).toBeUndefined();
   });
 });

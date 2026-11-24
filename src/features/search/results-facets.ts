@@ -7,23 +7,8 @@ import {
   qualisFacetColor,
   qualisStatusKey,
 } from '@/shared/lib/design-tokens';
+import { titleCaseLabel } from '@/shared/lib/format';
 import type { FacetFieldConfig } from '@/shared/ui/facet-panel';
-
-const LOWERCASE_WORDS = new Set(['de', 'da', 'do', 'das', 'dos', 'e']);
-
-/** "METROPOLITANA DE SALVADOR" → "Metropolitana de Salvador". */
-export function titleCaseLabel(value: string): string {
-  return value
-    .toLocaleLowerCase('pt-BR')
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word, index) =>
-      index > 0 && LOWERCASE_WORDS.has(word)
-        ? word
-        : word.charAt(0).toLocaleUpperCase('pt-BR') + word.slice(1),
-    )
-    .join(' ');
-}
 
 /** Rótulo do `source_type` de `/v2/researcher` (faceta e tags do total). */
 export function sourceTypeLabel(value: string): string {

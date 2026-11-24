@@ -182,6 +182,7 @@ describe('MSW da API v2', () => {
           params: { path: { kind: 'article' } },
         }),
       ),
+      unwrap(simcc.GET('/metrics/general')),
     ];
 
     expect(calls).toHaveLength(Object.keys(v2Fixtures).length);

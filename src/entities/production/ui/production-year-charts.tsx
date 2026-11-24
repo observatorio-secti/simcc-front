@@ -100,31 +100,42 @@ export function ProductionMetricYearChart({
 export interface MultiKindSeriesConfig {
   kind: ProductionKind;
   label: string;
+  /** Chave da série; o padrão é o `kind` (use outra ao repetir o tipo). */
+  key?: string;
+  /** Filtros somados ao recorte do gráfico só nesta série (ex.: `granted`). */
+  filter?: Partial<ProductionYearChartQuery>;
+  /** Cor da série; o padrão é a cor do tipo. */
+  bgClassName?: string;
 }
 
 export interface MultiKindYearChartProps {
   title: string;
+  ariaLabel?: string;
   query: ProductionYearChartQuery;
   kinds: readonly MultiKindSeriesConfig[];
 }
 
 /**
- * Combina séries anuais de múltiplos tipos de produção (`/v2/metrics/production/{kind}`)
- * em um único gráfico de colunas empilhadas por ano.
+ * Combina séries anuais de `/v2/metrics/production/{kind}` (uma requisição
+ * por série: tipos diferentes ou o mesmo tipo com filtros diferentes) em um
+ * único gráfico de colunas empilhadas por ano.
  */
 export function MultiKindYearChart({
   title,
+  ariaLabel,
   query,
   kinds,
 }: MultiKindYearChartProps) {
   const queries = useQueries({
-    queries: kinds.map(({ kind }) => productionMetricQueryOptions(kind, query)),
+    queries: kinds.map(({ kind, filter }) =>
+      productionMetricQueryOptions(kind, { ...query, ...filter }),
+    ),
   });
 
   const isLoading = queries.some((q) => q.isLoading);
   const byPeriod = new Map<number, StackedYearPoint>();
 
-  kinds.forEach(({ kind }, idx) => {
+  kinds.forEach(({ kind, key = kind }, idx) => {
     const data = queries[idx]?.data?.data ?? [];
     for (const point of data) {
       if (point.value <= 0) continue;
@@ -136,21 +147,24 @@ export function MultiKindYearChart({
       existing.value += point.value;
       existing.groups = {
         ...existing.groups,
-        [kind]: (existing.groups?.[kind] ?? 0) + point.value,
+        [key]: (existing.groups?.[key] ?? 0) + point.value,
       };
       byPeriod.set(point.period, existing);
     }
   });
 
-  const series: StackedYearSeries[] = kinds.map(({ kind, label }) => ({
-    key: kind,
-    label,
-    bgClassName: productionColor(kind).bg,
-  }));
+  const series: StackedYearSeries[] = kinds.map(
+    ({ kind, key = kind, label, bgClassName }) => ({
+      key,
+      label,
+      bgClassName: bgClassName ?? productionColor(kind).bg,
+    }),
+  );
 
   return (
     <StackedYearChart
       title={title}
+      ariaLabel={ariaLabel}
       points={[...byPeriod.values()]}
       series={series}
       isLoading={isLoading}

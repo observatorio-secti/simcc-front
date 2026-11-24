@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Link } from '@tanstack/react-router';
 import researcherBackground from '@kit/assets/backgrounds/researcher.png';
 import {
   BarChart3,
@@ -13,7 +14,7 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react';
-import type { FacetResult } from '@/api/types';
+import type { FacetItem, FacetResult } from '@/api/types';
 import type { ProductionMetricPoint } from '@/entities/production/metric-queries';
 import {
   peakMetricPoint,
@@ -35,6 +36,20 @@ import { sourceTypeLabel } from '../results-facets';
 import { searchTypeBgClass, type SearchType } from '../search-schema';
 
 type FacetsRecord = Record<string, FacetResult> | null | undefined;
+
+type ValuedFacetItem = FacetItem & { value: string };
+
+/**
+ * Itens com valor. O `value` nulo só aparece no grupo "sem território" da
+ * faceta `territory_city`, que este resumo não usa.
+ */
+function valuedItems(
+  items: readonly FacetItem[] | undefined,
+): ValuedFacetItem[] {
+  return (items ?? []).filter(
+    (item): item is ValuedFacetItem => item.value !== null,
+  );
+}
 
 const QUERY_CAPTIONS: Record<SearchType, string> = {
   profile: 'em todo o perfil de',
@@ -121,6 +136,8 @@ export interface ResearcherSummaryProps {
   total: number | undefined;
   facets: FacetsRecord;
   loading: boolean;
+  /** Mostra o atalho "Ver no mapa" no card de territórios (fora da visão mapa). */
+  showMapLink?: boolean;
 }
 
 /** Card de total + 3 KPIs da aba de pesquisadores (template D). */
@@ -130,8 +147,9 @@ export function ResearcherSummary({
   total,
   facets,
   loading,
+  showMapLink = false,
 }: ResearcherSummaryProps) {
-  const sourceTypes = facets?.source_type?.items ?? [];
+  const sourceTypes = valuedItems(facets?.source_type?.items);
 
   return (
     <>
@@ -188,7 +206,19 @@ export function ResearcherSummary({
           value={facetTotal(facets, 'identity_territory')}
           loading={loading}
           caption="com pesquisadores no resultado"
-        />
+        >
+          {showMapLink && (
+            <Link
+              from="/busca"
+              to="."
+              search={(prev) => ({ ...prev, view: 'map' as const })}
+              resetScroll={false}
+              className="mt-2 inline-flex text-xs font-medium text-primary hover:underline"
+            >
+              Ver no mapa
+            </Link>
+          )}
+        </StatCard>
       </div>
     </>
   );
@@ -286,7 +316,7 @@ function facetItemsInScope(
   key: string,
   selected: readonly string[] | undefined,
 ) {
-  const items = facets?.[key]?.items ?? [];
+  const items = valuedItems(facets?.[key]?.items);
   if (!selected?.length) return items;
   const chosen = new Set(selected);
   return items.filter((item) => chosen.has(item.value));

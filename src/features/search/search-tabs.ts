@@ -196,8 +196,12 @@ const CHART_GROUP_SUFFIX = {
   type_participation: ' e tipo de participação',
 } as const;
 
-/** Título do gráfico por ano de uma aba de produção (ex.: "Artigos por ano e Qualis"). */
+/**
+ * Título do gráfico por ano de uma aba de produção (ex.: "Artigos por ano e
+ * Qualis"). Patentes se dividem em concedidas e depositadas (`granted`).
+ */
 export function productionChartTitle(kind: ProductionKind): string {
+  if (kind === 'patent') return 'Patentes por ano: concedidas e depositadas';
   const groupBy = defaultMetricGroupBy(kind);
   const suffix = groupBy ? CHART_GROUP_SUFFIX[groupBy] : '';
   return `${getProductionDefinition(kind).title} por ano${suffix}`;

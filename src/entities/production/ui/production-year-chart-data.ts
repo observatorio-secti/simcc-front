@@ -5,6 +5,7 @@ import type {
 import type { ProductionKind } from '@/entities/production/model';
 import {
   chartNeutralBg,
+  PATENT_GRANT_COLORS,
   eventNatureColor,
   eventNatureKey,
   orientationColor,
@@ -14,6 +15,7 @@ import {
   statusColor,
   statusKey,
 } from '@/shared/lib/design-tokens';
+import type { MultiKindSeriesConfig } from './production-year-charts';
 import type { StackedYearPoint, StackedYearSeries } from './stacked-year-chart';
 
 const QUALIS_SERIES: readonly StackedYearSeries[] = [
@@ -117,4 +119,31 @@ export function productionYearChartData(
   }
   const points = [...metric];
   return { points, series: groupedSeries(points, kind, groupBy) };
+}
+
+/**
+ * Patentes em duas séries, uma requisição cada: concedidas (`granted=true`)
+ * e só depositadas (`granted=false`). Somadas, dão o total de patentes.
+ */
+export function patentGrantSeries(
+  labelPrefix?: string,
+): MultiKindSeriesConfig[] {
+  const label = (text: string) =>
+    labelPrefix ? `${labelPrefix} ${text.toLowerCase()}` : text;
+  return [
+    {
+      kind: 'patent',
+      key: 'patent_granted',
+      label: label(PATENT_GRANT_COLORS.granted.label),
+      filter: { granted: true },
+      bgClassName: PATENT_GRANT_COLORS.granted.bg,
+    },
+    {
+      kind: 'patent',
+      key: 'patent_filed',
+      label: label(PATENT_GRANT_COLORS.filed.label),
+      filter: { granted: false },
+      bgClassName: PATENT_GRANT_COLORS.filed.bg,
+    },
+  ];
 }

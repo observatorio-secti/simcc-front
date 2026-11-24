@@ -22,6 +22,7 @@ describe('graduateProgramListSearch', () => {
       sort_by: 'name',
       sort_order: 'asc',
       facets: [...GRADUATE_PROGRAM_FACETS],
+      facet_limit: 100,
     });
   });
 

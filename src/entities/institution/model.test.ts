@@ -32,7 +32,7 @@ describe('tipos derivados do OpenAPI', () => {
       Schemas['InstitutionFilter']
     >();
     expectTypeOf<InstitutionScholarshipCount>().toEqualTypeOf<
-      Schemas['InstitutionScholarshipCount']
+      Schemas['ScholarshipBreakdownItem']
     >();
   });
 });

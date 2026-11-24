@@ -29,6 +29,10 @@ import {
   type ScholarshipSortBy,
 } from '@/entities/scholarship/model';
 import {
+  TERRITORY_CITY_FACET,
+  TERRITORY_FACET_LIMIT,
+} from '@/entities/territory/model';
+import {
   createListSearch,
   searchEnumArrayParam,
   searchStringArrayParam,
@@ -107,7 +111,8 @@ export const RESULTS_SORT_VALUES = [
   'jcr',
 ] as const;
 
-export const RESULTS_VIEW_MODES = ['grid', 'list'] as const;
+/** `map` só vale nas abas de pesquisadores (T2.3). */
+export const RESULTS_VIEW_MODES = ['grid', 'list', 'map'] as const;
 export type ResultsViewMode = (typeof RESULTS_VIEW_MODES)[number];
 
 export const resultsSearch = createListSearch({
@@ -118,6 +123,7 @@ export const resultsSearch = createListSearch({
     institution_id: searchStringArrayParam(),
     graduate_program_id: searchStringArrayParam(),
     city_id: searchStringArrayParam(),
+    city_code: searchStringArrayParam(),
     identity_territory: searchStringArrayParam(),
     graduation: searchStringArrayParam(),
     classification: searchEnumArrayParam(RESEARCHER_CLASSIFICATIONS),
@@ -158,6 +164,7 @@ export type ResultsFilterKey =
   | 'institution_id'
   | 'graduate_program_id'
   | 'city_id'
+  | 'city_code'
   | 'identity_territory'
   | 'graduation'
   | 'classification'
@@ -171,6 +178,7 @@ const COMMON_FILTERS = [
   'institution_id',
   'graduate_program_id',
   'city_id',
+  'city_code',
   'identity_territory',
 ] as const satisfies readonly ResultsFilterKey[];
 
@@ -459,6 +467,31 @@ export function toResearcherQuery(search: ResultsSearch): ResearcherSearch {
     facets: researcherFacets(search.type),
     ...(search.q ? { include: ['matches'], matches_limit: 1 } : {}),
   };
+}
+
+/**
+ * Mapa por território (T2.3): mesmo recorte da lista, só com a faceta
+ * `territory_city`. Fica numa query à parte para não pedir 100 valores das
+ * outras facetas nem mudar a chave da lista.
+ */
+export function toResearcherMapQuery(search: ResultsSearch): ResearcherSearch {
+  const {
+    include: _include,
+    matches_limit: _limit,
+    ...query
+  } = toResearcherQuery(search);
+  return {
+    ...query,
+    page: 1,
+    per_page: 1,
+    facets: [TERRITORY_CITY_FACET],
+    facet_limit: TERRITORY_FACET_LIMIT,
+  };
+}
+
+/** A visão de mapa só existe nas abas de pesquisadores. */
+export function isMapView(search: ResultsSearch): boolean {
+  return search.view === 'map' && activeTab(search).source === 'researcher';
 }
 
 const RANKING_SIZE = 10;

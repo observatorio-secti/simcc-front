@@ -120,3 +120,16 @@
     opacity: 1;
   }
 }
+
+/* Onda de gota nas perguntas restantes da MarIA (question-lives). */
+@keyframes maria-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0.6;
+  }
+  60%,
+  100% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 0;
+  }
+}

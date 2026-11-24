@@ -18,3 +18,19 @@ export function formatDate(value: string | null | undefined): string {
   const time = Date.parse(value);
   return Number.isNaN(time) ? '—' : dateFormat.format(time);
 }
+
+const LOWERCASE_WORDS = new Set(['de', 'da', 'do', 'das', 'dos', 'e']);
+
+/** "METROPOLITANA DE SALVADOR" → "Metropolitana de Salvador". */
+export function titleCaseLabel(value: string): string {
+  return value
+    .toLocaleLowerCase('pt-BR')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word, index) =>
+      index > 0 && LOWERCASE_WORDS.has(word)
+        ? word
+        : word.charAt(0).toLocaleUpperCase('pt-BR') + word.slice(1),
+    )
+    .join(' ');
+}

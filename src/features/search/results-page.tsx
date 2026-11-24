@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { magazineListQueryOptions } from '@/entities/magazine/queries';
@@ -8,9 +8,14 @@ import {
 } from '@/entities/production/metric-queries';
 import type { ProductionKind } from '@/entities/production/model';
 import { productionListQueryOptions } from '@/entities/production/queries';
-import { ProductionYearChart } from '@/entities/production/ui/production-year-charts';
+import { patentGrantSeries } from '@/entities/production/ui/production-year-chart-data';
+import {
+  MultiKindYearChart,
+  ProductionYearChart,
+} from '@/entities/production/ui/production-year-charts';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { scholarshipListQueryOptions } from '@/entities/scholarship/queries';
+import { splitTerritoryFacet, toggleCode } from '@/entities/territory/model';
 import {
   FacetPanel,
   FacetSheet,
@@ -18,6 +23,7 @@ import {
   type FacetsMap,
 } from '@/shared/ui/facet-panel';
 import { ResultToolbar } from '@/shared/ui/result-toolbar';
+import { Skeleton } from '@/shared/ui/skeleton';
 import type { SortSelection } from '@/shared/ui/sort-select';
 import {
   MagazineResults,
@@ -38,6 +44,7 @@ import {
   activeTab,
   applyQuery,
   countTabFilters,
+  isMapView,
   resolveSort,
   RESULTS_FACET_ORDER,
   resultsSearch,
@@ -45,6 +52,7 @@ import {
   toMagazineQuery,
   toProductionMetricQuery,
   toProductionQuery,
+  toResearcherMapQuery,
   toResearcherQuery,
   toResearcherRankingQuery,
   toScholarshipQuery,
@@ -62,6 +70,12 @@ export interface SearchResultsPageProps {
   /** Abre a produção como overlay (T13; quem monta a rota decide a navegação). */
   onOpenProduction: (kind: ProductionKind, id: string) => void;
 }
+
+const TerritoryMap = lazy(
+  () => import('@/entities/territory/ui/territory-map'),
+);
+
+const MAP_NOUN = ['pesquisador', 'pesquisadores'] as const;
 
 // Sem aba de produção ativa, as queries de produção ficam desligadas; o tipo
 // abaixo só satisfaz a assinatura.
@@ -99,10 +113,17 @@ export function SearchResultsPage({
     placeholderData: keepPreviousData,
   });
 
+  const showMap = isMapView(search);
+  const mapQuery = useQuery({
+    ...researcherListQueryOptions(toResearcherMapQuery(search)),
+    enabled: showMap,
+    placeholderData: keepPreviousData,
+  });
+
   const rankingFromList = sort.sort_by === 'matches' && search.page === 1;
   const rankingQuery = useQuery({
     ...researcherListQueryOptions(toResearcherRankingQuery(search)),
-    enabled: isResearcherTab && hasQuery && !rankingFromList,
+    enabled: isResearcherTab && hasQuery && !rankingFromList && !showMap,
   });
 
   const productionQuery = useQuery({
@@ -142,7 +163,8 @@ export function SearchResultsPage({
     scholarship: scholarshipQuery,
     magazine: magazineQuery,
   }[tab.source];
-  const facets = listQuery.data?.facets ?? null;
+  // `territory_city` só vem na query do mapa, mas nunca vai ao painel.
+  const facets = splitTerritoryFacet(listQuery.data?.facets).rest ?? null;
   const activeFiltersCount = countTabFilters(search, tab);
 
   function commit(next: ResultsSearch) {
@@ -154,6 +176,18 @@ export function SearchResultsPage({
     options?: { resetPage?: boolean },
   ) {
     commit(resultsSearch.update(search, patch, options));
+  }
+
+  function handleToggleTerritory(code: string) {
+    update({ identity_territory: toggleCode(search.identity_territory, code) });
+  }
+
+  function handleToggleCity(ibge: string) {
+    update({ city_code: toggleCode(search.city_code, ibge) });
+  }
+
+  function handleClearMap() {
+    update({ identity_territory: undefined, city_code: undefined });
   }
 
   function handleSortChange(next: SortSelection) {
@@ -241,8 +275,9 @@ export function SearchResultsPage({
               total={researcherQuery.data?.pagination.total_items}
               facets={researcherQuery.data?.facets}
               loading={researcherQuery.isPending}
+              showMapLink={!showMap}
             />
-            {hasQuery && (
+            {hasQuery && !showMap && (
               <ResearcherRanking
                 researchers={rankingResearchers}
                 type={type}
@@ -272,6 +307,27 @@ export function SearchResultsPage({
                   { view: nextView === 'grid' ? undefined : nextView },
                   { resetPage: false },
                 )
+              }
+              map={
+                <Suspense
+                  fallback={
+                    <Skeleton className="h-[380px] w-full rounded-lg" />
+                  }
+                >
+                  <TerritoryMap
+                    facet={
+                      splitTerritoryFacet(mapQuery.data?.facets).territoryCity
+                    }
+                    loading={mapQuery.isFetching}
+                    selectedTerritories={search.identity_territory}
+                    selectedCities={search.city_code}
+                    onToggleTerritory={handleToggleTerritory}
+                    onToggleCity={handleToggleCity}
+                    onClear={handleClearMap}
+                    noun={MAP_NOUN}
+                    listTitle="Territórios com pesquisadores"
+                  />
+                </Suspense>
               }
             />
           </>
@@ -327,20 +383,28 @@ export function SearchResultsPage({
               metric={metricQuery.data?.data}
               metricLoading={metricQuery.isPending}
             />
-            <ProductionYearChart
-              title={productionChartTitle(tab.kind)}
-              kind={tab.kind}
-              groupBy={defaultMetricGroupBy(tab.kind)}
-              metric={metricQuery.data?.data}
-              isLoading={metricQuery.isPending}
-              {...(tab.kind === 'article'
-                ? {
-                    selectedKeys: search.qualis,
-                    onToggleKey: (stratum: string) =>
-                      update(toggleQualisFilter(search, stratum)),
-                  }
-                : {})}
-            />
+            {tab.kind === 'patent' ? (
+              <MultiKindYearChart
+                title={productionChartTitle(tab.kind)}
+                query={toProductionMetricQuery(tab.kind, search)}
+                kinds={patentGrantSeries()}
+              />
+            ) : (
+              <ProductionYearChart
+                title={productionChartTitle(tab.kind)}
+                kind={tab.kind}
+                groupBy={defaultMetricGroupBy(tab.kind)}
+                metric={metricQuery.data?.data}
+                isLoading={metricQuery.isPending}
+                {...(tab.kind === 'article'
+                  ? {
+                      selectedKeys: search.qualis,
+                      onToggleKey: (stratum: string) =>
+                        update(toggleQualisFilter(search, stratum)),
+                    }
+                  : {})}
+              />
+            )}
             <ProductionResults
               {...listCallbacks}
               onOpenProduction={onOpenProduction}
