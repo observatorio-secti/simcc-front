@@ -328,9 +328,7 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       screen.getByRole('link', { name: /Espelho DGP CNPq/i }),
     ).toHaveAttribute('href', 'https://dgp.cnpq.br/dgp/espelhogrupo/1001');
 
-    expect(
-      await screen.findByText(/Lideranças? do grupo/),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Lideranças? do grupo/)).toBeInTheDocument();
     const leaderLink = await screen.findByRole('link', { name: 'Ana Souza' });
     expect(leaderLink).toHaveAttribute(
       'href',
@@ -377,9 +375,10 @@ describe('Rotas de grupos de pesquisa (T6)', () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText('Liderança do grupo')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'Carlos Lima' }),
-    ).toHaveAttribute('href', '/busca?q=Carlos+Lima&type=name');
+    expect(screen.getByRole('link', { name: 'Carlos Lima' })).toHaveAttribute(
+      'href',
+      '/busca?q=Carlos+Lima&type=name',
+    );
   }, 15000);
 
   it('navega direto para /pesquisadores/$lattesId ao clicar no nome sem buscar por nome', async () => {

@@ -4,11 +4,8 @@ import { cn } from '@/shared/lib/cn';
 import { chartNeutralBg } from '@/shared/lib/design-tokens';
 import { Card } from '@/shared/ui/card';
 import { SectionHeader } from '@/shared/ui/section-header';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/shared/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui/tooltip';
+import { getYearLabelStep } from './year-label-step';
 
 export interface StackedYearSeries {
   /** Chave do grupo presente em `groups` (ex.: `A1`, `book`, `CONCLUIDO`). */
@@ -44,14 +41,6 @@ export interface StackedYearChartProps {
 }
 
 const CHART_HEIGHT_PX = 144;
-
-/** Define o intervalo de exibição dos rótulos no eixo X para evitar sobreposição. */
-export function getYearLabelStep(total: number): number {
-  if (total <= 14) return 1;
-  if (total <= 28) return 2;
-  if (total <= 45) return 3;
-  return Math.ceil(total / 12);
-}
 
 function resolveSeriesList(
   points: readonly StackedYearPoint[],
