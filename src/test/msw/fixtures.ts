@@ -659,4 +659,17 @@ export const v2Fixtures: V2Fixtures = {
     filters_applied: {},
     meta: openApiMeta,
   },
+  '/metrics/general': {
+    data: {
+      articles: 412000,
+      books: 9800,
+      book_chapters: 31000,
+      work_in_event: 158000,
+      patents: 1200,
+      software: 2100,
+      brands: 640,
+      researchers: 16900,
+    },
+    meta: openApiMeta,
+  },
 };

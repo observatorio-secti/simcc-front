@@ -10,7 +10,13 @@ describe('InstitutionCard', () => {
           id: 'f1ac00a8-15d9-4306-a893-c611636601d6',
           name: 'UFBA - Universidade Federal Da Bahia',
           acronym: 'UFBA',
-          counts: { researchers: 2450, graduate_programs: 84, labs: 183 },
+          counts: {
+            researchers: 2450,
+            graduate_programs: 84,
+            scholarship_holders: 0,
+            research_groups: 0,
+            labs: 183,
+          },
         }}
         researchGroupsCount={412}
       />,
@@ -61,7 +67,13 @@ describe('InstitutionCard', () => {
           name: 'Centro Universitário SENAI CIMATEC',
           acronym: 'CIMATEC',
         }}
-        counts={{ researchers: 164, graduate_programs: 6 }}
+        counts={{
+          researchers: 164,
+          graduate_programs: 6,
+          scholarship_holders: 0,
+          research_groups: 0,
+          labs: 0,
+        }}
       />,
     );
 

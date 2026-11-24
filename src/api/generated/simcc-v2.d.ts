@@ -743,9 +743,29 @@ export interface paths {
         /**
          * Get Production Metric
          * @description Série anual de produções de um tipo, com os mesmos filtros de
-         *     `/v2/production/{kind}`.
+         *     `/v2/production/{kind}` e agrupamento opcional (`group_by`).
          */
         get: operations["get_production_metric_metrics_production__kind__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/general": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get General Metrics
+         * @description Métricas gerais únicas da plataforma (MVs canônicas + cache Redis).
+         */
+        get: operations["get_general_metrics_metrics_general_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -991,8 +1011,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -1272,8 +1297,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -1453,8 +1483,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -1609,8 +1644,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -1744,6 +1784,11 @@ export interface components {
         /** DetailResponse[EventWorkDetail] */
         DetailResponse_EventWorkDetail_: {
             data: components["schemas"]["EventWorkDetail"];
+            meta: components["schemas"]["Meta"];
+        };
+        /** DetailResponse[GeneralMetrics] */
+        DetailResponse_GeneralMetrics_: {
+            data: components["schemas"]["GeneralMetrics"];
             meta: components["schemas"]["Meta"];
         };
         /** DetailResponse[GraduateProgramDetail] */
@@ -1991,8 +2036,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -2262,8 +2312,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -2354,9 +2409,9 @@ export interface components {
         FacetItem: {
             /**
              * Value
-             * @description Valor a enviar no filtro correspondente
+             * @description Valor a enviar no filtro correspondente. Nulo só no grupo sem território da faceta territory_city
              */
-            value: string;
+            value: string | null;
             /**
              * Label
              * @description Texto de exibição
@@ -2373,11 +2428,21 @@ export interface components {
              */
             acronym?: string | null;
             /**
+             * Code
+             * @description Código estável: SEI (1 a 27) para território, IBGE (7 dígitos) para cidade
+             */
+            code?: number | null;
+            /**
              * Selected
              * @description Se o valor está aplicado no filtro atual
              * @default false
              */
             selected: boolean;
+            /**
+             * Children
+             * @description Valores do nível seguinte, em facetas hierárquicas (ex.: municípios de um território). O facet_limit vale por nível
+             */
+            children?: components["schemas"]["FacetItem"][] | null;
         };
         /**
          * FacetResult
@@ -2406,6 +2471,11 @@ export interface components {
              * @description Quantidade de valores distintos com resultados
              */
             total: number;
+            /**
+             * Covered
+             * @description Itens distintos do resultado com algum valor na faceta. Use no lugar da soma dos count, que conta em dobro itens com mais de um valor
+             */
+            covered?: number | null;
             /**
              * Items
              * @description Valores mais frequentes e os valores selecionados
@@ -2454,6 +2524,57 @@ export interface components {
              * @description Bolsas
              */
             scholarship_quantity?: number | null;
+        };
+        /** GeneralMetrics */
+        GeneralMetrics: {
+            /**
+             * Articles
+             * @description Total de artigos únicos
+             * @default 0
+             */
+            articles: number;
+            /**
+             * Books
+             * @description Total de livros únicos
+             * @default 0
+             */
+            books: number;
+            /**
+             * Book Chapters
+             * @description Total de capítulos de livros únicos
+             * @default 0
+             */
+            book_chapters: number;
+            /**
+             * Work In Event
+             * @description Total de trabalhos em eventos únicos
+             * @default 0
+             */
+            work_in_event: number;
+            /**
+             * Patents
+             * @description Total de patentes únicas
+             * @default 0
+             */
+            patents: number;
+            /**
+             * Software
+             * @description Total de softwares únicos
+             * @default 0
+             */
+            software: number;
+            /**
+             * Brands
+             * @description Total de marcas únicas
+             * @default 0
+             */
+            brands: number;
+            /**
+             * Researchers
+             * @description Total de pesquisadores cadastrados
+             * @default 0
+             */
+            researchers: number;
         };
         /** GraduateProgramCounts */
         GraduateProgramCounts: {
@@ -2606,6 +2727,16 @@ export interface components {
              * @description Cidade
              */
             city?: string[];
+            /**
+             * City Code
+             * @description Código IBGE (7 dígitos) do município da sede
+             */
+            city_code?: string[];
+            /**
+             * Identity Territory
+             * @description Território de identidade da sede: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
         };
         /** GraduateProgramLink */
         GraduateProgramLink: {
@@ -2777,8 +2908,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -2891,41 +3027,22 @@ export interface components {
             graduate_programs: number;
             /**
              * Scholarship Holders
-             * @description Pesquisadores bolsistas distintos vinculados à instituição
+             * @description Pesquisadores bolsistas vinculados à instituição
              * @default 0
              */
-            scholarship_holders?: number;
+            scholarship_holders: number;
             /**
              * Research Groups
              * @description Grupos de pesquisa vinculados à instituição
              * @default 0
              */
-            research_groups?: number;
+            research_groups: number;
             /**
              * Labs
              * @description Laboratórios vinculados à instituição
              * @default 0
              */
-            labs?: number;
-        };
-        /** InstitutionScholarshipCount */
-        InstitutionScholarshipCount: {
-            /**
-             * Modality
-             * @description Modalidade da bolsa
-             */
-            modality?: string | null;
-            /**
-             * Category Level
-             * @description Nível/categoria da bolsa
-             */
-            category_level?: string | null;
-            /**
-             * Researchers
-             * @description Quantidade de bolsistas distintos
-             * @default 0
-             */
-            researchers: number;
+            labs: number;
         };
         /** InstitutionDetail */
         InstitutionDetail: {
@@ -2980,7 +3097,7 @@ export interface components {
              * Scholarships
              * @description Detalhamento de bolsistas por modalidade e nível
              */
-            scholarships?: components["schemas"]["InstitutionScholarshipCount"][];
+            scholarships?: components["schemas"]["ScholarshipBreakdownItem"][];
         };
         /** InstitutionFilter */
         InstitutionFilter: {
@@ -3255,8 +3372,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -3546,8 +3668,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -3670,8 +3797,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -3695,7 +3827,7 @@ export interface components {
             kind: "article" | "book" | "book_chapter" | "software" | "patent" | "event" | "research_project" | "brand" | "guidance" | "report" | "magazine_text" | "event_work";
             /**
              * Group By
-             * @description Dimensão de agrupamento aplicada na série
+             * @description Dimensão de agrupamento aplicada
              */
             group_by?: string | null;
             /**
@@ -3832,8 +3964,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -4104,8 +4241,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -4401,8 +4543,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE (7 dígitos) dos municípios de vínculo
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos
+             * @description Territórios de identidade dos vínculos: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -4555,6 +4702,24 @@ export interface components {
              */
             scholarship_quantity?: number | null;
         };
+        /** ScholarshipBreakdownItem */
+        ScholarshipBreakdownItem: {
+            /**
+             * Modality
+             * @description Modalidade da bolsa
+             */
+            modality?: string | null;
+            /**
+             * Category Level
+             * @description Categoria/nível (ex.: 1A, 1B, 2)
+             */
+            category_level?: string | null;
+            /**
+             * Researchers
+             * @description Quantidade distinta de pesquisadores bolsistas
+             */
+            researchers: number;
+        };
         /** ScholarshipFilter */
         ScholarshipFilter: {
             /**
@@ -4633,7 +4798,7 @@ export interface components {
             value: number;
             /**
              * Groups
-             * @description Contagem por categoria quando `group_by` é informado
+             * @description Quebra por valor da dimensão de agrupamento (presente quando group_by é informado)
              */
             groups?: {
                 [key: string]: number;
@@ -4737,8 +4902,13 @@ export interface components {
              */
             city_id?: string[];
             /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
              * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
             /**
@@ -4982,7 +5152,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos */
+                /** @description Códigos IBGE (7 dígitos) dos municípios de vínculo */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Maior titulação (ex.: Doutorado) */
                 graduation?: string[];
@@ -5004,7 +5176,7 @@ export interface operations {
                 sort_by?: "name" | "id" | "relevance" | "matches";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: ("asc" | "desc") | null;
-                /** @description Lista de facets opt-in (area, city, classification, graduate_program, graduation, identity_territory, institution, modality, source_type, year) */
+                /** @description Lista de facets opt-in (area, city, classification, graduate_program, graduation, identity_territory, institution, modality, source_type, territory_city, year) */
                 facets?: string[];
                 /** @description Recursos adicionais opt-in (ex.: matches) */
                 include?: string[];
@@ -5047,6 +5219,7 @@ export interface operations {
             };
             header?: never;
             path: {
+                /** @description ID (UUID) ou Lattes ID do pesquisador */
                 researcher_id: string;
             };
             cookie?: never;
@@ -5087,6 +5260,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description ID (UUID) ou Lattes ID do pesquisador */
                 researcher_id: string;
             };
             cookie?: never;
@@ -5221,11 +5395,15 @@ export interface operations {
                 state?: string[];
                 /** @description Cidade */
                 city?: string[];
+                /** @description Código IBGE (7 dígitos) do município da sede */
+                city_code?: string[];
+                /** @description Território de identidade da sede: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
                 /** @description Campo para ordenação */
                 sort_by?: "name" | "acronym";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in (institution, area, modality, rating, state, city) */
+                /** @description Lista de facets opt-in (institution, area, modality, rating, state, city, identity_territory, territory_city) */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -5313,7 +5491,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -5335,7 +5515,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "citations" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -5423,7 +5603,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -5437,7 +5619,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -5525,7 +5707,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -5539,7 +5723,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -5627,7 +5811,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -5641,7 +5827,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -5729,7 +5915,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -5747,7 +5935,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -5835,7 +6023,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -5855,7 +6045,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -5943,7 +6133,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -5961,7 +6153,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -6049,7 +6241,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -6065,7 +6259,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -6153,7 +6347,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -6173,7 +6369,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -6261,7 +6457,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -6275,7 +6473,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -6363,7 +6561,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -6379,7 +6579,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -6467,7 +6667,9 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
@@ -6485,7 +6687,7 @@ export interface operations {
                 sort_by?: "relevance" | "year" | "title";
                 /** @description Direção da ordenação (asc/desc) */
                 sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
@@ -6767,6 +6969,8 @@ export interface operations {
     get_production_metric_metrics_production__kind__get: {
         parameters: {
             query?: {
+                /** @description Dimensão para quebra por categoria dentro de cada ano (ex.: qualis em article; nature/status em guidance; nature/type_participation em event; status/nature em research-project) */
+                group_by?: string | null;
                 /** @description Termo para busca textual */
                 q?: string | null;
                 /** @description Ano inicial */
@@ -6781,15 +6985,15 @@ export interface operations {
                 graduate_program_id?: string[];
                 /** @description IDs das cidades de vínculo dos autores da plataforma */
                 city_id?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma */
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
                 identity_territory?: string[];
                 /** @description Grande Área do Conhecimento dos autores da plataforma */
                 area?: string[];
                 /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
                 collection?: string[];
-                /** @description Dimensão de agrupamento por ano (ex.: qualis, nature, status, type_participation) */
-                group_by?: string | null;
-                /** @description Estrato Qualis (article) */
+                /** @description Estrato Qualis (A1...C) ou ausência (not_rated, not_applicable). Aceita também SQ e NP (apenas article) */
                 qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "not_rated" | "not_applicable")[];
                 /** @description Filtrar apenas artigos com PDF em acesso aberto (article) */
                 has_open_access?: boolean | null;
@@ -6797,20 +7001,25 @@ export interface operations {
                 magazine_name?: string[];
                 /** @description ISSN do periódico (article) */
                 issn?: string[];
-                /** @description Natureza (guidance, event, research-project) */
+                /** @description Categoria da patente (patent) */
+                category?: string[];
+                /** @description Apenas patentes concedidas (true) ou não (false) (patent) */
+                granted?: boolean | null;
+                /** @description Natureza da produção (event, research-project, brand, guidance, magazine-text, event-work) */
                 nature?: string[];
-                /** @description Situação (guidance, research-project) */
-                status?: string[];
-                /** @description Tipo (guidance) */
-                type?: string[];
-                /** @description Tipo de participação (event) */
+                /** @description Tipo de participação em evento (event) */
                 type_participation?: string[];
-                /** @description Forma de participação (event) */
+                /** @description Forma de participação em evento (event) */
                 form_participation?: string[];
+                /** @description Situação (research-project, guidance) */
+                status?: string[];
+                /** @description Tipo de orientação (guidance) */
+                type?: string[];
+                /** @description Classificação do evento (event-work) */
+                event_classification?: string[];
             };
             header?: never;
             path: {
-                /** @description Tipo de produção */
                 kind: "article" | "book" | "book-chapter" | "software" | "patent" | "event" | "research-project" | "brand" | "guidance" | "report" | "magazine-text" | "event-work";
             };
             cookie?: never;
@@ -6824,6 +7033,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProductionMetricResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_general_metrics_metrics_general_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailResponse_GeneralMetrics_"];
+                };
+            };
+            /** @description Recurso não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description Parâmetros inválidos */

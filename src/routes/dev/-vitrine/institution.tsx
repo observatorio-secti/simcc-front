@@ -19,7 +19,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Universidade Federal Da Bahia',
       acronym: 'UFBA',
     },
-    counts: { researchers: 2450, graduate_programs: 84 },
+    counts: {
+      researchers: 2450,
+      graduate_programs: 84,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
     researchGroupsCount: 412,
   },
   {
@@ -28,7 +34,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Universidade Estadual De Santa Cruz',
       acronym: 'UESC',
     },
-    counts: { researchers: 618, graduate_programs: 26 },
+    counts: {
+      researchers: 618,
+      graduate_programs: 26,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
     researchGroupsCount: 115,
   },
   {
@@ -37,7 +49,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Universidade Estadual De Feira De Santana',
       acronym: 'UEFS',
     },
-    counts: { researchers: 780, graduate_programs: 24 },
+    counts: {
+      researchers: 780,
+      graduate_programs: 24,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -45,7 +63,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Universidade Estadual Do Sudoeste Da Bahia',
       acronym: 'UESB',
     },
-    counts: { researchers: 710, graduate_programs: 22 },
+    counts: {
+      researchers: 710,
+      graduate_programs: 22,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -53,7 +77,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Universidade Do Estado Da Bahia',
       acronym: 'UNEB',
     },
-    counts: { researchers: 1120, graduate_programs: 28 },
+    counts: {
+      researchers: 1120,
+      graduate_programs: 28,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -61,7 +91,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Universidade Federal Do Recôncavo Da Bahia',
       acronym: 'UFRB',
     },
-    counts: { researchers: 495, graduate_programs: 18 },
+    counts: {
+      researchers: 495,
+      graduate_programs: 18,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -69,7 +105,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Universidade Federal Do Oeste Da Bahia',
       acronym: 'UFOB',
     },
-    counts: { researchers: 312, graduate_programs: 9 },
+    counts: {
+      researchers: 312,
+      graduate_programs: 9,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -77,7 +119,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Universidade Federal Do Sul Da Bahia',
       acronym: 'UFSB',
     },
-    counts: { researchers: 284, graduate_programs: 11 },
+    counts: {
+      researchers: 284,
+      graduate_programs: 11,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -85,7 +133,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Instituto Federal De Educação, Ciência E Tecnologia Da Bahia',
       acronym: 'IFBA',
     },
-    counts: { researchers: 540, graduate_programs: 12 },
+    counts: {
+      researchers: 540,
+      graduate_programs: 12,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -93,7 +147,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Escola Bahiana De Medicina E Saúde Pública',
       acronym: 'EBMSP',
     },
-    counts: { researchers: 196, graduate_programs: 5 },
+    counts: {
+      researchers: 196,
+      graduate_programs: 5,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -101,7 +161,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Fundação Oswaldo Cruz',
       acronym: 'FIOCRUZ',
     },
-    counts: { researchers: 145, graduate_programs: 4 },
+    counts: {
+      researchers: 145,
+      graduate_programs: 4,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
   },
   {
     institution: {
@@ -109,7 +175,13 @@ const SAMPLE_INSTITUTIONS: InstitutionDemoItem[] = [
       name: 'Centro Universitário SENAI CIMATEC',
       acronym: 'CIMATEC',
     },
-    counts: { researchers: 164, graduate_programs: 6 },
+    counts: {
+      researchers: 164,
+      graduate_programs: 6,
+      scholarship_holders: 0,
+      research_groups: 0,
+      labs: 0,
+    },
     researchGroupsCount: 28,
   },
   {

@@ -39273,8 +39273,8 @@
         "id": "2903409",
         "name": "Belmonte",
         "description": "Belmonte",
-        "territorio_identidade": "EXTREMO SUL",
-        "territorio_id": "7"
+        "territorio_identidade": "COSTA DO DESCOBRIMENTO",
+        "territorio_id": "27"
       },
       "geometry": {
         "type": "Polygon",
@@ -39638,8 +39638,8 @@
         "id": "2910727",
         "name": "Eunápolis",
         "description": "Eunápolis",
-        "territorio_identidade": "EXTREMO SUL",
-        "territorio_id": "7"
+        "territorio_identidade": "COSTA DO DESCOBRIMENTO",
+        "territorio_id": "27"
       },
       "geometry": {
         "type": "Polygon",
@@ -39743,8 +39743,8 @@
         "id": "2911808",
         "name": "Guaratinga",
         "description": "Guaratinga",
-        "territorio_identidade": "EXTREMO SUL",
-        "territorio_id": "7"
+        "territorio_identidade": "COSTA DO DESCOBRIMENTO",
+        "territorio_id": "27"
       },
       "geometry": {
         "type": "Polygon",
@@ -40092,8 +40092,8 @@
         "id": "2914653",
         "name": "Itabela",
         "description": "Itabela",
-        "territorio_identidade": "EXTREMO SUL",
-        "territorio_id": "7"
+        "territorio_identidade": "COSTA DO DESCOBRIMENTO",
+        "territorio_id": "27"
       },
       "geometry": {
         "type": "Polygon",
@@ -40191,8 +40191,8 @@
         "id": "2915304",
         "name": "Itagimirim",
         "description": "Itagimirim",
-        "territorio_identidade": "EXTREMO SUL",
-        "territorio_id": "7"
+        "territorio_identidade": "COSTA DO DESCOBRIMENTO",
+        "territorio_id": "27"
       },
       "geometry": {
         "type": "Polygon",
@@ -40625,8 +40625,8 @@
         "id": "2916302",
         "name": "Itapebi",
         "description": "Itapebi",
-        "territorio_identidade": "EXTREMO SUL",
-        "territorio_id": "7"
+        "territorio_identidade": "COSTA DO DESCOBRIMENTO",
+        "territorio_id": "27"
       },
       "geometry": {
         "type": "Polygon",
@@ -41505,8 +41505,8 @@
         "id": "2925303",
         "name": "Porto Seguro",
         "description": "Porto Seguro",
-        "territorio_identidade": "EXTREMO SUL",
-        "territorio_id": "7"
+        "territorio_identidade": "COSTA DO DESCOBRIMENTO",
+        "territorio_id": "27"
       },
       "geometry": {
         "type": "Polygon",
@@ -41766,8 +41766,8 @@
         "id": "2927705",
         "name": "Santa Cruz Cabrália",
         "description": "Santa Cruz Cabrália",
-        "territorio_identidade": "EXTREMO SUL",
-        "territorio_id": "7"
+        "territorio_identidade": "COSTA DO DESCOBRIMENTO",
+        "territorio_id": "27"
       },
       "geometry": {
         "type": "Polygon",

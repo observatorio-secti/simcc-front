@@ -52,7 +52,7 @@ describe('Redirect /resultados e /resultados-perfil (V2)', () => {
     });
   }, 15000);
 
-  it('converte source_type antigo e descarta abas sem equivalente', async () => {
+  it('converte source_type antigo e abre a aba mapa como visão de mapa', async () => {
     const { router } = await finalLocation(
       '/resultados-perfil?type_search=profile&terms=redes&tab=mapa' +
         '&source_type=ARTICLE&source_type=PARTICIPATION_EVENT&classification=A' +
@@ -64,6 +64,7 @@ describe('Redirect /resultados e /resultados-perfil (V2)', () => {
       source_type: ['article', 'event'],
       classification: ['A'],
       sort_by: 'relevance',
+      view: 'map',
     });
   }, 15000);
 

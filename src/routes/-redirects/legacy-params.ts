@@ -9,6 +9,7 @@ import {
   researcherProfileSearchSchema,
   type ResearcherProfileSearch,
 } from '@/features/researcher-profile/search-schema';
+import { territoryCode } from '@/entities/territory/model';
 
 // Tradução dos parâmetros das URLs do legado (`legado-v1:src/App.tsx`) para
 // os search params das rotas novas (V2). Funções puras: as rotas de redirect
@@ -131,7 +132,10 @@ const LEGACY_MULTI_FILTERS = [
  * `/resultados` e `/resultados-perfil` → search params de `/busca`.
  *
  * - `terms` → `q`; `type_search` → `type` (perfil quando ausente ou inválido);
- * - `tab` (`articles-home`…) → `tab` (instituições e mapa não existem);
+ * - `tab` (`articles-home`…) → `tab`; `tab=mapa` → `view=map` (T2.3); a aba de
+ *   instituições não existe;
+ * - `identity_territory` por nome → código SEI (a v2 aceita os dois, mas o
+ *   painel de facetas marca a opção pelo código);
  * - filtros com o nome da v2 (lista repetida) e `year_start`/`year_end`;
  * - `source_type` em maiúsculas → minúsculas;
  * - `sort_by` (pesquisadores) ou `production_sort` (aba de produção) → `sort_by`.
@@ -148,10 +152,16 @@ export function legacyResultsToBusca(params: URLSearchParams): ResultsSearch {
     q: termsToQuery(firstParam(params, 'terms')),
     type,
     tab,
+    view: tabParam === 'mapa' ? 'map' : undefined,
   };
   for (const key of LEGACY_MULTI_FILTERS) {
     const values = params.getAll(key).filter(Boolean);
     if (values.length > 0) raw[key] = values;
+  }
+  if (Array.isArray(raw.identity_territory)) {
+    raw.identity_territory = (raw.identity_territory as string[]).map(
+      (value) => territoryCode(value) ?? value,
+    );
   }
   const sourceTypes = params
     .getAll('source_type')

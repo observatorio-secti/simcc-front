@@ -5,6 +5,10 @@ import type {
 } from '@/entities/graduate-program/model';
 import { productionRefParam } from '@/entities/production/links';
 import {
+  TERRITORY_CITY_FACET,
+  TERRITORY_FACET_LIMIT,
+} from '@/entities/territory/model';
+import {
   createListSearch,
   searchStringArrayParam,
 } from '@/shared/lib/search-params';
@@ -28,6 +32,8 @@ export const GRADUATE_PROGRAM_FACETS = [
   'rating',
   'state',
   'city',
+  'identity_territory',
+  TERRITORY_CITY_FACET,
 ] as const;
 
 export const GRADUATE_PROGRAM_FACET_ORDER = [
@@ -35,6 +41,7 @@ export const GRADUATE_PROGRAM_FACET_ORDER = [
   'rating',
   'modality',
   'institution',
+  'identity_territory',
   'city',
   'state',
 ] as const;
@@ -58,6 +65,8 @@ export const graduateProgramListSearch = createListSearch({
     rating: searchStringArrayParam(),
     state: searchStringArrayParam(),
     city: searchStringArrayParam(),
+    identity_territory: searchStringArrayParam(),
+    city_code: searchStringArrayParam(),
   },
   extra: {
     view: z.enum(['grid', 'table']).optional(),
@@ -75,6 +84,8 @@ export function toGraduateProgramQueryParams(
   return {
     ...graduateProgramListSearch.toApiParams(search),
     facets: [...GRADUATE_PROGRAM_FACETS],
+    // O limite vale por nível em `territory_city`: 100 traz os 27 territórios.
+    facet_limit: TERRITORY_FACET_LIMIT,
   };
 }
 

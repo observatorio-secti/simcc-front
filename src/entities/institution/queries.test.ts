@@ -118,7 +118,13 @@ describe('institution queries', () => {
         id: 'inst-1',
         name: 'Universidade Estadual de Santa Cruz',
         acronym: 'UESC',
-        counts: { researchers: 618, graduate_programs: 26 },
+        counts: {
+          researchers: 618,
+          graduate_programs: 26,
+          scholarship_holders: 0,
+          research_groups: 0,
+          labs: 0,
+        },
       },
       meta: {
         took_ms: 3,

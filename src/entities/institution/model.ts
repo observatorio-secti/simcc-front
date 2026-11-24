@@ -31,7 +31,7 @@ import logoUneb from './assets/logo-uneb.png';
 export type InstitutionSummary = ListItem<'/institution'>;
 export type InstitutionDetail = DetailData<'/institution/{institution_id}'>;
 export type InstitutionCounts = Schema<'InstitutionCounts'>;
-export type InstitutionScholarshipCount = Schema<'InstitutionScholarshipCount'>;
+export type InstitutionScholarshipCount = Schema<'ScholarshipBreakdownItem'>;
 export type InstitutionQuery = QueryOf<'/institution'>;
 export type InstitutionFilters = ListFilters<'/institution'>;
 export type InstitutionListResponse = ListResponse<'/institution'>;
