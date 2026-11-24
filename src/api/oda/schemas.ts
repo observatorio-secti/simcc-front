@@ -193,7 +193,9 @@ export type OdaGroupResearchersResponseRaw = z.infer<
   typeof odaGroupResearchersResponseSchema
 >;
 export type OdaStateRaw = z.infer<typeof odaStateSchema>;
-export type OdaStateListResponseRaw = z.infer<typeof odaStateListResponseSchema>;
+export type OdaStateListResponseRaw = z.infer<
+  typeof odaStateListResponseSchema
+>;
 export type OdaKnowledgeAreaOptionRaw = z.infer<
   typeof odaKnowledgeAreaOptionSchema
 >;

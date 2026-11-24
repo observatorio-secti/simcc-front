@@ -227,10 +227,9 @@ export function ResearchGroupsPage() {
   function handleClearAll() {
     setQueryInput('');
     commitSearch(
-      researchGroupsSearch.update(
-        researchGroupsSearch.clearFilters(search),
-        { q: undefined },
-      ),
+      researchGroupsSearch.update(researchGroupsSearch.clearFilters(search), {
+        q: undefined,
+      }),
     );
   }
 
@@ -278,10 +277,7 @@ export function ResearchGroupsPage() {
         aria-label="Buscar grupos de pesquisa"
         className="flex h-[52px] items-center gap-2 rounded-lg border bg-card px-4"
       >
-        <Search
-          className="size-4 shrink-0 text-muted-foreground"
-          aria-hidden
-        />
+        <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden />
         <Input
           type="search"
           value={queryInput}
