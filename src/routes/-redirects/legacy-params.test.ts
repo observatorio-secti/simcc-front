@@ -80,11 +80,11 @@ describe('legacyResultsToBusca: territórios', () => {
     expect(search.identity_territory).toEqual(['7', 'Atlântida']);
   });
 
-  it('`tab=mapa` abre a visão de mapa da aba de pesquisadores', () => {
+  it('`tab=mapa` abre a aba dedicada de mapa', () => {
     const search = legacyResultsToBusca(
       new URLSearchParams('terms=solos&tab=mapa'),
     );
-    expect(search.view).toBe('map');
-    expect(search.tab).toBeUndefined();
+    expect(search.tab).toBe('map');
+    expect(search.view).toBeUndefined();
   });
 });

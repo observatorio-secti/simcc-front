@@ -108,10 +108,9 @@ function renderMap(ui: React.ReactElement) {
 }
 
 describe('TerritoryMap', () => {
-  it('foca o território ao clicar, abre o painel contextual e permite voltar para toda a Bahia', async () => {
+  it('centraliza o território ao clicar, exibe cidades com contagem e permite voltar para toda a Bahia', async () => {
     const user = userEvent.setup();
-    const fitBoundsSpy = vi.spyOn(L.Map.prototype, 'fitBounds');
-    const setZoomSpy = vi.spyOn(L.Map.prototype, 'setZoom');
+    const setViewSpy = vi.spyOn(L.Map.prototype, 'setView');
 
     renderMap(
       <TerritoryMap
@@ -122,11 +121,13 @@ describe('TerritoryMap', () => {
           selection,
           onBackToTerritories,
           onBackToTerritory,
+          onSelectCity,
         }) => (
           <TerritoryDetailPanel
             selection={selection}
             onBackToTerritories={onBackToTerritories}
             onBackToTerritory={onBackToTerritory}
+            onSelectCity={onSelectCity}
             noun={['pesquisador', 'pesquisadores']}
             onPageChange={vi.fn()}
           >
@@ -139,23 +140,30 @@ describe('TerritoryMap', () => {
       />,
     );
 
+    setViewSpy.mockClear();
     await user.click(screen.getByRole('button', { name: /Litoral Sul/ }));
 
     expect(screen.getByText('Conteúdo: 5')).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Ver toda a Bahia' }),
     ).toBeInTheDocument();
-    expect(fitBoundsSpy).toHaveBeenCalled();
+    expect(setViewSpy).toHaveBeenCalledTimes(1);
+    const [center, zoomArg] = setViewSpy.mock.calls[0]!;
+    expect((center as L.LatLng).lat).toBeCloseTo(-14.75, 1);
+    expect((center as L.LatLng).lng).toBeCloseTo(-39.05, 1);
+    expect(zoomArg).toBeGreaterThanOrEqual(8);
+
+    await user.click(screen.getByRole('button', { name: /Ilhéus/ }));
+    expect(screen.getByText('Conteúdo: 2913606')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Territórios' }));
 
-    expect(screen.queryByText('Conteúdo: 5')).not.toBeInTheDocument();
+    expect(screen.queryByText('Conteúdo: 2913606')).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Metropolitana de Salvador/ }),
     ).toBeInTheDocument();
 
-    fitBoundsSpy.mockRestore();
-    setZoomSpy.mockRestore();
+    setViewSpy.mockRestore();
   });
 
   it('mantém callback legado onToggleTerritory quando renderSelectionPanel não é informado', async () => {

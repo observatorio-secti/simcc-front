@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from 'react';
-import { LayoutGrid, Map as MapIcon, Rows3, Users } from 'lucide-react';
+import { useState } from 'react';
+import { LayoutGrid, Rows3, Users } from 'lucide-react';
 import type { ResearcherSummary } from '@/entities/researcher/model';
 import { PersonCard } from '@/entities/researcher/ui/person-card';
 import { cn } from '@/shared/lib/cn';
@@ -37,13 +37,10 @@ export interface ResearcherResultsProps {
   onClearFilters: () => void;
   onClearQuery: () => void;
   onOpenResearcher: (id: string) => void;
-  /** Mapa por território, mostrado no lugar da lista na visão `map` (T2.3). */
-  map?: ReactNode;
 }
 
 /**
- * Grade, lista ou mapa de pesquisadores. Grade e lista têm ordenação e
- * paginação; o mapa mostra o resultado inteiro por território.
+ * Grade ou lista paginada de pesquisadores, com ordenação.
  */
 export function ResearcherResults({
   researchers = [],
@@ -65,10 +62,8 @@ export function ResearcherResults({
   onClearFilters,
   onClearQuery,
   onOpenResearcher,
-  map,
 }: ResearcherResultsProps) {
   const [open, setOpen] = useState(true);
-  const showMap = view === 'map' && map !== undefined;
   const cardLayout = view === 'list' ? 'list' : 'grid';
 
   return (
@@ -81,20 +76,18 @@ export function ResearcherResults({
         controls="results-researchers"
         className="flex-wrap"
       >
-        {!showMap && (
-          <SortSelect
-            options={sortOptions}
-            value={sort.sort_by}
-            order={sort.sort_order}
-            onChange={onSortChange}
-            showOrderToggle
-          />
-        )}
+        <SortSelect
+          options={sortOptions}
+          value={sort.sort_by}
+          order={sort.sort_order}
+          onChange={onSortChange}
+          showOrderToggle
+        />
         <ToggleGroup
           type="single"
-          value={view}
+          value={cardLayout}
           onValueChange={(value) => {
-            if (value === 'grid' || value === 'list' || value === 'map') {
+            if (value === 'grid' || value === 'list') {
               onViewChange(value);
             }
           }}
@@ -115,21 +108,10 @@ export function ResearcherResults({
           >
             <LayoutGrid className="size-4" aria-hidden />
           </ToggleGroupItem>
-          {map !== undefined && (
-            <ToggleGroupItem
-              value="map"
-              aria-label="Ver no mapa"
-              className="size-8 rounded-sm data-[state=on]:border data-[state=on]:bg-card"
-            >
-              <MapIcon className="size-4" aria-hidden />
-            </ToggleGroupItem>
-          )}
         </ToggleGroup>
       </SectionHeader>
 
-      {open && showMap && <div id="results-researchers">{map}</div>}
-
-      {open && !showMap && (
+      {open && (
         <div
           id="results-researchers"
           aria-busy={isFetching || undefined}

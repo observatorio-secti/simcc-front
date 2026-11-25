@@ -16,6 +16,7 @@ export interface TerritoryDetailPanelProps {
   selection: TerritorySelection;
   onBackToTerritories: () => void;
   onBackToTerritory: () => void;
+  onSelectCity?: (ibge: string) => void;
   noun: TerritoryMapNoun;
   pagination?: PaginationMeta;
   loading?: boolean;
@@ -30,13 +31,14 @@ export interface TerritoryDetailPanelProps {
 
 /**
  * Painel lateral de detalhamento para o território ou município selecionado no
- * mapa: navegação hierárquica de volta, lista paginada no estilo da página e
- * controles compactos de paginação.
+ * mapa: navegação hierárquica de volta, resumo por municípios com resultados,
+ * lista paginada no estilo da página e controles compactos de paginação.
  */
 export function TerritoryDetailPanel({
   selection,
   onBackToTerritories,
   onBackToTerritory,
+  onSelectCity,
   noun,
   pagination,
   loading = false,
@@ -80,10 +82,7 @@ export function TerritoryDetailPanel({
           </Button>
           {selection.kind === 'city' && (
             <>
-              <span
-                aria-hidden
-                className="text-xs text-muted-foreground/60"
-              >
+              <span aria-hidden className="text-xs text-muted-foreground/60">
                 /
               </span>
               <Button
@@ -123,6 +122,27 @@ export function TerritoryDetailPanel({
             </span>
           )}
         </div>
+
+        {selection.kind === 'territory' && selection.cities.length > 0 && (
+          <div
+            aria-label="Municípios com resultados"
+            className="flex max-h-20 flex-wrap gap-1 overflow-y-auto pt-1"
+          >
+            {selection.cities.map((city) => (
+              <button
+                key={city.ibge}
+                type="button"
+                onClick={() => onSelectCity?.(city.ibge)}
+                className="inline-flex items-center gap-1 rounded-md border bg-neutral-50 px-1.5 py-0.5 text-[11px] text-foreground transition-colors hover:border-eng-blue hover:text-eng-blue dark:bg-neutral-900"
+              >
+                <span className="max-w-[140px] truncate">{city.label}</span>
+                <span className="font-semibold text-muted-foreground tabular-nums">
+                  {city.count.toLocaleString('pt-BR')}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div
@@ -133,7 +153,10 @@ export function TerritoryDetailPanel({
       >
         {loading ? (
           Array.from({ length: 4 }, (_, index) => (
-            <Skeleton key={index} className="h-[74px] w-full shrink-0 rounded-lg" />
+            <Skeleton
+              key={index}
+              className="h-[74px] w-full shrink-0 rounded-lg"
+            />
           ))
         ) : error ? (
           <div

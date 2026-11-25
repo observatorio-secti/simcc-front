@@ -5,7 +5,6 @@ import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { scholarshipListQueryOptions } from '@/entities/scholarship/queries';
 import {
   activeTab,
-  isMapView,
   toMagazineQuery,
   toProductionQuery,
   toResearcherMapQuery,
@@ -28,11 +27,14 @@ export function prefetchSearchResults(
       void queryClient.prefetchQuery(
         researcherListQueryOptions(toResearcherQuery(search)),
       );
-      if (isMapView(search)) {
-        void queryClient.prefetchQuery(
-          researcherListQueryOptions(toResearcherMapQuery(search)),
-        );
-      }
+      return;
+    case 'map':
+      void queryClient.prefetchQuery(
+        researcherListQueryOptions(toResearcherQuery(search)),
+      );
+      void queryClient.prefetchQuery(
+        researcherListQueryOptions(toResearcherMapQuery(search)),
+      );
       return;
     case 'scholarship':
       void queryClient.prefetchQuery(

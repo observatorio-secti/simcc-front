@@ -30,6 +30,7 @@ export function TerritoryResearchersPanel({
   selection,
   onBackToTerritories,
   onBackToTerritory,
+  onSelectCity,
   search,
   type,
   noun,
@@ -56,6 +57,7 @@ export function TerritoryResearchersPanel({
       selection={selection}
       onBackToTerritories={onBackToTerritories}
       onBackToTerritory={onBackToTerritory}
+      onSelectCity={onSelectCity}
       noun={noun}
       pagination={query.data?.pagination}
       loading={query.isPending}

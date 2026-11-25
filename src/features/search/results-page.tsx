@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { MapPin } from 'lucide-react';
 import { magazineListQueryOptions } from '@/entities/magazine/queries';
 import {
   defaultMetricGroupBy,
@@ -24,6 +25,7 @@ import {
   type FacetsMap,
 } from '@/shared/ui/facet-panel';
 import { ResultToolbar } from '@/shared/ui/result-toolbar';
+import { SectionHeader } from '@/shared/ui/section-header';
 import { Skeleton } from '@/shared/ui/skeleton';
 import type { SortSelection } from '@/shared/ui/sort-select';
 import {
@@ -46,7 +48,6 @@ import {
   activeTab,
   applyQuery,
   countTabFilters,
-  isMapView,
   resolveSort,
   RESULTS_FACET_ORDER,
   resultsSearch,
@@ -103,29 +104,29 @@ export function SearchResultsPage({
   const tabs = tabsForSearchType(type, hasQuery);
   const sort = resolveSort(tab, search);
   const sortOptions = sortOptionsForTab(tab, hasQuery);
-  const view: ResultsViewMode = search.view ?? 'grid';
+  const view: ResultsViewMode = search.view === 'list' ? 'list' : 'grid';
 
   const isResearcherTab = tab.source === 'researcher';
+  const isMapTab = tab.source === 'map';
   const isProductionTab = tab.source === 'production';
   const productionKind = tab.source === 'production' ? tab.kind : IDLE_KIND;
 
   const researcherQuery = useQuery({
     ...researcherListQueryOptions(toResearcherQuery(search)),
-    enabled: isResearcherTab,
+    enabled: isResearcherTab || isMapTab,
     placeholderData: keepPreviousData,
   });
 
-  const showMap = isMapView(search);
   const mapQuery = useQuery({
     ...researcherListQueryOptions(toResearcherMapQuery(search)),
-    enabled: showMap,
+    enabled: isMapTab,
     placeholderData: keepPreviousData,
   });
 
   const rankingFromList = sort.sort_by === 'matches' && search.page === 1;
   const rankingQuery = useQuery({
     ...researcherListQueryOptions(toResearcherRankingQuery(search)),
-    enabled: isResearcherTab && hasQuery && !rankingFromList && !showMap,
+    enabled: isResearcherTab && hasQuery && !rankingFromList,
   });
 
   const productionQuery = useQuery({
@@ -161,6 +162,7 @@ export function SearchResultsPage({
 
   const listQuery = {
     researcher: researcherQuery,
+    map: researcherQuery,
     production: productionQuery,
     scholarship: scholarshipQuery,
     magazine: magazineQuery,
@@ -266,9 +268,9 @@ export function SearchResultsPage({
               total={researcherQuery.data?.pagination.total_items}
               facets={researcherQuery.data?.facets}
               loading={researcherQuery.isPending}
-              showMapLink={!showMap}
+              showMapLink
             />
-            {hasQuery && !showMap && (
+            {hasQuery && (
               <ResearcherRanking
                 researchers={rankingResearchers}
                 type={type}
@@ -299,34 +301,49 @@ export function SearchResultsPage({
                   { resetPage: false },
                 )
               }
-              map={
-                <Suspense
-                  fallback={
-                    <Skeleton className="h-[420px] w-full rounded-lg md:h-[480px]" />
-                  }
-                >
-                  <TerritoryMap
-                    facet={
-                      splitTerritoryFacet(mapQuery.data?.facets).territoryCity
-                    }
-                    loading={mapQuery.isFetching}
-                    selectedTerritories={search.identity_territory}
-                    selectedCities={search.city_code}
-                    renderSelectionPanel={(ctx) => (
-                      <TerritoryResearchersPanel
-                        {...ctx}
-                        search={search}
-                        type={type}
-                        noun={MAP_NOUN}
-                        onOpenResearcher={onOpenResearcher}
-                      />
-                    )}
-                    noun={MAP_NOUN}
-                    listTitle="Territórios com pesquisadores"
-                  />
-                </Suspense>
-              }
             />
+          </>
+        ) : tab.source === 'map' ? (
+          <>
+            <ResearcherSummary
+              q={search.q}
+              type={type}
+              total={researcherQuery.data?.pagination.total_items}
+              facets={researcherQuery.data?.facets}
+              loading={researcherQuery.isPending}
+              showMapLink={false}
+            />
+            <section className="flex flex-col gap-4">
+              <SectionHeader
+                icon={MapPin}
+                title="Mapa por território de identidade"
+              />
+              <Suspense
+                fallback={
+                  <Skeleton className="h-[420px] w-full rounded-lg md:h-[480px]" />
+                }
+              >
+                <TerritoryMap
+                  facet={
+                    splitTerritoryFacet(mapQuery.data?.facets).territoryCity
+                  }
+                  loading={mapQuery.isFetching}
+                  selectedTerritories={search.identity_territory}
+                  selectedCities={search.city_code}
+                  renderSelectionPanel={(ctx) => (
+                    <TerritoryResearchersPanel
+                      {...ctx}
+                      search={search}
+                      type={type}
+                      noun={MAP_NOUN}
+                      onOpenResearcher={onOpenResearcher}
+                    />
+                  )}
+                  noun={MAP_NOUN}
+                  listTitle="Territórios com pesquisadores"
+                />
+              </Suspense>
+            </section>
           </>
         ) : tab.source === 'scholarship' ? (
           <>

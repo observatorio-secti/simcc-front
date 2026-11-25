@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { HandCoins, Newspaper, Users } from 'lucide-react';
+import { HandCoins, MapPin, Newspaper, Users } from 'lucide-react';
 import type { ProductionKind } from '@/entities/production/model';
 import { defaultMetricGroupBy } from '@/entities/production/metric-queries';
 import { getProductionDefinition } from '@/entities/production/registry';
@@ -16,6 +16,7 @@ import type { SearchType } from './search-schema';
 
 export const SEARCH_TAB_IDS = [
   'researchers',
+  'map',
   'articles',
   'books',
   'book_chapters',
@@ -47,6 +48,11 @@ export interface ResearcherSearchTab extends SearchTabBase<'researchers'> {
   source: 'researcher';
 }
 
+/** Aba do mapa de pesquisadores por território de identidade. */
+export interface MapSearchTab extends SearchTabBase<'map'> {
+  source: 'map';
+}
+
 /** Aba listada por `/v2/scholarship` (bolsistas, só sem termo). */
 export interface ScholarshipSearchTab extends SearchTabBase<'scholarships'> {
   source: 'scholarship';
@@ -59,7 +65,7 @@ export interface MagazineSearchTab extends SearchTabBase<'magazines'> {
 
 /** Aba listada por `/v2/production/<kind>`. */
 export interface ProductionSearchTab extends SearchTabBase<
-  Exclude<SearchTabId, 'researchers' | 'scholarships' | 'magazines'>
+  Exclude<SearchTabId, 'researchers' | 'map' | 'scholarships' | 'magazines'>
 > {
   source: 'production';
   kind: ProductionKind;
@@ -67,6 +73,7 @@ export interface ProductionSearchTab extends SearchTabBase<
 
 export type SearchTabDefinition =
   | ResearcherSearchTab
+  | MapSearchTab
   | ScholarshipSearchTab
   | ProductionSearchTab
   | MagazineSearchTab;
@@ -91,6 +98,12 @@ export const SEARCH_TABS: Record<SearchTabId, SearchTabDefinition> = {
     source: 'researcher',
     label: 'Pesquisadores',
     icon: Users,
+  },
+  map: {
+    id: 'map',
+    source: 'map',
+    label: 'Mapa',
+    icon: MapPin,
   },
   articles: productionTab('articles', 'article'),
   books: productionTab('books', 'book'),
@@ -133,15 +146,15 @@ const ALL_PRODUCTION_TABS = [
  * especialidade só têm pesquisadores.
  */
 export const TABS_BY_SEARCH_TYPE: Record<SearchType, readonly SearchTabId[]> = {
-  profile: ['researchers', ...ALL_PRODUCTION_TABS],
-  article: ['researchers', 'articles'],
-  book: ['researchers', 'books', 'book_chapters'],
-  patent: ['researchers', 'patents'],
-  software: ['researchers', 'software'],
-  speaker: ['researchers', 'events'],
-  area: ['researchers'],
-  name: ['researchers'],
-  abstract: ['researchers'],
+  profile: ['researchers', 'map', ...ALL_PRODUCTION_TABS],
+  article: ['researchers', 'map', 'articles'],
+  book: ['researchers', 'map', 'books', 'book_chapters'],
+  patent: ['researchers', 'map', 'patents'],
+  software: ['researchers', 'map', 'software'],
+  speaker: ['researchers', 'map', 'events'],
+  area: ['researchers', 'map'],
+  name: ['researchers', 'map'],
+  abstract: ['researchers', 'map'],
 };
 
 /**
@@ -152,6 +165,7 @@ export const TABS_BY_SEARCH_TYPE: Record<SearchType, readonly SearchTabId[]> = {
  */
 export const CATALOG_TABS = [
   'researchers',
+  'map',
   'scholarships',
   ...ALL_PRODUCTION_TABS,
   'research_projects',

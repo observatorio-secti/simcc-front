@@ -211,7 +211,13 @@ export function ResearcherSummary({
             <Link
               from="/busca"
               to="."
-              search={(prev) => ({ ...prev, view: 'map' as const })}
+              search={(prev) => ({
+                ...prev,
+                tab: 'map' as const,
+                page: 1,
+                sort_by: undefined,
+                sort_order: undefined,
+              })}
               resetScroll={false}
               className="mt-2 inline-flex text-xs font-medium text-primary hover:underline"
             >

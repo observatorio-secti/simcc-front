@@ -97,6 +97,7 @@ export function legacySearchType(
 /** Abas de `/resultados` (`result-home-v2.tsx`) que têm aba em `/busca`. */
 const LEGACY_RESULTS_TABS: Readonly<Record<string, SearchTabId>> = {
   'researchers-home': 'researchers',
+  mapa: 'map',
   'articles-home': 'articles',
   'book-home': 'books',
   'patent-home': 'patents',
@@ -132,8 +133,7 @@ const LEGACY_MULTI_FILTERS = [
  * `/resultados` e `/resultados-perfil` → search params de `/busca`.
  *
  * - `terms` → `q`; `type_search` → `type` (perfil quando ausente ou inválido);
- * - `tab` (`articles-home`…) → `tab`; `tab=mapa` → `view=map` (T2.3); a aba de
- *   instituições não existe;
+ * - `tab` (`articles-home`, `mapa`…) → `tab`; a aba de instituições não existe;
  * - `identity_territory` por nome → código SEI (a v2 aceita os dois, mas o
  *   painel de facetas marca a opção pelo código);
  * - filtros com o nome da v2 (lista repetida) e `year_start`/`year_end`;
@@ -152,7 +152,6 @@ export function legacyResultsToBusca(params: URLSearchParams): ResultsSearch {
     q: termsToQuery(firstParam(params, 'terms')),
     type,
     tab,
-    view: tabParam === 'mapa' ? 'map' : undefined,
   };
   for (const key of LEGACY_MULTI_FILTERS) {
     const values = params.getAll(key).filter(Boolean);
@@ -170,7 +169,8 @@ export function legacyResultsToBusca(params: URLSearchParams): ResultsSearch {
   if (sourceTypes.length > 0) raw.source_type = sourceTypes;
   raw.year_start = firstParam(params, 'year_start');
   raw.year_end = firstParam(params, 'year_end');
-  const isProductionTab = tab !== undefined && tab !== 'researchers';
+  const isProductionTab =
+    tab !== undefined && tab !== 'researchers' && tab !== 'map';
   raw.sort_by = isProductionTab
     ? firstParam(params, 'production_sort')
     : firstParam(params, 'sort_by');

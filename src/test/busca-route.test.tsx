@@ -158,6 +158,7 @@ describe('Rota /busca (T2)', () => {
     const tabs = within(tablist).getAllByRole('tab');
     expect(tabs.map((tab) => tab.textContent)).toEqual([
       'Pesquisadores',
+      'Mapa',
       'Artigos',
     ]);
 
@@ -383,9 +384,9 @@ describe('Rota /busca (T2)', () => {
     expect(router.state.location.search).not.toHaveProperty('researcher');
   }, 20000);
 
-  it('mostra o mapa por território, aproxima e pagina pesquisadores do território sem alterar filtros globais (T2.3)', async () => {
+  it('mostra o mapa em aba dedicada entre Pesquisadores e Artigos, aproxima e pagina pesquisadores do território', async () => {
     const researchers = captureResearchersWithMap();
-    const { findByRole, findByText, queryByText, router, user } =
+    const { findAllByRole, findByRole, findByText, queryByText, router, user } =
       await renderRoute('/busca?q=solos', {
         handlers: [
           researchers.handler,
@@ -398,10 +399,18 @@ describe('Rota /busca (T2)', () => {
     expect(
       await findByText('Pesquisadores com mais ocorrências'),
     ).toBeInTheDocument();
-    await user.click(await findByRole('radio', { name: 'Ver no mapa' }));
+
+    const tabs = await findAllByRole('tab');
+    expect(tabs.slice(0, 3).map((tab) => tab.textContent?.trim())).toEqual([
+      'Pesquisadores',
+      'Mapa',
+      'Artigos',
+    ]);
+
+    await user.click(await findByRole('tab', { name: 'Mapa' }));
 
     await waitFor(() => {
-      expect(router.state.location.search).toMatchObject({ view: 'map' });
+      expect(router.state.location.search).toMatchObject({ tab: 'map' });
     });
     // O mapa é carregado sob demanda (Leaflet em chunk à parte).
     const territory = await findByRole(
@@ -422,11 +431,14 @@ describe('Rota /busca (T2)', () => {
     expect(mapCall.get('facet_limit')).toBe('100');
     expect(mapCall.getAll('facets')).toEqual(['territory_city']);
 
-    // Clicar no território abre a prévia paginada sem mutar identity_territory na URL.
+    // Clicar no território abre a prévia paginada e lista as cidades com contagem sem mutar identity_territory na URL.
     await user.click(territory);
     expect(router.state.location.search).not.toHaveProperty(
       'identity_territory',
     );
+    expect(
+      await findByRole('button', { name: /Ilhéus/ }),
+    ).toBeInTheDocument();
     await waitFor(() => {
       const previewCall = researchers.calls.find(
         (params) =>

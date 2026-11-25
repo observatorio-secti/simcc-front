@@ -38,6 +38,7 @@ describe('abas sem termo (D1.4)', () => {
     // Com termo, as abas continuam as do tipo de busca (T2).
     expect(tabsForSearchType('article').map((tab) => tab.id)).toEqual([
       'researchers',
+      'map',
       'articles',
     ]);
   });

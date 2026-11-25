@@ -82,18 +82,35 @@ describe('PersonCard', () => {
     expect(screen.queryByText(/evidência/)).not.toBeInTheDocument();
   });
 
-  it('suporta layout compacto para painéis laterais', () => {
-    render(
+  it('suporta layout compacto com foto à esquerda e metadados da listagem', () => {
+    const { container } = render(
       <PersonCard
         layout="compact"
-        researcher={baseResearcher}
+        researcher={{
+          ...baseResearcher,
+          counts: {
+            articles: 12,
+            book_chapters: 0,
+            books: 0,
+            patents: 0,
+            software: 0,
+            brands: 0,
+            guidance: 0,
+            reports: 0,
+          },
+        }}
         searchType="article"
       />,
     );
 
     const link = screen.getByRole('link', { name: /Helena Duarte Ramos/ });
     expect(link).toHaveAttribute('data-layout', 'compact');
+    const img = container.querySelector('img');
+    expect(img).not.toBeNull();
+    expect(img).not.toHaveClass('absolute');
     expect(screen.getByText('UFBA / UESC')).toBeInTheDocument();
+    expect(screen.getByText('Doutorado')).toBeInTheDocument();
+    expect(screen.getByText('12 artigos')).toBeInTheDocument();
     expect(screen.getByText('37 evidências')).toBeInTheDocument();
   });
 });

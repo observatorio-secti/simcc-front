@@ -1,13 +1,15 @@
 import { useState, type ComponentProps } from 'react';
-import { Building2, User } from 'lucide-react';
+import { BookOpen, Building2, GraduationCap, User } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 import { searchTypeColor } from '@/shared/lib/design-tokens';
 import { Badge } from '@/shared/ui/badge';
 import { focusRing } from '@/shared/ui/focus-ring';
 import {
   formatAffiliationAcronyms,
+  formatCount,
   formatEvidenceCount,
   researcherHref,
+  type ResearcherCounts,
   type ResearcherSummary,
 } from '../model';
 
@@ -20,7 +22,12 @@ export type PersonCardResearcher = Pick<ResearcherSummary, 'id' | 'name'> &
   Partial<
     Pick<
       ResearcherSummary,
-      'image_url' | 'classification' | 'matches' | 'affiliations'
+      | 'image_url'
+      | 'classification'
+      | 'graduation'
+      | 'counts'
+      | 'matches'
+      | 'affiliations'
     >
   >;
 
@@ -35,13 +42,36 @@ export interface PersonCardProps extends Omit<
   evidenceTotal?: number;
   /** Tipo de busca para colorir o badge de evidências (`bg-search-*`). */
   searchType?: string | null;
-  /** Disposição em grade (`aspect-[3/4]`), lista (`min-h-24`) ou compacta (`min-h-18`). */
+  /** Disposição em grade (`aspect-[3/4]`), lista (`min-h-24`) ou compacta com foto à esquerda (`compact`). */
   layout?: 'grid' | 'list' | 'compact';
+}
+
+function productionSummaryLabel(
+  counts: ResearcherCounts | undefined,
+): string | null {
+  if (!counts) return null;
+  if (counts.articles > 0) {
+    return counts.articles === 1
+      ? '1 artigo'
+      : `${formatCount(counts.articles)} artigos`;
+  }
+  const total =
+    counts.articles +
+    counts.books +
+    counts.book_chapters +
+    counts.patents +
+    counts.software +
+    counts.brands +
+    counts.guidance +
+    counts.reports;
+  if (total <= 0) return null;
+  return total === 1 ? '1 produção' : `${formatCount(total)} produções`;
 }
 
 /**
  * Cartão de pesquisador (`sc-person` em `design-kit/reference/components.md`).
- * Card plano sem sombra com foto ou gradiente slate, classificação e evidências.
+ * Nos modos `grid` e `list`, usa foto em tela cheia com overlay escuro; no modo
+ * `compact`, posiciona a foto à esquerda com os dados da listagem à direita.
  */
 export function PersonCard({
   researcher,
@@ -57,12 +87,90 @@ export function PersonCard({
   const showImage = src !== null && failedSrc !== src;
 
   const classification = researcher.classification?.trim() || null;
+  const graduation = researcher.graduation?.trim() || null;
   const evidenceTotal = evidenceOverride ?? researcher.matches?.total ?? 0;
   const institutionLabel =
     institutionOverride ?? formatAffiliationAcronyms(researcher.affiliations);
+  const productionLabel = productionSummaryLabel(researcher.counts);
   const evidenceColor = searchTypeColor(searchType);
   const isList = layout === 'list';
-  const isCompact = layout === 'compact';
+
+  if (layout === 'compact') {
+    return (
+      // TODO(T3): migrar para <Link to="/pesquisadores/$id">
+      <a
+        data-slot="person-card"
+        data-layout={layout}
+        href={researcherHref(researcher.id)}
+        className={cn(
+          'group flex items-start gap-2.5 rounded-lg border bg-card p-2.5 text-card-foreground transition-colors hover:border-eng-blue',
+          focusRing,
+          className,
+        )}
+        {...props}
+      >
+        <span className="relative grid size-14 shrink-0 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-slate-400 to-slate-600 text-white">
+          {showImage ? (
+            <img
+              src={src}
+              alt=""
+              aria-hidden
+              loading="lazy"
+              className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.04]"
+              onError={() => setFailedSrc(src)}
+            />
+          ) : (
+            <User className="size-7 text-white/75" strokeWidth={1.75} aria-hidden />
+          )}
+        </span>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex items-start justify-between gap-1.5">
+            <p className="line-clamp-2 text-sm leading-snug font-semibold text-foreground transition-colors group-hover:text-eng-blue">
+              {researcher.name}
+            </p>
+            {(classification !== null || evidenceTotal > 0) && (
+              <div className="flex shrink-0 items-center gap-1">
+                {classification !== null && (
+                  <Badge variant="outline" size="sm">
+                    {classification}
+                  </Badge>
+                )}
+                {evidenceTotal > 0 && (
+                  <Badge size="sm" className={evidenceColor.bg}>
+                    {formatEvidenceCount(evidenceTotal)}
+                  </Badge>
+                )}
+              </div>
+            )}
+          </div>
+
+          {(institutionLabel || graduation || productionLabel) && (
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-muted-foreground">
+              {institutionLabel && (
+                <span className="inline-flex max-w-full items-center gap-1">
+                  <Building2 className="size-3 shrink-0" aria-hidden />
+                  <span className="truncate">{institutionLabel}</span>
+                </span>
+              )}
+              {graduation && (
+                <span className="inline-flex items-center gap-1">
+                  <GraduationCap className="size-3 shrink-0" aria-hidden />
+                  <span className="truncate">{graduation}</span>
+                </span>
+              )}
+              {productionLabel && (
+                <span className="inline-flex items-center gap-1 tabular-nums">
+                  <BookOpen className="size-3 shrink-0" aria-hidden />
+                  <span>{productionLabel}</span>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </a>
+    );
+  }
 
   return (
     // TODO(T3): migrar para <Link to="/pesquisadores/$id">
@@ -72,11 +180,9 @@ export function PersonCard({
       href={researcherHref(researcher.id)}
       className={cn(
         'group relative isolate flex overflow-hidden rounded-lg border bg-neutral-300 text-white dark:bg-neutral-800',
-        isCompact
-          ? 'min-h-[74px] flex-row items-end justify-between gap-2.5 p-2.5'
-          : isList
-            ? 'min-h-24 flex-col justify-between gap-3 p-3 sm:flex-row sm:items-end sm:gap-4'
-            : 'aspect-[3/4] flex-col justify-between p-3',
+        isList
+          ? 'min-h-24 flex-col justify-between gap-3 p-3 sm:flex-row sm:items-end sm:gap-4'
+          : 'aspect-[3/4] flex-col justify-between p-3',
         focusRing,
         className,
       )}
@@ -96,13 +202,7 @@ export function PersonCard({
           aria-hidden
           className="absolute inset-0 -z-20 grid place-items-center bg-gradient-to-br from-slate-400 to-slate-600 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
         >
-          <User
-            className={cn(
-              'text-white/35',
-              isCompact ? 'size-10' : 'size-16',
-            )}
-            strokeWidth={1.75}
-          />
+          <User className="size-16 text-white/35" strokeWidth={1.75} />
         </div>
       )}
 
@@ -115,7 +215,6 @@ export function PersonCard({
         <div
           className={cn(
             'flex items-center justify-between gap-1.5',
-            isCompact && 'order-2 shrink-0 self-start',
             isList && 'sm:order-2 sm:shrink-0',
           )}
         >
@@ -133,21 +232,9 @@ export function PersonCard({
       )}
 
       <div
-        className={cn(
-          'min-w-0',
-          isCompact
-            ? 'order-1 flex-1'
-            : isList
-              ? 'sm:order-1 sm:flex-1'
-              : 'mt-auto',
-        )}
+        className={cn('min-w-0', isList ? 'sm:order-1 sm:flex-1' : 'mt-auto')}
       >
-        <p
-          className={cn(
-            'line-clamp-2 leading-tight font-medium text-white',
-            isCompact ? 'text-sm' : 'text-lg',
-          )}
-        >
+        <p className="line-clamp-2 text-lg leading-tight font-medium text-white">
           {researcher.name}
         </p>
         {institutionLabel && (

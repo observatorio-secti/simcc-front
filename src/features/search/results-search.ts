@@ -113,8 +113,8 @@ export const RESULTS_SORT_VALUES = [
   'jcr',
 ] as const;
 
-/** `map` só vale nas abas de pesquisadores (T2.3). */
-export const RESULTS_VIEW_MODES = ['grid', 'list', 'map'] as const;
+/** Modos de exibição da lista de pesquisadores. */
+export const RESULTS_VIEW_MODES = ['grid', 'list'] as const;
 export type ResultsViewMode = (typeof RESULTS_VIEW_MODES)[number];
 
 export const resultsSearch = createListSearch({
@@ -223,6 +223,7 @@ const ALL_FILTERS: readonly ResultsFilterKey[] = [
 /** O que define a lista de uma aba: a origem e, nas produções, o tipo. */
 export type TabSource =
   | { source: 'researcher' }
+  | { source: 'map' }
   | { source: 'production'; kind: ProductionKind }
   | { source: 'scholarship' }
   | { source: 'magazine' };
@@ -231,6 +232,7 @@ export type TabSource =
 export function filterKeysForTab(tab: TabSource): readonly ResultsFilterKey[] {
   switch (tab.source) {
     case 'researcher':
+    case 'map':
       return RESEARCHER_FILTERS;
     case 'scholarship':
       return SCHOLARSHIP_FILTERS;
@@ -243,7 +245,11 @@ export function filterKeysForTab(tab: TabSource): readonly ResultsFilterKey[] {
 
 /** Bolsas e revistas não têm ano na v2. */
 export function tabSupportsYear(tab: TabSource): boolean {
-  return tab.source === 'researcher' || tab.source === 'production';
+  return (
+    tab.source === 'researcher' ||
+    tab.source === 'map' ||
+    tab.source === 'production'
+  );
 }
 
 /** Quantidade de filtros aplicados que valem para a aba (o intervalo de anos conta 1). */
@@ -389,7 +395,7 @@ export function sortOptionsForTab(
   tab: TabSource,
   hasQuery: boolean,
 ): readonly SortOption[] {
-  if (tab.source === 'researcher') {
+  if (tab.source === 'researcher' || tab.source === 'map') {
     return hasQuery
       ? RESEARCHER_SORT_OPTIONS
       : RESEARCHER_SORT_OPTIONS.filter((option) => option.value === 'name');
@@ -511,11 +517,6 @@ export function toResearcherMapPreviewQuery(
     page,
     per_page: perPage,
   };
-}
-
-/** A visão de mapa só existe nas abas de pesquisadores. */
-export function isMapView(search: ResultsSearch): boolean {
-  return search.view === 'map' && activeTab(search).source === 'researcher';
 }
 
 const RANKING_SIZE = 10;

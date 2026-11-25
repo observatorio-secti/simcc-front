@@ -26,6 +26,7 @@ export function TerritoryProgramsPanel({
   selection,
   onBackToTerritories,
   onBackToTerritory,
+  onSelectCity,
   search,
   noun,
 }: TerritoryProgramsPanelProps) {
@@ -50,6 +51,7 @@ export function TerritoryProgramsPanel({
       selection={selection}
       onBackToTerritories={onBackToTerritories}
       onBackToTerritory={onBackToTerritory}
+      onSelectCity={onSelectCity}
       noun={noun}
       pagination={query.data?.pagination}
       loading={query.isPending}

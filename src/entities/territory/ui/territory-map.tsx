@@ -71,13 +71,13 @@ function fitFeaturesBounds(
   try {
     const bounds = L.geoJSON(features).getBounds();
     if (!bounds.isValid()) return;
-    map.fitBounds(bounds, {
-      padding: options.padding,
-      maxZoom: options.maxZoom,
-    });
-    if (options.minZoom !== undefined && map.getZoom() < options.minZoom) {
-      map.setZoom(options.minZoom);
-    }
+    const padding = L.point(options.padding[0] * 2, options.padding[1] * 2);
+    const boundsZoom = map.getBoundsZoom(bounds, false, padding);
+    const minZoom = options.minZoom ?? map.getMinZoom();
+    const maxZoom = options.maxZoom ?? map.getMaxZoom();
+    const resolvedZoom = Number.isFinite(boundsZoom) ? boundsZoom : minZoom;
+    const targetZoom = Math.max(minZoom, Math.min(maxZoom, resolvedZoom));
+    map.setView(bounds.getCenter(), targetZoom, { animate: true });
   } catch {
     // Ambiente sem layout real (jsdom).
   }
@@ -86,12 +86,19 @@ function fitFeaturesBounds(
 /** Substantivo contado pelo mapa: `['programa', 'programas']`. */
 export type TerritoryMapNoun = readonly [singular: string, plural: string];
 
+export interface TerritoryCityCount {
+  ibge: string;
+  label: string;
+  count: number;
+}
+
 export type TerritorySelection =
   | {
       kind: 'territory';
       code: string;
       label: string;
       count: number;
+      cities: readonly TerritoryCityCount[];
     }
   | {
       kind: 'city';
@@ -106,6 +113,7 @@ export interface TerritorySelectionContext {
   selection: TerritorySelection;
   onBackToTerritories: () => void;
   onBackToTerritory: () => void;
+  onSelectCity: (ibge: string) => void;
 }
 
 export interface TerritoryMapProps {
@@ -128,6 +136,22 @@ export interface TerritoryMapProps {
   /** Título da lista lateral. */
   listTitle?: string;
   className?: string;
+}
+
+function territoryActiveCities(
+  children: readonly { value: string | null; label: string; count: number }[] | null | undefined,
+): TerritoryCityCount[] {
+  return (children ?? [])
+    .filter(
+      (child): child is { value: string; label: string; count: number } =>
+        child.value !== null && child.count > 0,
+    )
+    .map((child) => ({
+      ibge: child.value,
+      label: child.label,
+      count: child.count,
+    }))
+    .sort((a, b) => b.count - a.count);
 }
 
 /**
@@ -223,6 +247,7 @@ export default function TerritoryMap({
           code,
           label,
           count: territory?.count ?? 0,
+          cities: territoryActiveCities(territory?.children),
         });
       } else {
         toggleTerritory?.(code);
@@ -284,6 +309,34 @@ export default function TerritoryMap({
       code: selection.territoryCode,
       label: selection.territoryLabel,
       count: territory?.count ?? 0,
+      cities: territoryActiveCities(territory?.children),
+    });
+  }
+
+  function handleSelectCityFromPanel(ibge: string) {
+    if (!selection) return;
+    const territoryCode =
+      selection.kind === 'territory' ? selection.code : selection.territoryCode;
+    const territoryLabel =
+      selection.kind === 'territory'
+        ? selection.label
+        : selection.territoryLabel;
+    const feature = index?.municipalities.get(ibge);
+    const city = counts.cities.get(ibge);
+    const territory = counts.territories.get(territoryCode);
+
+    setSelection({
+      kind: 'city',
+      ibge,
+      label: city?.label ?? feature?.properties.name ?? ibge,
+      territoryCode,
+      territoryLabel:
+        territory?.label ??
+        territoryLabel ??
+        feature?.properties.territorio_identidade ??
+        TERRITORY_NAMES[territoryCode] ??
+        territoryCode,
+      count: city?.count ?? 0,
     });
   }
 
@@ -491,9 +544,12 @@ export default function TerritoryMap({
       for (const [ibge, city] of counts.cities) {
         const feature = index.municipalities.get(ibge);
         if (!feature || city.count === 0) continue;
+        const territoryId = String(feature.properties.territorio_id);
+        if (focusedTerritoryCode && territoryId !== focusedTerritoryCode) {
+          continue;
+        }
         const center = centerOf(feature as unknown as GeoJSON.GeoJsonObject);
         if (!center) continue;
-        const territoryId = String(feature.properties.territorio_id);
         L.marker(center, {
           icon: createMarkerIcon(city.count, focusedCityIbge === ibge),
         })
@@ -611,6 +667,7 @@ export default function TerritoryMap({
           selection,
           onBackToTerritories: handleBackToTerritories,
           onBackToTerritory: handleBackToTerritory,
+          onSelectCity: handleSelectCityFromPanel,
         })
       ) : (
         <div className="flex h-[420px] flex-col gap-2 rounded-lg border bg-card p-3 md:h-[480px]">

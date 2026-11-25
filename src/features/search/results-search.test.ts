@@ -4,7 +4,6 @@ import {
   activeTab,
   applyQuery,
   countTabFilters,
-  isMapView,
   resolveSort,
   resultsSearch,
   searchInFor,
@@ -151,11 +150,11 @@ describe('results-search (T2)', () => {
     expect(ranking.facets).toBeUndefined();
   });
 
-  it('pede só territory_city no mapa, com o mesmo recorte e limite por nível', () => {
+  it('pede só territory_city na aba de mapa, com o mesmo recorte e limite por nível', () => {
     const search = resultsSearch.parse(
-      'q=solos&view=map&identity_territory=5&city_code=2913606&page=3',
+      'q=solos&tab=map&identity_territory=5&city_code=2913606&page=3',
     );
-    expect(isMapView(search)).toBe(true);
+    expect(activeTab(search).source).toBe('map');
     const map = toResearcherMapQuery(search);
     expect(map).toMatchObject({
       q: 'solos',
@@ -175,11 +174,13 @@ describe('results-search (T2)', () => {
     });
   });
 
-  it('a visão de mapa só vale nas abas de pesquisadores', () => {
-    expect(
-      isMapView(resultsSearch.parse('q=solos&tab=articles&view=map')),
-    ).toBe(false);
-    expect(isMapView(resultsSearch.parse('q=solos&view=list'))).toBe(false);
+  it('a aba de mapa aparece após Pesquisadores e antes de Artigos', () => {
+    expect(TABS_BY_SEARCH_TYPE.profile.slice(0, 3)).toEqual([
+      'researchers',
+      'map',
+      'articles',
+    ]);
+    expect(TABS_BY_SEARCH_TYPE.name).toEqual(['researchers', 'map']);
   });
 
   it('converte o estado em parâmetros de /v2/production/<kind> e de /v2/metrics', () => {
@@ -235,7 +236,7 @@ describe('results-search (T2)', () => {
   it('resolve aba e ordenação válidas para o tipo de busca', () => {
     expect(resolveSearchTab('article', 'patents').id).toBe('researchers');
     expect(resolveSearchTab('article', 'articles').id).toBe('articles');
-    expect(TABS_BY_SEARCH_TYPE.name).toEqual(['researchers']);
+    expect(TABS_BY_SEARCH_TYPE.name).toEqual(['researchers', 'map']);
     expect(
       resolveSort(
         { source: 'production', kind: 'article' },
