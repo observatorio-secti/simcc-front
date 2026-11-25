@@ -42,7 +42,7 @@ export type ProgramCardData = Pick<GraduateProgramSummary, 'id' | 'name'> &
       GraduateProgramSummary &
         Pick<
           GraduateProgramDetail,
-          'institution' | 'counts' | 'research_lines' | 'type'
+          'institution' | 'counts' | 'research_lines'
         >,
       'id' | 'name'
     >
@@ -82,6 +82,10 @@ const PROGRAM_TYPE_LABELS: Record<string, string> = {
   'MESTRADO E DOUTORADO': 'Mestrado e doutorado',
   'MESTRADO PROFISSIONAL': 'Mestrado profissional',
   'DOUTORADO PROFISSIONAL': 'Doutorado profissional',
+  'MESTRADO PROFISSIONAL DOUTORADO PROFISSIONAL':
+    'Mestrado e doutorado profissional',
+  'MESTRADO PROFISSIONAL E DOUTORADO PROFISSIONAL':
+    'Mestrado e doutorado profissional',
   'POS DOUTORADO': 'Pós-doutorado',
 };
 
@@ -236,10 +240,21 @@ export function formatProgramType(
 ): string | null {
   const cleaned = cleanProgramText(type);
   if (!cleaned) return null;
-  const normalized = normalizeKey(cleaned);
+  const deduped = cleaned.includes('/')
+    ? Array.from(
+        new Map(
+          cleaned
+            .split('/')
+            .map((part) => part.trim())
+            .filter(Boolean)
+            .map((part) => [normalizeKey(part), part]),
+        ).values(),
+      ).join('/')
+    : cleaned;
+  const normalized = normalizeKey(deduped);
   return (
     PROGRAM_TYPE_LABELS[normalized] ??
-    (isUniformCase(cleaned) ? toSentenceCase(cleaned) : cleaned)
+    (isUniformCase(deduped) ? toSentenceCase(deduped) : deduped)
   );
 }
 

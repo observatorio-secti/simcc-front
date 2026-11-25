@@ -80,9 +80,15 @@ describe('modalidade e tipo', () => {
     expect(formatProgramType('MESTRADO/DOUTORADO')).toBe(
       'Mestrado e doutorado',
     );
+    expect(formatProgramType('Mestrado/Doutorado/Doutorado')).toBe(
+      'Mestrado e doutorado',
+    );
     expect(formatProgramType('DOUTORADO PROFISSIONAL')).toBe(
       'Doutorado profissional',
     );
+    expect(
+      formatProgramType('Mestrado Profissional/Doutorado Profissional'),
+    ).toBe('Mestrado e doutorado profissional');
     expect(formatProgramType(undefined)).toBeNull();
   });
 });

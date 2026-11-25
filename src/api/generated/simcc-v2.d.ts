@@ -44,7 +44,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/researcher": {
+    "/graduate-program": {
         parameters: {
             query?: never;
             header?: never;
@@ -52,10 +52,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List Researchers
-         * @description Retorna lista paginada de pesquisadores com filtros e ordenação.
+         * List Graduate Programs
+         * @description Retorna lista paginada de programas de pós-graduação.
          */
-        get: operations["list_researchers_researcher_get"];
+        get: operations["list_graduate_programs_graduate_program_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -64,7 +64,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/researcher/{researcher_id}": {
+    "/graduate-program/{program_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -72,31 +72,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Researcher
-         * @description Retorna o perfil de um pesquisador. Formação, experiência e fomento
-         *     vêm com `include=education,experience,foment`.
+         * Get Graduate Program
+         * @description Retorna o detalhe do programa com suas linhas de pesquisa.
          */
-        get: operations["get_researcher_researcher__researcher_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/researcher/{researcher_id}/image": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Researcher Image
-         * @description Retorna a foto do pesquisador.
-         */
-        get: operations["get_researcher_image_researcher__researcher_id__image_get"];
+        get: operations["get_graduate_program_graduate_program__program_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -145,7 +124,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/graduate-program": {
+    "/magazine": {
         parameters: {
             query?: never;
             header?: never;
@@ -153,10 +132,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List Graduate Programs
-         * @description Retorna lista paginada de programas de pós-graduação.
+         * List Magazines
+         * @description Revistas com Qualis e JCR, buscáveis por nome e ISSN.
          */
-        get: operations["list_graduate_programs_graduate_program_get"];
+        get: operations["list_magazines_magazine_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -165,7 +144,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/graduate-program/{program_id}": {
+    "/magazine/{magazine_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Magazine */
+        get: operations["get_magazine_magazine__magazine_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/general": {
         parameters: {
             query?: never;
             header?: never;
@@ -173,10 +169,31 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Graduate Program
-         * @description Retorna o detalhe do programa com suas linhas de pesquisa.
+         * Get General Metrics
+         * @description Métricas gerais únicas da plataforma (MVs canônicas + cache Redis).
          */
-        get: operations["get_graduate_program_graduate_program__program_id__get"];
+        get: operations["get_general_metrics_metrics_general_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/production/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Production Metric
+         * @description Série anual de produções de um tipo, com os mesmos filtros de
+         *     `/v2/production/{kind}` e agrupamento opcional (`group_by`).
+         */
+        get: operations["get_production_metric_metrics_production__kind__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -245,26 +262,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/production/book/{book_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Dossiê detalhado de livro
-         * @description Retorna detalhes de um livro pelo ID canônico ou ISBN.
-         */
-        get: operations["get_book_production_book__book_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/production/book-chapter": {
         parameters: {
             query?: never;
@@ -305,7 +302,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/production/software": {
+    "/production/book/{book_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -313,10 +310,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Busca e listagem paginada de softwares
-         * @description Retorna lista paginada de softwares com filtros.
+         * Dossiê detalhado de livro
+         * @description Retorna detalhes de um livro pelo ID canônico ou ISBN.
          */
-        get: operations["list_software_production_software_get"];
+        get: operations["get_book_production_book__book_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -325,7 +322,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/production/software/{software_id}": {
+    "/production/brand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Busca e listagem paginada de marcas */
+        get: operations["list_brand_production_brand_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/brand/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalhe de marcas */
+        get: operations["get_brand_production_brand__item_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/event": {
         parameters: {
             query?: never;
             header?: never;
@@ -333,10 +364,132 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Dossiê detalhado de software
-         * @description Retorna detalhes de um software pelo ID canônico ou código.
+         * Busca e listagem paginada de participação em eventos
+         * @description Retorna lista paginada de eventos com filtros.
          */
-        get: operations["get_software_production_software__software_id__get"];
+        get: operations["list_events_production_event_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/event-work": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Busca e listagem paginada de trabalhos em eventos */
+        get: operations["list_event_work_production_event_work_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/event-work/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalhe de trabalhos em eventos */
+        get: operations["get_event_work_production_event_work__item_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/event/{event_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Dossiê detalhado de participação em evento
+         * @description Retorna detalhes de uma participação em evento pelo ID canônico.
+         */
+        get: operations["get_event_production_event__event_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/guidance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Busca e listagem paginada de orientações */
+        get: operations["list_guidance_production_guidance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/guidance/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalhe de orientações */
+        get: operations["get_guidance_production_guidance__item_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/magazine-text": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Busca e listagem paginada de textos em revista */
+        get: operations["list_magazine_text_production_magazine_text_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/production/magazine-text/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalhe de textos em revista */
+        get: operations["get_magazine_text_production_magazine_text__item_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -385,18 +538,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/production/event": {
+    "/production/report": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * Busca e listagem paginada de participação em eventos
-         * @description Retorna lista paginada de eventos com filtros.
-         */
-        get: operations["list_events_production_event_get"];
+        /** Busca e listagem paginada de relatórios técnicos */
+        get: operations["list_report_production_report_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -405,18 +555,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/production/event/{event_id}": {
+    "/production/report/{item_id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * Dossiê detalhado de participação em evento
-         * @description Retorna detalhes de uma participação em evento pelo ID canônico.
-         */
-        get: operations["get_event_production_event__event_id__get"];
+        /** Detalhe de relatórios técnicos */
+        get: operations["get_report_production_report__item_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -465,177 +612,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/production/brand": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Busca e listagem paginada de marcas */
-        get: operations["list_brand_production_brand_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/brand/{item_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Detalhe de marcas */
-        get: operations["get_brand_production_brand__item_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/guidance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Busca e listagem paginada de orientações */
-        get: operations["list_guidance_production_guidance_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/guidance/{item_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Detalhe de orientações */
-        get: operations["get_guidance_production_guidance__item_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/report": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Busca e listagem paginada de relatórios técnicos */
-        get: operations["list_report_production_report_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/report/{item_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Detalhe de relatórios técnicos */
-        get: operations["get_report_production_report__item_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/magazine-text": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Busca e listagem paginada de textos em revista */
-        get: operations["list_magazine_text_production_magazine_text_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/magazine-text/{item_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Detalhe de textos em revista */
-        get: operations["get_magazine_text_production_magazine_text__item_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/event-work": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Busca e listagem paginada de trabalhos em eventos */
-        get: operations["list_event_work_production_event_work_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/production/event-work/{item_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Detalhe de trabalhos em eventos */
-        get: operations["get_event_work_production_event_work__item_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/suggestion": {
+    "/production/software": {
         parameters: {
             query?: never;
             header?: never;
@@ -643,10 +620,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List Suggestions
-         * @description Retorna termos do dicionário de pesquisa que começam com `q`.
+         * Busca e listagem paginada de softwares
+         * @description Retorna lista paginada de softwares com filtros.
          */
-        get: operations["list_suggestions_suggestion_get"];
+        get: operations["list_software_production_software_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -655,7 +632,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/magazine": {
+    "/production/software/{software_id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -663,10 +640,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List Magazines
-         * @description Revistas com Qualis e JCR, buscáveis por nome e ISSN.
+         * Dossiê detalhado de software
+         * @description Retorna detalhes de um software pelo ID canônico ou código.
          */
-        get: operations["list_magazines_magazine_get"];
+        get: operations["get_software_production_software__software_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -675,24 +652,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/magazine/{magazine_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Magazine */
-        get: operations["get_magazine_magazine__magazine_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/scholarship": {
+    "/researcher": {
         parameters: {
             query?: never;
             header?: never;
@@ -700,10 +660,51 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List Scholarships
-         * @description Bolsas e auxílios (fomento) dos pesquisadores.
+         * List Researchers
+         * @description Retorna lista paginada de pesquisadores com filtros e ordenação.
          */
-        get: operations["list_scholarships_scholarship_get"];
+        get: operations["list_researchers_researcher_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/researcher/{researcher_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Researcher
+         * @description Retorna o perfil de um pesquisador. Formação, experiência e fomento
+         *     vêm com `include=education,experience,foment`.
+         */
+        get: operations["get_researcher_researcher__researcher_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/researcher/{researcher_id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Researcher Image
+         * @description Retorna a foto do pesquisador.
+         */
+        get: operations["get_researcher_image_researcher__researcher_id__image_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -733,7 +734,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/metrics/production/{kind}": {
+    "/scholarship": {
         parameters: {
             query?: never;
             header?: never;
@@ -741,11 +742,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get Production Metric
-         * @description Série anual de produções de um tipo, com os mesmos filtros de
-         *     `/v2/production/{kind}` e agrupamento opcional (`group_by`).
+         * List Scholarships
+         * @description Bolsas e auxílios (fomento) dos pesquisadores.
          */
-        get: operations["get_production_metric_metrics_production__kind__get"];
+        get: operations["list_scholarships_scholarship_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -754,7 +754,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/metrics/general": {
+    "/suggestion": {
         parameters: {
             query?: never;
             header?: never;
@@ -762,10 +762,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get General Metrics
-         * @description Métricas gerais únicas da plataforma (MVs canônicas + cache Redis).
+         * List Suggestions
+         * @description Retorna termos do dicionário de pesquisa que começam com `q`.
          */
-        get: operations["get_general_metrics_metrics_general_get"];
+        get: operations["list_suggestions_suggestion_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -780,22 +780,32 @@ export interface components {
     schemas: {
         /** Affiliation */
         Affiliation: {
+            /** @description Cidade do vínculo */
+            city?: components["schemas"]["CityRef"] | null;
+            /**
+             * Identity Territory
+             * @description Território de identidade do vínculo
+             */
+            identity_territory?: string | null;
             institution: components["schemas"]["InstitutionRef"];
             /**
              * Workload
              * @description Regime de trabalho em horas semanais
              */
             workload?: number | null;
-            /**
-             * Identity Territory
-             * @description Território de identidade do vínculo
-             */
-            identity_territory?: string | null;
-            /** @description Cidade do vínculo */
-            city?: components["schemas"]["CityRef"] | null;
         };
         /** AnalyticsMetricItem */
         AnalyticsMetricItem: {
+            /**
+             * Active Users
+             * @description Quantidade de usuários ativos
+             */
+            active_users: number;
+            /**
+             * Country
+             * @description País de origem do acesso
+             */
+            country: string;
             /**
              * Date
              * Format: date
@@ -803,30 +813,20 @@ export interface components {
              */
             date: string;
             /**
-             * Event Name
-             * @description Nome do evento registrado no GA4
-             */
-            event_name: string;
-            /**
-             * Country
-             * @description País de origem do acesso
-             */
-            country: string;
-            /**
-             * Host Name
-             * @description Host do site acessado
-             */
-            host_name: string;
-            /**
              * Event Count
              * @description Quantidade de eventos disparados
              */
             event_count: number;
             /**
-             * Active Users
-             * @description Quantidade de usuários ativos
+             * Event Name
+             * @description Nome do evento registrado no GA4
              */
-            active_users: number;
+            event_name: string;
+            /**
+             * Host Name
+             * @description Host do site acessado
+             */
+            host_name: string;
         };
         /** AnalyticsPageMetric */
         AnalyticsPageMetric: {
@@ -858,26 +858,26 @@ export interface components {
              * @description Lista de métricas detalhadas
              */
             data: components["schemas"]["AnalyticsMetricItem"][];
+            meta: components["schemas"]["Meta"];
             /** @description Resumo do período */
             summary: components["schemas"]["AnalyticsSummary"];
-            meta: components["schemas"]["Meta"];
         };
         /** AnalyticsSummary */
         AnalyticsSummary: {
-            /**
-             * Total Events
-             * @description Total acumulado de eventos no período
-             */
-            total_events: number;
+            /** End Date */
+            end_date: string;
+            /** Start Date */
+            start_date: string;
             /**
              * Total Active Users
              * @description Total acumulado de usuários ativos
              */
             total_active_users: number;
-            /** Start Date */
-            start_date: string;
-            /** End Date */
-            end_date: string;
+            /**
+             * Total Events
+             * @description Total acumulado de eventos no período
+             */
+            total_events: number;
         };
         /**
          * ArticleDetail
@@ -885,38 +885,31 @@ export interface components {
          */
         ArticleDetail: {
             /**
-             * Id
-             * Format: uuid
-             * @description Identificador único canônico do artigo
+             * Abstract
+             * @description Resumo completo do artigo (OpenAlex)
              */
-            id: string;
+            abstract?: string | null;
             /**
-             * Title
-             * @description Título do artigo
+             * All Authors Raw
+             * @description Citação textual de todos os autores da publicação
              */
-            title: string;
+            all_authors_raw?: string | null;
             /**
-             * Year
-             * @description Ano de publicação
+             * Authors
+             * @description Autores separados a partir de `all_authors_raw`
              */
-            year?: number | null;
-            /**
-             * Doi
-             * @description DOI do artigo
-             */
-            doi?: string | null;
-            magazine?: components["schemas"]["MagazineRef"] | null;
-            /**
-             * Platform Authors
-             * @description Coautores pesquisadores cadastrados na plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
+            authors?: components["schemas"]["AuthorName"][];
             /**
              * Citations Count
              * @description Total de citações registradas no OpenAlex
              * @default 0
              */
             citations_count: number;
+            /**
+             * Doi
+             * @description DOI do artigo
+             */
+            doi?: string | null;
             /**
              * Has Abstract
              * @description Indica se o artigo possui resumo no OpenAlex
@@ -930,45 +923,52 @@ export interface components {
              */
             has_open_access_pdf: boolean;
             /**
-             * Matches
-             * @description Evidências de busca quando termo textual (q) pesquisado
+             * Id
+             * Format: uuid
+             * @description Identificador único canônico do artigo
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
-            /**
-             * Authors
-             * @description Autores separados a partir de `all_authors_raw`
-             */
-            authors?: components["schemas"]["AuthorName"][];
-            /**
-             * Abstract
-             * @description Resumo completo do artigo (OpenAlex)
-             */
-            abstract?: string | null;
-            /**
-             * Landing Page Url
-             * @description URL da página oficial da publicação
-             */
-            landing_page_url?: string | null;
-            /**
-             * Pdf Url
-             * @description URL direta do arquivo PDF em acesso aberto
-             */
-            pdf_url?: string | null;
+            id: string;
             /**
              * Keywords
              * @description Palavras-chave registradas no OpenAlex
              */
             keywords?: string[];
             /**
-             * All Authors Raw
-             * @description Citação textual de todos os autores da publicação
+             * Landing Page Url
+             * @description URL da página oficial da publicação
              */
-            all_authors_raw?: string | null;
+            landing_page_url?: string | null;
             /**
              * Language
              * @description Idioma da publicação
              */
             language?: string | null;
+            magazine?: components["schemas"]["MagazineRef"] | null;
+            /**
+             * Matches
+             * @description Evidências de busca quando termo textual (q) pesquisado
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Pdf Url
+             * @description URL direta do arquivo PDF em acesso aberto
+             */
+            pdf_url?: string | null;
+            /**
+             * Platform Authors
+             * @description Coautores pesquisadores cadastrados na plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Title
+             * @description Título do artigo
+             */
+            title: string;
+            /**
+             * Year
+             * @description Ano de publicação
+             */
+            year?: number | null;
         };
         /**
          * ArticleFilter
@@ -976,80 +976,80 @@ export interface components {
          */
         ArticleFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
             /**
-             * Qualis
-             * @description Estrato Qualis (A1...C) ou ausência (not_rated, not_applicable). Aceita também SQ e NP
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
              */
-            qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "not_rated" | "not_applicable")[];
+            graduate_program_id?: string[];
             /**
              * Has Open Access
              * @description Filtrar apenas artigos com PDF em acesso aberto
              */
             has_open_access?: boolean | null;
             /**
-             * Magazine Name
-             * @description Nome da revista/periódico
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
              */
-            magazine_name?: string[];
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
             /**
              * Issn
              * @description ISSN do periódico
              */
             issn?: string[];
+            /**
+             * Magazine Name
+             * @description Nome da revista/periódico
+             */
+            magazine_name?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Qualis
+             * @description Estrato Qualis (A1...C) ou ausência (not_rated, not_applicable). Aceita também SQ e NP
+             */
+            qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "not_rated" | "not_applicable")[];
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * ArticleMatch
@@ -1062,11 +1062,6 @@ export interface components {
              */
             field: string;
             /**
-             * Snippet
-             * @description Trecho em texto puro, sem marcação
-             */
-            snippet: string;
-            /**
              * Highlights
              * @description Intervalos [início, fim) destacados em `snippet`, em unidades UTF-16 (as de String.slice no JavaScript)
              */
@@ -1074,6 +1069,11 @@ export interface components {
                 number,
                 number
             ][];
+            /**
+             * Snippet
+             * @description Trecho em texto puro, sem marcação
+             */
+            snippet: string;
         };
         /**
          * ArticleSearchResponse
@@ -1085,14 +1085,6 @@ export interface components {
              * @description Lista paginada de artigos
              */
             data: components["schemas"]["ArticleSummary"][];
-            /** @description Metadados de paginação */
-            pagination: components["schemas"]["Pagination"];
-            /** @description Filtros aplicados na busca */
-            filters_applied: components["schemas"]["ArticleFilter"];
-            /** @description Critério e direção de ordenação */
-            sort: components["schemas"]["Sort"];
-            /** @description Metadados de performance e cache */
-            meta: components["schemas"]["Meta"];
             /**
              * Facets
              * @description Facets solicitados em `facets`
@@ -1100,6 +1092,14 @@ export interface components {
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            /** @description Filtros aplicados na busca */
+            filters_applied: components["schemas"]["ArticleFilter"];
+            /** @description Metadados de performance e cache */
+            meta: components["schemas"]["Meta"];
+            /** @description Metadados de paginação */
+            pagination: components["schemas"]["Pagination"];
+            /** @description Critério e direção de ordenação */
+            sort: components["schemas"]["Sort"];
         };
         /**
          * ArticleSummary
@@ -1107,38 +1107,16 @@ export interface components {
          */
         ArticleSummary: {
             /**
-             * Id
-             * Format: uuid
-             * @description Identificador único canônico do artigo
-             */
-            id: string;
-            /**
-             * Title
-             * @description Título do artigo
-             */
-            title: string;
-            /**
-             * Year
-             * @description Ano de publicação
-             */
-            year?: number | null;
-            /**
-             * Doi
-             * @description DOI do artigo
-             */
-            doi?: string | null;
-            magazine?: components["schemas"]["MagazineRef"] | null;
-            /**
-             * Platform Authors
-             * @description Coautores pesquisadores cadastrados na plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
              * Citations Count
              * @description Total de citações registradas no OpenAlex
              * @default 0
              */
             citations_count: number;
+            /**
+             * Doi
+             * @description DOI do artigo
+             */
+            doi?: string | null;
             /**
              * Has Abstract
              * @description Indica se o artigo possui resumo no OpenAlex
@@ -1152,10 +1130,32 @@ export interface components {
              */
             has_open_access_pdf: boolean;
             /**
+             * Id
+             * Format: uuid
+             * @description Identificador único canônico do artigo
+             */
+            id: string;
+            magazine?: components["schemas"]["MagazineRef"] | null;
+            /**
              * Matches
              * @description Evidências de busca quando termo textual (q) pesquisado
              */
             matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform Authors
+             * @description Coautores pesquisadores cadastrados na plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Title
+             * @description Título do artigo
+             */
+            title: string;
+            /**
+             * Year
+             * @description Ano de publicação
+             */
+            year?: number | null;
         };
         /**
          * AuthorName
@@ -1170,12 +1170,12 @@ export interface components {
         };
         /** Bibliometrics */
         Bibliometrics: {
+            /** Cited By Count */
+            cited_by_count?: number | null;
             /** H Index */
             h_index?: number | null;
             /** I10 Index */
             i10_index?: number | null;
-            /** Cited By Count */
-            cited_by_count?: number | null;
             /** Works Count */
             works_count?: number | null;
         };
@@ -1185,76 +1185,76 @@ export interface components {
          */
         BookChapterDetail: {
             /**
-             * Id
-             * Format: uuid
-             * @description ID canônico do capítulo
+             * All Authors Raw
+             * @description Autores brutos
              */
-            id: string;
-            /**
-             * Title
-             * @description Título do capítulo
-             */
-            title: string;
-            /**
-             * Book Title
-             * @description Título do livro
-             */
-            book_title?: string | null;
-            /**
-             * Year
-             * @description Ano de publicação
-             */
-            year?: number | null;
-            /**
-             * Isbn
-             * @description ISBN
-             */
-            isbn?: string | null;
-            /**
-             * Publishing Company
-             * @description Editora
-             */
-            publishing_company?: string | null;
-            /**
-             * Platform Authors
-             * @description Autores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            all_authors_raw?: string | null;
             /**
              * Authors
              * @description Autores separados a partir de `all_authors_raw`
              */
             authors?: components["schemas"]["AuthorName"][];
             /**
+             * Book Title
+             * @description Título do livro
+             */
+            book_title?: string | null;
+            /**
              * Doi
              * @description DOI
              */
             doi?: string | null;
-            /**
-             * Organizers
-             * @description Organizadores
-             */
-            organizers?: string | null;
-            /**
-             * Start Page
-             * @description Página inicial
-             */
-            start_page?: string | null;
             /**
              * End Page
              * @description Página final
              */
             end_page?: string | null;
             /**
-             * All Authors Raw
-             * @description Autores brutos
+             * Id
+             * Format: uuid
+             * @description ID canônico do capítulo
              */
-            all_authors_raw?: string | null;
+            id: string;
+            /**
+             * Isbn
+             * @description ISBN
+             */
+            isbn?: string | null;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Organizers
+             * @description Organizadores
+             */
+            organizers?: string | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Publishing Company
+             * @description Editora
+             */
+            publishing_company?: string | null;
+            /**
+             * Start Page
+             * @description Página inicial
+             */
+            start_page?: string | null;
+            /**
+             * Title
+             * @description Título do capítulo
+             */
+            title: string;
+            /**
+             * Year
+             * @description Ano de publicação
+             */
+            year?: number | null;
         };
         /**
          * BookChapterFilter
@@ -1262,60 +1262,60 @@ export interface components {
          */
         BookChapterFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
+            /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * BookChapterSearchResponse
@@ -1324,14 +1324,14 @@ export interface components {
         BookChapterSearchResponse: {
             /** Data */
             data: components["schemas"]["BookChapterSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["BookChapterFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["BookChapterFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * BookChapterSummary
@@ -1339,46 +1339,46 @@ export interface components {
          */
         BookChapterSummary: {
             /**
+             * Book Title
+             * @description Título do livro
+             */
+            book_title?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico do capítulo
              */
             id: string;
             /**
-             * Title
-             * @description Título do capítulo
-             */
-            title: string;
-            /**
-             * Book Title
-             * @description Título do livro
-             */
-            book_title?: string | null;
-            /**
-             * Year
-             * @description Ano de publicação
-             */
-            year?: number | null;
-            /**
              * Isbn
              * @description ISBN
              */
             isbn?: string | null;
             /**
-             * Publishing Company
-             * @description Editora
+             * Matches
+             * @description Matches
              */
-            publishing_company?: string | null;
+            matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
              * Platform Authors
              * @description Autores da plataforma
              */
             platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
-             * Matches
-             * @description Matches
+             * Publishing Company
+             * @description Editora
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            publishing_company?: string | null;
+            /**
+             * Title
+             * @description Título do capítulo
+             */
+            title: string;
+            /**
+             * Year
+             * @description Ano de publicação
+             */
+            year?: number | null;
         };
         /**
          * BookDetail
@@ -1386,41 +1386,10 @@ export interface components {
          */
         BookDetail: {
             /**
-             * Id
-             * Format: uuid
-             * @description ID canônico do livro
+             * All Authors Raw
+             * @description Autores brutos
              */
-            id: string;
-            /**
-             * Title
-             * @description Título do livro
-             */
-            title: string;
-            /**
-             * Year
-             * @description Ano de publicação
-             */
-            year?: number | null;
-            /**
-             * Isbn
-             * @description ISBN
-             */
-            isbn?: string | null;
-            /**
-             * Publishing Company
-             * @description Editora
-             */
-            publishing_company?: string | null;
-            /**
-             * Platform Authors
-             * @description Autores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            all_authors_raw?: string | null;
             /**
              * Authors
              * @description Autores separados a partir de `all_authors_raw`
@@ -1432,15 +1401,46 @@ export interface components {
              */
             doi?: string | null;
             /**
+             * Id
+             * Format: uuid
+             * @description ID canônico do livro
+             */
+            id: string;
+            /**
+             * Isbn
+             * @description ISBN
+             */
+            isbn?: string | null;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Publishing Company
+             * @description Editora
+             */
+            publishing_company?: string | null;
+            /**
              * Publishing Company City
              * @description Cidade
              */
             publishing_company_city?: string | null;
             /**
-             * All Authors Raw
-             * @description Autores brutos
+             * Title
+             * @description Título do livro
              */
-            all_authors_raw?: string | null;
+            title: string;
+            /**
+             * Year
+             * @description Ano de publicação
+             */
+            year?: number | null;
         };
         /**
          * BookFilter
@@ -1448,60 +1448,60 @@ export interface components {
          */
         BookFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
+            /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * BookSearchResponse
@@ -1510,14 +1510,14 @@ export interface components {
         BookSearchResponse: {
             /** Data */
             data: components["schemas"]["BookSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["BookFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["BookFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * BookSummary
@@ -1531,6 +1531,26 @@ export interface components {
              */
             id: string;
             /**
+             * Isbn
+             * @description ISBN
+             */
+            isbn?: string | null;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Publishing Company
+             * @description Editora
+             */
+            publishing_company?: string | null;
+            /**
              * Title
              * @description Título do livro
              */
@@ -1540,26 +1560,6 @@ export interface components {
              * @description Ano de publicação
              */
             year?: number | null;
-            /**
-             * Isbn
-             * @description ISBN
-             */
-            isbn?: string | null;
-            /**
-             * Publishing Company
-             * @description Editora
-             */
-            publishing_company?: string | null;
-            /**
-             * Platform Authors
-             * @description Autores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
         };
         /**
          * BrandDetail
@@ -1567,21 +1567,21 @@ export interface components {
          */
         BrandDetail: {
             /**
+             * Goal
+             * @description Finalidade da marca
+             */
+            goal?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico da marca
              */
             id: string;
             /**
-             * Title
-             * @description Nome da marca
+             * Matches
+             * @description Matches
              */
-            title: string;
-            /**
-             * Year
-             * @description Ano
-             */
-            year?: number | null;
+            matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
              * Nature
              * @description Natureza da marca
@@ -1593,15 +1593,15 @@ export interface components {
              */
             platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
-             * Matches
-             * @description Matches
+             * Title
+             * @description Nome da marca
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            title: string;
             /**
-             * Goal
-             * @description Finalidade da marca
+             * Year
+             * @description Ano
              */
-            goal?: string | null;
+            year?: number | null;
         };
         /**
          * BrandFilter
@@ -1609,65 +1609,65 @@ export interface components {
          */
         BrandFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
             /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
              * Nature
              * @description Natureza da marca
              */
             nature?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * BrandSearchResponse
@@ -1676,14 +1676,14 @@ export interface components {
         BrandSearchResponse: {
             /** Data */
             data: components["schemas"]["BrandSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["BrandFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["BrandFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * BrandSummary
@@ -1697,15 +1697,10 @@ export interface components {
              */
             id: string;
             /**
-             * Title
-             * @description Nome da marca
+             * Matches
+             * @description Matches
              */
-            title: string;
-            /**
-             * Year
-             * @description Ano
-             */
-            year?: number | null;
+            matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
              * Nature
              * @description Natureza da marca
@@ -1717,10 +1712,15 @@ export interface components {
              */
             platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
-             * Matches
-             * @description Matches
+             * Title
+             * @description Nome da marca
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            title: string;
+            /**
+             * Year
+             * @description Ano
+             */
+            year?: number | null;
         };
         /**
          * CatalogResponse
@@ -1732,15 +1732,15 @@ export interface components {
              * @description Lista de programas
              */
             data: components["schemas"]["GraduateProgramSummary"][];
-            /** @description Metadados de paginação */
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["GraduateProgramFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["GraduateProgramFilter"];
+            meta: components["schemas"]["Meta"];
+            /** @description Metadados de paginação */
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /** CityRef */
         CityRef: {
@@ -1844,40 +1844,40 @@ export interface components {
         /** Education */
         Education: {
             /**
-             * Degree
-             * @description Nível (ex.: Doutorado)
-             */
-            degree: string;
-            /**
              * Course
              * @description Nome do curso
              */
             course?: string | null;
             /**
-             * Institution
-             * @description Instituição
+             * Degree
+             * @description Nível (ex.: Doutorado)
              */
-            institution?: string | null;
-            /**
-             * Start Year
-             * @description Ano de início
-             */
-            start_year?: number | null;
+            degree: string;
             /**
              * End Year
              * @description Ano de conclusão
              */
             end_year?: number | null;
             /**
-             * Status
-             * @description Situação
+             * Institution
+             * @description Instituição
              */
-            status?: string | null;
+            institution?: string | null;
             /**
              * Keywords
              * @description Palavras-chave
              */
             keywords?: string[];
+            /**
+             * Start Year
+             * @description Ano de início
+             */
+            start_year?: number | null;
+            /**
+             * Status
+             * @description Situação
+             */
+            status?: string | null;
         };
         /** ErrorBody */
         ErrorBody: {
@@ -1886,13 +1886,13 @@ export interface components {
              * @description Código estável do erro (ex.: not_found, validation_error, unknown_parameter)
              */
             code: string;
+            /** Details */
+            details?: components["schemas"]["ErrorDetail"][];
             /**
              * Message
              * @description Mensagem legível
              */
             message: string;
-            /** Details */
-            details?: components["schemas"]["ErrorDetail"][];
         };
         /** ErrorDetail */
         ErrorDetail: {
@@ -1901,6 +1901,11 @@ export interface components {
              * @description Parâmetro ou campo relacionado ao erro
              */
             field?: string | null;
+            /**
+             * Input
+             * @description Valor recebido
+             */
+            input?: unknown | null;
             /**
              * Message
              * @description Descrição do problema
@@ -1911,11 +1916,6 @@ export interface components {
              * @description Tipo do erro de validação
              */
             type?: string | null;
-            /**
-             * Input
-             * @description Valor recebido
-             */
-            input?: unknown | null;
         };
         /**
          * ErrorResponse
@@ -1949,51 +1949,51 @@ export interface components {
          */
         EventDetail: {
             /**
+             * Event Name
+             * @description Nome do evento
+             */
+            event_name?: string | null;
+            /**
+             * Form Participation
+             * @description Forma de participação
+             */
+            form_participation?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico da participação
              */
             id: string;
             /**
-             * Title
-             * @description Título do trabalho ou apresentação (ausente quando a participação não teve trabalho apresentado)
+             * Matches
+             * @description Matches
              */
-            title?: string | null;
-            /**
-             * Event Name
-             * @description Nome do evento
-             */
-            event_name?: string | null;
-            /**
-             * Year
-             * @description Ano do evento
-             */
-            year?: number | null;
+            matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
              * Nature
              * @description Natureza do evento
              */
             nature?: string | null;
             /**
-             * Type Participation
-             * @description Tipo de participação
-             */
-            type_participation?: string | null;
-            /**
              * Platform Authors
              * @description Participantes da plataforma
              */
             platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
-             * Matches
-             * @description Matches
+             * Title
+             * @description Título do trabalho ou apresentação (ausente quando a participação não teve trabalho apresentado)
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            title?: string | null;
             /**
-             * Form Participation
-             * @description Forma de participação
+             * Type Participation
+             * @description Tipo de participação
              */
-            form_participation?: string | null;
+            type_participation?: string | null;
+            /**
+             * Year
+             * @description Ano do evento
+             */
+            year?: number | null;
         };
         /**
          * EventFilter
@@ -2001,75 +2001,75 @@ export interface components {
          */
         EventFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
             /**
+             * Form Participation
+             * @description Forma de participação (ex.: Convidado, Ouvinte)
+             */
+            form_participation?: string[];
+            /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
              * Nature
              * @description Natureza do evento (ex.: Congresso, Seminário)
              */
             nature?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
             /**
              * Type Participation
              * @description Tipo de participação (ex.: Apresentação Oral)
              */
             type_participation?: string[];
             /**
-             * Form Participation
-             * @description Forma de participação (ex.: Convidado, Ouvinte)
+             * Year End
+             * @description Ano final
              */
-            form_participation?: string[];
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * EventSearchResponse
@@ -2078,14 +2078,14 @@ export interface components {
         EventSearchResponse: {
             /** Data */
             data: components["schemas"]["EventSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["EventFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["EventFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * EventSummary
@@ -2093,46 +2093,46 @@ export interface components {
          */
         EventSummary: {
             /**
+             * Event Name
+             * @description Nome do evento
+             */
+            event_name?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico da participação
              */
             id: string;
             /**
-             * Title
-             * @description Título do trabalho ou apresentação (ausente quando a participação não teve trabalho apresentado)
+             * Matches
+             * @description Matches
              */
-            title?: string | null;
-            /**
-             * Event Name
-             * @description Nome do evento
-             */
-            event_name?: string | null;
-            /**
-             * Year
-             * @description Ano do evento
-             */
-            year?: number | null;
+            matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
              * Nature
              * @description Natureza do evento
              */
             nature?: string | null;
             /**
-             * Type Participation
-             * @description Tipo de participação
-             */
-            type_participation?: string | null;
-            /**
              * Platform Authors
              * @description Participantes da plataforma
              */
             platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
-             * Matches
-             * @description Matches
+             * Title
+             * @description Título do trabalho ou apresentação (ausente quando a participação não teve trabalho apresentado)
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            title?: string | null;
+            /**
+             * Type Participation
+             * @description Tipo de participação
+             */
+            type_participation?: string | null;
+            /**
+             * Year
+             * @description Ano do evento
+             */
+            year?: number | null;
         };
         /**
          * EventWorkDetail
@@ -2140,66 +2140,96 @@ export interface components {
          */
         EventWorkDetail: {
             /**
-             * Id
-             * Format: uuid
-             * @description ID canônico do trabalho em evento
+             * All Authors Raw
+             * @description Lista bruta de autores
              */
-            id: string;
+            all_authors_raw?: string | null;
             /**
-             * Title
-             * @description Título do trabalho
+             * End Page
+             * @description Página final
              */
-            title: string;
+            end_page?: string | null;
             /**
-             * Year
-             * @description Ano de publicação
+             * Event City
+             * @description Cidade do evento
              */
-            year?: number | null;
-            /**
-             * Nature
-             * @description Natureza do trabalho
-             */
-            nature?: string | null;
-            /**
-             * Event Name
-             * @description Nome do evento
-             */
-            event_name?: string | null;
+            event_city?: string | null;
             /**
              * Event Classification
              * @description Classificação do evento
              */
             event_classification?: string | null;
             /**
-             * Platform Authors
-             * @description Autores da plataforma
+             * Event Name
+             * @description Nome do evento
              */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
+            event_name?: string | null;
             /**
-             * Matches
-             * @description Matches
+             * Event Year
+             * @description Ano do evento
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            event_year?: number | null;
             /**
-             * Title En
-             * @description Título em inglês
+             * Homepage
+             * @description URL do trabalho
              */
-            title_en?: string | null;
+            homepage?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             * @description ID canônico do trabalho em evento
+             */
+            id: string;
+            /**
+             * Isbn
+             * @description ISBN dos anais
+             */
+            isbn?: string | null;
+            /**
+             * Issue
+             * @description Fascículo
+             */
+            issue?: string | null;
             /**
              * Language
              * @description Idioma
              */
             language?: string | null;
             /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
              * Means Divulgation
              * @description Meio de divulgação
              */
             means_divulgation?: string | null;
             /**
-             * Homepage
-             * @description URL do trabalho
+             * Nature
+             * @description Natureza do trabalho
              */
-            homepage?: string | null;
+            nature?: string | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Proceedings Title
+             * @description Título dos anais
+             */
+            proceedings_title?: string | null;
+            /**
+             * Publisher City
+             * @description Cidade da editora
+             */
+            publisher_city?: string | null;
+            /**
+             * Publisher Name
+             * @description Editora
+             */
+            publisher_name?: string | null;
             /**
              * Relevance
              * @description Produção relevante
@@ -2211,36 +2241,6 @@ export interface components {
              */
             scientific_divulgation?: boolean | null;
             /**
-             * All Authors Raw
-             * @description Lista bruta de autores
-             */
-            all_authors_raw?: string | null;
-            /**
-             * Event City
-             * @description Cidade do evento
-             */
-            event_city?: string | null;
-            /**
-             * Event Year
-             * @description Ano do evento
-             */
-            event_year?: number | null;
-            /**
-             * Proceedings Title
-             * @description Título dos anais
-             */
-            proceedings_title?: string | null;
-            /**
-             * Volume
-             * @description Volume
-             */
-            volume?: string | null;
-            /**
-             * Issue
-             * @description Fascículo
-             */
-            issue?: string | null;
-            /**
              * Series
              * @description Série
              */
@@ -2251,25 +2251,25 @@ export interface components {
              */
             start_page?: string | null;
             /**
-             * End Page
-             * @description Página final
+             * Title
+             * @description Título do trabalho
              */
-            end_page?: string | null;
+            title: string;
             /**
-             * Publisher Name
-             * @description Editora
+             * Title En
+             * @description Título em inglês
              */
-            publisher_name?: string | null;
+            title_en?: string | null;
             /**
-             * Publisher City
-             * @description Cidade da editora
+             * Volume
+             * @description Volume
              */
-            publisher_city?: string | null;
+            volume?: string | null;
             /**
-             * Isbn
-             * @description ISBN dos anais
+             * Year
+             * @description Ano de publicação
              */
-            isbn?: string | null;
+            year?: number | null;
         };
         /**
          * EventWorkFilter
@@ -2277,70 +2277,70 @@ export interface components {
          */
         EventWorkFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
             /**
+             * Event Classification
+             * @description Classificação do evento
+             */
+            event_classification?: string[];
+            /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
              * Nature
              * @description Natureza do trabalho
              */
             nature?: string[];
             /**
-             * Event Classification
-             * @description Classificação do evento
+             * Q
+             * @description Termo para busca textual
              */
-            event_classification?: string[];
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * EventWorkSearchResponse
@@ -2349,14 +2349,14 @@ export interface components {
         EventWorkSearchResponse: {
             /** Data */
             data: components["schemas"]["EventWorkSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["EventWorkFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["EventWorkFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * EventWorkSummary
@@ -2364,11 +2364,36 @@ export interface components {
          */
         EventWorkSummary: {
             /**
+             * Event Classification
+             * @description Classificação do evento
+             */
+            event_classification?: string | null;
+            /**
+             * Event Name
+             * @description Nome do evento
+             */
+            event_name?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico do trabalho em evento
              */
             id: string;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Nature
+             * @description Natureza do trabalho
+             */
+            nature?: string | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
              * Title
              * @description Título do trabalho
@@ -2379,59 +2404,34 @@ export interface components {
              * @description Ano de publicação
              */
             year?: number | null;
-            /**
-             * Nature
-             * @description Natureza do trabalho
-             */
-            nature?: string | null;
-            /**
-             * Event Name
-             * @description Nome do evento
-             */
-            event_name?: string | null;
-            /**
-             * Event Classification
-             * @description Classificação do evento
-             */
-            event_classification?: string | null;
-            /**
-             * Platform Authors
-             * @description Autores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
         };
         /** FacetItem */
         FacetItem: {
-            /**
-             * Value
-             * @description Valor a enviar no filtro correspondente. Nulo só no grupo sem território da faceta territory_city
-             */
-            value: string | null;
-            /**
-             * Label
-             * @description Texto de exibição
-             */
-            label: string;
-            /**
-             * Count
-             * @description Itens do resultado com esse valor
-             */
-            count: number;
             /**
              * Acronym
              * @description Sigla, quando o valor for uma entidade
              */
             acronym?: string | null;
             /**
+             * Children
+             * @description Valores do nível seguinte, em facetas hierárquicas (ex.: municípios de um território). O facet_limit vale por nível
+             */
+            children?: components["schemas"]["FacetItem"][] | null;
+            /**
              * Code
              * @description Código estável: SEI (1 a 27) para território, IBGE (7 dígitos) para cidade
              */
             code?: number | null;
+            /**
+             * Count
+             * @description Itens do resultado com esse valor
+             */
+            count: number;
+            /**
+             * Label
+             * @description Texto de exibição
+             */
+            label: string;
             /**
              * Selected
              * @description Se o valor está aplicado no filtro atual
@@ -2439,10 +2439,10 @@ export interface components {
              */
             selected: boolean;
             /**
-             * Children
-             * @description Valores do nível seguinte, em facetas hierárquicas (ex.: municípios de um território). O facet_limit vale por nível
+             * Value
+             * @description Valor a enviar no filtro correspondente. Nulo só no grupo sem território da faceta territory_city
              */
-            children?: components["schemas"]["FacetItem"][] | null;
+            value: string | null;
         };
         /**
          * FacetResult
@@ -2462,16 +2462,6 @@ export interface components {
          */
         FacetResult: {
             /**
-             * Param
-             * @description Parâmetro de filtro correspondente à faceta. Lista quando a faceta mapeia para um intervalo (ex.: year → year_start, year_end)
-             */
-            param?: string | string[] | null;
-            /**
-             * Total
-             * @description Quantidade de valores distintos com resultados
-             */
-            total: number;
-            /**
              * Covered
              * @description Itens distintos do resultado com algum valor na faceta. Use no lugar da soma dos count, que conta em dobro itens com mais de um valor
              */
@@ -2481,29 +2471,34 @@ export interface components {
              * @description Valores mais frequentes e os valores selecionados
              */
             items: components["schemas"]["FacetItem"][];
+            /**
+             * Param
+             * @description Parâmetro de filtro correspondente à faceta. Lista quando a faceta mapeia para um intervalo (ex.: year → year_start, year_end)
+             */
+            param?: string | string[] | null;
+            /**
+             * Total
+             * @description Quantidade de valores distintos com resultados
+             */
+            total: number;
         };
         /** Foment */
         Foment: {
             /**
-             * Modality Code
-             * @description Código
+             * Aid Quantity
+             * @description Auxílios
              */
-            modality_code?: string | null;
-            /**
-             * Modality
-             * @description Modalidade (ex.: Produtividade em Pesquisa)
-             */
-            modality?: string | null;
-            /**
-             * Category Level
-             * @description Categoria/nível (ex.: 1A)
-             */
-            category_level?: string | null;
+            aid_quantity?: number | null;
             /**
              * Call Title
              * @description Chamada
              */
             call_title?: string | null;
+            /**
+             * Category Level
+             * @description Categoria/nível (ex.: 1A)
+             */
+            category_level?: string | null;
             /**
              * Funding Program
              * @description Programa de fomento
@@ -2515,10 +2510,15 @@ export interface components {
              */
             institute?: string | null;
             /**
-             * Aid Quantity
-             * @description Auxílios
+             * Modality
+             * @description Modalidade (ex.: Produtividade em Pesquisa)
              */
-            aid_quantity?: number | null;
+            modality?: string | null;
+            /**
+             * Modality Code
+             * @description Código
+             */
+            modality_code?: string | null;
             /**
              * Scholarship Quantity
              * @description Bolsas
@@ -2534,35 +2534,17 @@ export interface components {
              */
             articles: number;
             /**
-             * Books
-             * @description Total de livros únicos
-             * @default 0
-             */
-            books: number;
-            /**
              * Book Chapters
              * @description Total de capítulos de livros únicos
              * @default 0
              */
             book_chapters: number;
             /**
-             * Work In Event
-             * @description Total de trabalhos em eventos únicos
+             * Books
+             * @description Total de livros únicos
              * @default 0
              */
-            work_in_event: number;
-            /**
-             * Patents
-             * @description Total de patentes únicas
-             * @default 0
-             */
-            patents: number;
-            /**
-             * Software
-             * @description Total de softwares únicos
-             * @default 0
-             */
-            software: number;
+            books: number;
             /**
              * Brands
              * @description Total de marcas únicas
@@ -2570,11 +2552,29 @@ export interface components {
              */
             brands: number;
             /**
+             * Patents
+             * @description Total de patentes únicas
+             * @default 0
+             */
+            patents: number;
+            /**
              * Researchers
              * @description Total de pesquisadores cadastrados
              * @default 0
              */
             researchers: number;
+            /**
+             * Software
+             * @description Total de softwares únicos
+             * @default 0
+             */
+            software: number;
+            /**
+             * Work In Event
+             * @description Total de trabalhos em eventos únicos
+             * @default 0
+             */
+            work_in_event: number;
         };
         /** GraduateProgramCounts */
         GraduateProgramCounts: {
@@ -2588,103 +2588,103 @@ export interface components {
         /** GraduateProgramDetail */
         GraduateProgramDetail: {
             /**
-             * Id
-             * Format: uuid
-             * @description Identificador do recurso
-             */
-            id: string;
-            /**
-             * Name
-             * @description Nome do recurso
-             */
-            name: string;
-            /**
              * Acronym
              * @description Sigla do recurso
              */
             acronym?: string | null;
-            /**
-             * Institution Id
-             * @description Instituição do programa
-             */
-            institution_id?: string | null;
             /**
              * Area
              * @description Área de avaliação
              */
             area?: string | null;
             /**
-             * Modality
-             * @description Modalidade
-             */
-            modality?: string | null;
-            /**
-             * Rating
-             * @description Conceito CAPES
-             */
-            rating?: string | null;
-            /**
-             * State
-             * @description UF
-             */
-            state?: string | null;
-            /**
              * City
              * @description Cidade
              */
             city?: string | null;
-            institution?: components["schemas"]["InstitutionRef"] | null;
             /**
              * Code
              * @description Código CAPES
              */
             code?: string | null;
             /**
-             * Name En
-             * @description Nome em inglês
+             * Coordinator
+             * @description Coordenação
              */
-            name_en?: string | null;
-            /**
-             * Type
-             * @description Tipo (ex.: Mestrado)
-             */
-            type?: string | null;
+            coordinator?: string | null;
+            counts?: components["schemas"]["GraduateProgramCounts"];
             /**
              * Description
              * @description Descrição
              */
             description?: string | null;
             /**
-             * Site
-             * @description Site do programa
-             */
-            site?: string | null;
-            /**
-             * Coordinator
-             * @description Coordenação
-             */
-            coordinator?: string | null;
-            /**
              * Email
              * @description E-mail de contato
              */
             email?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             * @description Identificador do recurso
+             */
+            id: string;
+            institution?: components["schemas"]["InstitutionRef"] | null;
+            /**
+             * Institution Id
+             * @description Instituição do programa
+             */
+            institution_id?: string | null;
+            /**
+             * Modality
+             * @description Modalidade
+             */
+            modality?: string | null;
+            /**
+             * Name
+             * @description Nome do recurso
+             */
+            name: string;
+            /**
+             * Name En
+             * @description Nome em inglês
+             */
+            name_en?: string | null;
             /**
              * Phone
              * @description Telefone de contato
              */
             phone?: string | null;
             /**
-             * Start
-             * @description Data de início
+             * Rating
+             * @description Conceito CAPES
              */
-            start?: string | null;
+            rating?: string | null;
             /**
              * Research Lines
              * @description Linhas de pesquisa
              */
             research_lines?: components["schemas"]["ResearchLine"][];
-            counts?: components["schemas"]["GraduateProgramCounts"];
+            /**
+             * Site
+             * @description Site do programa
+             */
+            site?: string | null;
+            /**
+             * Start
+             * @description Data de início
+             */
+            start?: string | null;
+            /**
+             * State
+             * @description UF
+             */
+            state?: string | null;
+            /**
+             * Type
+             * @description Tipo (ex.: Mestrado)
+             */
+            type?: string | null;
         };
         /**
          * GraduateProgramFilter
@@ -2693,35 +2693,10 @@ export interface components {
          */
         GraduateProgramFilter: {
             /**
-             * Q
-             * @description Termo para busca por nome ou sigla
-             */
-            q?: string | null;
-            /**
-             * Institution Id
-             * @description IDs das instituições
-             */
-            institution_id?: string[];
-            /**
              * Area
              * @description Área de avaliação CAPES
              */
             area?: string[];
-            /**
-             * Modality
-             * @description Modalidade (ex.: Acadêmico, Profissional)
-             */
-            modality?: string[];
-            /**
-             * Rating
-             * @description Conceito CAPES
-             */
-            rating?: string[];
-            /**
-             * State
-             * @description UF
-             */
-            state?: string[];
             /**
              * City
              * @description Cidade
@@ -2737,6 +2712,36 @@ export interface components {
              * @description Território de identidade da sede: código SEI (1 a 27) ou nome
              */
             identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description IDs das instituições
+             */
+            institution_id?: string[];
+            /**
+             * Modality
+             * @description Modalidade (ex.: Acadêmico, Profissional)
+             */
+            modality?: string[];
+            /**
+             * Q
+             * @description Termo para busca por nome ou sigla
+             */
+            q?: string | null;
+            /**
+             * Rating
+             * @description Conceito CAPES
+             */
+            rating?: string[];
+            /**
+             * State
+             * @description UF
+             */
+            state?: string[];
+            /**
+             * Type
+             * @description Tipo do programa (ex.: Mestrado, Doutorado)
+             */
+            type?: string[];
         };
         /** GraduateProgramLink */
         GraduateProgramLink: {
@@ -2750,6 +2755,11 @@ export interface components {
         /** GraduateProgramRef */
         GraduateProgramRef: {
             /**
+             * Acronym
+             * @description Sigla do programa
+             */
+            acronym?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description Identificador do programa
@@ -2760,14 +2770,24 @@ export interface components {
              * @description Nome do programa
              */
             name: string;
-            /**
-             * Acronym
-             * @description Sigla do programa
-             */
-            acronym?: string | null;
         };
         /** GraduateProgramSummary */
         GraduateProgramSummary: {
+            /**
+             * Acronym
+             * @description Sigla do recurso
+             */
+            acronym?: string | null;
+            /**
+             * Area
+             * @description Área de avaliação
+             */
+            area?: string | null;
+            /**
+             * City
+             * @description Cidade
+             */
+            city?: string | null;
             /**
              * Id
              * Format: uuid
@@ -2775,30 +2795,20 @@ export interface components {
              */
             id: string;
             /**
-             * Name
-             * @description Nome do recurso
-             */
-            name: string;
-            /**
-             * Acronym
-             * @description Sigla do recurso
-             */
-            acronym?: string | null;
-            /**
              * Institution Id
              * @description Instituição do programa
              */
             institution_id?: string | null;
             /**
-             * Area
-             * @description Área de avaliação
-             */
-            area?: string | null;
-            /**
              * Modality
              * @description Modalidade
              */
             modality?: string | null;
+            /**
+             * Name
+             * @description Nome do recurso
+             */
+            name: string;
             /**
              * Rating
              * @description Conceito CAPES
@@ -2810,10 +2820,10 @@ export interface components {
              */
             state?: string | null;
             /**
-             * City
-             * @description Cidade
+             * Type
+             * @description Tipo (ex.: Mestrado)
              */
-            city?: string | null;
+            type?: string | null;
         };
         /**
          * GuidanceDetail
@@ -2827,30 +2837,15 @@ export interface components {
              */
             id: string;
             /**
-             * Title
-             * @description Título do trabalho orientado
+             * Matches
+             * @description Matches
              */
-            title: string;
-            /**
-             * Year
-             * @description Ano
-             */
-            year?: number | null;
+            matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
              * Nature
              * @description Natureza (ex.: Dissertação de mestrado)
              */
             nature?: string | null;
-            /**
-             * Type
-             * @description Tipo (ex.: Orientador principal)
-             */
-            type?: string | null;
-            /**
-             * Status
-             * @description Situação (ex.: Concluída, Em andamento)
-             */
-            status?: string | null;
             /**
              * Oriented
              * @description Nome do orientando
@@ -2862,10 +2857,25 @@ export interface components {
              */
             platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
-             * Matches
-             * @description Matches
+             * Status
+             * @description Situação (ex.: Concluída, Em andamento)
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            status?: string | null;
+            /**
+             * Title
+             * @description Título do trabalho orientado
+             */
+            title: string;
+            /**
+             * Type
+             * @description Tipo (ex.: Orientador principal)
+             */
+            type?: string | null;
+            /**
+             * Year
+             * @description Ano
+             */
+            year?: number | null;
         };
         /**
          * GuidanceFilter
@@ -2873,75 +2883,75 @@ export interface components {
          */
         GuidanceFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
             /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
              * Nature
              * @description Natureza da orientação
              */
             nature?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Status
+             * @description Situação da orientação
+             */
+            status?: string[];
             /**
              * Type
              * @description Tipo de orientação
              */
             type?: string[];
             /**
-             * Status
-             * @description Situação da orientação
+             * Year End
+             * @description Ano final
              */
-            status?: string[];
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * GuidanceSearchResponse
@@ -2950,14 +2960,14 @@ export interface components {
         GuidanceSearchResponse: {
             /** Data */
             data: components["schemas"]["GuidanceSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["GuidanceFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["GuidanceFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * GuidanceSummary
@@ -2971,30 +2981,15 @@ export interface components {
              */
             id: string;
             /**
-             * Title
-             * @description Título do trabalho orientado
+             * Matches
+             * @description Matches
              */
-            title: string;
-            /**
-             * Year
-             * @description Ano
-             */
-            year?: number | null;
+            matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
              * Nature
              * @description Natureza (ex.: Dissertação de mestrado)
              */
             nature?: string | null;
-            /**
-             * Type
-             * @description Tipo (ex.: Orientador principal)
-             */
-            type?: string | null;
-            /**
-             * Status
-             * @description Situação (ex.: Concluída, Em andamento)
-             */
-            status?: string | null;
             /**
              * Oriented
              * @description Nome do orientando
@@ -3006,19 +3001,28 @@ export interface components {
              */
             platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
-             * Matches
-             * @description Matches
+             * Status
+             * @description Situação (ex.: Concluída, Em andamento)
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            status?: string | null;
+            /**
+             * Title
+             * @description Título do trabalho orientado
+             */
+            title: string;
+            /**
+             * Type
+             * @description Tipo (ex.: Orientador principal)
+             */
+            type?: string | null;
+            /**
+             * Year
+             * @description Ano
+             */
+            year?: number | null;
         };
         /** InstitutionCounts */
         InstitutionCounts: {
-            /**
-             * Researchers
-             * @description Pesquisadores vinculados
-             * @default 0
-             */
-            researchers: number;
             /**
              * Graduate Programs
              * @description Programas de pós-graduação da instituição
@@ -3026,11 +3030,11 @@ export interface components {
              */
             graduate_programs: number;
             /**
-             * Scholarship Holders
-             * @description Pesquisadores bolsistas vinculados à instituição
+             * Labs
+             * @description Laboratórios vinculados à instituição
              * @default 0
              */
-            scholarship_holders: number;
+            labs: number;
             /**
              * Research Groups
              * @description Grupos de pesquisa vinculados à instituição
@@ -3038,35 +3042,26 @@ export interface components {
              */
             research_groups: number;
             /**
-             * Labs
-             * @description Laboratórios vinculados à instituição
+             * Researchers
+             * @description Pesquisadores vinculados
              * @default 0
              */
-            labs: number;
+            researchers: number;
+            /**
+             * Scholarship Holders
+             * @description Pesquisadores bolsistas vinculados à instituição
+             * @default 0
+             */
+            scholarship_holders: number;
         };
         /** InstitutionDetail */
         InstitutionDetail: {
-            /**
-             * Id
-             * Format: uuid
-             * @description Identificador da instituição
-             */
-            id: string;
-            /**
-             * Name
-             * @description Nome da instituição
-             */
-            name: string;
             /**
              * Acronym
              * @description Sigla da instituição
              */
             acronym?: string | null;
-            /**
-             * Image
-             * @description URL do logo
-             */
-            image?: string | null;
+            counts?: components["schemas"]["InstitutionCounts"];
             /**
              * Cover
              * @description URL da imagem de capa
@@ -3078,21 +3073,36 @@ export interface components {
              */
             description?: string | null;
             /**
-             * Lattes Id
-             * @description Código no Lattes
+             * Id
+             * Format: uuid
+             * @description Identificador da instituição
              */
-            lattes_id?: string | null;
+            id: string;
+            /**
+             * Image
+             * @description URL do logo
+             */
+            image?: string | null;
             /**
              * Latitude
              * @description Latitude
              */
             latitude?: number | null;
             /**
+             * Lattes Id
+             * @description Código no Lattes
+             */
+            lattes_id?: string | null;
+            /**
              * Longitude
              * @description Longitude
              */
             longitude?: number | null;
-            counts?: components["schemas"]["InstitutionCounts"];
+            /**
+             * Name
+             * @description Nome da instituição
+             */
+            name: string;
             /**
              * Scholarships
              * @description Detalhamento de bolsistas por modalidade e nível
@@ -3114,18 +3124,28 @@ export interface components {
              * @description Lista de instituições
              */
             data: components["schemas"]["InstitutionRef"][];
-            /** @description Metadados de paginação */
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["InstitutionFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["InstitutionFilter"];
+            meta: components["schemas"]["Meta"];
+            /** @description Metadados de paginação */
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /** InstitutionRef */
         InstitutionRef: {
+            /**
+             * Acronym
+             * @description Sigla da instituição
+             */
+            acronym?: string | null;
+            /**
+             * Cover
+             * @description URL da imagem de capa
+             */
+            cover?: string | null;
             /**
              * Id
              * Format: uuid
@@ -3133,25 +3153,15 @@ export interface components {
              */
             id: string;
             /**
-             * Name
-             * @description Nome da instituição
-             */
-            name: string;
-            /**
-             * Acronym
-             * @description Sigla da instituição
-             */
-            acronym?: string | null;
-            /**
              * Image
              * @description URL do logo
              */
             image?: string | null;
             /**
-             * Cover
-             * @description URL da imagem de capa
+             * Name
+             * @description Nome da instituição
              */
-            cover?: string | null;
+            name: string;
         };
         /** Magazine */
         Magazine: {
@@ -3162,25 +3172,10 @@ export interface components {
              */
             id: string;
             /**
-             * Name
-             * @description Nome da revista
-             */
-            name?: string | null;
-            /**
              * Issn
              * @description ISSN
              */
             issn?: string | null;
-            /**
-             * Qualis
-             * @description Estrato Qualis
-             */
-            qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C") | null;
-            /**
-             * Qualis Status
-             * @description Motivo da ausência de estrato
-             */
-            qualis_status?: ("not_rated" | "not_applicable") | null;
             /**
              * Jcr
              * @description Fator de impacto JCR
@@ -3192,6 +3187,21 @@ export interface components {
              */
             jcr_link?: string | null;
             /**
+             * Name
+             * @description Nome da revista
+             */
+            name?: string | null;
+            /**
+             * Qualis
+             * @description Estrato Qualis
+             */
+            qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C") | null;
+            /**
+             * Qualis Status
+             * @description Motivo da ausência de estrato
+             */
+            qualis_status?: ("not_rated" | "not_applicable") | null;
+            /**
              * Reference Period
              * @description Período de referência do Qualis
              */
@@ -3200,15 +3210,15 @@ export interface components {
         /** MagazineFilter */
         MagazineFilter: {
             /**
-             * Q
-             * @description Busca pelo nome da revista
-             */
-            q?: string | null;
-            /**
              * Issn
              * @description ISSN
              */
             issn?: string[];
+            /**
+             * Q
+             * @description Busca pelo nome da revista
+             */
+            q?: string | null;
             /**
              * Qualis
              * @description Estrato Qualis ou ausência (not_rated, not_applicable)
@@ -3219,14 +3229,14 @@ export interface components {
         MagazineListResponse: {
             /** Data */
             data: components["schemas"]["Magazine"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["MagazineFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["MagazineFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * MagazineRef
@@ -3234,15 +3244,20 @@ export interface components {
          */
         MagazineRef: {
             /**
-             * Name
-             * @description Nome da revista/periódico
-             */
-            name?: string | null;
-            /**
              * Issn
              * @description ISSN da publicação
              */
             issn?: string | null;
+            /**
+             * Jcr
+             * @description Fator de impacto JCR
+             */
+            jcr?: number | null;
+            /**
+             * Name
+             * @description Nome da revista/periódico
+             */
+            name?: string | null;
             /**
              * Qualis
              * @description Estrato Qualis CAPES; null quando não houver
@@ -3253,11 +3268,6 @@ export interface components {
              * @description Motivo da ausência de estrato: not_rated (sem Qualis) ou not_applicable (não se aplica)
              */
             qualis_status?: ("not_rated" | "not_applicable") | null;
-            /**
-             * Jcr
-             * @description Fator de impacto JCR
-             */
-            jcr?: number | null;
         };
         /**
          * MagazineTextDetail
@@ -3265,56 +3275,46 @@ export interface components {
          */
         MagazineTextDetail: {
             /**
+             * All Authors Raw
+             * @description Lista bruta de autores
+             */
+            all_authors_raw?: string | null;
+            /**
+             * Homepage
+             * @description URL do texto
+             */
+            homepage?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico do texto
              */
             id: string;
             /**
-             * Title
-             * @description Título do texto
-             */
-            title: string;
-            /**
-             * Year
-             * @description Ano de publicação
-             */
-            year?: number | null;
-            /**
-             * Nature
-             * @description Natureza do texto
-             */
-            nature?: string | null;
-            /**
              * Language
              * @description Idioma
              */
             language?: string | null;
-            /**
-             * Means Divulgation
-             * @description Meio de divulgação
-             */
-            means_divulgation?: string | null;
-            /**
-             * Platform Authors
-             * @description Autores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
              * Matches
              * @description Matches
              */
             matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
-             * Title En
-             * @description Título em inglês
+             * Means Divulgation
+             * @description Meio de divulgação
              */
-            title_en?: string | null;
+            means_divulgation?: string | null;
             /**
-             * Homepage
-             * @description URL do texto
+             * Nature
+             * @description Natureza do texto
              */
-            homepage?: string | null;
+            nature?: string | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
              * Relevance
              * @description Produção relevante
@@ -3326,10 +3326,20 @@ export interface components {
              */
             scientific_divulgation?: boolean | null;
             /**
-             * All Authors Raw
-             * @description Lista bruta de autores
+             * Title
+             * @description Título do texto
              */
-            all_authors_raw?: string | null;
+            title: string;
+            /**
+             * Title En
+             * @description Título em inglês
+             */
+            title_en?: string | null;
+            /**
+             * Year
+             * @description Ano de publicação
+             */
+            year?: number | null;
         };
         /**
          * MagazineTextFilter
@@ -3337,65 +3347,65 @@ export interface components {
          */
         MagazineTextFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
             /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
              * Nature
              * @description Natureza do texto
              */
             nature?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * MagazineTextSearchResponse
@@ -3404,14 +3414,14 @@ export interface components {
         MagazineTextSearchResponse: {
             /** Data */
             data: components["schemas"]["MagazineTextSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["MagazineTextFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["MagazineTextFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * MagazineTextSummary
@@ -3425,6 +3435,31 @@ export interface components {
              */
             id: string;
             /**
+             * Language
+             * @description Idioma
+             */
+            language?: string | null;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Means Divulgation
+             * @description Meio de divulgação
+             */
+            means_divulgation?: string | null;
+            /**
+             * Nature
+             * @description Natureza do texto
+             */
+            nature?: string | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
              * Title
              * @description Título do texto
              */
@@ -3434,31 +3469,6 @@ export interface components {
              * @description Ano de publicação
              */
             year?: number | null;
-            /**
-             * Nature
-             * @description Natureza do texto
-             */
-            nature?: string | null;
-            /**
-             * Language
-             * @description Idioma
-             */
-            language?: string | null;
-            /**
-             * Means Divulgation
-             * @description Meio de divulgação
-             */
-            means_divulgation?: string | null;
-            /**
-             * Platform Authors
-             * @description Autores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
         };
         /**
          * MatchItem
@@ -3478,22 +3488,6 @@ export interface components {
          */
         MatchItem: {
             /**
-             * Source Type
-             * @enum {string}
-             */
-            source_type: "article" | "book" | "book_chapter" | "patent" | "software" | "event" | "area_specialty" | "profile";
-            /** Source Id */
-            source_id?: string | null;
-            /** Title */
-            title?: string | null;
-            /** Year */
-            year?: number | null;
-            /**
-             * Snippet
-             * @description Trecho em texto puro, sem marcação
-             */
-            snippet?: string | null;
-            /**
              * Highlights
              * @description Intervalos [início, fim) destacados em `snippet`, em unidades UTF-16 (as de String.slice no JavaScript)
              */
@@ -3501,17 +3495,33 @@ export interface components {
                 number,
                 number
             ][];
+            /**
+             * Snippet
+             * @description Trecho em texto puro, sem marcação
+             */
+            snippet?: string | null;
+            /** Source Id */
+            source_id?: string | null;
+            /**
+             * Source Type
+             * @enum {string}
+             */
+            source_type: "article" | "book" | "book_chapter" | "patent" | "software" | "event" | "area_specialty" | "profile";
+            /** Title */
+            title?: string | null;
+            /** Year */
+            year?: number | null;
         };
         /** MatchesSummary */
         MatchesSummary: {
-            /** Total */
-            total: number;
             /** By Type */
             by_type: {
                 [key: string]: number;
             };
             /** Items */
             items: components["schemas"]["MatchItem"][];
+            /** Total */
+            total: number;
         };
         /**
          * Meta
@@ -3524,15 +3534,15 @@ export interface components {
          */
         Meta: {
             /**
-             * Took Ms
-             * @description Tempo de processamento em milissegundos
-             */
-            took_ms: number;
-            /**
              * Cached
              * @description Se a resposta veio do cache
              */
             cached: boolean;
+            /**
+             * Data As Of
+             * @description Última atualização dos dados de busca (refresh das visões materializadas)
+             */
+            data_as_of?: string | null;
             /**
              * Timestamp
              * Format: date-time
@@ -3540,10 +3550,10 @@ export interface components {
              */
             timestamp: string;
             /**
-             * Data As Of
-             * @description Última atualização dos dados de busca (refresh das visões materializadas)
+             * Took Ms
+             * @description Tempo de processamento em milissegundos
              */
-            data_as_of?: string | null;
+            took_ms: number;
         };
         /**
          * Pagination
@@ -3557,6 +3567,10 @@ export interface components {
          *     }
          */
         Pagination: {
+            /** Has Next */
+            has_next: boolean;
+            /** Has Prev */
+            has_prev: boolean;
             /** Page */
             page: number;
             /** Per Page */
@@ -3565,32 +3579,12 @@ export interface components {
             total_items: number;
             /** Total Pages */
             total_pages: number;
-            /** Has Next */
-            has_next: boolean;
-            /** Has Prev */
-            has_prev: boolean;
         };
         /**
          * PatentDetail
          * @description Dossiê detalhado de patente.
          */
         PatentDetail: {
-            /**
-             * Id
-             * Format: uuid
-             * @description ID canônico da patente
-             */
-            id: string;
-            /**
-             * Title
-             * @description Título da patente
-             */
-            title: string;
-            /**
-             * Year
-             * @description Ano
-             */
-            year?: number | null;
             /**
              * Category
              * @description Categoria
@@ -3601,21 +3595,6 @@ export interface components {
              * @description Número do registro/depósito
              */
             code?: string | null;
-            /**
-             * Platform Authors
-             * @description Inventores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
-            /**
-             * Grant Date
-             * @description Data concessão
-             */
-            grant_date?: string | null;
             /**
              * Deposit Date
              * @description Data depósito
@@ -3626,105 +3605,27 @@ export interface components {
              * @description Detalhes
              */
             details?: string | null;
-        };
-        /**
-         * PatentFilter
-         * @description Filtros para busca de patentes.
-         */
-        PatentFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Grant Date
+             * @description Data concessão
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
-            /**
-             * City Code
-             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
-             */
-            city_code?: string[];
-            /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
-             */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
-            /**
-             * Collection
-             * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
-             */
-            collection?: string[];
-            /**
-             * Category
-             * @description Categoria da patente (ex.: Produto, Processo)
-             */
-            category?: string[];
-            /**
-             * Granted
-             * @description Apenas patentes concedidas (true) ou ainda não concedidas (false)
-             */
-            granted?: boolean | null;
-        };
-        /**
-         * PatentSearchResponse
-         * @description Resposta paginada da busca de patentes.
-         */
-        PatentSearchResponse: {
-            /** Data */
-            data: components["schemas"]["PatentSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["PatentFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
-            /** Facets */
-            facets?: {
-                [key: string]: components["schemas"]["FacetResult"];
-            } | null;
-        };
-        /**
-         * PatentSummary
-         * @description Card resumido de patente.
-         */
-        PatentSummary: {
+            grant_date?: string | null;
             /**
              * Id
              * Format: uuid
              * @description ID canônico da patente
              */
             id: string;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform Authors
+             * @description Inventores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
              * Title
              * @description Título da patente
@@ -3735,6 +3636,99 @@ export interface components {
              * @description Ano
              */
             year?: number | null;
+        };
+        /**
+         * PatentFilter
+         * @description Filtros para busca de patentes.
+         */
+        PatentFilter: {
+            /**
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
+             */
+            area?: string[];
+            /**
+             * Category
+             * @description Categoria da patente (ex.: Produto, Processo)
+             */
+            category?: string[];
+            /**
+             * City Code
+             * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
+             */
+            city_code?: string[];
+            /**
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
+             */
+            city_id?: string[];
+            /**
+             * Collection
+             * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
+             */
+            collection?: string[];
+            /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Granted
+             * @description Apenas patentes concedidas (true) ou ainda não concedidas (false)
+             */
+            granted?: boolean | null;
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
+        };
+        /**
+         * PatentSearchResponse
+         * @description Resposta paginada da busca de patentes.
+         */
+        PatentSearchResponse: {
+            /** Data */
+            data: components["schemas"]["PatentSummary"][];
+            /** Facets */
+            facets?: {
+                [key: string]: components["schemas"]["FacetResult"];
+            } | null;
+            filters_applied: components["schemas"]["PatentFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
+        };
+        /**
+         * PatentSummary
+         * @description Card resumido de patente.
+         */
+        PatentSummary: {
             /**
              * Category
              * @description Categoria
@@ -3746,15 +3740,31 @@ export interface components {
              */
             code?: string | null;
             /**
-             * Platform Authors
-             * @description Inventores da plataforma
+             * Id
+             * Format: uuid
+             * @description ID canônico da patente
              */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
+            id: string;
             /**
              * Matches
              * @description Matches
              */
             matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform Authors
+             * @description Inventores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Title
+             * @description Título da patente
+             */
+            title: string;
+            /**
+             * Year
+             * @description Ano
+             */
+            year?: number | null;
         };
         /**
          * ProductionBaseFilter
@@ -3762,84 +3772,109 @@ export interface components {
          */
         ProductionBaseFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
+            /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /** ProductionMetricResponse */
         ProductionMetricResponse: {
-            /**
-             * Kind
-             * @description Tipo de produção contado
-             * @enum {string}
-             */
-            kind: "article" | "book" | "book_chapter" | "software" | "patent" | "event" | "research_project" | "brand" | "guidance" | "report" | "magazine_text" | "event_work";
-            /**
-             * Group By
-             * @description Dimensão de agrupamento aplicada
-             */
-            group_by?: string | null;
             /**
              * Data
              * @description Série anual, ano crescente
              */
             data: components["schemas"]["SeriesPoint"][];
             filters_applied: components["schemas"]["ProductionBaseFilter"];
+            /**
+             * Group By
+             * @description Dimensão de agrupamento aplicada
+             */
+            group_by?: string | null;
+            /**
+             * Kind
+             * @description Tipo de produção contado
+             * @enum {string}
+             */
+            kind: "article" | "book" | "book_chapter" | "software" | "patent" | "event" | "research_project" | "brand" | "guidance" | "report" | "magazine_text" | "event_work";
             meta: components["schemas"]["Meta"];
         };
         /** ProfessionalExperience */
         ProfessionalExperience: {
+            /**
+             * Additional Info
+             * @description Outras informações
+             */
+            additional_info?: string | null;
+            /**
+             * Employment Type
+             * @description Vínculo
+             */
+            employment_type?: string | null;
+            /**
+             * End Year
+             * @description Ano de término (ausente se atual)
+             */
+            end_year?: number | null;
+            /**
+             * Exclusive Dedication
+             * @description Dedicação exclusiva
+             */
+            exclusive_dedication?: boolean | null;
+            /**
+             * Functional Classification
+             * @description Enquadramento funcional
+             */
+            functional_classification?: string | null;
             /**
              * Organization
              * @description Instituição ou empresa
@@ -3851,35 +3886,10 @@ export interface components {
              */
             start_year?: number | null;
             /**
-             * End Year
-             * @description Ano de término (ausente se atual)
-             */
-            end_year?: number | null;
-            /**
-             * Employment Type
-             * @description Vínculo
-             */
-            employment_type?: string | null;
-            /**
-             * Functional Classification
-             * @description Enquadramento funcional
-             */
-            functional_classification?: string | null;
-            /**
              * Workload Hours Weekly
              * @description Carga horária semanal
              */
             workload_hours_weekly?: number | null;
-            /**
-             * Exclusive Dedication
-             * @description Dedicação exclusiva
-             */
-            exclusive_dedication?: boolean | null;
-            /**
-             * Additional Info
-             * @description Outras informações
-             */
-            additional_info?: string | null;
         };
         /**
          * ReportDetail
@@ -3887,11 +3897,31 @@ export interface components {
          */
         ReportDetail: {
             /**
+             * Financing
+             * @description Instituição financiadora
+             */
+            financing?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico do relatório
              */
             id: string;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Project Name
+             * @description Projeto relacionado
+             */
+            project_name?: string | null;
             /**
              * Title
              * @description Título do relatório
@@ -3902,26 +3932,6 @@ export interface components {
              * @description Ano
              */
             year?: number | null;
-            /**
-             * Project Name
-             * @description Projeto relacionado
-             */
-            project_name?: string | null;
-            /**
-             * Platform Authors
-             * @description Autores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
-            /**
-             * Financing
-             * @description Instituição financiadora
-             */
-            financing?: string | null;
         };
         /**
          * ReportFilter
@@ -3929,60 +3939,60 @@ export interface components {
          */
         ReportFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
+            /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * ReportSearchResponse
@@ -3991,14 +4001,14 @@ export interface components {
         ReportSearchResponse: {
             /** Data */
             data: components["schemas"]["ReportSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["ReportFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["ReportFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * ReportSummary
@@ -4012,6 +4022,21 @@ export interface components {
              */
             id: string;
             /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform Authors
+             * @description Autores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
+            /**
+             * Project Name
+             * @description Projeto relacionado
+             */
+            project_name?: string | null;
+            /**
              * Title
              * @description Título do relatório
              */
@@ -4021,21 +4046,6 @@ export interface components {
              * @description Ano
              */
             year?: number | null;
-            /**
-             * Project Name
-             * @description Projeto relacionado
-             */
-            project_name?: string | null;
-            /**
-             * Platform Authors
-             * @description Autores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
         };
         /** ResearchGroupRef */
         ResearchGroupRef: {
@@ -4054,41 +4064,31 @@ export interface components {
         /** ResearchLine */
         ResearchLine: {
             /**
-             * Name
-             * @description Nome da linha de pesquisa
-             */
-            name: string;
-            /**
              * Area
              * @description Área da linha
              */
             area?: string | null;
             /**
-             * Start Year
-             * @description Ano de início
-             */
-            start_year?: number | null;
-            /**
              * End Year
              * @description Ano de término
              */
             end_year?: number | null;
+            /**
+             * Name
+             * @description Nome da linha de pesquisa
+             */
+            name: string;
+            /**
+             * Start Year
+             * @description Ano de início
+             */
+            start_year?: number | null;
         };
         /**
          * ResearchProjectComponent
          * @description Integrante de um projeto de pesquisa, conforme declarado no Lattes.
          */
         ResearchProjectComponent: {
-            /**
-             * Name
-             * @description Nome do integrante
-             */
-            name?: string | null;
-            /**
-             * Lattes Id
-             * @description ID Lattes
-             */
-            lattes_id?: string | null;
             /**
              * Citations
              * @description Nome em citações bibliográficas
@@ -4100,6 +4100,16 @@ export interface components {
              * @default false
              */
             coordinator: boolean;
+            /**
+             * Lattes Id
+             * @description ID Lattes
+             */
+            lattes_id?: string | null;
+            /**
+             * Name
+             * @description Nome do integrante
+             */
+            name?: string | null;
         };
         /**
          * ResearchProjectDetail
@@ -4107,71 +4117,51 @@ export interface components {
          */
         ResearchProjectDetail: {
             /**
-             * Id
-             * Format: uuid
-             * @description ID canônico do projeto
+             * Agency Code
+             * @description Código da agência financiadora principal
              */
-            id: string;
-            /**
-             * Title
-             * @description Nome do projeto
-             */
-            title: string;
-            /**
-             * Start Year
-             * @description Ano de início
-             */
-            start_year?: number | null;
-            /**
-             * End Year
-             * @description Ano de término (ausente se em andamento)
-             */
-            end_year?: number | null;
-            /**
-             * Status
-             * @description Situação (ex.: EM_ANDAMENTO, CONCLUIDO)
-             */
-            status?: string | null;
-            /**
-             * Nature
-             * @description Natureza (ex.: PESQUISA, EXTENSAO)
-             */
-            nature?: string | null;
+            agency_code?: string | null;
             /**
              * Agency Name
              * @description Agência financiadora principal
              */
             agency_name?: string | null;
             /**
-             * Platform Authors
-             * @description Integrantes da plataforma
+             * Components
+             * @description Integrantes declarados no Lattes
              */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
-            /**
-             * Agency Code
-             * @description Código da agência financiadora principal
-             */
-            agency_code?: string | null;
+            components?: components["schemas"]["ResearchProjectComponent"][];
             /**
              * Description
              * @description Descrição do projeto
              */
             description?: string | null;
             /**
-             * Number Undergraduates
-             * @description Número de alunos de graduação
+             * End Year
+             * @description Ano de término (ausente se em andamento)
              */
-            number_undergraduates?: number | null;
+            end_year?: number | null;
             /**
-             * Number Specialists
-             * @description Número de alunos de especialização
+             * Foment
+             * @description Financiamentos do projeto
              */
-            number_specialists?: number | null;
+            foment?: components["schemas"]["ResearchProjectFoment"][];
+            /**
+             * Id
+             * Format: uuid
+             * @description ID canônico do projeto
+             */
+            id: string;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Nature
+             * @description Natureza (ex.: PESQUISA, EXTENSAO)
+             */
+            nature?: string | null;
             /**
              * Number Academic Masters
              * @description Número de alunos de mestrado acadêmico
@@ -4183,20 +4173,40 @@ export interface components {
              */
             number_phd?: number | null;
             /**
-             * Foment
-             * @description Financiamentos do projeto
+             * Number Specialists
+             * @description Número de alunos de especialização
              */
-            foment?: components["schemas"]["ResearchProjectFoment"][];
+            number_specialists?: number | null;
             /**
-             * Components
-             * @description Integrantes declarados no Lattes
+             * Number Undergraduates
+             * @description Número de alunos de graduação
              */
-            components?: components["schemas"]["ResearchProjectComponent"][];
+            number_undergraduates?: number | null;
+            /**
+             * Platform Authors
+             * @description Integrantes da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
              * Productions
              * @description Produções vinculadas ao projeto
              */
             productions?: components["schemas"]["ResearchProjectProduction"][];
+            /**
+             * Start Year
+             * @description Ano de início
+             */
+            start_year?: number | null;
+            /**
+             * Status
+             * @description Situação (ex.: EM_ANDAMENTO, CONCLUIDO)
+             */
+            status?: string | null;
+            /**
+             * Title
+             * @description Nome do projeto
+             */
+            title: string;
         };
         /**
          * ResearchProjectFilter
@@ -4206,70 +4216,70 @@ export interface components {
          */
         ResearchProjectFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
             /**
-             * Status
-             * @description Situação do projeto (ex.: EM_ANDAMENTO, CONCLUIDO)
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
              */
-            status?: string[];
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
             /**
              * Nature
              * @description Natureza do projeto (ex.: PESQUISA, EXTENSAO)
              */
             nature?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Status
+             * @description Situação do projeto (ex.: EM_ANDAMENTO, CONCLUIDO)
+             */
+            status?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * ResearchProjectFoment
@@ -4277,15 +4287,15 @@ export interface components {
          */
         ResearchProjectFoment: {
             /**
-             * Agency Name
-             * @description Nome da agência
-             */
-            agency_name?: string | null;
-            /**
              * Agency Code
              * @description Código da agência
              */
             agency_code?: string | null;
+            /**
+             * Agency Name
+             * @description Nome da agência
+             */
+            agency_name?: string | null;
             /**
              * Nature
              * @description Natureza do financiamento (ex.: Bolsa, Auxílio)
@@ -4315,14 +4325,14 @@ export interface components {
         ResearchProjectSearchResponse: {
             /** Data */
             data: components["schemas"]["ResearchProjectSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["ResearchProjectFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["ResearchProjectFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * ResearchProjectSummary
@@ -4330,51 +4340,51 @@ export interface components {
          */
         ResearchProjectSummary: {
             /**
-             * Id
-             * Format: uuid
-             * @description ID canônico do projeto
+             * Agency Name
+             * @description Agência financiadora principal
              */
-            id: string;
-            /**
-             * Title
-             * @description Nome do projeto
-             */
-            title: string;
-            /**
-             * Start Year
-             * @description Ano de início
-             */
-            start_year?: number | null;
+            agency_name?: string | null;
             /**
              * End Year
              * @description Ano de término (ausente se em andamento)
              */
             end_year?: number | null;
             /**
-             * Status
-             * @description Situação (ex.: EM_ANDAMENTO, CONCLUIDO)
+             * Id
+             * Format: uuid
+             * @description ID canônico do projeto
              */
-            status?: string | null;
+            id: string;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
             /**
              * Nature
              * @description Natureza (ex.: PESQUISA, EXTENSAO)
              */
             nature?: string | null;
             /**
-             * Agency Name
-             * @description Agência financiadora principal
-             */
-            agency_name?: string | null;
-            /**
              * Platform Authors
              * @description Integrantes da plataforma
              */
             platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
-             * Matches
-             * @description Matches
+             * Start Year
+             * @description Ano de início
              */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
+            start_year?: number | null;
+            /**
+             * Status
+             * @description Situação (ex.: EM_ANDAMENTO, CONCLUIDO)
+             */
+            status?: string | null;
+            /**
+             * Title
+             * @description Nome do projeto
+             */
+            title: string;
         };
         /** ResearcherCounts */
         ResearcherCounts: {
@@ -4394,16 +4404,6 @@ export interface components {
              */
             books: number;
             /**
-             * Patents
-             * @default 0
-             */
-            patents: number;
-            /**
-             * Software
-             * @default 0
-             */
-            software: number;
-            /**
              * Brands
              * @default 0
              */
@@ -4415,66 +4415,42 @@ export interface components {
              */
             guidance: number;
             /**
+             * Patents
+             * @default 0
+             */
+            patents: number;
+            /**
              * Reports
              * @description Relatórios técnicos
              * @default 0
              */
             reports: number;
+            /**
+             * Software
+             * @default 0
+             */
+            software: number;
         };
         /** ResearcherDetail */
         ResearcherDetail: {
-            /**
-             * Id
-             * Format: uuid
-             * @description Identificador do pesquisador
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /**
-             * Image Url
-             * @description URL absoluta da foto do pesquisador
-             */
-            image_url: string;
-            /**
-             * Graduation
-             * @description Maior titulação
-             */
-            graduation?: string | null;
-            /**
-             * Classification
-             * @description Classificação do pesquisador
-             */
-            classification?: string | null;
-            /**
-             * Lattes Update
-             * @description Data da última atualização do Lattes
-             */
-            lattes_update?: string | null;
+            /** Abstract */
+            abstract?: string | null;
+            /** Abstract Ai */
+            abstract_ai?: string | null;
             /**
              * Affiliations
              * @default []
              */
             affiliations: components["schemas"]["Affiliation"][];
-            /** @description Contadores de produção */
-            counts?: components["schemas"]["ResearcherCounts"];
-            /** Abstract */
-            abstract?: string | null;
-            /** Abstract Ai */
-            abstract_ai?: string | null;
-            identifiers: components["schemas"]["ResearcherIdentifiers"];
             /** @description Métricas do OpenAlex, quando disponíveis */
             bibliometrics?: components["schemas"]["Bibliometrics"] | null;
             /**
-             * Graduate Programs
-             * @default []
+             * Classification
+             * @description Classificação do pesquisador
              */
-            graduate_programs: components["schemas"]["GraduateProgramLink"][];
-            /**
-             * Research Groups
-             * @default []
-             */
-            research_groups: components["schemas"]["ResearchGroupRef"][];
+            classification?: string | null;
+            /** @description Contadores de produção */
+            counts?: components["schemas"]["ResearcherCounts"];
             /**
              * Education
              * @description Formação (com include=education)
@@ -4490,6 +4466,40 @@ export interface components {
              * @description Bolsas e auxílios (com include=foment)
              */
             foment?: components["schemas"]["Foment"][] | null;
+            /**
+             * Graduate Programs
+             * @default []
+             */
+            graduate_programs: components["schemas"]["GraduateProgramLink"][];
+            /**
+             * Graduation
+             * @description Maior titulação
+             */
+            graduation?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             * @description Identificador do pesquisador
+             */
+            id: string;
+            identifiers: components["schemas"]["ResearcherIdentifiers"];
+            /**
+             * Image Url
+             * @description URL absoluta da foto do pesquisador
+             */
+            image_url: string;
+            /**
+             * Lattes Update
+             * @description Data da última atualização do Lattes
+             */
+            lattes_update?: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Research Groups
+             * @default []
+             */
+            research_groups: components["schemas"]["ResearchGroupRef"][];
         };
         /**
          * ResearcherFilter
@@ -4501,20 +4511,65 @@ export interface components {
          */
         ResearcherFilter: {
             /**
+             * Area
+             * @description Grandes áreas do conhecimento (ex.: CIENCIAS_EXATAS_E_DA_TERRA)
+             */
+            area?: string[];
+            /**
+             * City Code
+             * @description Códigos IBGE (7 dígitos) dos municípios de vínculo
+             */
+            city_code?: string[];
+            /**
+             * City Id
+             * @description IDs das cidades de vínculo
+             */
+            city_id?: string[];
+            /**
+             * Classification
+             * @description Classificação do pesquisador
+             */
+            classification?: ("A+" | "A" | "B+" | "B" | "C+" | "C" | "D+" | "D" | "E+" | "E")[];
+            /**
+             * Collection
+             * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
+             */
+            collection?: string[];
+            /**
+             * Graduate Program Id
+             * @description IDs dos programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Graduation
+             * @description Maior titulação (ex.: Doutorado)
+             */
+            graduation?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description IDs das instituições de vínculo
+             */
+            institution_id?: string[];
+            /**
+             * Modality
+             * @description Modalidades de bolsa de fomento (ex.: Produtividade em Pesquisa - 1A)
+             */
+            modality?: string[];
+            /**
              * Q
              * @description Busca textual no perfil (nome e resumo) e nas produções
              */
             q?: string | null;
             /**
-             * Year Start
-             * @description Ano inicial de produção
+             * Researcher Id
+             * @description IDs dos pesquisadores
              */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final de produção
-             */
-            year_end?: number | null;
+            researcher_id?: string[];
             /**
              * Search In
              * @description Escopo da busca textual (`q`): `all` (perfil e produções), `name` (somente nome) ou `abstract` (somente resumo)
@@ -4523,78 +4578,33 @@ export interface components {
              */
             search_in: "all" | "name" | "abstract";
             /**
-             * Researcher Id
-             * @description IDs dos pesquisadores
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description IDs das instituições de vínculo
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description IDs dos programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo
-             */
-            city_id?: string[];
-            /**
-             * City Code
-             * @description Códigos IBGE (7 dígitos) dos municípios de vínculo
-             */
-            city_code?: string[];
-            /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos: código SEI (1 a 27) ou nome
-             */
-            identity_territory?: string[];
-            /**
-             * Graduation
-             * @description Maior titulação (ex.: Doutorado)
-             */
-            graduation?: string[];
-            /**
-             * Classification
-             * @description Classificação do pesquisador
-             */
-            classification?: ("A+" | "A" | "B+" | "B" | "C+" | "C" | "D+" | "D" | "E+" | "E")[];
-            /**
-             * Area
-             * @description Grandes áreas do conhecimento (ex.: CIENCIAS_EXATAS_E_DA_TERRA)
-             */
-            area?: string[];
-            /**
-             * Modality
-             * @description Modalidades de bolsa de fomento (ex.: Produtividade em Pesquisa - 1A)
-             */
-            modality?: string[];
-            /**
              * Source Type
              * @description Tipos de produção considerados. Com `q`, restringe as obras que podem casar com a busca; sem `q`, exige ao menos uma obra desses tipos
              */
             source_type?: ("article" | "book" | "book_chapter" | "patent" | "software" | "event" | "area_specialty")[];
             /**
-             * Collection
-             * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
+             * Year End
+             * @description Ano final de produção
              */
-            collection?: string[];
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial de produção
+             */
+            year_start?: number | null;
         };
         /** ResearcherIdentifiers */
         ResearcherIdentifiers: {
-            /** Lattes Id */
-            lattes_id: string;
             /** Lattes 10 Id */
             lattes_10_id?: string | null;
+            /** Lattes Id */
+            lattes_id: string;
+            /** Openalex */
+            openalex?: string | null;
             /** Orcid */
             orcid?: string | null;
             /** Scopus */
             scopus?: string | null;
-            /** Openalex */
-            openalex?: string | null;
         };
         /**
          * ResearcherRef
@@ -4608,94 +4618,94 @@ export interface components {
              */
             id: string;
             /**
-             * Name
-             * @description Nome do pesquisador
-             */
-            name: string;
-            /**
              * Lattes Id
              * @description ID Lattes
              */
             lattes_id?: string | null;
+            /**
+             * Name
+             * @description Nome do pesquisador
+             */
+            name: string;
         };
         /** ResearcherSummary */
         ResearcherSummary: {
             /**
-             * Id
-             * Format: uuid
-             * @description Identificador do pesquisador
+             * Affiliations
+             * @default []
              */
-            id: string;
-            /** Name */
-            name: string;
+            affiliations: components["schemas"]["Affiliation"][];
             /**
-             * Image Url
-             * @description URL absoluta da foto do pesquisador
+             * Classification
+             * @description Classificação do pesquisador
              */
-            image_url: string;
+            classification?: string | null;
+            /** @description Contadores de produção */
+            counts?: components["schemas"]["ResearcherCounts"];
             /**
              * Graduation
              * @description Maior titulação
              */
             graduation?: string | null;
             /**
-             * Classification
-             * @description Classificação do pesquisador
+             * Id
+             * Format: uuid
+             * @description Identificador do pesquisador
              */
-            classification?: string | null;
+            id: string;
+            /**
+             * Image Url
+             * @description URL absoluta da foto do pesquisador
+             */
+            image_url: string;
             /**
              * Lattes Update
              * @description Data da última atualização do Lattes
              */
             lattes_update?: string | null;
-            /**
-             * Affiliations
-             * @default []
-             */
-            affiliations: components["schemas"]["Affiliation"][];
-            /** @description Contadores de produção */
-            counts?: components["schemas"]["ResearcherCounts"];
             matches?: components["schemas"]["MatchesSummary"] | null;
+            /** Name */
+            name: string;
         };
         /** Scholarship */
         Scholarship: {
             /**
-             * Id
-             * Format: uuid
-             * @description Identificador do registro de fomento
+             * Aid Quantity
+             * @description Auxílios
              */
-            id: string;
-            researcher: components["schemas"]["ScholarshipResearcher"];
-            /**
-             * Modality
-             * @description Modalidade
-             */
-            modality?: string | null;
-            /**
-             * Category Level
-             * @description Nível
-             */
-            category_level?: string | null;
+            aid_quantity?: number | null;
             /**
              * Call Title
              * @description Chamada
              */
             call_title?: string | null;
             /**
+             * Category Level
+             * @description Nível
+             */
+            category_level?: string | null;
+            /**
              * Funding Program
              * @description Programa de fomento
              */
             funding_program?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             * @description Identificador do registro de fomento
+             */
+            id: string;
             /**
              * Institute
              * @description Instituição
              */
             institute?: string | null;
             /**
-             * Aid Quantity
-             * @description Auxílios
+             * Modality
+             * @description Modalidade
              */
-            aid_quantity?: number | null;
+            modality?: string | null;
+            researcher: components["schemas"]["ScholarshipResearcher"];
             /**
              * Scholarship Quantity
              * @description Bolsas
@@ -4705,15 +4715,15 @@ export interface components {
         /** ScholarshipBreakdownItem */
         ScholarshipBreakdownItem: {
             /**
-             * Modality
-             * @description Modalidade da bolsa
-             */
-            modality?: string | null;
-            /**
              * Category Level
              * @description Categoria/nível (ex.: 1A, 1B, 2)
              */
             category_level?: string | null;
+            /**
+             * Modality
+             * @description Modalidade da bolsa
+             */
+            modality?: string | null;
             /**
              * Researchers
              * @description Quantidade distinta de pesquisadores bolsistas
@@ -4723,43 +4733,43 @@ export interface components {
         /** ScholarshipFilter */
         ScholarshipFilter: {
             /**
-             * Researcher Id
-             * @description IDs dos pesquisadores
+             * Category Level
+             * @description Categoria/nível (ex.: 1A, 2)
              */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description IDs das instituições de vínculo
-             */
-            institution_id?: string[];
+            category_level?: string[];
             /**
              * Graduate Program Id
              * @description IDs dos programas de pós
              */
             graduate_program_id?: string[];
             /**
+             * Institution Id
+             * @description IDs das instituições de vínculo
+             */
+            institution_id?: string[];
+            /**
              * Modality
              * @description Modalidade (ex.: Produtividade em Pesquisa)
              */
             modality?: string[];
             /**
-             * Category Level
-             * @description Categoria/nível (ex.: 1A, 2)
+             * Researcher Id
+             * @description IDs dos pesquisadores
              */
-            category_level?: string[];
+            researcher_id?: string[];
         };
         /** ScholarshipListResponse */
         ScholarshipListResponse: {
             /** Data */
             data: components["schemas"]["Scholarship"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["ScholarshipFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["ScholarshipFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /** ScholarshipResearcher */
         ScholarshipResearcher: {
@@ -4775,17 +4785,24 @@ export interface components {
         SearchResponse: {
             /** Data */
             data: components["schemas"]["ResearcherSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["ResearcherFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["ResearcherFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /** SeriesPoint */
         SeriesPoint: {
+            /**
+             * Groups
+             * @description Quebra por valor da dimensão de agrupamento (presente quando group_by é informado)
+             */
+            groups?: {
+                [key: string]: number;
+            } | null;
             /**
              * Period
              * @description Ano
@@ -4796,13 +4813,6 @@ export interface components {
              * @description Quantidade de produções no ano
              */
             value: number;
-            /**
-             * Groups
-             * @description Quebra por valor da dimensão de agrupamento (presente quando group_by é informado)
-             */
-            groups?: {
-                [key: string]: number;
-            } | null;
         };
         /**
          * SoftwareDetail
@@ -4810,11 +4820,46 @@ export interface components {
          */
         SoftwareDetail: {
             /**
+             * Availability
+             * @description Disponibilidade
+             */
+            availability?: string | null;
+            /**
+             * Code
+             * @description Código do registro
+             */
+            code?: string | null;
+            /**
+             * Environment
+             * @description Ambiente
+             */
+            environment?: string | null;
+            /**
+             * Financing
+             * @description Financiamento
+             */
+            financing?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico do software
              */
             id: string;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform
+             * @description Plataforma
+             */
+            platform?: string | null;
+            /**
+             * Platform Authors
+             * @description Desenvolvedores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
              * Title
              * @description Título do software
@@ -4825,41 +4870,6 @@ export interface components {
              * @description Ano de desenvolvimento
              */
             year?: number | null;
-            /**
-             * Platform
-             * @description Plataforma
-             */
-            platform?: string | null;
-            /**
-             * Environment
-             * @description Ambiente
-             */
-            environment?: string | null;
-            /**
-             * Code
-             * @description Código do registro
-             */
-            code?: string | null;
-            /**
-             * Platform Authors
-             * @description Desenvolvedores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
-            /**
-             * Availability
-             * @description Disponibilidade
-             */
-            availability?: string | null;
-            /**
-             * Financing
-             * @description Financiamento
-             */
-            financing?: string | null;
         };
         /**
          * SoftwareFilter
@@ -4867,60 +4877,60 @@ export interface components {
          */
         SoftwareFilter: {
             /**
-             * Q
-             * @description Termo para busca textual
+             * Area
+             * @description Grande Área do Conhecimento dos autores da plataforma
              */
-            q?: string | null;
-            /**
-             * Year Start
-             * @description Ano inicial
-             */
-            year_start?: number | null;
-            /**
-             * Year End
-             * @description Ano final
-             */
-            year_end?: number | null;
-            /**
-             * Researcher Id
-             * @description Filtrar por IDs de pesquisadores da plataforma
-             */
-            researcher_id?: string[];
-            /**
-             * Institution Id
-             * @description Filtrar por IDs de instituições
-             */
-            institution_id?: string[];
-            /**
-             * Graduate Program Id
-             * @description Filtrar por IDs de programas de pós-graduação
-             */
-            graduate_program_id?: string[];
-            /**
-             * City Id
-             * @description IDs das cidades de vínculo dos autores da plataforma
-             */
-            city_id?: string[];
+            area?: string[];
             /**
              * City Code
              * @description Códigos IBGE dos municípios de vínculo dos autores da plataforma
              */
             city_code?: string[];
             /**
-             * Identity Territory
-             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             * City Id
+             * @description IDs das cidades de vínculo dos autores da plataforma
              */
-            identity_territory?: string[];
-            /**
-             * Area
-             * @description Grande Área do Conhecimento dos autores da plataforma
-             */
-            area?: string[];
+            city_id?: string[];
             /**
              * Collection
              * @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções
              */
             collection?: string[];
+            /**
+             * Graduate Program Id
+             * @description Filtrar por IDs de programas de pós-graduação
+             */
+            graduate_program_id?: string[];
+            /**
+             * Identity Territory
+             * @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome
+             */
+            identity_territory?: string[];
+            /**
+             * Institution Id
+             * @description Filtrar por IDs de instituições
+             */
+            institution_id?: string[];
+            /**
+             * Q
+             * @description Termo para busca textual
+             */
+            q?: string | null;
+            /**
+             * Researcher Id
+             * @description Filtrar por IDs de pesquisadores da plataforma
+             */
+            researcher_id?: string[];
+            /**
+             * Year End
+             * @description Ano final
+             */
+            year_end?: number | null;
+            /**
+             * Year Start
+             * @description Ano inicial
+             */
+            year_start?: number | null;
         };
         /**
          * SoftwareSearchResponse
@@ -4929,14 +4939,14 @@ export interface components {
         SoftwareSearchResponse: {
             /** Data */
             data: components["schemas"]["SoftwareSummary"][];
-            pagination: components["schemas"]["Pagination"];
-            filters_applied: components["schemas"]["SoftwareFilter"];
-            sort: components["schemas"]["Sort"];
-            meta: components["schemas"]["Meta"];
             /** Facets */
             facets?: {
                 [key: string]: components["schemas"]["FacetResult"];
             } | null;
+            filters_applied: components["schemas"]["SoftwareFilter"];
+            meta: components["schemas"]["Meta"];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["Sort"];
         };
         /**
          * SoftwareSummary
@@ -4944,11 +4954,36 @@ export interface components {
          */
         SoftwareSummary: {
             /**
+             * Code
+             * @description Código do registro
+             */
+            code?: string | null;
+            /**
+             * Environment
+             * @description Ambiente
+             */
+            environment?: string | null;
+            /**
              * Id
              * Format: uuid
              * @description ID canônico do software
              */
             id: string;
+            /**
+             * Matches
+             * @description Matches
+             */
+            matches?: components["schemas"]["ArticleMatch"][] | null;
+            /**
+             * Platform
+             * @description Plataforma
+             */
+            platform?: string | null;
+            /**
+             * Platform Authors
+             * @description Desenvolvedores da plataforma
+             */
+            platform_authors?: components["schemas"]["ResearcherRef"][];
             /**
              * Title
              * @description Título do software
@@ -4959,31 +4994,6 @@ export interface components {
              * @description Ano de desenvolvimento
              */
             year?: number | null;
-            /**
-             * Platform
-             * @description Plataforma
-             */
-            platform?: string | null;
-            /**
-             * Environment
-             * @description Ambiente
-             */
-            environment?: string | null;
-            /**
-             * Code
-             * @description Código do registro
-             */
-            code?: string | null;
-            /**
-             * Platform Authors
-             * @description Desenvolvedores da plataforma
-             */
-            platform_authors?: components["schemas"]["ResearcherRef"][];
-            /**
-             * Matches
-             * @description Matches
-             */
-            matches?: components["schemas"]["ArticleMatch"][] | null;
         };
         /** Sort */
         Sort: {
@@ -5001,11 +5011,6 @@ export interface components {
         /** Suggestion */
         Suggestion: {
             /**
-             * Term
-             * @description Termo sugerido
-             */
-            term: string;
-            /**
              * Frequency
              * @description Quantidade de textos em que o termo aparece
              */
@@ -5015,6 +5020,11 @@ export interface components {
              * @description Dicionários de origem onde o termo ocorre
              */
             source_types?: ("article" | "book" | "book_chapter" | "patent" | "speaker" | "abstract")[];
+            /**
+             * Term
+             * @description Termo sugerido
+             */
+            term: string;
         };
         /** SuggestionResponse */
         SuggestionResponse: {
@@ -5028,15 +5038,15 @@ export interface components {
         /** Term */
         Term: {
             /**
-             * Term
-             * @description Palavra (sem acento, minúscula)
-             */
-            term: string;
-            /**
              * Frequency
              * @description Títulos em que a palavra aparece
              */
             frequency: number;
+            /**
+             * Term
+             * @description Palavra (sem acento, minúscula)
+             */
+            term: string;
         };
         /** TermsResponse */
         TermsResponse: {
@@ -5133,55 +5143,39 @@ export interface operations {
             };
         };
     };
-    list_researchers_researcher_get: {
+    list_graduate_programs_graduate_program_get: {
         parameters: {
             query?: {
-                /** @description Busca textual no perfil (nome e resumo) e nas produções */
-                q?: string | null;
-                /** @description Ano inicial de produção */
-                year_start?: number | null;
-                /** @description Ano final de produção */
-                year_end?: number | null;
-                /** @description Escopo da busca textual (`q`): `all` (perfil e produções), `name` (somente nome) ou `abstract` (somente resumo) */
-                search_in?: "all" | "name" | "abstract";
-                /** @description IDs dos pesquisadores */
-                researcher_id?: string[];
-                /** @description IDs das instituições de vínculo */
-                institution_id?: string[];
-                /** @description IDs dos programas de pós-graduação */
-                graduate_program_id?: string[];
-                /** @description IDs das cidades de vínculo */
-                city_id?: string[];
-                /** @description Códigos IBGE (7 dígitos) dos municípios de vínculo */
-                city_code?: string[];
-                /** @description Territórios de identidade dos vínculos: código SEI (1 a 27) ou nome */
-                identity_territory?: string[];
-                /** @description Maior titulação (ex.: Doutorado) */
-                graduation?: string[];
-                /** @description Classificação do pesquisador */
-                classification?: ("A+" | "A" | "B+" | "B" | "C+" | "C" | "D+" | "D" | "E+" | "E")[];
-                /** @description Grandes áreas do conhecimento (ex.: CIENCIAS_EXATAS_E_DA_TERRA) */
-                area?: string[];
-                /** @description Modalidades de bolsa de fomento (ex.: Produtividade em Pesquisa - 1A) */
-                modality?: string[];
-                /** @description Tipos de produção considerados. Com `q`, restringe as obras que podem casar com a busca; sem `q`, exige ao menos uma obra desses tipos */
-                source_type?: ("article" | "book" | "book_chapter" | "patent" | "software" | "event" | "area_specialty")[];
-                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
-                collection?: string[];
                 /** @description Número da página */
                 page?: number;
                 /** @description Itens por página */
                 per_page?: number;
+                /** @description Termo para busca por nome ou sigla */
+                q?: string | null;
+                /** @description IDs das instituições */
+                institution_id?: string[];
+                /** @description Área de avaliação CAPES */
+                area?: string[];
+                /** @description Modalidade (ex.: Acadêmico, Profissional) */
+                modality?: string[];
+                /** @description Tipo do programa (ex.: Mestrado, Doutorado) */
+                type?: string[];
+                /** @description Conceito CAPES */
+                rating?: string[];
+                /** @description UF */
+                state?: string[];
+                /** @description Cidade */
+                city?: string[];
+                /** @description Código IBGE (7 dígitos) do município da sede */
+                city_code?: string[];
+                /** @description Território de identidade da sede: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
                 /** @description Campo para ordenação */
-                sort_by?: "name" | "id" | "relevance" | "matches";
+                sort_by?: "name" | "acronym";
                 /** @description Direção da ordenação (asc/desc) */
-                sort_order?: ("asc" | "desc") | null;
-                /** @description Lista de facets opt-in (area, city, classification, graduate_program, graduation, identity_territory, institution, modality, source_type, territory_city, year) */
+                sort_order?: "asc" | "desc";
+                /** @description Lista de facets opt-in (institution, area, modality, type, rating, state, city, identity_territory, territory_city) */
                 facets?: string[];
-                /** @description Recursos adicionais opt-in (ex.: matches) */
-                include?: string[];
-                /** @description Número máximo de evidências por pesquisador */
-                matches_limit?: number;
                 /** @description Número máximo de valores por facet */
                 facet_limit?: number;
             };
@@ -5197,7 +5191,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SearchResponse"];
+                    "application/json": components["schemas"]["CatalogResponse"];
                 };
             };
             /** @description Parâmetros inválidos */
@@ -5211,57 +5205,12 @@ export interface operations {
             };
         };
     };
-    get_researcher_researcher__researcher_id__get: {
-        parameters: {
-            query?: {
-                /** @description Seções opcionais do perfil (education, experience, foment) */
-                include?: string[];
-            };
-            header?: never;
-            path: {
-                /** @description ID (UUID) ou Lattes ID do pesquisador */
-                researcher_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailResponse_ResearcherDetail_"];
-                };
-            };
-            /** @description Recurso não encontrado */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    get_researcher_image_researcher__researcher_id__image_get: {
+    get_graduate_program_graduate_program__program_id__get: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                /** @description ID (UUID) ou Lattes ID do pesquisador */
-                researcher_id: string;
+                program_id: string;
             };
             cookie?: never;
         };
@@ -5272,7 +5221,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DetailResponse_GraduateProgramDetail_"];
+                };
             };
             /** @description Recurso não encontrado */
             404: {
@@ -5374,38 +5325,25 @@ export interface operations {
             };
         };
     };
-    list_graduate_programs_graduate_program_get: {
+    list_magazines_magazine_get: {
         parameters: {
             query?: {
                 /** @description Número da página */
                 page?: number;
                 /** @description Itens por página */
                 per_page?: number;
-                /** @description Termo para busca por nome ou sigla */
+                /** @description Busca pelo nome da revista */
                 q?: string | null;
-                /** @description IDs das instituições */
-                institution_id?: string[];
-                /** @description Área de avaliação CAPES */
-                area?: string[];
-                /** @description Modalidade (ex.: Acadêmico, Profissional) */
-                modality?: string[];
-                /** @description Conceito CAPES */
-                rating?: string[];
-                /** @description UF */
-                state?: string[];
-                /** @description Cidade */
-                city?: string[];
-                /** @description Código IBGE (7 dígitos) do município da sede */
-                city_code?: string[];
-                /** @description Território de identidade da sede: código SEI (1 a 27) ou nome */
-                identity_territory?: string[];
+                /** @description ISSN */
+                issn?: string[];
+                /** @description Estrato Qualis ou ausência (not_rated, not_applicable) */
+                qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "not_rated" | "not_applicable")[];
                 /** @description Campo para ordenação */
-                sort_by?: "name" | "acronym";
-                /** @description Direção da ordenação (asc/desc) */
-                sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in (institution, area, modality, rating, state, city, identity_territory, territory_city) */
+                sort_by?: "name" | "jcr";
+                /** @description Direção (padrão: asc para name, desc para jcr) */
+                sort_order?: ("asc" | "desc") | null;
+                /** @description Facets opt-in (qualis) */
                 facets?: string[];
-                /** @description Número máximo de valores por facet */
                 facet_limit?: number;
             };
             header?: never;
@@ -5420,7 +5358,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CatalogResponse"];
+                    "application/json": components["schemas"]["MagazineListResponse"];
                 };
             };
             /** @description Parâmetros inválidos */
@@ -5434,12 +5372,12 @@ export interface operations {
             };
         };
     };
-    get_graduate_program_graduate_program__program_id__get: {
+    get_magazine_magazine__magazine_id__get: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                program_id: string;
+                magazine_id: string;
             };
             cookie?: never;
         };
@@ -5451,7 +5389,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DetailResponse_GraduateProgramDetail_"];
+                    "application/json": components["schemas"]["DetailResponse_Magazine_"];
                 };
             };
             /** @description Recurso não encontrado */
@@ -5461,6 +5399,124 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_general_metrics_metrics_general_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailResponse_GeneralMetrics_"];
+                };
+            };
+            /** @description Recurso não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_production_metric_metrics_production__kind__get: {
+        parameters: {
+            query?: {
+                /** @description Dimensão para quebra por categoria dentro de cada ano (ex.: qualis em article; nature/status em guidance; nature/type_participation em event; status/nature em research-project) */
+                group_by?: string | null;
+                /** @description Termo para busca textual */
+                q?: string | null;
+                /** @description Ano inicial */
+                year_start?: number | null;
+                /** @description Ano final */
+                year_end?: number | null;
+                /** @description Filtrar por IDs de pesquisadores da plataforma */
+                researcher_id?: string[];
+                /** @description Filtrar por IDs de instituições */
+                institution_id?: string[];
+                /** @description Filtrar por IDs de programas de pós-graduação */
+                graduate_program_id?: string[];
+                /** @description IDs das cidades de vínculo dos autores da plataforma */
+                city_id?: string[];
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
+                /** @description Grande Área do Conhecimento dos autores da plataforma */
+                area?: string[];
+                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
+                collection?: string[];
+                /** @description Estrato Qualis (A1...C) ou ausência (not_rated, not_applicable). Aceita também SQ e NP (apenas article) */
+                qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "not_rated" | "not_applicable")[];
+                /** @description Filtrar apenas artigos com PDF em acesso aberto (article) */
+                has_open_access?: boolean | null;
+                /** @description Nome da revista/periódico (article) */
+                magazine_name?: string[];
+                /** @description ISSN do periódico (article) */
+                issn?: string[];
+                /** @description Categoria da patente (patent) */
+                category?: string[];
+                /** @description Apenas patentes concedidas (true) ou não (false) (patent) */
+                granted?: boolean | null;
+                /** @description Natureza da produção (event, research-project, brand, guidance, magazine-text, event-work) */
+                nature?: string[];
+                /** @description Tipo de participação em evento (event) */
+                type_participation?: string[];
+                /** @description Forma de participação em evento (event) */
+                form_participation?: string[];
+                /** @description Situação (research-project, guidance) */
+                status?: string[];
+                /** @description Tipo de orientação (guidance) */
+                type?: string[];
+                /** @description Classificação do evento (event-work) */
+                event_classification?: string[];
+            };
+            header?: never;
+            path: {
+                kind: "article" | "book" | "book-chapter" | "software" | "patent" | "event" | "research-project" | "brand" | "guidance" | "report" | "magazine-text" | "event-work";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductionMetricResponse"];
                 };
             };
             /** @description Parâmetros inválidos */
@@ -5650,46 +5706,6 @@ export interface operations {
             };
         };
     };
-    get_book_production_book__book_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                book_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailResponse_BookDetail_"];
-                };
-            };
-            /** @description Recurso não encontrado */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
     list_book_chapters_production_book_chapter_get: {
         parameters: {
             query?: {
@@ -5794,76 +5810,12 @@ export interface operations {
             };
         };
     };
-    list_software_production_software_get: {
-        parameters: {
-            query?: {
-                /** @description Termo para busca textual */
-                q?: string | null;
-                /** @description Ano inicial */
-                year_start?: number | null;
-                /** @description Ano final */
-                year_end?: number | null;
-                /** @description Filtrar por IDs de pesquisadores da plataforma */
-                researcher_id?: string[];
-                /** @description Filtrar por IDs de instituições */
-                institution_id?: string[];
-                /** @description Filtrar por IDs de programas de pós-graduação */
-                graduate_program_id?: string[];
-                /** @description IDs das cidades de vínculo dos autores da plataforma */
-                city_id?: string[];
-                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
-                city_code?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
-                identity_territory?: string[];
-                /** @description Grande Área do Conhecimento dos autores da plataforma */
-                area?: string[];
-                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
-                collection?: string[];
-                /** @description Número da página */
-                page?: number;
-                /** @description Itens por página */
-                per_page?: number;
-                /** @description Campo para ordenação */
-                sort_by?: "relevance" | "year" | "title";
-                /** @description Direção da ordenação (asc/desc) */
-                sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
-                facets?: string[];
-                /** @description Número máximo de valores por facet */
-                facet_limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SoftwareSearchResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    get_software_production_software__software_id__get: {
+    get_book_production_book__book_id__get: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                software_id: string;
+                book_id: string;
             };
             cookie?: never;
         };
@@ -5875,333 +5827,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DetailResponse_SoftwareDetail_"];
-                };
-            };
-            /** @description Recurso não encontrado */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    list_patents_production_patent_get: {
-        parameters: {
-            query?: {
-                /** @description Termo para busca textual */
-                q?: string | null;
-                /** @description Ano inicial */
-                year_start?: number | null;
-                /** @description Ano final */
-                year_end?: number | null;
-                /** @description Filtrar por IDs de pesquisadores da plataforma */
-                researcher_id?: string[];
-                /** @description Filtrar por IDs de instituições */
-                institution_id?: string[];
-                /** @description Filtrar por IDs de programas de pós-graduação */
-                graduate_program_id?: string[];
-                /** @description IDs das cidades de vínculo dos autores da plataforma */
-                city_id?: string[];
-                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
-                city_code?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
-                identity_territory?: string[];
-                /** @description Grande Área do Conhecimento dos autores da plataforma */
-                area?: string[];
-                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
-                collection?: string[];
-                /** @description Categoria da patente (ex.: Produto, Processo) */
-                category?: string[];
-                /** @description Apenas patentes concedidas (true) ou ainda não concedidas (false) */
-                granted?: boolean | null;
-                /** @description Número da página */
-                page?: number;
-                /** @description Itens por página */
-                per_page?: number;
-                /** @description Campo para ordenação */
-                sort_by?: "relevance" | "year" | "title";
-                /** @description Direção da ordenação (asc/desc) */
-                sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
-                facets?: string[];
-                /** @description Número máximo de valores por facet */
-                facet_limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PatentSearchResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    get_patent_production_patent__patent_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                patent_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailResponse_PatentDetail_"];
-                };
-            };
-            /** @description Recurso não encontrado */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    list_events_production_event_get: {
-        parameters: {
-            query?: {
-                /** @description Termo para busca textual */
-                q?: string | null;
-                /** @description Ano inicial */
-                year_start?: number | null;
-                /** @description Ano final */
-                year_end?: number | null;
-                /** @description Filtrar por IDs de pesquisadores da plataforma */
-                researcher_id?: string[];
-                /** @description Filtrar por IDs de instituições */
-                institution_id?: string[];
-                /** @description Filtrar por IDs de programas de pós-graduação */
-                graduate_program_id?: string[];
-                /** @description IDs das cidades de vínculo dos autores da plataforma */
-                city_id?: string[];
-                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
-                city_code?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
-                identity_territory?: string[];
-                /** @description Grande Área do Conhecimento dos autores da plataforma */
-                area?: string[];
-                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
-                collection?: string[];
-                /** @description Natureza do evento (ex.: Congresso, Seminário) */
-                nature?: string[];
-                /** @description Tipo de participação (ex.: Apresentação Oral) */
-                type_participation?: string[];
-                /** @description Forma de participação (ex.: Convidado, Ouvinte) */
-                form_participation?: string[];
-                /** @description Número da página */
-                page?: number;
-                /** @description Itens por página */
-                per_page?: number;
-                /** @description Campo para ordenação */
-                sort_by?: "relevance" | "year" | "title";
-                /** @description Direção da ordenação (asc/desc) */
-                sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
-                facets?: string[];
-                /** @description Número máximo de valores por facet */
-                facet_limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EventSearchResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    get_event_production_event__event_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                event_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailResponse_EventDetail_"];
-                };
-            };
-            /** @description Recurso não encontrado */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    list_research_projects_production_research_project_get: {
-        parameters: {
-            query?: {
-                /** @description Termo para busca textual */
-                q?: string | null;
-                /** @description Ano inicial */
-                year_start?: number | null;
-                /** @description Ano final */
-                year_end?: number | null;
-                /** @description Filtrar por IDs de pesquisadores da plataforma */
-                researcher_id?: string[];
-                /** @description Filtrar por IDs de instituições */
-                institution_id?: string[];
-                /** @description Filtrar por IDs de programas de pós-graduação */
-                graduate_program_id?: string[];
-                /** @description IDs das cidades de vínculo dos autores da plataforma */
-                city_id?: string[];
-                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
-                city_code?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
-                identity_territory?: string[];
-                /** @description Grande Área do Conhecimento dos autores da plataforma */
-                area?: string[];
-                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
-                collection?: string[];
-                /** @description Situação do projeto (ex.: EM_ANDAMENTO, CONCLUIDO) */
-                status?: string[];
-                /** @description Natureza do projeto (ex.: PESQUISA, EXTENSAO) */
-                nature?: string[];
-                /** @description Número da página */
-                page?: number;
-                /** @description Itens por página */
-                per_page?: number;
-                /** @description Campo para ordenação */
-                sort_by?: "relevance" | "year" | "title";
-                /** @description Direção da ordenação (asc/desc) */
-                sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
-                facets?: string[];
-                /** @description Número máximo de valores por facet */
-                facet_limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ResearchProjectSearchResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    get_research_project_production_research_project__project_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailResponse_ResearchProjectDetail_"];
+                    "application/json": components["schemas"]["DetailResponse_BookDetail_"];
                 };
             };
             /** @description Recurso não encontrado */
@@ -6308,6 +5934,224 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DetailResponse_BrandDetail_"];
+                };
+            };
+            /** @description Recurso não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_events_production_event_get: {
+        parameters: {
+            query?: {
+                /** @description Termo para busca textual */
+                q?: string | null;
+                /** @description Ano inicial */
+                year_start?: number | null;
+                /** @description Ano final */
+                year_end?: number | null;
+                /** @description Filtrar por IDs de pesquisadores da plataforma */
+                researcher_id?: string[];
+                /** @description Filtrar por IDs de instituições */
+                institution_id?: string[];
+                /** @description Filtrar por IDs de programas de pós-graduação */
+                graduate_program_id?: string[];
+                /** @description IDs das cidades de vínculo dos autores da plataforma */
+                city_id?: string[];
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
+                /** @description Grande Área do Conhecimento dos autores da plataforma */
+                area?: string[];
+                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
+                collection?: string[];
+                /** @description Natureza do evento (ex.: Congresso, Seminário) */
+                nature?: string[];
+                /** @description Tipo de participação (ex.: Apresentação Oral) */
+                type_participation?: string[];
+                /** @description Forma de participação (ex.: Convidado, Ouvinte) */
+                form_participation?: string[];
+                /** @description Número da página */
+                page?: number;
+                /** @description Itens por página */
+                per_page?: number;
+                /** @description Campo para ordenação */
+                sort_by?: "relevance" | "year" | "title";
+                /** @description Direção da ordenação (asc/desc) */
+                sort_order?: "asc" | "desc";
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                facets?: string[];
+                /** @description Número máximo de valores por facet */
+                facet_limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventSearchResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_event_work_production_event_work_get: {
+        parameters: {
+            query?: {
+                /** @description Termo para busca textual */
+                q?: string | null;
+                /** @description Ano inicial */
+                year_start?: number | null;
+                /** @description Ano final */
+                year_end?: number | null;
+                /** @description Filtrar por IDs de pesquisadores da plataforma */
+                researcher_id?: string[];
+                /** @description Filtrar por IDs de instituições */
+                institution_id?: string[];
+                /** @description Filtrar por IDs de programas de pós-graduação */
+                graduate_program_id?: string[];
+                /** @description IDs das cidades de vínculo dos autores da plataforma */
+                city_id?: string[];
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
+                /** @description Grande Área do Conhecimento dos autores da plataforma */
+                area?: string[];
+                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
+                collection?: string[];
+                /** @description Natureza do trabalho */
+                nature?: string[];
+                /** @description Classificação do evento */
+                event_classification?: string[];
+                /** @description Número da página */
+                page?: number;
+                /** @description Itens por página */
+                per_page?: number;
+                /** @description Campo para ordenação */
+                sort_by?: "relevance" | "year" | "title";
+                /** @description Direção da ordenação (asc/desc) */
+                sort_order?: "asc" | "desc";
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                facets?: string[];
+                /** @description Número máximo de valores por facet */
+                facet_limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventWorkSearchResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_event_work_production_event_work__item_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailResponse_EventWorkDetail_"];
+                };
+            };
+            /** @description Recurso não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_event_production_event__event_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailResponse_EventDetail_"];
                 };
             };
             /** @description Recurso não encontrado */
@@ -6440,110 +6284,6 @@ export interface operations {
             };
         };
     };
-    list_report_production_report_get: {
-        parameters: {
-            query?: {
-                /** @description Termo para busca textual */
-                q?: string | null;
-                /** @description Ano inicial */
-                year_start?: number | null;
-                /** @description Ano final */
-                year_end?: number | null;
-                /** @description Filtrar por IDs de pesquisadores da plataforma */
-                researcher_id?: string[];
-                /** @description Filtrar por IDs de instituições */
-                institution_id?: string[];
-                /** @description Filtrar por IDs de programas de pós-graduação */
-                graduate_program_id?: string[];
-                /** @description IDs das cidades de vínculo dos autores da plataforma */
-                city_id?: string[];
-                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
-                city_code?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
-                identity_territory?: string[];
-                /** @description Grande Área do Conhecimento dos autores da plataforma */
-                area?: string[];
-                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
-                collection?: string[];
-                /** @description Número da página */
-                page?: number;
-                /** @description Itens por página */
-                per_page?: number;
-                /** @description Campo para ordenação */
-                sort_by?: "relevance" | "year" | "title";
-                /** @description Direção da ordenação (asc/desc) */
-                sort_order?: "asc" | "desc";
-                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
-                facets?: string[];
-                /** @description Número máximo de valores por facet */
-                facet_limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReportSearchResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    get_report_production_report__item_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                item_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DetailResponse_ReportDetail_"];
-                };
-            };
-            /** @description Recurso não encontrado */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
     list_magazine_text_production_magazine_text_get: {
         parameters: {
             query?: {
@@ -6650,7 +6390,7 @@ export interface operations {
             };
         };
     };
-    list_event_work_production_event_work_get: {
+    list_patents_production_patent_get: {
         parameters: {
             query?: {
                 /** @description Termo para busca textual */
@@ -6675,10 +6415,10 @@ export interface operations {
                 area?: string[];
                 /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
                 collection?: string[];
-                /** @description Natureza do trabalho */
-                nature?: string[];
-                /** @description Classificação do evento */
-                event_classification?: string[];
+                /** @description Categoria da patente (ex.: Produto, Processo) */
+                category?: string[];
+                /** @description Apenas patentes concedidas (true) ou ainda não concedidas (false) */
+                granted?: boolean | null;
                 /** @description Número da página */
                 page?: number;
                 /** @description Itens por página */
@@ -6704,7 +6444,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EventWorkSearchResponse"];
+                    "application/json": components["schemas"]["PatentSearchResponse"];
                 };
             };
             /** @description Parâmetros inválidos */
@@ -6718,7 +6458,111 @@ export interface operations {
             };
         };
     };
-    get_event_work_production_event_work__item_id__get: {
+    get_patent_production_patent__patent_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailResponse_PatentDetail_"];
+                };
+            };
+            /** @description Recurso não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_report_production_report_get: {
+        parameters: {
+            query?: {
+                /** @description Termo para busca textual */
+                q?: string | null;
+                /** @description Ano inicial */
+                year_start?: number | null;
+                /** @description Ano final */
+                year_end?: number | null;
+                /** @description Filtrar por IDs de pesquisadores da plataforma */
+                researcher_id?: string[];
+                /** @description Filtrar por IDs de instituições */
+                institution_id?: string[];
+                /** @description Filtrar por IDs de programas de pós-graduação */
+                graduate_program_id?: string[];
+                /** @description IDs das cidades de vínculo dos autores da plataforma */
+                city_id?: string[];
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
+                /** @description Grande Área do Conhecimento dos autores da plataforma */
+                area?: string[];
+                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
+                collection?: string[];
+                /** @description Número da página */
+                page?: number;
+                /** @description Itens por página */
+                per_page?: number;
+                /** @description Campo para ordenação */
+                sort_by?: "relevance" | "year" | "title";
+                /** @description Direção da ordenação (asc/desc) */
+                sort_order?: "asc" | "desc";
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                facets?: string[];
+                /** @description Número máximo de valores por facet */
+                facet_limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportSearchResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_report_production_report__item_id__get: {
         parameters: {
             query?: never;
             header?: never;
@@ -6735,7 +6579,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DetailResponse_EventWorkDetail_"];
+                    "application/json": components["schemas"]["DetailResponse_ReportDetail_"];
                 };
             };
             /** @description Recurso não encontrado */
@@ -6758,61 +6602,46 @@ export interface operations {
             };
         };
     };
-    list_suggestions_suggestion_get: {
-        parameters: {
-            query: {
-                /** @description Início do termo digitado. Ignora acentuação e maiúsculas/minúsculas */
-                q: string;
-                /** @description Dicionários considerados. Sem valor, considera todos e soma as frequências do termo */
-                source_type?: ("article" | "book" | "book_chapter" | "patent" | "speaker" | "abstract")[];
-                /** @description Quantidade máxima de sugestões */
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SuggestionResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    list_magazines_magazine_get: {
+    list_research_projects_production_research_project_get: {
         parameters: {
             query?: {
+                /** @description Termo para busca textual */
+                q?: string | null;
+                /** @description Ano inicial */
+                year_start?: number | null;
+                /** @description Ano final */
+                year_end?: number | null;
+                /** @description Filtrar por IDs de pesquisadores da plataforma */
+                researcher_id?: string[];
+                /** @description Filtrar por IDs de instituições */
+                institution_id?: string[];
+                /** @description Filtrar por IDs de programas de pós-graduação */
+                graduate_program_id?: string[];
+                /** @description IDs das cidades de vínculo dos autores da plataforma */
+                city_id?: string[];
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
+                /** @description Grande Área do Conhecimento dos autores da plataforma */
+                area?: string[];
+                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
+                collection?: string[];
+                /** @description Situação do projeto (ex.: EM_ANDAMENTO, CONCLUIDO) */
+                status?: string[];
+                /** @description Natureza do projeto (ex.: PESQUISA, EXTENSAO) */
+                nature?: string[];
                 /** @description Número da página */
                 page?: number;
                 /** @description Itens por página */
                 per_page?: number;
-                /** @description Busca pelo nome da revista */
-                q?: string | null;
-                /** @description ISSN */
-                issn?: string[];
-                /** @description Estrato Qualis ou ausência (not_rated, not_applicable) */
-                qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "not_rated" | "not_applicable")[];
                 /** @description Campo para ordenação */
-                sort_by?: "name" | "jcr";
-                /** @description Direção (padrão: asc para name, desc para jcr) */
-                sort_order?: ("asc" | "desc") | null;
-                /** @description Facets opt-in (qualis) */
+                sort_by?: "relevance" | "year" | "title";
+                /** @description Direção da ordenação (asc/desc) */
+                sort_order?: "asc" | "desc";
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
                 facets?: string[];
+                /** @description Número máximo de valores por facet */
                 facet_limit?: number;
             };
             header?: never;
@@ -6827,7 +6656,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MagazineListResponse"];
+                    "application/json": components["schemas"]["ResearchProjectSearchResponse"];
                 };
             };
             /** @description Parâmetros inválidos */
@@ -6841,12 +6670,12 @@ export interface operations {
             };
         };
     };
-    get_magazine_magazine__magazine_id__get: {
+    get_research_project_production_research_project__project_id__get: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                magazine_id: string;
+                project_id: string;
             };
             cookie?: never;
         };
@@ -6858,7 +6687,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DetailResponse_Magazine_"];
+                    "application/json": components["schemas"]["DetailResponse_ResearchProjectDetail_"];
                 };
             };
             /** @description Recurso não encontrado */
@@ -6868,6 +6697,305 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_software_production_software_get: {
+        parameters: {
+            query?: {
+                /** @description Termo para busca textual */
+                q?: string | null;
+                /** @description Ano inicial */
+                year_start?: number | null;
+                /** @description Ano final */
+                year_end?: number | null;
+                /** @description Filtrar por IDs de pesquisadores da plataforma */
+                researcher_id?: string[];
+                /** @description Filtrar por IDs de instituições */
+                institution_id?: string[];
+                /** @description Filtrar por IDs de programas de pós-graduação */
+                graduate_program_id?: string[];
+                /** @description IDs das cidades de vínculo dos autores da plataforma */
+                city_id?: string[];
+                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
+                /** @description Grande Área do Conhecimento dos autores da plataforma */
+                area?: string[];
+                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
+                collection?: string[];
+                /** @description Número da página */
+                page?: number;
+                /** @description Itens por página */
+                per_page?: number;
+                /** @description Campo para ordenação */
+                sort_by?: "relevance" | "year" | "title";
+                /** @description Direção da ordenação (asc/desc) */
+                sort_order?: "asc" | "desc";
+                /** @description Lista de facets opt-in. Comuns: institution, graduate_program, city, identity_territory, territory_city, year, area. Cada tipo de produção aceita também os facets dos seus filtros próprios */
+                facets?: string[];
+                /** @description Número máximo de valores por facet */
+                facet_limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoftwareSearchResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_software_production_software__software_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                software_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailResponse_SoftwareDetail_"];
+                };
+            };
+            /** @description Recurso não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_researchers_researcher_get: {
+        parameters: {
+            query?: {
+                /** @description Busca textual no perfil (nome e resumo) e nas produções */
+                q?: string | null;
+                /** @description Ano inicial de produção */
+                year_start?: number | null;
+                /** @description Ano final de produção */
+                year_end?: number | null;
+                /** @description Escopo da busca textual (`q`): `all` (perfil e produções), `name` (somente nome) ou `abstract` (somente resumo) */
+                search_in?: "all" | "name" | "abstract";
+                /** @description IDs dos pesquisadores */
+                researcher_id?: string[];
+                /** @description IDs das instituições de vínculo */
+                institution_id?: string[];
+                /** @description IDs dos programas de pós-graduação */
+                graduate_program_id?: string[];
+                /** @description IDs das cidades de vínculo */
+                city_id?: string[];
+                /** @description Códigos IBGE (7 dígitos) dos municípios de vínculo */
+                city_code?: string[];
+                /** @description Territórios de identidade dos vínculos: código SEI (1 a 27) ou nome */
+                identity_territory?: string[];
+                /** @description Maior titulação (ex.: Doutorado) */
+                graduation?: string[];
+                /** @description Classificação do pesquisador */
+                classification?: ("A+" | "A" | "B+" | "B" | "C+" | "C" | "D+" | "D" | "E+" | "E")[];
+                /** @description Grandes áreas do conhecimento (ex.: CIENCIAS_EXATAS_E_DA_TERRA) */
+                area?: string[];
+                /** @description Modalidades de bolsa de fomento (ex.: Produtividade em Pesquisa - 1A) */
+                modality?: string[];
+                /** @description Tipos de produção considerados. Com `q`, restringe as obras que podem casar com a busca; sem `q`, exige ao menos uma obra desses tipos */
+                source_type?: ("article" | "book" | "book_chapter" | "patent" | "software" | "event" | "area_specialty")[];
+                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
+                collection?: string[];
+                /** @description Número da página */
+                page?: number;
+                /** @description Itens por página */
+                per_page?: number;
+                /** @description Campo para ordenação */
+                sort_by?: "name" | "id" | "relevance" | "matches";
+                /** @description Direção da ordenação (asc/desc) */
+                sort_order?: ("asc" | "desc") | null;
+                /** @description Lista de facets opt-in (area, city, classification, graduate_program, graduation, identity_territory, institution, modality, source_type, territory_city, year) */
+                facets?: string[];
+                /** @description Recursos adicionais opt-in (ex.: matches) */
+                include?: string[];
+                /** @description Número máximo de evidências por pesquisador */
+                matches_limit?: number;
+                /** @description Número máximo de valores por facet */
+                facet_limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_researcher_researcher__researcher_id__get: {
+        parameters: {
+            query?: {
+                /** @description Seções opcionais do perfil (education, experience, foment) */
+                include?: string[];
+            };
+            header?: never;
+            path: {
+                /** @description ID (UUID) ou Lattes ID do pesquisador */
+                researcher_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DetailResponse_ResearcherDetail_"];
+                };
+            };
+            /** @description Recurso não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_researcher_image_researcher__researcher_id__image_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID (UUID) ou Lattes ID do pesquisador */
+                researcher_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Recurso não encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Parâmetros inválidos */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_researcher_terms_researcher__researcher_id__terms_get: {
+        parameters: {
+            query?: {
+                /** @description Quantidade de termos */
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                researcher_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TermsResponse"];
                 };
             };
             /** @description Parâmetros inválidos */
@@ -6932,123 +7060,16 @@ export interface operations {
             };
         };
     };
-    get_researcher_terms_researcher__researcher_id__terms_get: {
+    list_suggestions_suggestion_get: {
         parameters: {
-            query?: {
-                /** @description Quantidade de termos */
+            query: {
+                /** @description Início do termo digitado. Ignora acentuação e maiúsculas/minúsculas */
+                q: string;
+                /** @description Dicionários considerados. Sem valor, considera todos e soma as frequências do termo */
+                source_type?: ("article" | "book" | "book_chapter" | "patent" | "speaker" | "abstract")[];
+                /** @description Quantidade máxima de sugestões */
                 limit?: number;
             };
-            header?: never;
-            path: {
-                researcher_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TermsResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    get_production_metric_metrics_production__kind__get: {
-        parameters: {
-            query?: {
-                /** @description Dimensão para quebra por categoria dentro de cada ano (ex.: qualis em article; nature/status em guidance; nature/type_participation em event; status/nature em research-project) */
-                group_by?: string | null;
-                /** @description Termo para busca textual */
-                q?: string | null;
-                /** @description Ano inicial */
-                year_start?: number | null;
-                /** @description Ano final */
-                year_end?: number | null;
-                /** @description Filtrar por IDs de pesquisadores da plataforma */
-                researcher_id?: string[];
-                /** @description Filtrar por IDs de instituições */
-                institution_id?: string[];
-                /** @description Filtrar por IDs de programas de pós-graduação */
-                graduate_program_id?: string[];
-                /** @description IDs das cidades de vínculo dos autores da plataforma */
-                city_id?: string[];
-                /** @description Códigos IBGE dos municípios de vínculo dos autores da plataforma */
-                city_code?: string[];
-                /** @description Territórios de identidade dos vínculos dos autores da plataforma: código SEI (1 a 27) ou nome */
-                identity_territory?: string[];
-                /** @description Grande Área do Conhecimento dos autores da plataforma */
-                area?: string[];
-                /** @description Slugs das coleções (sem filtro por padrão). Use 'all' ou '*' para buscar em todas as coleções */
-                collection?: string[];
-                /** @description Estrato Qualis (A1...C) ou ausência (not_rated, not_applicable). Aceita também SQ e NP (apenas article) */
-                qualis?: ("A1" | "A2" | "A3" | "A4" | "B1" | "B2" | "B3" | "B4" | "B5" | "C" | "not_rated" | "not_applicable")[];
-                /** @description Filtrar apenas artigos com PDF em acesso aberto (article) */
-                has_open_access?: boolean | null;
-                /** @description Nome da revista/periódico (article) */
-                magazine_name?: string[];
-                /** @description ISSN do periódico (article) */
-                issn?: string[];
-                /** @description Categoria da patente (patent) */
-                category?: string[];
-                /** @description Apenas patentes concedidas (true) ou não (false) (patent) */
-                granted?: boolean | null;
-                /** @description Natureza da produção (event, research-project, brand, guidance, magazine-text, event-work) */
-                nature?: string[];
-                /** @description Tipo de participação em evento (event) */
-                type_participation?: string[];
-                /** @description Forma de participação em evento (event) */
-                form_participation?: string[];
-                /** @description Situação (research-project, guidance) */
-                status?: string[];
-                /** @description Tipo de orientação (guidance) */
-                type?: string[];
-                /** @description Classificação do evento (event-work) */
-                event_classification?: string[];
-            };
-            header?: never;
-            path: {
-                kind: "article" | "book" | "book-chapter" | "software" | "patent" | "event" | "research-project" | "brand" | "guidance" | "report" | "magazine-text" | "event-work";
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProductionMetricResponse"];
-                };
-            };
-            /** @description Parâmetros inválidos */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    get_general_metrics_metrics_general_get: {
-        parameters: {
-            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -7061,16 +7082,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DetailResponse_GeneralMetrics_"];
-                };
-            };
-            /** @description Recurso não encontrado */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
+                    "application/json": components["schemas"]["SuggestionResponse"];
                 };
             };
             /** @description Parâmetros inválidos */

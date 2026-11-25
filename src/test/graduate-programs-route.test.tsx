@@ -43,6 +43,7 @@ const programA: GraduateProgramSummary = {
   acronym: 'PGCOMP',
   area: 'CIÊNCIAS EXATAS E DA TERRA',
   modality: 'ACADÊMICO',
+  type: 'MESTRADO E DOUTORADO',
   rating: '5',
   city: 'Salvador',
   state: 'BA',
@@ -54,6 +55,7 @@ const programB: GraduateProgramSummary = {
   acronym: 'PPGSC',
   area: 'CIÊNCIAS DA SAÚDE',
   modality: 'PROFISSIONAL',
+  type: 'MESTRADO PROFISSIONAL',
   rating: '4',
   city: 'Salvador',
   state: 'BA',
@@ -128,6 +130,22 @@ function makeListHandler(
             },
           ],
         },
+        type: {
+          param: 'type',
+          total: 2,
+          items: [
+            {
+              value: 'MESTRADO E DOUTORADO',
+              label: 'MESTRADO E DOUTORADO',
+              count: 1,
+            },
+            {
+              value: 'MESTRADO PROFISSIONAL',
+              label: 'MESTRADO PROFISSIONAL',
+              count: 1,
+            },
+          ],
+        },
         city: {
           param: 'city',
           total: 1,
@@ -187,6 +205,12 @@ describe('Rotas de Pós-graduação (T5)', () => {
     expect(
       screen.getByText('Programa de Pós-Graduação em Saúde Coletiva'),
     ).toBeInTheDocument();
+    expect(screen.getAllByText('Mestrado e doutorado').length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.getAllByText('Mestrado profissional').length).toBeGreaterThan(
+      0,
+    );
 
     // Mapa alimentado pela faceta territory_city, numa query só
     // O mapa é carregado sob demanda (Leaflet em chunk à parte).
@@ -263,6 +287,12 @@ describe('Rotas de Pós-graduação (T5)', () => {
       expect(router.state.location.search).toMatchObject({ view: 'table' });
     });
     expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'Tipo' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText('Mestrado e doutorado').length).toBeGreaterThan(
+      0,
+    );
   });
 
   it('renderiza detalhe do programa com linhas de pesquisa e informações gerais em /pos-graduacao/$id', async () => {

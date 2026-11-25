@@ -86,6 +86,7 @@ const BIOTEC_PROGRAM: GraduateProgramSummary = {
   institution_id: 'inst-uesc',
   area: 'INTERDISCIPLINAR',
   modality: 'PROFISSIONAL',
+  type: 'Mestrado Profissional',
   rating: '4',
   state: 'BA',
   city: 'ILHÉUS',
