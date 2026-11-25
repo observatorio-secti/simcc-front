@@ -28,6 +28,8 @@ export interface ListSearchOptions<
   maxPerPage?: number;
   /** Habilita `year_start` e `year_end` (padrão: `true`). */
   yearRange?: boolean;
+  /** Aplica `anoCorrente - 10` como padrão de `year_start` (padrão: `true`). */
+  defaultYearStart?: boolean;
   /** Filtros específicos da listagem enviados também para a API v2. */
   filters?: TFilters;
   /** Parâmetros de UI que ficam na URL mas não são enviados à API (ex.: `view`). */
@@ -411,6 +413,7 @@ export function createListSearch<
     | undefined = undefined,
   TDefaultSortOrder extends SortOrder | undefined = undefined,
   TYearRange extends boolean = true,
+  TDefaultYearStart extends boolean = true,
 >(options?: {
   sortBy?: TSortBy;
   defaultSortBy?: TDefaultSortBy;
@@ -419,6 +422,7 @@ export function createListSearch<
   defaultPerPage?: number;
   maxPerPage?: number;
   yearRange?: TYearRange;
+  defaultYearStart?: TDefaultYearStart;
   filters?: TFilters;
   extra?: TExtra;
 }) {
@@ -429,22 +433,31 @@ export function createListSearch<
     Math.max(1, options?.defaultPerPage ?? DEFAULT_PER_PAGE),
   );
   const includeYearRange = options?.yearRange ?? true;
+  const useDefaultYearStart =
+    includeYearRange && (options?.defaultYearStart ?? true);
   const filtersShape = (options?.filters ?? {}) as TFilters;
   const extraShape = (options?.extra ?? {}) as TExtra;
 
   const yearShape = (
     includeYearRange
       ? {
-          year_start: searchDefaultedYearParam(getDefaultYearStart),
+          year_start: useDefaultYearStart
+            ? searchDefaultedYearParam(getDefaultYearStart)
+            : searchYearParam(),
           year_end: searchYearParam(),
         }
       : {}
   ) as TYearRange extends false
     ? Record<never, never>
-    : {
-        year_start: ReturnType<typeof searchDefaultedYearParam>;
-        year_end: ReturnType<typeof searchYearParam>;
-      };
+    : TDefaultYearStart extends false
+      ? {
+          year_start: ReturnType<typeof searchYearParam>;
+          year_end: ReturnType<typeof searchYearParam>;
+        }
+      : {
+          year_start: ReturnType<typeof searchDefaultedYearParam>;
+          year_end: ReturnType<typeof searchYearParam>;
+        };
 
   const baseObject = z.object({
     q: searchStringParam(),
@@ -494,7 +507,7 @@ export function createListSearch<
       ...(options?.defaultSortOrder !== undefined
         ? { sort_order: options.defaultSortOrder }
         : {}),
-      ...(includeYearRange ? { year_start: getDefaultYearStart() } : {}),
+      ...(useDefaultYearStart ? { year_start: getDefaultYearStart() } : {}),
     };
   }
 
@@ -608,12 +621,10 @@ export function createListSearch<
         count += 1;
       }
     }
-    if (
-      includeYearRange &&
-      ((record.year_start !== undefined &&
-        record.year_start !== getDefaultYearStart()) ||
-        record.year_end !== undefined)
-    ) {
+    const hasYearStart =
+      record.year_start !== undefined &&
+      (!useDefaultYearStart || record.year_start !== getDefaultYearStart());
+    if (includeYearRange && (hasYearStart || record.year_end !== undefined)) {
       count += 1;
     }
     return count;

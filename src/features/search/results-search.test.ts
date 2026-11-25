@@ -53,7 +53,7 @@ describe('results-search (T2)', () => {
     expect(search.page).toBe(1);
   });
 
-  it('converte o estado em parâmetros de /v2/researcher sem conversão por tela', () => {
+  it('converte o estado em parâmetros de /v2/researcher sem recorte padrão de ano', () => {
     const search = resultsSearch.parse(
       'q=solos&area=ENGENHARIAS&qualis=A1&graduation=Doutorado&page=3',
     );
@@ -61,7 +61,6 @@ describe('results-search (T2)', () => {
       q: 'solos',
       page: 3,
       per_page: 30,
-      year_start: getDefaultYearStart(),
       area: ['ENGENHARIAS'],
       graduation: ['Doutorado'],
       sort_by: 'matches',
@@ -294,8 +293,14 @@ describe('results-search (T2)', () => {
     ).toBe(3);
 
     const cleared = resultsSearch.clearFilters(search);
-    expect(cleared.year_start).toBe(getDefaultYearStart());
+    expect(cleared.year_start).toBeUndefined();
     expect(cleared.year_end).toBeUndefined();
     expect(countTabFilters(cleared, { source: 'researcher' })).toBe(0);
+    expect(
+      countTabFilters(cleared, { source: 'production', kind: 'article' }),
+    ).toBe(0);
+
+    const withExplicitYear = resultsSearch.parse('year_start=2018');
+    expect(countTabFilters(withExplicitYear, { source: 'researcher' })).toBe(1);
   });
 });

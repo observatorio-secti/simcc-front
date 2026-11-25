@@ -139,7 +139,7 @@ describe('Rota /busca (T2)', () => {
 
     const params = researchers.calls.at(-1)!;
     expect(params.get('q')).toBe('solos');
-    expect(params.get('year_start')).toBe(String(getDefaultYearStart()));
+    expect(params.has('year_start')).toBe(false);
     expect(params.has('year_end')).toBe(false);
     expect(params.get('sort_by')).toBe('matches');
     expect(params.getAll('include')).toEqual(['matches']);

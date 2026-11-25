@@ -49,6 +49,7 @@ import {
   activeTab,
   applyQuery,
   countTabFilters,
+  resolveProductionYearStart,
   resolveSort,
   RESULTS_FACET_ORDER,
   resultsSearch,
@@ -198,15 +199,29 @@ export function SearchResultsPage({
     commit(applyQuery(search, { q: undefined }));
   }
 
+  const effectiveYearStart = isProductionTab
+    ? resolveProductionYearStart(search)
+    : search.year_start;
+
   const facetPanelProps = {
     facets: (facets ?? undefined) as FacetsMap | undefined,
-    values: search as Record<string, unknown>,
-    defaultValues: { year_start: getDefaultYearStart() },
+    values: {
+      ...(search as Record<string, unknown>),
+      year_start: effectiveYearStart,
+    },
+    defaultValues: isProductionTab
+      ? { year_start: getDefaultYearStart() }
+      : {},
     config: RESULTS_FACET_CONFIG,
     order: RESULTS_FACET_ORDER,
     loading: listQuery.isPending,
-    onSearchChange: (patch: Record<string, string[] | number | undefined>) =>
-      update(patch),
+    onSearchChange: (patch: Record<string, string[] | number | undefined>) => {
+      const normalized =
+        isProductionTab && patch.year_start === getDefaultYearStart()
+          ? { ...patch, year_start: undefined }
+          : patch;
+      update(normalized);
+    },
     onClear: handleClearFilters,
   };
 
@@ -400,7 +415,7 @@ export function SearchResultsPage({
             />
             {tab.kind === 'article' && (
               <RecentYearsNotice
-                yearStart={search.year_start}
+                yearStart={effectiveYearStart}
                 yearEnd={search.year_end}
               />
             )}
