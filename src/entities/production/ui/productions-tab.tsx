@@ -9,6 +9,7 @@ import type {
 import { productionListQueryOptions } from '@/entities/production/queries';
 import { getProductionDefinition } from '@/entities/production/registry';
 import { ProductionCard } from '@/entities/production/ui/production-card';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { LoadingBlock } from '@/shared/ui/loading-block';
@@ -114,9 +115,11 @@ function ProductionSection({
       }
     | undefined;
   const items = typedData?.data ?? [];
+  const defaultYearStart = getDefaultYearStart();
   const hasFilters = Boolean(
     search.q ||
-    search.year_start !== undefined ||
+    (search.year_start !== undefined &&
+      search.year_start !== defaultYearStart) ||
     search.year_end !== undefined,
   );
 
@@ -158,7 +161,9 @@ function ProductionSection({
               description={
                 hasFilters
                   ? `Não encontramos ${definition.title.toLowerCase()} para os filtros aplicados ${emptyContext.inScope}.`
-                  : `${emptyContext.owner} ainda não possui ${definition.title.toLowerCase()} cadastrados.`
+                  : search.year_start !== undefined
+                    ? `Não encontramos ${definition.title.toLowerCase()} ${emptyContext.inScope} a partir de ${search.year_start}.`
+                    : `${emptyContext.owner} ainda não possui ${definition.title.toLowerCase()} cadastrados.`
               }
               action={
                 hasFilters ? (
@@ -248,12 +253,18 @@ export function ProductionsTab({
     !hasArticle && search.sort_by === 'citations' ? 'year' : search.sort_by;
   const collapsible = kinds.length > 1;
 
+  const defaultYearStart = getDefaultYearStart();
+
   function handleClearFilters() {
     onClearQuery();
-    if (search.year_start !== undefined || search.year_end !== undefined) {
+    if (
+      (search.year_start !== undefined &&
+        search.year_start !== defaultYearStart) ||
+      search.year_end !== undefined
+    ) {
       onUpdateSearch({
         q: undefined,
-        year_start: undefined,
+        year_start: defaultYearStart,
         year_end: undefined,
       });
     }

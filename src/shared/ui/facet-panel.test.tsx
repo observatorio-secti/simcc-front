@@ -323,4 +323,48 @@ describe('FacetPanel', () => {
     expect(labelEl).not.toHaveClass('truncate');
     expect(labelEl.parentElement).toHaveClass('items-start');
   });
+
+  it('trata defaultValues de intervalo como estado padrão e restaura ao limpar', async () => {
+    const user = userEvent.setup();
+    const onSearchChange = vi.fn();
+
+    const { rerender } = render(
+      <FacetPanel
+        facets={SAMPLE_FACETS}
+        values={{ year_start: 2016 }}
+        defaultValues={{ year_start: 2016 }}
+        defaultOpen={['year']}
+        onClear={vi.fn()}
+        onSearchChange={onSearchChange}
+      />,
+    );
+
+    expect(screen.getByLabelText('Ano inicial')).toHaveValue(2016);
+    expect(
+      screen.queryByRole('button', { name: 'Limpar filtros' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Limpar período' }),
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <FacetPanel
+        facets={SAMPLE_FACETS}
+        values={{ year_start: 2012, year_end: 2022 }}
+        defaultValues={{ year_start: 2016 }}
+        defaultOpen={['year']}
+        onClear={vi.fn()}
+        onSearchChange={onSearchChange}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Limpar filtros' }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Limpar período' }));
+    expect(onSearchChange).toHaveBeenLastCalledWith({
+      year_start: 2016,
+      year_end: undefined,
+    });
+  });
 });

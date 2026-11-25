@@ -1,7 +1,6 @@
 import {
   createFileRoute,
   notFound,
-  stripSearchParams,
   useLocation,
   useRouter,
 } from '@tanstack/react-router';
@@ -24,17 +23,20 @@ import { isNotFoundApiError } from '@/features/researcher-profile/queries';
 import { ResearcherProfilePage } from '@/features/researcher-profile/researcher-profile-page';
 import {
   cleanProfileSearch,
-  PROFILE_SEARCH_DEFAULTS,
-  researcherProfileSearchSchema,
+  createProfileSearchMiddleware,
+  researcherProfileSearchObject,
   type ResearcherProfileSearch,
 } from '@/features/researcher-profile/search-schema';
+import { normalizeYearRange } from '@/shared/lib/search-params';
 
 // O estado do perfil (aba, filtros, página) é da feature; a produção aberta
 // como overlay (T13) é da rota, que compõe as duas features.
-const profileRouteSearchSchema = researcherProfileSearchSchema.extend({
-  /** Produção aberta como overlay sobre o perfil (`<kind da v2>:<id>`, ADR 0010). */
-  production: productionRefParam,
-});
+const profileRouteSearchSchema = researcherProfileSearchObject
+  .extend({
+    /** Produção aberta como overlay sobre o perfil (`<kind da v2>:<id>`, ADR 0010). */
+    production: productionRefParam,
+  })
+  .transform(normalizeYearRange);
 
 export const Route = createFileRoute('/_public/pesquisadores/$id')({
   staticData: { crumb: 'Pesquisador' },
@@ -42,7 +44,7 @@ export const Route = createFileRoute('/_public/pesquisadores/$id')({
   // Omite os padrões (aba, página, visão) da URL, inclusive na máscara do
   // overlay aberto a partir da busca (ADR 0010).
   search: {
-    middlewares: [stripSearchParams(PROFILE_SEARCH_DEFAULTS)],
+    middlewares: [createProfileSearchMiddleware()],
   },
   loaderDeps: ({ search }) => ({ production: search.production }),
   loader: async ({ context, params, deps }) => {

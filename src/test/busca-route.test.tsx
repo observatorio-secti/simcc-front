@@ -1,6 +1,7 @@
 import { waitFor, within } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
 import { describe, expect, it } from 'vitest';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import { v2Fixtures } from './msw/fixtures';
 import { simccV2Url } from './msw/handlers';
 import { renderRoute } from './render-route';
@@ -115,6 +116,8 @@ describe('Rota /busca (T2)', () => {
 
     const params = researchers.calls.at(-1)!;
     expect(params.get('q')).toBe('solos');
+    expect(params.get('year_start')).toBe(String(getDefaultYearStart()));
+    expect(params.has('year_end')).toBe(false);
     expect(params.get('sort_by')).toBe('matches');
     expect(params.getAll('include')).toEqual(['matches']);
     expect(params.getAll('facets')).toContain('source_type');
@@ -155,6 +158,9 @@ describe('Rota /busca (T2)', () => {
       article.title.toLowerCase(),
     );
     expect(articles.calls.at(-1)!.get('q')).toBe('solos');
+    expect(articles.calls.at(-1)!.get('year_start')).toBe(
+      String(getDefaultYearStart()),
+    );
   }, 15000);
 
   it('mostra o gráfico por ano da aba de produção e filtra pelo Qualis clicado', async () => {
@@ -176,6 +182,9 @@ describe('Rota /busca (T2)', () => {
     ).toBeInTheDocument();
     expect(metricCalls.at(-1)!.get('group_by')).toBe('qualis');
     expect(metricCalls.at(-1)!.get('q')).toBe('solos');
+    expect(metricCalls.at(-1)!.get('year_start')).toBe(
+      String(getDefaultYearStart()),
+    );
 
     await user.click(await findByRole('button', { name: 'Qualis A1' }));
     await waitFor(() => {

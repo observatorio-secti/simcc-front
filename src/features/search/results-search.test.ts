@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import {
   activeTab,
   applyQuery,
@@ -61,6 +62,7 @@ describe('results-search (T2)', () => {
       q: 'solos',
       page: 3,
       per_page: 30,
+      year_start: getDefaultYearStart(),
       area: ['ENGENHARIAS'],
       graduation: ['Doutorado'],
       sort_by: 'matches',
@@ -188,6 +190,7 @@ describe('results-search (T2)', () => {
       q: 'solos',
       page: 1,
       per_page: 30,
+      year_start: getDefaultYearStart(),
       city_id: ['c'],
       qualis: ['A2'],
       sort_by: 'citations',
@@ -210,11 +213,13 @@ describe('results-search (T2)', () => {
     expect(toProductionQuery('book', search)).not.toHaveProperty('qualis');
     expect(toProductionMetricQuery('book', search)).toEqual({
       q: 'solos',
+      year_start: getDefaultYearStart(),
       city_id: ['c'],
     });
     // Artigos agrupam por Qualis; o filtro de Qualis não entra na série.
     expect(toProductionMetricQuery('article', search)).toEqual({
       q: 'solos',
+      year_start: getDefaultYearStart(),
       city_id: ['c'],
       group_by: 'qualis',
     });
@@ -273,6 +278,12 @@ describe('results-search (T2)', () => {
   });
 
   it('conta só os filtros que valem para a aba', () => {
+    const empty = resultsSearch.parse('');
+    expect(countTabFilters(empty, { source: 'researcher' })).toBe(0);
+    expect(
+      countTabFilters(empty, { source: 'production', kind: 'article' }),
+    ).toBe(0);
+
     const search = resultsSearch.parse(
       'graduation=Doutorado&qualis=A1&qualis=A2&year_end=2020',
     );
@@ -280,5 +291,10 @@ describe('results-search (T2)', () => {
     expect(
       countTabFilters(search, { source: 'production', kind: 'article' }),
     ).toBe(3);
+
+    const cleared = resultsSearch.clearFilters(search);
+    expect(cleared.year_start).toBe(getDefaultYearStart());
+    expect(cleared.year_end).toBeUndefined();
+    expect(countTabFilters(cleared, { source: 'researcher' })).toBe(0);
   });
 });

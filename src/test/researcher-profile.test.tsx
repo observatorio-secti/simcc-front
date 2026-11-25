@@ -1,6 +1,7 @@
 import { waitFor } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
 import { describe, expect, it } from 'vitest';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import { openApiErrors, v2Fixtures } from './msw/fixtures';
 import { simccV2Url } from './msw/handlers';
 import { renderRoute } from './render-route';
@@ -9,9 +10,16 @@ const RESEARCHER_ID = v2Fixtures['/researcher/{researcher_id}'].data.id;
 
 describe('Rota /pesquisadores/$id (T3)', () => {
   it('renderiza perfil completo com cabeçalho, sidebar, nuvem de termos, bolsas e artigos', async () => {
-    const { findByRole, findByText, getByText } = await renderRoute(
-      `/pesquisadores/${RESEARCHER_ID}`,
-    );
+    const articleCalls: URLSearchParams[] = [];
+    const { findByRole, findByText, getByLabelText, getByText } =
+      await renderRoute(`/pesquisadores/${RESEARCHER_ID}`, {
+        handlers: [
+          http.get(simccV2Url('/production/article'), ({ request }) => {
+            articleCalls.push(new URL(request.url).searchParams);
+            return HttpResponse.json(v2Fixtures['/production/article']);
+          }),
+        ],
+      });
 
     const researcher = v2Fixtures['/researcher/{researcher_id}'].data;
     expect(
@@ -22,6 +30,13 @@ describe('Rota /pesquisadores/$id (T3)', () => {
     expect(await findByText('Produtividade em Pesquisa')).toBeInTheDocument();
     expect(await findByText('solos')).toBeInTheDocument();
     expect(await findByText('redes')).toBeInTheDocument();
+
+    // Filtro de ano inicial com padrão dinâmico (anoCorrente - 10) e enviado à API
+    expect(getByLabelText('Ano inicial')).toHaveValue(getDefaultYearStart());
+    expect(getByLabelText('Ano final')).toHaveValue(null);
+    expect(articleCalls.at(-1)?.get('year_start')).toBe(
+      String(getDefaultYearStart()),
+    );
 
     // Gráfico Qualis e lista de artigos
     expect(

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import { YearFilter } from './year-filter';
 
 function ControlledYearFilter({
@@ -57,7 +58,7 @@ describe('YearFilter', () => {
     });
   });
 
-  it('permite apagar dígitos de um ano já preenchido e limpar o campo', async () => {
+  it('permite apagar dígitos de um ano inicial já preenchido para digitar outro mais antigo', async () => {
     const user = userEvent.setup();
     const onSpy = vi.fn();
 
@@ -73,13 +74,17 @@ describe('YearFilter', () => {
 
     await user.keyboard('{Backspace}{Backspace}{Backspace}');
     expect(startInput).toHaveValue(null);
-    expect(onSpy).toHaveBeenCalledWith({
-      yearStart: undefined,
+    expect(onSpy).not.toHaveBeenCalled();
+
+    await user.type(startInput, '1995');
+    expect(startInput).toHaveValue(1995);
+    expect(onSpy).toHaveBeenLastCalledWith({
+      yearStart: 1995,
       yearEnd: undefined,
     });
   });
 
-  it('restaura o valor anterior no blur se o rascunho ficar incompleto', async () => {
+  it('restaura o valor anterior no blur se o rascunho ficar incompleto ou vazio', async () => {
     const user = userEvent.setup();
     render(<ControlledYearFilter initialStart={2020} />);
 
@@ -90,14 +95,28 @@ describe('YearFilter', () => {
 
     await user.tab();
     expect(startInput).toHaveValue(2020);
+
+    await user.clear(startInput);
+    expect(startInput).toHaveValue(null);
+    await user.tab();
+    expect(startInput).toHaveValue(2020);
   });
 
-  it('limpa ambos os campos ao clicar em Limpar anos', async () => {
+  it('oculta Limpar anos quando já está no padrão e restaura para o padrão ao clicar', async () => {
     const user = userEvent.setup();
     const onSpy = vi.fn();
+    const defaultStart = getDefaultYearStart();
 
-    render(
+    const { rerender } = render(
+      <ControlledYearFilter initialStart={defaultStart} onSpy={onSpy} />,
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Limpar anos' }),
+    ).not.toBeInTheDocument();
+
+    rerender(
       <ControlledYearFilter
+        key="custom"
         initialStart={2019}
         initialEnd={2023}
         onSpy={onSpy}
@@ -106,10 +125,10 @@ describe('YearFilter', () => {
 
     await user.click(screen.getByRole('button', { name: 'Limpar anos' }));
 
-    expect(screen.getByLabelText('Ano inicial')).toHaveValue(null);
+    expect(screen.getByLabelText('Ano inicial')).toHaveValue(defaultStart);
     expect(screen.getByLabelText('Ano final')).toHaveValue(null);
     expect(onSpy).toHaveBeenLastCalledWith({
-      yearStart: undefined,
+      yearStart: defaultStart,
       yearEnd: undefined,
     });
   });
