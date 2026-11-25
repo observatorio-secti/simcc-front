@@ -12,6 +12,7 @@ describe('ProgramCard', () => {
           acronym: 'PPGSC',
           area: 'SAÚDE COLETIVA',
           modality: 'ACADÊMICO',
+          type: 'Mestrado/Doutorado',
           rating: '5',
           city: 'FEIRA DE SANTANA',
           state: 'BA',
@@ -47,6 +48,7 @@ describe('ProgramCard', () => {
     expect(screen.getByText('PPGSC')).toBeInTheDocument();
     expect(screen.getByText('Conceito 5')).toBeInTheDocument();
     expect(screen.getByText('Acadêmico')).toBeInTheDocument();
+    expect(screen.getByText('Mestrado e doutorado')).toBeInTheDocument();
     expect(
       screen.getByText('Saúde coletiva').closest('[data-slot="badge"]'),
     ).toHaveClass('bg-area-saude');
@@ -115,6 +117,7 @@ describe('ProgramCard', () => {
           acronym: 'PPGECO',
           area: 'BIODIVERSIDADE',
           modality: 'ACADÊMICO',
+          type: 'Mestrado',
           rating: '4',
           city: 'ILHÉUS',
           state: 'BA',
@@ -128,6 +131,8 @@ describe('ProgramCard', () => {
     });
     expect(card).toHaveAttribute('data-layout', 'compact');
     expect(screen.getByText('Conceito 4')).toBeInTheDocument();
+    expect(screen.getByText('Acadêmico')).toBeInTheDocument();
+    expect(screen.getByText('Mestrado')).toBeInTheDocument();
     expect(screen.getByText('Ilhéus, BA')).toBeInTheDocument();
     expect(screen.queryByText('19 docentes')).not.toBeInTheDocument();
   });

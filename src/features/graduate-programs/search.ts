@@ -30,6 +30,7 @@ export const GRADUATE_PROGRAM_FACETS = [
   'institution',
   'area',
   'modality',
+  'type',
   'rating',
   'state',
   'city',
@@ -40,6 +41,7 @@ export const GRADUATE_PROGRAM_FACETS = [
 export const GRADUATE_PROGRAM_FACET_ORDER = [
   'area',
   'rating',
+  'type',
   'modality',
   'institution',
   'identity_territory',
@@ -63,6 +65,7 @@ export const graduateProgramListSearch = createListSearch({
     institution_id: searchStringArrayParam(),
     area: searchStringArrayParam(),
     modality: searchStringArrayParam(),
+    type: searchStringArrayParam(),
     rating: searchStringArrayParam(),
     state: searchStringArrayParam(),
     city: searchStringArrayParam(),

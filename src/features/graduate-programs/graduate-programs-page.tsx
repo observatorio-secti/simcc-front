@@ -16,6 +16,7 @@ import {
   formatProgramArea,
   formatProgramLocation,
   formatProgramModality,
+  formatProgramType,
   resolveProgramAreaColor,
   type GraduateProgramSummary,
 } from '@/entities/graduate-program/model';
@@ -80,6 +81,10 @@ const FACET_CONFIG: Record<string, FacetFieldConfig> = {
   rating: {
     label: 'Conceito CAPES',
     formatItemLabel: (item) => formatCapesRating(item.label) ?? item.label,
+  },
+  type: {
+    label: 'Tipo',
+    formatItemLabel: (item) => formatProgramType(item.label) ?? item.label,
   },
   modality: {
     label: 'Modalidade',
@@ -192,7 +197,7 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
     values: search as Record<string, unknown>,
     config: FACET_CONFIG,
     order: GRADUATE_PROGRAM_FACET_ORDER,
-    defaultOpen: ['area', 'rating', 'modality'],
+    defaultOpen: ['area', 'rating', 'type', 'modality'],
     loading: listQuery.isPending,
     onFilterChange: handleFilterChange,
     onClear: handleClearFilters,
@@ -241,7 +246,9 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
             </p>
           </div>
           <Suspense
-            fallback={<Skeleton className="h-[420px] w-full rounded-lg md:h-[480px]" />}
+            fallback={
+              <Skeleton className="h-[420px] w-full rounded-lg md:h-[480px]" />
+            }
           >
             <TerritoryMap
               facet={territoryCity}
@@ -448,6 +455,7 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
                         <TableRow>
                           <TableHead>Programa</TableHead>
                           <TableHead>Área</TableHead>
+                          <TableHead>Tipo</TableHead>
                           <TableHead>Modalidade</TableHead>
                           <TableHead>Conceito</TableHead>
                           <TableHead>Localidade</TableHead>
@@ -459,6 +467,7 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
                           const areaColor = areaLabel
                             ? resolveProgramAreaColor(program.area)
                             : null;
+                          const typeLabel = formatProgramType(program.type);
                           const modalityLabel = formatProgramModality(
                             program.modality,
                           );
@@ -479,6 +488,15 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
                                     <Dot className={areaColor.bg} />
                                     <span>{areaLabel}</span>
                                   </span>
+                                ) : (
+                                  '—'
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {typeLabel ? (
+                                  <Badge variant="outline" size="sm">
+                                    {typeLabel}
+                                  </Badge>
                                 ) : (
                                   '—'
                                 )}

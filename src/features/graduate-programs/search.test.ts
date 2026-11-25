@@ -27,12 +27,15 @@ describe('graduateProgramListSearch', () => {
   });
 
   it('faz round-trip de filtros repetidos na URL e reseta página ao filtrar', () => {
+    expect(GRADUATE_PROGRAM_FACETS).toContain('type');
+
     const initial = graduateProgramListSearch.fromURLSearchParams(
-      '?q=computa%C3%A7%C3%A3o&city=Salvador&city=Feira+de+Santana&page=3',
+      '?q=computa%C3%A7%C3%A3o&city=Salvador&city=Feira+de+Santana&type=Mestrado&page=3',
     );
     expect(initial).toMatchObject({
       q: 'computação',
       city: ['Salvador', 'Feira de Santana'],
+      type: ['Mestrado'],
       page: 3,
     });
 
@@ -46,6 +49,7 @@ describe('graduateProgramListSearch', () => {
 
     const usp = graduateProgramListSearch.toURLSearchParams(updated);
     expect(usp.getAll('city')).toEqual(['Salvador', 'Feira de Santana']);
+    expect(usp.getAll('type')).toEqual(['Mestrado']);
     expect(usp.getAll('rating')).toEqual(['5']);
     expect(usp.get('page')).toBeNull();
   });

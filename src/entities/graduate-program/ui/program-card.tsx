@@ -61,8 +61,8 @@ export function ProgramCard({
     acronym.toLowerCase() !== program.name.trim().toLowerCase();
 
   const capesLabel = formatCapesRating(program.rating);
-  const modalityLabel =
-    formatProgramModality(program.modality) ?? formatProgramType(program.type);
+  const modalityLabel = formatProgramModality(program.modality);
+  const typeLabel = formatProgramType(program.type);
   const areaLabel = formatProgramArea(program.area);
   const areaColor = areaLabel ? resolveProgramAreaColor(program.area) : null;
   const useOutlineArea =
@@ -83,7 +83,10 @@ export function ProgramCard({
   const linesText = formatResearchLinesCount(resolvedLinesCount);
 
   const hasBadges =
-    capesLabel !== null || modalityLabel !== null || areaLabel !== null;
+    capesLabel !== null ||
+    modalityLabel !== null ||
+    typeLabel !== null ||
+    areaLabel !== null;
   const hasMeta =
     resolvedInstitution !== null ||
     location !== null ||
@@ -154,6 +157,11 @@ export function ProgramCard({
             {modalityLabel && (
               <Badge variant="outline" size="sm">
                 {modalityLabel}
+              </Badge>
+            )}
+            {typeLabel && (
+              <Badge variant="outline" size="sm">
+                {typeLabel}
               </Badge>
             )}
             {areaLabel &&
