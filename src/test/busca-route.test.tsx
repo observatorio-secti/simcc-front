@@ -50,10 +50,33 @@ const territoryGeoJson = {
 /** `/researcher` com a faceta `territory_city` quando a query pede o mapa. */
 function captureResearchersWithMap() {
   const calls: URLSearchParams[] = [];
+  const page2Researcher = {
+    ...researcher,
+    id: 'res-page-2',
+    name: 'Marina Costa Oliveira',
+  };
   const handler = http.get(simccV2Url('/researcher'), ({ request }) => {
     const params = new URL(request.url).searchParams;
     calls.push(params);
     const fixture = v2Fixtures['/researcher'];
+    if (
+      params.getAll('identity_territory').includes('5') &&
+      params.get('per_page') === '6'
+    ) {
+      const page = Number(params.get('page') ?? '1');
+      return HttpResponse.json({
+        ...fixture,
+        data: page === 2 ? [page2Researcher] : [researcher],
+        pagination: {
+          page,
+          per_page: 6,
+          total_items: 7,
+          total_pages: 2,
+          has_next: page < 2,
+          has_prev: page > 1,
+        },
+      });
+    }
     if (!params.getAll('facets').includes('territory_city')) {
       return HttpResponse.json(fixture);
     }
@@ -360,7 +383,7 @@ describe('Rota /busca (T2)', () => {
     expect(router.state.location.search).not.toHaveProperty('researcher');
   }, 20000);
 
-  it('mostra o mapa por território e filtra pelo território clicado (T2.3)', async () => {
+  it('mostra o mapa por território, aproxima e pagina pesquisadores do território sem alterar filtros globais (T2.3)', async () => {
     const researchers = captureResearchersWithMap();
     const { findByRole, findByText, queryByText, router, user } =
       await renderRoute('/busca?q=solos', {
@@ -399,17 +422,29 @@ describe('Rota /busca (T2)', () => {
     expect(mapCall.get('facet_limit')).toBe('100');
     expect(mapCall.getAll('facets')).toEqual(['territory_city']);
 
+    // Clicar no território abre a prévia paginada sem mutar identity_territory na URL.
     await user.click(territory);
+    expect(router.state.location.search).not.toHaveProperty(
+      'identity_territory',
+    );
     await waitFor(() => {
-      expect(router.state.location.search).toMatchObject({
-        view: 'map',
-        identity_territory: ['5'],
-      });
+      const previewCall = researchers.calls.find(
+        (params) =>
+          params.getAll('identity_territory').includes('5') &&
+          params.get('per_page') === '6',
+      );
+      expect(previewCall).toBeDefined();
+      expect(previewCall!.getAll('facets')).toEqual([]);
     });
-    await waitFor(() => {
-      expect(researchers.calls.at(-1)!.getAll('identity_territory')).toEqual([
-        '5',
-      ]);
-    });
+
+    expect(await findByText('Página 1 de 2')).toBeInTheDocument();
+    await user.click(await findByRole('button', { name: 'Próxima página' }));
+    expect(await findByText('Marina Costa Oliveira')).toBeInTheDocument();
+    expect(await findByText('Página 2 de 2')).toBeInTheDocument();
+
+    await user.click(await findByRole('button', { name: 'Territórios' }));
+    expect(
+      await findByRole('button', { name: /Litoral Sul/ }),
+    ).toBeInTheDocument();
   }, 20000);
 });

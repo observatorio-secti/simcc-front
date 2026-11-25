@@ -8,6 +8,7 @@ import {
   TERRITORY_CITY_FACET,
   TERRITORY_FACET_LIMIT,
 } from '@/entities/territory/model';
+import type { TerritorySelection } from '@/entities/territory/ui/territory-map';
 import {
   createListSearch,
   searchStringArrayParam,
@@ -77,6 +78,8 @@ export type GraduateProgramListSearchState = z.output<
   typeof graduateProgramListSearch.schema
 >;
 
+export const GRADUATE_PROGRAM_MAP_PREVIEW_SIZE = 6;
+
 /** Converte o estado validado da URL nos parâmetros de query da API v2. */
 export function toGraduateProgramQueryParams(
   search: GraduateProgramListSearchState,
@@ -86,6 +89,23 @@ export function toGraduateProgramQueryParams(
     facets: [...GRADUATE_PROGRAM_FACETS],
     // O limite vale por nível em `territory_city`: 100 traz os 27 territórios.
     facet_limit: TERRITORY_FACET_LIMIT,
+  };
+}
+
+/** Query paginada para listar os programas do território ou município focado no mapa. */
+export function toGraduateProgramMapPreviewQuery(
+  search: GraduateProgramListSearchState,
+  selection: TerritorySelection,
+  page: number,
+  perPage = GRADUATE_PROGRAM_MAP_PREVIEW_SIZE,
+): GraduateProgramSearch {
+  return {
+    ...graduateProgramListSearch.toApiParams(search),
+    ...(selection.kind === 'territory'
+      ? { identity_territory: [selection.code], city_code: undefined }
+      : { identity_territory: undefined, city_code: [selection.ibge] }),
+    page,
+    per_page: perPage,
   };
 }
 

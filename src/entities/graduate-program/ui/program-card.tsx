@@ -36,6 +36,8 @@ export interface ProgramCardProps extends Omit<
   researchersCount?: number | null;
   /** Contagem de linhas de pesquisa quando `program.research_lines` não estiver presente. */
   researchLinesCount?: number | null;
+  /** Disposição em grade (`grid`) ou compacta horizontal para painéis estreitos (`compact`). */
+  layout?: 'grid' | 'compact';
 }
 
 /**
@@ -48,9 +50,11 @@ export function ProgramCard({
   institutionLabel,
   researchersCount,
   researchLinesCount,
+  layout = 'grid',
   className,
   ...props
 }: ProgramCardProps) {
+  const isCompact = layout === 'compact';
   const acronym = cleanProgramText(program.acronym);
   const showAcronym =
     acronym !== null &&
@@ -90,9 +94,13 @@ export function ProgramCard({
     // TODO(T5): migrar para <Link to="/pos-graduacao/$id">
     <a
       data-slot="program-card"
+      data-layout={layout}
       href={programHref(program.id)}
       className={cn(
-        'group flex flex-col items-center gap-3 rounded-lg border bg-card p-6 text-center text-card-foreground transition-colors hover:border-eng-blue',
+        'group flex rounded-lg border bg-card text-card-foreground transition-colors hover:border-eng-blue',
+        isCompact
+          ? 'flex-row items-start gap-2.5 p-2.5 text-left'
+          : 'flex-col items-center gap-3 p-6 text-center',
         focusRing,
         className,
       )}
@@ -100,80 +108,110 @@ export function ProgramCard({
     >
       <div
         aria-hidden
-        className="grid size-14 shrink-0 place-items-center rounded-md border bg-card text-muted-foreground transition-colors group-hover:text-eng-blue"
-      >
-        <GraduationCap className="size-6" />
-      </div>
-
-      <div className="flex w-full min-w-0 flex-col items-center gap-1">
-        {showAcronym && (
-          <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
-            {acronym}
-          </span>
+        className={cn(
+          'grid shrink-0 place-items-center rounded-md border bg-card text-muted-foreground transition-colors group-hover:text-eng-blue',
+          isCompact ? 'size-9' : 'size-14',
         )}
-        <p className="line-clamp-2 text-base leading-snug font-semibold text-foreground transition-colors group-hover:text-eng-blue">
-          {program.name}
-        </p>
+      >
+        <GraduationCap className={isCompact ? 'size-4' : 'size-6'} />
       </div>
 
-      {hasBadges && (
-        <div className="flex max-w-full flex-wrap items-center justify-center gap-1.5">
-          {capesLabel && <Tag variant="brand">{capesLabel}</Tag>}
-          {modalityLabel && (
-            <Badge variant="outline" size="sm">
-              {modalityLabel}
-            </Badge>
+      <div
+        className={cn(
+          'flex min-w-0 flex-1 flex-col',
+          isCompact ? 'gap-1.5' : 'w-full items-center gap-3',
+        )}
+      >
+        <div
+          className={cn(
+            'flex w-full min-w-0 flex-col gap-0.5',
+            !isCompact && 'items-center gap-1',
           )}
-          {areaLabel &&
-            areaColor &&
-            (useOutlineArea ? (
-              <Badge
-                variant="outline"
-                size="sm"
-                className="max-w-full text-foreground uppercase"
-              >
-                <Dot className={areaColor.bg} />
-                <span className="truncate">{areaLabel}</span>
-              </Badge>
-            ) : (
-              <Badge
-                size="sm"
-                className={cn(areaColor.bg, 'max-w-full uppercase')}
-              >
-                <span className="truncate">{areaLabel}</span>
-              </Badge>
-            ))}
+        >
+          {showAcronym && (
+            <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+              {acronym}
+            </span>
+          )}
+          <p
+            className={cn(
+              'line-clamp-2 leading-snug font-semibold text-foreground transition-colors group-hover:text-eng-blue',
+              isCompact ? 'text-sm' : 'text-base',
+            )}
+          >
+            {program.name}
+          </p>
         </div>
-      )}
 
-      {hasMeta && (
-        <div className="mt-auto flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 pt-1 text-xs text-muted-foreground">
-          {resolvedInstitution && (
-            <span className="inline-flex max-w-full items-center gap-1">
-              <Building2 className="size-3 shrink-0" aria-hidden />
-              <span className="truncate">{resolvedInstitution}</span>
-            </span>
-          )}
-          {location && (
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="size-3 shrink-0" aria-hidden />
-              <span>{location}</span>
-            </span>
-          )}
-          {researchersText && (
-            <span className="inline-flex items-center gap-1">
-              <Users className="size-3 shrink-0" aria-hidden />
-              <span>{researchersText}</span>
-            </span>
-          )}
-          {linesText && (
-            <span className="inline-flex items-center gap-1">
-              <TextSearch className="size-3 shrink-0" aria-hidden />
-              <span>{linesText}</span>
-            </span>
-          )}
-        </div>
-      )}
+        {hasBadges && (
+          <div
+            className={cn(
+              'flex max-w-full flex-wrap items-center gap-1.5',
+              !isCompact && 'justify-center',
+            )}
+          >
+            {capesLabel && <Tag variant="brand">{capesLabel}</Tag>}
+            {modalityLabel && (
+              <Badge variant="outline" size="sm">
+                {modalityLabel}
+              </Badge>
+            )}
+            {areaLabel &&
+              areaColor &&
+              (useOutlineArea ? (
+                <Badge
+                  variant="outline"
+                  size="sm"
+                  className="max-w-full text-foreground uppercase"
+                >
+                  <Dot className={areaColor.bg} />
+                  <span className="truncate">{areaLabel}</span>
+                </Badge>
+              ) : (
+                <Badge
+                  size="sm"
+                  className={cn(areaColor.bg, 'max-w-full uppercase')}
+                >
+                  <span className="truncate">{areaLabel}</span>
+                </Badge>
+              ))}
+          </div>
+        )}
+
+        {hasMeta && (
+          <div
+            className={cn(
+              'flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground',
+              !isCompact && 'mt-auto justify-center gap-y-1.5 pt-1',
+            )}
+          >
+            {resolvedInstitution && (
+              <span className="inline-flex max-w-full items-center gap-1">
+                <Building2 className="size-3 shrink-0" aria-hidden />
+                <span className="truncate">{resolvedInstitution}</span>
+              </span>
+            )}
+            {location && (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="size-3 shrink-0" aria-hidden />
+                <span>{location}</span>
+              </span>
+            )}
+            {!isCompact && researchersText && (
+              <span className="inline-flex items-center gap-1">
+                <Users className="size-3 shrink-0" aria-hidden />
+                <span>{researchersText}</span>
+              </span>
+            )}
+            {!isCompact && linesText && (
+              <span className="inline-flex items-center gap-1">
+                <TextSearch className="size-3 shrink-0" aria-hidden />
+                <span>{linesText}</span>
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </a>
   );
 }

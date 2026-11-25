@@ -35,8 +35,8 @@ export interface PersonCardProps extends Omit<
   evidenceTotal?: number;
   /** Tipo de busca para colorir o badge de evidências (`bg-search-*`). */
   searchType?: string | null;
-  /** Disposição em grade (`aspect-[3/4]`) ou em lista (`min-h-24`). */
-  layout?: 'grid' | 'list';
+  /** Disposição em grade (`aspect-[3/4]`), lista (`min-h-24`) ou compacta (`min-h-18`). */
+  layout?: 'grid' | 'list' | 'compact';
 }
 
 /**
@@ -62,6 +62,7 @@ export function PersonCard({
     institutionOverride ?? formatAffiliationAcronyms(researcher.affiliations);
   const evidenceColor = searchTypeColor(searchType);
   const isList = layout === 'list';
+  const isCompact = layout === 'compact';
 
   return (
     // TODO(T3): migrar para <Link to="/pesquisadores/$id">
@@ -70,10 +71,12 @@ export function PersonCard({
       data-layout={layout}
       href={researcherHref(researcher.id)}
       className={cn(
-        'group relative isolate flex overflow-hidden rounded-lg border bg-neutral-300 p-3 text-white dark:bg-neutral-800',
-        isList
-          ? 'min-h-24 flex-col justify-between gap-3 sm:flex-row sm:items-end sm:gap-4'
-          : 'aspect-[3/4] flex-col justify-between',
+        'group relative isolate flex overflow-hidden rounded-lg border bg-neutral-300 text-white dark:bg-neutral-800',
+        isCompact
+          ? 'min-h-[74px] flex-row items-end justify-between gap-2.5 p-2.5'
+          : isList
+            ? 'min-h-24 flex-col justify-between gap-3 p-3 sm:flex-row sm:items-end sm:gap-4'
+            : 'aspect-[3/4] flex-col justify-between p-3',
         focusRing,
         className,
       )}
@@ -93,7 +96,13 @@ export function PersonCard({
           aria-hidden
           className="absolute inset-0 -z-20 grid place-items-center bg-gradient-to-br from-slate-400 to-slate-600 transition-transform duration-300 ease-out group-hover:scale-[1.04]"
         >
-          <User className="size-16 text-white/35" strokeWidth={1.75} />
+          <User
+            className={cn(
+              'text-white/35',
+              isCompact ? 'size-10' : 'size-16',
+            )}
+            strokeWidth={1.75}
+          />
         </div>
       )}
 
@@ -106,6 +115,7 @@ export function PersonCard({
         <div
           className={cn(
             'flex items-center justify-between gap-1.5',
+            isCompact && 'order-2 shrink-0 self-start',
             isList && 'sm:order-2 sm:shrink-0',
           )}
         >
@@ -123,13 +133,25 @@ export function PersonCard({
       )}
 
       <div
-        className={cn('min-w-0', isList ? 'sm:order-1 sm:flex-1' : 'mt-auto')}
+        className={cn(
+          'min-w-0',
+          isCompact
+            ? 'order-1 flex-1'
+            : isList
+              ? 'sm:order-1 sm:flex-1'
+              : 'mt-auto',
+        )}
       >
-        <p className="line-clamp-2 text-lg leading-tight font-medium text-white">
+        <p
+          className={cn(
+            'line-clamp-2 leading-tight font-medium text-white',
+            isCompact ? 'text-sm' : 'text-lg',
+          )}
+        >
           {researcher.name}
         </p>
         {institutionLabel && (
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-white/90">
+          <p className="mt-1 flex items-center gap-1.5 text-xs text-white/90">
             <Building2 className="size-3 shrink-0" aria-hidden />
             <span className="truncate">{institutionLabel}</span>
           </p>

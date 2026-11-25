@@ -29,6 +29,8 @@ interface PaginationBaseProps {
   disabled?: boolean;
   /** Oculta o componente quando há no máximo 1 página e sem seletor de `per_page` (padrão: `true`). */
   hideOnSinglePage?: boolean;
+  /** Versão enxuta para painéis estreitos (oculta os botões numéricos e textos longos). */
+  compact?: boolean;
   className?: string;
 }
 
@@ -120,6 +122,7 @@ export function Pagination({
   onPerPageChange,
   disabled = false,
   hideOnSinglePage = true,
+  compact = false,
   className,
 }: PaginationProps) {
   const page = pagination?.page ?? explicitPage ?? 1;
@@ -197,40 +200,47 @@ export function Pagination({
             aria-label="Página anterior"
           >
             <ChevronLeft aria-hidden />
-            <span className="hidden sm:inline">Anterior</span>
+            {!compact && <span className="hidden sm:inline">Anterior</span>}
           </Button>
 
-          <div className="hidden items-center gap-1 sm:flex">
-            {tokens.map((token) =>
-              typeof token === 'number' ? (
-                <Button
-                  key={token}
-                  type="button"
-                  variant={token === page ? 'default' : 'outline'}
-                  size="icon-sm"
-                  disabled={disabled}
-                  onClick={() => {
-                    if (token !== page) onPageChange(token);
-                  }}
-                  aria-label={`Página ${token}`}
-                  aria-current={token === page ? 'page' : undefined}
-                  className="tabular-nums"
-                >
-                  {token}
-                </Button>
-              ) : (
-                <span
-                  key={token}
-                  aria-hidden
-                  className="inline-flex size-8 items-center justify-center text-muted-foreground"
-                >
-                  <MoreHorizontal className="size-4" />
-                </span>
-              ),
-            )}
-          </div>
+          {!compact && (
+            <div className="hidden items-center gap-1 sm:flex">
+              {tokens.map((token) =>
+                typeof token === 'number' ? (
+                  <Button
+                    key={token}
+                    type="button"
+                    variant={token === page ? 'default' : 'outline'}
+                    size="icon-sm"
+                    disabled={disabled}
+                    onClick={() => {
+                      if (token !== page) onPageChange(token);
+                    }}
+                    aria-label={`Página ${token}`}
+                    aria-current={token === page ? 'page' : undefined}
+                    className="tabular-nums"
+                  >
+                    {token}
+                  </Button>
+                ) : (
+                  <span
+                    key={token}
+                    aria-hidden
+                    className="inline-flex size-8 items-center justify-center text-muted-foreground"
+                  >
+                    <MoreHorizontal className="size-4" />
+                  </span>
+                ),
+              )}
+            </div>
+          )}
 
-          <span className="px-2 text-xs text-muted-foreground tabular-nums sm:hidden">
+          <span
+            className={cn(
+              'px-2 text-xs text-muted-foreground tabular-nums',
+              !compact && 'sm:hidden',
+            )}
+          >
             Página {page} de {totalPages}
           </span>
 
@@ -242,7 +252,7 @@ export function Pagination({
             onClick={() => onPageChange(page + 1)}
             aria-label="Próxima página"
           >
-            <span className="hidden sm:inline">Próxima</span>
+            {!compact && <span className="hidden sm:inline">Próxima</span>}
             <ChevronRight aria-hidden />
           </Button>
         </div>

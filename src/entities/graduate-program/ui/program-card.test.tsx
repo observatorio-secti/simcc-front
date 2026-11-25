@@ -104,4 +104,31 @@ describe('ProgramCard', () => {
     expect(screen.queryByText(/Conceito/)).not.toBeInTheDocument();
     expect(screen.queryByText(/docente/)).not.toBeInTheDocument();
   });
+
+  it('suporta layout compacto para painéis laterais', () => {
+    render(
+      <ProgramCard
+        layout="compact"
+        program={{
+          id: 'prog-compact',
+          name: 'Programa de Pós-Graduação em Ecologia',
+          acronym: 'PPGECO',
+          area: 'BIODIVERSIDADE',
+          modality: 'ACADÊMICO',
+          rating: '4',
+          city: 'ILHÉUS',
+          state: 'BA',
+          counts: { researchers: 19 },
+        }}
+      />,
+    );
+
+    const card = screen.getByRole('link', {
+      name: /Programa de Pós-Graduação em Ecologia/i,
+    });
+    expect(card).toHaveAttribute('data-layout', 'compact');
+    expect(screen.getByText('Conceito 4')).toBeInTheDocument();
+    expect(screen.getByText('Ilhéus, BA')).toBeInTheDocument();
+    expect(screen.queryByText('19 docentes')).not.toBeInTheDocument();
+  });
 });

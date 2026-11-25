@@ -32,6 +32,7 @@ import {
   TERRITORY_CITY_FACET,
   TERRITORY_FACET_LIMIT,
 } from '@/entities/territory/model';
+import type { TerritorySelection } from '@/entities/territory/ui/territory-map';
 import {
   createListSearch,
   getDefaultYearStart,
@@ -472,6 +473,8 @@ export function toResearcherQuery(search: ResultsSearch): ResearcherSearch {
   };
 }
 
+export const RESEARCHER_MAP_PREVIEW_SIZE = 6;
+
 /**
  * Mapa por território (T2.3): mesmo recorte da lista, só com a faceta
  * `territory_city`. Fica numa query à parte para não pedir 100 valores das
@@ -489,6 +492,24 @@ export function toResearcherMapQuery(search: ResultsSearch): ResearcherSearch {
     per_page: 1,
     facets: [TERRITORY_CITY_FACET],
     facet_limit: TERRITORY_FACET_LIMIT,
+  };
+}
+
+/** Query paginada para listar os pesquisadores do território ou município focado no mapa. */
+export function toResearcherMapPreviewQuery(
+  search: ResultsSearch,
+  selection: TerritorySelection,
+  page: number,
+  perPage = RESEARCHER_MAP_PREVIEW_SIZE,
+): ResearcherSearch {
+  const { facets: _facets, ...query } = toResearcherQuery(search);
+  return {
+    ...query,
+    ...(selection.kind === 'territory'
+      ? { identity_territory: [selection.code], city_code: undefined }
+      : { identity_territory: undefined, city_code: [selection.ibge] }),
+    page,
+    per_page: perPage,
   };
 }
 

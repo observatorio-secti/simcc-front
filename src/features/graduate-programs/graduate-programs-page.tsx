@@ -25,7 +25,6 @@ import { ProgramRef } from '@/entities/graduate-program/ui/program-ref';
 import {
   formatTerritoryName,
   splitTerritoryFacet,
-  toggleCode,
 } from '@/entities/territory/model';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
@@ -64,6 +63,7 @@ import {
   type GraduateProgramListSearchState,
   type GraduateProgramViewMode,
 } from './search';
+import { TerritoryProgramsPanel } from './territory-programs-panel';
 
 const TerritoryMap = lazy(
   () => import('@/entities/territory/ui/territory-map'),
@@ -175,31 +175,6 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
     );
   }
 
-  function handleToggleTerritory(code: string) {
-    commitSearch(
-      graduateProgramListSearch.update(search, {
-        identity_territory: toggleCode(search.identity_territory, code),
-      }),
-    );
-  }
-
-  function handleToggleCity(ibge: string) {
-    commitSearch(
-      graduateProgramListSearch.update(search, {
-        city_code: toggleCode(search.city_code, ibge),
-      }),
-    );
-  }
-
-  function handleClearMap() {
-    commitSearch(
-      graduateProgramListSearch.update(search, {
-        identity_territory: undefined,
-        city_code: undefined,
-      }),
-    );
-  }
-
   const viewMode: GraduateProgramViewMode = search.view ?? 'grid';
   const activeFiltersCount =
     graduateProgramListSearch.countActiveFilters(search);
@@ -261,20 +236,25 @@ export function GraduateProgramsPage({ search }: GraduateProgramsPageProps) {
               </h2>
             </div>
             <p className="text-xs text-muted-foreground">
-              Clique em um território ou município para filtrar o catálogo
+              Clique em um território ou município para aproximar e ver os
+              programas
             </p>
           </div>
           <Suspense
-            fallback={<Skeleton className="h-[380px] w-full rounded-lg" />}
+            fallback={<Skeleton className="h-[420px] w-full rounded-lg md:h-[480px]" />}
           >
             <TerritoryMap
               facet={territoryCity}
               loading={listQuery.isFetching}
               selectedTerritories={search.identity_territory}
               selectedCities={search.city_code}
-              onToggleTerritory={handleToggleTerritory}
-              onToggleCity={handleToggleCity}
-              onClear={handleClearMap}
+              renderSelectionPanel={(ctx) => (
+                <TerritoryProgramsPanel
+                  {...ctx}
+                  search={search}
+                  noun={MAP_NOUN}
+                />
+              )}
               noun={MAP_NOUN}
               listTitle="Territórios com oferta"
             />

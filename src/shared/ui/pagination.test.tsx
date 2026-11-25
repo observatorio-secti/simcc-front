@@ -171,4 +171,33 @@ describe('Pagination', () => {
     await user.click(screen.getByRole('option', { name: '50 por página' }));
     expect(onPerPageChange).toHaveBeenCalledWith(50);
   });
+
+  it('renderiza versão compacta para painéis estreitos sem lista numérica', () => {
+    render(
+      <Pagination
+        compact
+        pagination={{
+          page: 2,
+          per_page: 6,
+          total_items: 25,
+          total_pages: 5,
+          has_prev: true,
+          has_next: true,
+        }}
+        onPageChange={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Mostrando 7–12 de 25')).toBeInTheDocument();
+    expect(screen.getByText('Página 2 de 5')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Página 1' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Página anterior' }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: 'Próxima página' }),
+    ).toBeEnabled();
+  });
 });

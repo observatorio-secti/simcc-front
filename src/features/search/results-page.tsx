@@ -15,7 +15,7 @@ import {
 } from '@/entities/production/ui/production-year-charts';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { scholarshipListQueryOptions } from '@/entities/scholarship/queries';
-import { splitTerritoryFacet, toggleCode } from '@/entities/territory/model';
+import { splitTerritoryFacet } from '@/entities/territory/model';
 import { getDefaultYearStart } from '@/shared/lib/search-params';
 import {
   FacetPanel,
@@ -40,6 +40,7 @@ import {
   ResearcherSummary,
   ScholarshipSummary,
 } from './components/results-summary';
+import { TerritoryResearchersPanel } from './components/territory-researchers-panel';
 import { RESULTS_FACET_CONFIG } from './results-facets';
 import {
   activeTab,
@@ -179,18 +180,6 @@ export function SearchResultsPage({
     commit(resultsSearch.update(search, patch, options));
   }
 
-  function handleToggleTerritory(code: string) {
-    update({ identity_territory: toggleCode(search.identity_territory, code) });
-  }
-
-  function handleToggleCity(ibge: string) {
-    update({ city_code: toggleCode(search.city_code, ibge) });
-  }
-
-  function handleClearMap() {
-    update({ identity_territory: undefined, city_code: undefined });
-  }
-
   function handleSortChange(next: SortSelection) {
     update({
       sort_by: next.sort_by as ResultsSearch['sort_by'],
@@ -313,7 +302,7 @@ export function SearchResultsPage({
               map={
                 <Suspense
                   fallback={
-                    <Skeleton className="h-[380px] w-full rounded-lg" />
+                    <Skeleton className="h-[420px] w-full rounded-lg md:h-[480px]" />
                   }
                 >
                   <TerritoryMap
@@ -323,9 +312,15 @@ export function SearchResultsPage({
                     loading={mapQuery.isFetching}
                     selectedTerritories={search.identity_territory}
                     selectedCities={search.city_code}
-                    onToggleTerritory={handleToggleTerritory}
-                    onToggleCity={handleToggleCity}
-                    onClear={handleClearMap}
+                    renderSelectionPanel={(ctx) => (
+                      <TerritoryResearchersPanel
+                        {...ctx}
+                        search={search}
+                        type={type}
+                        noun={MAP_NOUN}
+                        onOpenResearcher={onOpenResearcher}
+                      />
+                    )}
                     noun={MAP_NOUN}
                     listTitle="Territórios com pesquisadores"
                   />

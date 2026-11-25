@@ -203,22 +203,27 @@ describe('Rotas de Pós-graduação (T5)', () => {
     // A faceta hierárquica não vira bloco do painel de filtros
     expect(screen.queryByText('territory_city')).not.toBeInTheDocument();
 
-    // Clicar no território filtra por código SEI
+    // Clicar no território abre a prévia paginada na lateral sem alterar a URL
     await user.click(territory);
-    await waitFor(() => {
-      expect(router.state.location.search).toMatchObject({
-        identity_territory: ['26'],
-      });
-    });
-    expect(calls.at(-1)!.getAll('identity_territory')).toEqual(['26']);
-    await user.click(
-      await screen.findByRole('button', { name: /Metropolitana de Salvador/ }),
+    expect(router.state.location.search).not.toHaveProperty(
+      'identity_territory',
     );
     await waitFor(() => {
-      expect(router.state.location.search).not.toHaveProperty(
-        'identity_territory',
+      const previewCall = calls.find(
+        (params) =>
+          params.getAll('identity_territory').includes('26') &&
+          params.get('per_page') === '6',
       );
+      expect(previewCall).toBeDefined();
+      expect(previewCall!.getAll('facets')).toEqual([]);
     });
+    expect(
+      await screen.findByRole('heading', { name: 'Metropolitana de Salvador' }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Territórios' }));
+    expect(
+      await screen.findByRole('button', { name: /Metropolitana de Salvador/ }),
+    ).toBeInTheDocument();
 
     // Busca textual atualiza URL e filtra resultados
     const searchInput = screen.getByPlaceholderText(
