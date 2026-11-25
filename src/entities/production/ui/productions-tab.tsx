@@ -9,6 +9,7 @@ import type {
 import { productionListQueryOptions } from '@/entities/production/queries';
 import { getProductionDefinition } from '@/entities/production/registry';
 import { ProductionCard } from '@/entities/production/ui/production-card';
+import { RecentYearsNotice } from '@/entities/production/ui/recent-years-notice';
 import { getDefaultYearStart } from '@/shared/lib/search-params';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
@@ -137,6 +138,13 @@ function ProductionSection({
 
       {(!collapsible || open) && (
         <div id={contentId} className="flex flex-col gap-4">
+          {kind === 'article' && !isPending && !isError && (
+            <RecentYearsNotice
+              yearStart={search.year_start}
+              yearEnd={search.year_end}
+            />
+          )}
+
           {isPending ? (
             <LoadingBlock />
           ) : isError ? (

@@ -38,10 +38,14 @@ describe('Rota /pesquisadores/$id (T3)', () => {
       String(getDefaultYearStart()),
     );
 
-    // Gráfico Qualis e lista de artigos
+    // Cartão de aviso do período antes do gráfico Qualis, seguido da lista de artigos
+    const notice = await findByRole('note');
+    const chartHeading = getByText('Gráfico de quantidade total por Qualis');
+    expect(notice).toHaveTextContent(/publicações de anos anteriores/i);
     expect(
-      getByText('Gráfico de quantidade total por Qualis'),
-    ).toBeInTheDocument();
+      notice.compareDocumentPosition(chartHeading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
     const firstArticle = v2Fixtures['/production/article'].data[0];
     if (firstArticle) {
       expect(

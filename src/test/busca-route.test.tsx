@@ -170,6 +170,9 @@ describe('Rota /busca (T2)', () => {
         tab: 'articles',
       });
     });
+    expect(await findByRole('note')).toHaveTextContent(
+      /publicações de anos anteriores/i,
+    );
     expect(await findByText('Total de artigos')).toBeInTheDocument();
     expect(await findByText('Ano com mais produções')).toBeInTheDocument();
     const card = await waitFor(() => {

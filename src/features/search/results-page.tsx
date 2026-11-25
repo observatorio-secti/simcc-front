@@ -14,6 +14,7 @@ import {
   MultiKindYearChart,
   ProductionYearChart,
 } from '@/entities/production/ui/production-year-charts';
+import { RecentYearsNotice } from '@/entities/production/ui/recent-years-notice';
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { scholarshipListQueryOptions } from '@/entities/scholarship/queries';
 import { splitTerritoryFacet } from '@/entities/territory/model';
@@ -397,6 +398,12 @@ export function SearchResultsPage({
               metric={metricQuery.data?.data}
               metricLoading={metricQuery.isPending}
             />
+            {tab.kind === 'article' && (
+              <RecentYearsNotice
+                yearStart={search.year_start}
+                yearEnd={search.year_end}
+              />
+            )}
             {tab.kind === 'patent' ? (
               <MultiKindYearChart
                 title={productionChartTitle(tab.kind)}

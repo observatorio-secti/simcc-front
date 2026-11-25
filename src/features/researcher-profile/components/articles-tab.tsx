@@ -11,6 +11,7 @@ import type { ProductionItem } from '@/entities/production/model';
 import { productionListQueryOptions } from '@/entities/production/queries';
 import { ProductionCard } from '@/entities/production/ui/production-card';
 import { ProductionMetricYearChart } from '@/entities/production/ui/production-year-charts';
+import { RecentYearsNotice } from '@/entities/production/ui/recent-years-notice';
 import { formatCount } from '@/entities/researcher/model';
 import { qualisColor } from '@/shared/lib/design-tokens';
 import { getDefaultYearStart } from '@/shared/lib/search-params';
@@ -214,6 +215,11 @@ export function ArticlesTab({
           }
         />
       </div>
+
+      <RecentYearsNotice
+        yearStart={search.year_start}
+        yearEnd={search.year_end}
+      />
 
       <ProductionMetricYearChart
         title="Gráfico de quantidade total por Qualis"
