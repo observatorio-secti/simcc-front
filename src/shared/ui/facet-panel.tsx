@@ -1,6 +1,7 @@
 import { useId, useState, type ComponentProps, type FormEvent } from 'react';
 import { Search, SlidersHorizontal, Trash2 } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import {
   Accordion,
   AccordionContent,
@@ -58,6 +59,8 @@ export interface FacetPanelProps {
   facets?: FacetsMap;
   /** Estado atual de busca/filtros (ex.: objeto validado pelos search params). */
   values?: Record<string, unknown>;
+  /** Valores padrão (ex.: `year_start` padrão) que não contam como filtro ativo nem somem ao limpar. */
+  defaultValues?: Record<string, unknown>;
   /** Configuração opcional por chave de faceta (rótulos, `Dot`, busca local). */
   config?: Record<string, FacetFieldConfig>;
   /** Resolvedor genérico de classe do `Dot` por faceta/valor (cor vinda de fora). */
@@ -179,11 +182,25 @@ function getOrderedEntries(
   });
 }
 
+function isCustomRangeActive(
+  startValue: number | undefined,
+  endValue: number | undefined,
+  defaultStart: number | undefined,
+  defaultEnd: number | undefined,
+): boolean {
+  const startActive = startValue !== undefined && startValue !== defaultStart;
+  const endActive = endValue !== undefined && endValue !== defaultEnd;
+  return startActive || endActive;
+}
+
 function YearRangeControl({
   startParam,
   endParam,
   startValue,
   endValue,
+  defaultStart,
+  defaultEnd,
+  hasCustomValue,
   minAvailable,
   maxAvailable,
   onApply,
@@ -192,6 +209,9 @@ function YearRangeControl({
   endParam: string;
   startValue?: number;
   endValue?: number;
+  defaultStart?: number;
+  defaultEnd?: number;
+  hasCustomValue: boolean;
   minAvailable?: number;
   maxAvailable?: number;
   onApply: (range: { start?: number; end?: number }) => void;
@@ -207,12 +227,10 @@ function YearRangeControl({
     endValue !== undefined ? String(endValue) : '',
   );
 
-  const hasValue = startValue !== undefined || endValue !== undefined;
-
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    let parsedStart = readYearValue(startDraft);
-    let parsedEnd = readYearValue(endDraft);
+    let parsedStart = readYearValue(startDraft) ?? defaultStart;
+    let parsedEnd = readYearValue(endDraft) ?? defaultEnd;
     if (
       parsedStart !== undefined &&
       parsedEnd !== undefined &&
@@ -226,9 +244,9 @@ function YearRangeControl({
   }
 
   function handleClear() {
-    setStartDraft('');
-    setEndDraft('');
-    onApply({ start: undefined, end: undefined });
+    setStartDraft(defaultStart !== undefined ? String(defaultStart) : '');
+    setEndDraft(defaultEnd !== undefined ? String(defaultEnd) : '');
+    onApply({ start: defaultStart, end: defaultEnd });
   }
 
   return (
@@ -248,7 +266,9 @@ function YearRangeControl({
             min={1000}
             max={9999}
             placeholder={
-              minAvailable !== undefined ? String(minAvailable) : 'Ex.: 2015'
+              minAvailable !== undefined
+                ? String(minAvailable)
+                : `Ex.: ${defaultStart ?? getDefaultYearStart()}`
             }
             value={startDraft}
             onChange={(event) => setStartDraft(event.target.value)}
@@ -269,7 +289,9 @@ function YearRangeControl({
             min={1000}
             max={9999}
             placeholder={
-              maxAvailable !== undefined ? String(maxAvailable) : 'Ex.: 2026'
+              maxAvailable !== undefined
+                ? String(maxAvailable)
+                : `Ex.: ${new Date().getFullYear()}`
             }
             value={endDraft}
             onChange={(event) => setEndDraft(event.target.value)}
@@ -288,7 +310,7 @@ function YearRangeControl({
         <Button type="submit" size="sm" variant="secondary" className="flex-1">
           Aplicar
         </Button>
-        {hasValue && (
+        {hasCustomValue && (
           <Button
             type="button"
             size="sm"
@@ -414,6 +436,7 @@ function CheckboxFacetList({
 export function FacetPanel({
   facets,
   values,
+  defaultValues,
   config,
   getDotClassName,
   order,
@@ -454,8 +477,12 @@ export function FacetPanel({
     if (isRangeFacet(key, facet, fieldConfig)) {
       const [startParam, endParam] = resolveRangeParams(facet);
       if (
-        readYearValue(values?.[startParam]) !== undefined ||
-        readYearValue(values?.[endParam]) !== undefined
+        isCustomRangeActive(
+          readYearValue(values?.[startParam]),
+          readYearValue(values?.[endParam]),
+          readYearValue(defaultValues?.[startParam]),
+          readYearValue(defaultValues?.[endParam]),
+        )
       ) {
         activeFiltersCount += 1;
       }
@@ -478,8 +505,12 @@ export function FacetPanel({
             const [startParam, endParam] = resolveRangeParams(facet);
             if (
               index === 0 ||
-              readYearValue(values?.[startParam]) !== undefined ||
-              readYearValue(values?.[endParam]) !== undefined
+              isCustomRangeActive(
+                readYearValue(values?.[startParam]),
+                readYearValue(values?.[endParam]),
+                readYearValue(defaultValues?.[startParam]),
+                readYearValue(defaultValues?.[endParam]),
+              )
             ) {
               acc.push(key);
             }
@@ -605,6 +636,8 @@ export function FacetPanel({
               const [startParam, endParam] = resolveRangeParams(facet);
               const startValue = readYearValue(values?.[startParam]);
               const endValue = readYearValue(values?.[endParam]);
+              const defaultStart = readYearValue(defaultValues?.[startParam]);
+              const defaultEnd = readYearValue(defaultValues?.[endParam]);
               const years = facet.items
                 .map((item) => readYearValue(item.value))
                 .filter((year): year is number => year !== undefined);
@@ -612,8 +645,12 @@ export function FacetPanel({
                 years.length > 0 ? Math.min(...years) : undefined;
               const maxAvailable =
                 years.length > 0 ? Math.max(...years) : undefined;
-              const hasActiveRange =
-                startValue !== undefined || endValue !== undefined;
+              const hasActiveRange = isCustomRangeActive(
+                startValue,
+                endValue,
+                defaultStart,
+                defaultEnd,
+              );
 
               return (
                 <AccordionItem key={facetKey} value={facetKey}>
@@ -634,6 +671,9 @@ export function FacetPanel({
                       endParam={endParam}
                       startValue={startValue}
                       endValue={endValue}
+                      defaultStart={defaultStart}
+                      defaultEnd={defaultEnd}
+                      hasCustomValue={hasActiveRange}
                       minAvailable={minAvailable}
                       maxAvailable={maxAvailable}
                       onApply={(range) =>

@@ -16,6 +16,7 @@ import {
 import { researcherListQueryOptions } from '@/entities/researcher/queries';
 import { scholarshipListQueryOptions } from '@/entities/scholarship/queries';
 import { splitTerritoryFacet, toggleCode } from '@/entities/territory/model';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import {
   FacetPanel,
   FacetSheet,
@@ -208,6 +209,7 @@ export function SearchResultsPage({
   const facetPanelProps = {
     facets: (facets ?? undefined) as FacetsMap | undefined,
     values: search as Record<string, unknown>,
+    defaultValues: { year_start: getDefaultYearStart() },
     config: RESULTS_FACET_CONFIG,
     order: RESULTS_FACET_ORDER,
     loading: listQuery.isPending,

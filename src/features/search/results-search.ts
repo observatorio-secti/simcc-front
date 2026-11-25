@@ -34,6 +34,7 @@ import {
 } from '@/entities/territory/model';
 import {
   createListSearch,
+  getDefaultYearStart,
   searchEnumArrayParam,
   searchStringArrayParam,
   searchStringParam,
@@ -253,7 +254,9 @@ export function countTabFilters(search: ResultsSearch, tab: TabSource): number {
   }
   if (
     tabSupportsYear(tab) &&
-    (search.year_start !== undefined || search.year_end !== undefined)
+    ((search.year_start !== undefined &&
+      search.year_start !== getDefaultYearStart()) ||
+      search.year_end !== undefined)
   ) {
     count += 1;
   }

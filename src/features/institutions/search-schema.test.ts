@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import {
   institutionDetailSearch,
   institutionListSearch,
@@ -62,6 +63,7 @@ describe('institutionDetailSearch', () => {
       per_page: 12,
       sort_by: 'year',
       sort_order: 'desc',
+      year_start: getDefaultYearStart(),
     });
   });
 

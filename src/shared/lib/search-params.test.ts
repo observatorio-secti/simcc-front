@@ -14,6 +14,7 @@ import {
   cleanSearchParams,
   createListSearch,
   createListSearchSchema,
+  getDefaultYearStart,
   parseListSearchString,
   searchBooleanParam,
   searchEnumArrayParam,
@@ -63,10 +64,11 @@ describe('search-params', () => {
         per_page: 20,
         sort_by: 'relevance',
         sort_order: 'desc',
+        year_start: getDefaultYearStart(),
       });
       expect('q' in parsed).toBe(false);
       expect('institution_id' in parsed).toBe(false);
-      expect('year_start' in parsed).toBe(false);
+      expect('year_end' in parsed).toBe(false);
     });
 
     it('normaliza q (trim, vazio vira ausente, número da URL vira string)', () => {
@@ -148,8 +150,22 @@ describe('search-params', () => {
         year_start: 'abc',
         year_end: 99,
       });
-      expect('year_start' in invalidYears).toBe(false);
+      expect(invalidYears.year_start).toBe(getDefaultYearStart());
       expect('year_end' in invalidYears).toBe(false);
+    });
+
+    it('calcula year_start dinamicamente como ano corrente - 10', () => {
+      vi.useFakeTimers();
+      try {
+        vi.setSystemTime(new Date('2030-06-15T12:00:00Z'));
+        const parsed = articleSearch.parse({});
+        expect(parsed.year_start).toBe(2020);
+        expect(articleSearch.toURLSearchParams(parsed).has('year_start')).toBe(
+          false,
+        );
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('permite desativar intervalo de ano em catálogos sem ano', () => {
@@ -192,6 +208,7 @@ describe('search-params', () => {
         q: 'simcc',
         page: 1,
         per_page: 20,
+        year_start: getDefaultYearStart(),
       });
 
       type ArticleSearch = ReturnType<typeof articleSearch.parse>;
@@ -201,7 +218,7 @@ describe('search-params', () => {
         per_page: number;
         sort_by: 'relevance' | 'year' | 'citations' | 'title';
         sort_order: 'asc' | 'desc';
-        year_start?: number;
+        year_start: number;
         year_end?: number;
         institution_id?: string[];
         area?: string[];
@@ -216,7 +233,7 @@ describe('search-params', () => {
         per_page: number;
         sort_by?: string;
         sort_order?: 'asc' | 'desc';
-        year_start?: number;
+        year_start: number;
         year_end?: number;
       }>();
     });
@@ -412,6 +429,7 @@ describe('search-params', () => {
         per_page: 50,
         sort_by: 'year',
         sort_order: 'asc',
+        year_start: getDefaultYearStart(),
       });
       expect(articleSearch.countActiveFilters(cleaned)).toBe(0);
     });
@@ -468,6 +486,7 @@ describe('search-params', () => {
         per_page: 20,
         sort_by: 'relevance',
         sort_order: 'desc',
+        year_start: getDefaultYearStart(),
         institution_id: ['ufba', 'uesc'],
       });
 

@@ -13,6 +13,7 @@ import { ProductionCard } from '@/entities/production/ui/production-card';
 import { ProductionMetricYearChart } from '@/entities/production/ui/production-year-charts';
 import { formatCount } from '@/entities/researcher/model';
 import { qualisColor } from '@/shared/lib/design-tokens';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Checkbox } from '@/shared/ui/checkbox';
@@ -92,6 +93,12 @@ export function ArticlesTab({
   const items = data?.data ?? [];
   const total = data?.pagination.total_items ?? items.length;
   const totalPages = data?.pagination.total_pages ?? 1;
+
+  const defaultYearStart = getDefaultYearStart();
+  const hasCustomFilters =
+    selectedQualis.length > 0 ||
+    search.year_start !== defaultYearStart ||
+    search.year_end !== undefined;
 
   function handleToggleQualis(stratum: QualisStratum) {
     const exists = selectedQualis.includes(stratum);
@@ -279,18 +286,20 @@ export function ArticlesTab({
           <EmptyState
             icon={FileText}
             title="Nenhum artigo encontrado"
-            description="Não há artigos publicados para os filtros selecionados."
+            description={
+              hasCustomFilters
+                ? 'Não há artigos publicados para os filtros selecionados.'
+                : `Não há artigos publicados a partir de ${search.year_start}.`
+            }
             action={
-              selectedQualis.length > 0 ||
-              search.year_start !== undefined ||
-              search.year_end !== undefined ? (
+              hasCustomFilters ? (
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() =>
                     onUpdateSearch({
                       qualis: undefined,
-                      year_start: undefined,
+                      year_start: defaultYearStart,
                       year_end: undefined,
                       page: 1,
                     })

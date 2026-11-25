@@ -4,7 +4,7 @@ import {
 } from '@/shared/lib/search-params';
 import {
   cleanProfileSearch,
-  PROFILE_SEARCH_DEFAULTS,
+  getProfileSearchDefaults,
   researcherProfileSearchSchema,
   type ResearcherProfileSearch,
 } from './search-schema';
@@ -50,7 +50,7 @@ export function encodeProfileOverlaySearch(
   const { q: _q, search_type: _searchType, ...own } = routeSearch;
   const encoded = toURLSearchParams(
     own as Record<string, unknown>,
-    PROFILE_SEARCH_DEFAULTS as Record<string, unknown>,
+    getProfileSearchDefaults() as Record<string, unknown>,
   ).toString();
   return { encoded: encoded || undefined, routeSearch };
 }

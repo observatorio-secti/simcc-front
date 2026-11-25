@@ -40,6 +40,34 @@ const DEFAULT_MAX_PER_PAGE = 100;
 const MIN_YEAR = 1000;
 const MAX_YEAR = 9999;
 
+/** Janela padrão de anos exibida nos filtros (`anoCorrente - 10`). */
+export const DEFAULT_YEAR_WINDOW = 10;
+
+/** Retorna o ano inicial padrão (`anoCorrente - 10`). */
+export function getDefaultYearStart(
+  currentYear = new Date().getFullYear(),
+): number {
+  return currentYear - DEFAULT_YEAR_WINDOW;
+}
+
+/** Normaliza intervalo invertido de anos (`year_start > year_end`). */
+export function normalizeYearRange<
+  T extends { year_start?: number; year_end?: number },
+>(obj: T): T {
+  if (
+    typeof obj.year_start === 'number' &&
+    typeof obj.year_end === 'number' &&
+    obj.year_start > obj.year_end
+  ) {
+    return {
+      ...obj,
+      year_start: obj.year_end,
+      year_end: obj.year_start,
+    };
+  }
+  return obj;
+}
+
 function flattenValues(raw: unknown): unknown[] {
   if (Array.isArray(raw)) return raw;
   if (raw === undefined || raw === null) return [];
@@ -207,6 +235,19 @@ export function searchYearParam(options?: { min?: number; max?: number }) {
     (raw) => parseYearValue(raw, min, max),
     z.number().int().min(min).max(max).optional(),
   ) as unknown as OptionalParam<number>;
+}
+
+/** Parâmetro de ano inteiro com fallback dinâmico quando ausente ou inválido. */
+export function searchDefaultedYearParam(
+  getDefault: () => number,
+  options?: { min?: number; max?: number },
+) {
+  const min = options?.min ?? MIN_YEAR;
+  const max = options?.max ?? MAX_YEAR;
+  return z.preprocess(
+    (raw) => parseYearValue(raw, min, max) ?? getDefault(),
+    z.number().int().min(min).max(max),
+  ) as unknown as DefaultedParam<number>;
 }
 
 /**
@@ -394,14 +435,14 @@ export function createListSearch<
   const yearShape = (
     includeYearRange
       ? {
-          year_start: searchYearParam(),
+          year_start: searchDefaultedYearParam(getDefaultYearStart),
           year_end: searchYearParam(),
         }
       : {}
   ) as TYearRange extends false
     ? Record<never, never>
     : {
-        year_start: ReturnType<typeof searchYearParam>;
+        year_start: ReturnType<typeof searchDefaultedYearParam>;
         year_end: ReturnType<typeof searchYearParam>;
       };
 
@@ -431,39 +472,40 @@ export function createListSearch<
   type RawInput = z.input<typeof baseObject>;
 
   const schema = baseObject.transform((parsed) => {
-    const obj = { ...parsed } as Record<string, unknown>;
-    if (
-      includeYearRange &&
-      typeof obj.year_start === 'number' &&
-      typeof obj.year_end === 'number' &&
-      obj.year_start > obj.year_end
-    ) {
-      const [start, end] = [obj.year_end, obj.year_start];
-      obj.year_start = start;
-      obj.year_end = end;
-    }
+    const obj = includeYearRange
+      ? normalizeYearRange({ ...parsed } as Record<string, unknown> & {
+          year_start?: number;
+          year_end?: number;
+        })
+      : ({ ...parsed } as Record<string, unknown>);
     return stripUndefined(obj) as RawOutput;
   }) as unknown as z.ZodType<RawOutput, RawInput>;
 
   type SearchState = RawOutput;
   type ApiParams = Omit<SearchState, keyof TExtra>;
 
-  const defaults: Record<string, unknown> = {
-    page: defaultPage,
-    per_page: defaultPerPage,
-    ...(options?.defaultSortBy !== undefined
-      ? { sort_by: options.defaultSortBy }
-      : {}),
-    ...(options?.defaultSortOrder !== undefined
-      ? { sort_order: options.defaultSortOrder }
-      : {}),
-  };
+  function getDefaults(): Record<string, unknown> {
+    return {
+      page: defaultPage,
+      per_page: defaultPerPage,
+      ...(options?.defaultSortBy !== undefined
+        ? { sort_by: options.defaultSortBy }
+        : {}),
+      ...(options?.defaultSortOrder !== undefined
+        ? { sort_order: options.defaultSortOrder }
+        : {}),
+      ...(includeYearRange ? { year_start: getDefaultYearStart() } : {}),
+    };
+  }
 
   const filterKeys = Object.keys(filtersShape);
   const extraKeys = new Set(Object.keys(extraShape));
 
   const middlewares: SearchMiddleware<SearchState>[] = [
-    stripSearchParams(defaults as Partial<SearchState>),
+    (ctx) =>
+      stripSearchParams<SearchState>(getDefaults() as Partial<SearchState>)(
+        ctx,
+      ),
   ];
 
   function parse(
@@ -477,13 +519,13 @@ export function createListSearch<
   }
 
   function buildURLSearchParams(search: Partial<SearchState>): URLSearchParams {
-    return toURLSearchParams(search as Record<string, unknown>, defaults);
+    return toURLSearchParams(search as Record<string, unknown>, getDefaults());
   }
 
   function clean(search: Partial<SearchState>): Partial<SearchState> {
     return cleanSearchParams(
       search as Record<string, unknown>,
-      defaults,
+      getDefaults(),
     ) as Partial<SearchState>;
   }
 
@@ -568,7 +610,9 @@ export function createListSearch<
     }
     if (
       includeYearRange &&
-      (record.year_start !== undefined || record.year_end !== undefined)
+      ((record.year_start !== undefined &&
+        record.year_start !== getDefaultYearStart()) ||
+        record.year_end !== undefined)
     ) {
       count += 1;
     }
@@ -577,7 +621,9 @@ export function createListSearch<
 
   return {
     schema,
-    defaults: defaults as Partial<SearchState>,
+    get defaults() {
+      return getDefaults() as Partial<SearchState>;
+    },
     middlewares,
     parse,
     fromURLSearchParams,

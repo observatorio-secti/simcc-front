@@ -1,11 +1,14 @@
 import { useId, useState } from 'react';
 import { Calendar, X } from 'lucide-react';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 
 export interface YearFilterProps {
   yearStart?: number;
   yearEnd?: number;
+  /** Ano inicial padrão restaurado ao limpar (padrão: `anoCorrente - 10`). */
+  defaultYearStart?: number;
   onChange: (next: { yearStart?: number; yearEnd?: number }) => void;
 }
 
@@ -33,7 +36,12 @@ function resolveDraftValue(
 }
 
 /** Filtro de intervalo de anos sincronizado com a URL (`year_start`, `year_end`). */
-export function YearFilter({ yearStart, yearEnd, onChange }: YearFilterProps) {
+export function YearFilter({
+  yearStart,
+  yearEnd,
+  defaultYearStart = getDefaultYearStart(),
+  onChange,
+}: YearFilterProps) {
   const baseId = useId();
   const startId = `${baseId}-year-start`;
   const endId = `${baseId}-year-end`;
@@ -45,7 +53,9 @@ export function YearFilter({ yearStart, yearEnd, onChange }: YearFilterProps) {
 
   const startValue = resolveDraftValue(yearStart, startOverride);
   const endValue = resolveDraftValue(yearEnd, endOverride);
-  const hasFilter = yearStart !== undefined || yearEnd !== undefined;
+  const hasFilter =
+    (yearStart !== undefined && yearStart !== defaultYearStart) ||
+    yearEnd !== undefined;
 
   function handleFieldChange(
     field: 'start' | 'end',
@@ -55,12 +65,8 @@ export function YearFilter({ yearStart, yearEnd, onChange }: YearFilterProps) {
   ) {
     setOverride({ base: currentBase, value: raw });
     if (raw.trim() === '') {
-      if (currentBase !== undefined) {
-        onChange(
-          field === 'start'
-            ? { yearStart: undefined, yearEnd }
-            : { yearStart, yearEnd: undefined },
-        );
+      if (field === 'end' && currentBase !== undefined) {
+        onChange({ yearStart, yearEnd: undefined });
       }
       return;
     }
@@ -78,7 +84,7 @@ export function YearFilter({ yearStart, yearEnd, onChange }: YearFilterProps) {
     value: string,
     setOverride: (next: DraftOverride | null) => void,
   ) {
-    if (value.trim() !== '' && parseYearInput(value) === undefined) {
+    if (parseYearInput(value) === undefined) {
       setOverride(null);
     }
   }
@@ -99,7 +105,7 @@ export function YearFilter({ yearStart, yearEnd, onChange }: YearFilterProps) {
           inputMode="numeric"
           min={1900}
           max={2100}
-          placeholder="Ex.: 2018"
+          placeholder={`Ex.: ${defaultYearStart}`}
           value={startValue}
           onChange={(event) =>
             handleFieldChange(
@@ -127,7 +133,7 @@ export function YearFilter({ yearStart, yearEnd, onChange }: YearFilterProps) {
           inputMode="numeric"
           min={1900}
           max={2100}
-          placeholder="Ex.: 2026"
+          placeholder={`Ex.: ${new Date().getFullYear()}`}
           value={endValue}
           onChange={(event) =>
             handleFieldChange(
@@ -150,7 +156,7 @@ export function YearFilter({ yearStart, yearEnd, onChange }: YearFilterProps) {
           onClick={() => {
             setStartOverride(null);
             setEndOverride(null);
-            onChange({ yearStart: undefined, yearEnd: undefined });
+            onChange({ yearStart: defaultYearStart, yearEnd: undefined });
           }}
         >
           <X aria-hidden />

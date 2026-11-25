@@ -1,6 +1,13 @@
+import {
+  stripSearchParams,
+  type SearchMiddleware,
+} from '@tanstack/react-router';
 import { z } from 'zod';
 import {
   cleanSearchParams,
+  getDefaultYearStart,
+  normalizeYearRange,
+  searchDefaultedYearParam,
   searchEnumArrayParam,
   searchStringParam,
   searchYearParam,
@@ -110,10 +117,10 @@ const sortOrderParam = z
   })
   .catch(undefined);
 
-export const researcherProfileSearchSchema = z.object({
+export const researcherProfileSearchObject = z.object({
   tab: tabParam,
   qualis: searchEnumArrayParam(QUALIS_STRATA),
-  year_start: searchYearParam(),
+  year_start: searchDefaultedYearParam(getDefaultYearStart),
   year_end: searchYearParam(),
   page: z
     .unknown()
@@ -126,19 +133,34 @@ export const researcherProfileSearchSchema = z.object({
   search_type: searchStringParam(),
 });
 
+export const researcherProfileSearchSchema =
+  researcherProfileSearchObject.transform(normalizeYearRange);
+
 export type ResearcherProfileSearch = z.infer<
   typeof researcherProfileSearchSchema
 >;
 
-export const PROFILE_SEARCH_DEFAULTS: Partial<ResearcherProfileSearch> = {
-  tab: 'articles',
-  page: 1,
-  view: 'grid',
-};
+/** Valores padrão da URL do perfil (incluindo `year_start` dinâmico). */
+export function getProfileSearchDefaults(): Partial<ResearcherProfileSearch> {
+  return {
+    tab: 'articles',
+    page: 1,
+    view: 'grid',
+    year_start: getDefaultYearStart(),
+  };
+}
+
+/** Middleware do TanStack Router que omite os padrões dinâmicos da URL do perfil. */
+export function createProfileSearchMiddleware<
+  T extends Partial<ResearcherProfileSearch> = ResearcherProfileSearch,
+>(): SearchMiddleware<T> {
+  return (ctx) =>
+    stripSearchParams<T>(getProfileSearchDefaults() as Partial<T>)(ctx);
+}
 
 /** Remove valores padrão e vazios para manter a URL limpa. */
 export function cleanProfileSearch(
   search: Partial<ResearcherProfileSearch>,
 ): Partial<ResearcherProfileSearch> {
-  return cleanSearchParams(search, PROFILE_SEARCH_DEFAULTS);
+  return cleanSearchParams(search, getProfileSearchDefaults());
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getDefaultYearStart } from '@/shared/lib/search-params';
 import {
   cleanProfileSearch,
   researcherProfileSearchSchema,
@@ -10,7 +11,7 @@ describe('researcherProfileSearchSchema', () => {
     expect(parsed).toEqual({
       tab: 'articles',
       qualis: undefined,
-      year_start: undefined,
+      year_start: getDefaultYearStart(),
       year_end: undefined,
       page: 1,
       view: 'grid',
@@ -66,8 +67,18 @@ describe('researcherProfileSearchSchema', () => {
       tab: 'articles',
       page: 1,
       view: 'grid',
+      year_start: getDefaultYearStart(),
       qualis: ['A1'],
     });
     expect(cleaned).toEqual({ qualis: ['A1'] });
+  });
+
+  it('normaliza intervalo invertido de anos', () => {
+    const parsed = researcherProfileSearchSchema.parse({
+      year_start: 2025,
+      year_end: 2018,
+    });
+    expect(parsed.year_start).toBe(2018);
+    expect(parsed.year_end).toBe(2025);
   });
 });
