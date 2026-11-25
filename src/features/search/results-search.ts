@@ -120,6 +120,7 @@ export type ResultsViewMode = (typeof RESULTS_VIEW_MODES)[number];
 export const resultsSearch = createListSearch({
   sortBy: RESULTS_SORT_VALUES,
   defaultPerPage: 30,
+  defaultYearStart: false,
   filters: {
     area: searchStringArrayParam(),
     institution_id: searchStringArrayParam(),
@@ -259,12 +260,11 @@ export function countTabFilters(search: ResultsSearch, tab: TabSource): number {
     const value = search[key];
     if (Array.isArray(value)) count += value.length;
   }
-  if (
-    tabSupportsYear(tab) &&
-    ((search.year_start !== undefined &&
-      search.year_start !== getDefaultYearStart()) ||
-      search.year_end !== undefined)
-  ) {
+  const hasYearStart =
+    search.year_start !== undefined &&
+    (tab.source !== 'production' ||
+      search.year_start !== getDefaultYearStart());
+  if (tabSupportsYear(tab) && (hasYearStart || search.year_end !== undefined)) {
     count += 1;
   }
   return count;
@@ -535,6 +535,18 @@ export function toResearcherRankingQuery(
   };
 }
 
+/** Ano inicial efetivo das abas de produção (`anoCorrente - 10` por padrão). */
+export function resolveProductionYearStart(
+  search: Pick<ResultsSearch, 'year_start' | 'year_end'>,
+): number | undefined {
+  if (search.year_start !== undefined) return search.year_start;
+  const fallback = getDefaultYearStart();
+  if (search.year_end !== undefined && search.year_end < fallback) {
+    return undefined;
+  }
+  return fallback;
+}
+
 /** Parâmetros de `/v2/production/<kind>` para uma aba de produção. */
 export function toProductionQuery<K extends ProductionKind>(
   kind: K,
@@ -542,8 +554,11 @@ export function toProductionQuery<K extends ProductionKind>(
 ): ProductionQuery<K> {
   const sort = resolveSort({ source: 'production', kind }, search);
   const keys = kind === 'article' ? ARTICLE_FILTERS : COMMON_FILTERS;
+  const base = baseQuery(search);
+  const yearStart = resolveProductionYearStart(base);
   return {
-    ...baseQuery(search),
+    ...base,
+    ...(yearStart !== undefined ? { year_start: yearStart } : {}),
     ...pickFilters(search, keys),
     sort_by: sort.sort_by,
     sort_order: sort.sort_order,
@@ -597,11 +612,12 @@ export function toProductionMetricQuery(
   kind: ProductionKind,
   search: ResultsSearch,
 ): ProductionMetricQuery {
-  const { q, year_start, year_end } = baseQuery(search);
+  const { q, year_end } = baseQuery(search);
+  const yearStart = resolveProductionYearStart(search);
   const groupBy = defaultMetricGroupBy(kind);
   return {
     ...(q !== undefined ? { q } : {}),
-    ...(year_start !== undefined ? { year_start } : {}),
+    ...(yearStart !== undefined ? { year_start: yearStart } : {}),
     ...(year_end !== undefined ? { year_end } : {}),
     ...pickFilters(search, COMMON_FILTERS),
     ...(groupBy ? { group_by: groupBy } : {}),
