@@ -270,6 +270,39 @@ describe('/maria/$conversationId', () => {
     expect(readBrowserConversationIds()).toEqual([]);
   }, 15000);
 
+  it('abre o detalhamento da produção em overlay ao clicar no título do card', async () => {
+    const { user, router } = await renderRoute(
+      `/maria/${MARIA_CONVERSATION_ID}`,
+      {
+        handlers: conversationHandlers(),
+      },
+    );
+
+    await expectProductionCard();
+    const card = document.querySelector('[data-slot="production-card"]')!;
+    const link = within(card as HTMLElement).getByRole('link', {
+      name: articleTitle,
+    });
+    await user.click(link);
+
+    const dialog = await screen.findByRole('dialog');
+    const fixtureArticleId =
+      v2Fixtures['/production/article/{article_id}'].data.id;
+    expect(
+      within(dialog).getByRole('link', { name: /Abrir página completa/ }),
+    ).toHaveAttribute('href', `/producoes/artigo/${fixtureArticleId}`);
+    expect(router.state.location.search).toMatchObject({
+      production: `article:${fixtureArticleId}`,
+    });
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Fechar produção' }),
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  }, 15000);
+
   it('responde 404 para id que não é UUID', async () => {
     await renderRoute('/maria/nao-e-uuid');
     expect(

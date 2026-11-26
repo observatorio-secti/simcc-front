@@ -12,6 +12,7 @@ import {
   messageText,
   type ConversationMessage,
 } from '@/entities/conversation/model';
+import type { ProductionKind } from '@/entities/production/model';
 import { cn } from '@/shared/lib/cn';
 import { searchTypeColor } from '@/shared/lib/design-tokens';
 import { Button } from '@/shared/ui/button';
@@ -146,6 +147,7 @@ export interface MessageListProps {
   messages: readonly ConversationMessage[];
   stream?: ConversationStreamState;
   onAsk?: (question: string) => void;
+  onOpenProduction?: (kind: ProductionKind, itemId: string) => void;
   onRetry: () => void;
   onDismiss: () => void;
 }
@@ -155,6 +157,7 @@ export function MessageList({
   messages,
   stream,
   onAsk,
+  onOpenProduction,
   onRetry,
   onDismiss,
 }: MessageListProps) {
@@ -196,6 +199,7 @@ export function MessageList({
                 blocks={message.content}
                 // Só a última resposta oferece perguntas de continuação.
                 onAsk={index === lastIndex && !stream ? onAsk : undefined}
+                onOpenProduction={onOpenProduction}
               />
             </AssistantMessage>
           ),
@@ -215,7 +219,10 @@ export function MessageList({
               stream.activities.length > 0) && (
               <AssistantMessage busy={stream.status === 'streaming'}>
                 <Activities stream={stream} />
-                <MessageBlocks blocks={stream.blocks} />
+                <MessageBlocks
+                  blocks={stream.blocks}
+                  onOpenProduction={onOpenProduction}
+                />
               </AssistantMessage>
             )}
           </>

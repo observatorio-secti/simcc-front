@@ -7,7 +7,7 @@ import type { MariaConversationDetail, MariaMessage } from '@/api/maria';
 export const MARIA_TEST_URL = 'http://maria.test/';
 
 export const MARIA_CONVERSATION_ID = '3f1c2b4a-1111-4222-8333-444455556666';
-export const MARIA_RESEARCHER_ID = '6cfd7af4-d287-4c2b-8f11-0861b54f5cf4';
+export const MARIA_RESEARCHER_ID = '9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d';
 export const MARIA_ARTICLE_ID = 'c92dfe9d-a8f4-4d6b-8ba0-b7f0d7729da3';
 
 export function mariaConversation(

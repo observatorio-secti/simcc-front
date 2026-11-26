@@ -101,6 +101,7 @@ describe('Listagens: /busca sem termo (D1.4)', () => {
       .map((tab) => tab.textContent);
     expect(labels).toEqual([
       'Pesquisadores',
+      'Mapa',
       'Bolsistas',
       'Artigos',
       'Livros',

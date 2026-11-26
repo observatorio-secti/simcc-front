@@ -11,6 +11,7 @@ import {
   conversationDetailQueryOptions,
   conversationMessagesQueryOptions,
 } from '@/entities/conversation/queries';
+import type { ProductionKind } from '@/entities/production/model';
 import { Button } from '@/shared/ui/button';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { LoadingBlock } from '@/shared/ui/loading-block';
@@ -77,8 +78,10 @@ function ConversationNotFound({ conversationId }: { conversationId: string }) {
 /** `/maria/$conversationId`: uma conversa, com a resposta em streaming. */
 export function ConversationPage({
   conversationId,
+  onOpenProduction,
 }: {
   conversationId: string;
+  onOpenProduction?: (kind: ProductionKind, itemId: string) => void;
 }) {
   const queryClient = useQueryClient();
   const detail = useQuery(conversationDetailQueryOptions(conversationId));
@@ -171,6 +174,7 @@ export function ConversationPage({
                 messages={messages.data ?? []}
                 stream={stream}
                 onAsk={limitReached ? undefined : ask}
+                onOpenProduction={onOpenProduction}
                 onRetry={() => stream && ask(stream.question)}
                 onDismiss={() =>
                   dismissConversationStream(queryClient, conversationId)

@@ -160,7 +160,13 @@ function PlainProduction({ production }: { production: CitedProduction }) {
  * Produções citadas: o `id` e o `type` da MarIA são o id e o tipo da v2, e o
  * card da entidade é montado com o detalhe da v2. Mostra algumas e expande o resto.
  */
-function ProductionsBlockView({ block }: { block: ProductionsBlock }) {
+function ProductionsBlockView({
+  block,
+  onOpenProduction,
+}: {
+  block: ProductionsBlock;
+  onOpenProduction?: (kind: ProductionKind, itemId: string) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
   const entries = block.productions.map((production) => ({
     production,
@@ -188,6 +194,15 @@ function ProductionsBlockView({ block }: { block: ProductionsBlock }) {
                 <ProductionCard
                   kind={kind as ProductionKind}
                   item={result.data.data as ProductionItem}
+                  onOpen={
+                    onOpenProduction
+                      ? (item) =>
+                          onOpenProduction(
+                            kind as ProductionKind,
+                            (item as ProductionItem).id,
+                          )
+                      : undefined
+                  }
                 />
               ) : kind && result?.isPending ? (
                 <Skeleton
@@ -424,10 +439,16 @@ export interface MessageBlocksProps {
   blocks: readonly (ConversationBlock | undefined)[];
   /** Envia uma pergunta sugerida; sem ele, as sugestões não aparecem. */
   onAsk?: (question: string) => void;
+  /** Abre o detalhe da produção ao clicar no título do card. */
+  onOpenProduction?: (kind: ProductionKind, itemId: string) => void;
 }
 
 /** Blocos de uma resposta da MarIA, na ordem em que a API os entrega. */
-export function MessageBlocks({ blocks, onAsk }: MessageBlocksProps) {
+export function MessageBlocks({
+  blocks,
+  onAsk,
+  onOpenProduction,
+}: MessageBlocksProps) {
   return (
     <div className="flex min-w-0 flex-col gap-4">
       {blocks.map((block, index) => {
@@ -438,7 +459,13 @@ export function MessageBlocks({ blocks, onAsk }: MessageBlocksProps) {
           case 'researchers':
             return <ResearchersBlockView key={index} block={block} />;
           case 'productions':
-            return <ProductionsBlockView key={index} block={block} />;
+            return (
+              <ProductionsBlockView
+                key={index}
+                block={block}
+                onOpenProduction={onOpenProduction}
+              />
+            );
           case 'graduate_programs':
             return <GraduateProgramsBlockView key={index} block={block} />;
           case 'research_groups':
