@@ -1,4 +1,4 @@
-import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { AlertTriangle, Maximize2 } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 import { Button } from './button';
 import { Card, CardContent } from './card';
@@ -8,7 +8,7 @@ export interface PowerBiEmbedProps {
   src: string;
   /** Nome do painel: vira o `title` do iframe e o texto do card. */
   title: string;
-  /** Link de "Abrir no Power BI"; o padrão é o próprio `src`. */
+  /** Link de "Abrir em tela cheia"; o padrão é o próprio `src`. */
   href?: string;
   /** Texto do card mostrado em telas estreitas (e quando indisponível). */
   description?: string;
@@ -23,8 +23,8 @@ function OpenLink({ href }: { href: string }) {
   return (
     <Button asChild variant="outline" size="sm">
       <a href={href} target="_blank" rel="noopener noreferrer">
-        <ExternalLink aria-hidden />
-        Abrir no Power BI
+        <Maximize2 aria-hidden />
+        Abrir em tela cheia
         <span className="sr-only"> (abre em nova aba)</span>
       </a>
     </Button>

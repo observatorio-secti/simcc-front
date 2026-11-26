@@ -22,7 +22,9 @@ describe('PowerBiEmbed', () => {
     expect(iframe).toHaveAttribute('allowfullscreen');
 
     // Link no topo (telas largas) e no card (telas estreitas)
-    const links = screen.getAllByRole('link', { name: /Abrir no Power BI/ });
+    const links = screen.getAllByRole('link', {
+      name: /Abrir em tela cheia/,
+    });
     expect(links).toHaveLength(2);
     for (const link of links) {
       expect(link).toHaveAttribute('href', SRC);

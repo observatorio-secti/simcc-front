@@ -1,35 +1,98 @@
-import { useNavigate } from '@tanstack/react-router';
-import { PowerBiEmbed } from '@/shared/ui/power-bi-embed';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import { INDICATOR_PANELS, type IndicatorPanelId } from './indicators-data';
+import { Link } from '@tanstack/react-router';
+import { ArrowLeft, ArrowRight, BarChart3 } from 'lucide-react';
+import { cn } from '@/shared/lib/cn';
+import { Button } from '@/shared/ui/button';
 import {
-  DEFAULT_INDICATOR_PANEL,
-  type IndicatorsSearch,
-} from './search-schema';
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui/card';
+import { focusRing } from '@/shared/ui/focus-ring';
+import { PowerBiEmbed } from '@/shared/ui/power-bi-embed';
+import { INDICATOR_PANELS, type IndicatorPanel } from './indicators-data';
+import type { IndicatorsSearch } from './search-schema';
 
-function isPanelId(value: string): value is IndicatorPanelId {
-  return INDICATOR_PANELS.some((panel) => panel.id === value);
+function IndicatorPanelCard({ panel }: { panel: IndicatorPanel }) {
+  const Icon = panel.icon;
+
+  return (
+    <Link
+      to="/indicadores"
+      search={{ painel: panel.id }}
+      className={cn('group block h-full rounded-lg', focusRing)}
+    >
+      <Card className="h-full justify-between transition-colors group-hover:border-eng-blue">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">
+            {panel.title}
+          </CardTitle>
+          <CardAction>
+            <Icon className="size-5 text-muted-foreground" aria-hidden />
+          </CardAction>
+        </CardHeader>
+
+        <CardContent className="flex-1">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {panel.description}
+          </p>
+        </CardContent>
+
+        <CardFooter className="pt-2">
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-eng-blue transition-colors group-hover:text-eng-dark-blue dark:group-hover:text-brand-soft">
+            Acessar painel
+            <ArrowRight className="size-4" aria-hidden />
+          </span>
+        </CardFooter>
+      </Card>
+    </Link>
+  );
 }
 
 /**
- * Tela pública de Indicadores (`/indicadores`, Template F): os painéis do
- * Power BI do observatório, um por aba (ADR 0012).
+ * Tela pública de Indicadores (`/indicadores`, Template F): lista os painéis
+ * do Power BI em cartões (estilo INCITES) e exibe o painel embutido ao
+ * selecionar um cartão via `?painel=<id>` (ADR 0012).
  */
 export function IndicatorsPage({ search }: { search: IndicatorsSearch }) {
-  const navigate = useNavigate({ from: '/indicadores' });
-  const active = search.painel ?? DEFAULT_INDICATOR_PANEL;
+  const activePanel = search.painel
+    ? INDICATOR_PANELS.find((panel) => panel.id === search.painel)
+    : undefined;
 
-  function handleChange(value: string) {
-    if (!isPanelId(value)) return;
-    void navigate({
-      search: {
-        painel: value === DEFAULT_INDICATOR_PANEL ? undefined : value,
-      },
-    });
+  if (activePanel) {
+    return (
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+        <div className="flex flex-col gap-3">
+          <Button asChild variant="outline" size="sm" className="w-fit">
+            <Link to="/indicadores" search={{}}>
+              <ArrowLeft aria-hidden />
+              Voltar aos painéis
+            </Link>
+          </Button>
+          <header className="flex flex-col gap-1">
+            <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
+              {activePanel.title}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {activePanel.description}
+            </p>
+          </header>
+        </div>
+
+        <PowerBiEmbed
+          src={activePanel.src}
+          title={activePanel.title}
+          description={activePanel.description}
+          unavailable={activePanel.unavailable}
+        />
+      </div>
+    );
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       <header className="flex flex-col gap-1">
         <h1 className="text-xl font-semibold tracking-tight md:text-2xl">
           Indicadores
@@ -39,37 +102,28 @@ export function IndicatorsPage({ search }: { search: IndicatorsSearch }) {
         </p>
       </header>
 
-      <Tabs
-        value={active}
-        onValueChange={handleChange}
-        className="flex flex-col gap-4"
-      >
-        <TabsList
-          aria-label="Painéis"
-          className="w-full justify-start overflow-x-auto bg-neutral-100 dark:bg-neutral-800"
-        >
-          {INDICATOR_PANELS.map((panel) => {
-            const Icon = panel.icon;
-            return (
-              <TabsTrigger key={panel.id} value={panel.id} className="gap-2">
-                <Icon className="size-3.5" aria-hidden />
-                <span>{panel.title}</span>
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle>Sobre os painéis de indicadores</CardTitle>
+          <BarChart3 className="size-4 text-muted-foreground" aria-hidden />
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Painéis interativos que reúnem diagnósticos e indicadores
+            estratégicos sobre a produção científica, pesquisadores e programas
+            de pós-graduação da Bahia.
+          </p>
+        </CardContent>
+      </Card>
 
+      <section
+        aria-label="Painéis disponíveis"
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+      >
         {INDICATOR_PANELS.map((panel) => (
-          <TabsContent key={panel.id} value={panel.id} className="mt-0">
-            <PowerBiEmbed
-              src={panel.src}
-              title={panel.title}
-              description={panel.description}
-              unavailable={panel.unavailable}
-            />
-          </TabsContent>
+          <IndicatorPanelCard key={panel.id} panel={panel} />
         ))}
-      </Tabs>
+      </section>
     </div>
   );
 }
