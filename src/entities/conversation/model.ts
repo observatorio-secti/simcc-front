@@ -15,12 +15,16 @@ export type ConversationBlock = MariaBlock;
 export type TextBlock = MariaSchema<'TextBlock'>;
 export type ResearchersBlock = MariaSchema<'ResearchersBlock'>;
 export type ProductionsBlock = MariaSchema<'ProductionsBlock'>;
+export type GraduateProgramsBlock = MariaSchema<'GraduateProgramsBlock'>;
+export type ResearchGroupsBlock = MariaSchema<'ResearchGroupsBlock'>;
 export type SuggestionsBlock = MariaSchema<'SuggestionsBlock'>;
 export type TableBlock = MariaSchema<'TableBlock'>;
 export type ChartBlock = MariaSchema<'ChartBlock'>;
 export type BlockOrigin = MariaSchema<'BlockOrigin'>;
 export type CitedResearcher = MariaSchema<'ResearcherCard'>;
 export type CitedProduction = MariaSchema<'ProductionCard'>;
+export type CitedGraduateProgram = MariaSchema<'GraduateProgramCard'>;
+export type CitedResearchGroup = MariaSchema<'ResearchGroupCard'>;
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

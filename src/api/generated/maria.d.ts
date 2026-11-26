@@ -1019,6 +1019,41 @@ export interface components {
             /** Year */
             year?: number | null;
         };
+        /** GraduateProgramCard */
+        GraduateProgramCard: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Acronym */
+            acronym?: string | null;
+            /** Institution Label */
+            institution_label?: string | null;
+        };
+        /** GraduateProgramsBlock */
+        GraduateProgramsBlock: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "graduate_programs";
+            /** Title */
+            title?: string | null;
+            /** Graduate Programs */
+            graduate_programs: components["schemas"]["GraduateProgramCard"][];
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Truncated
+             * @description O resultado foi cortado pelo limite de linhas.
+             * @default false
+             */
+            truncated: boolean;
+            origin?: components["schemas"]["BlockOrigin"] | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1060,7 +1095,7 @@ export interface components {
             conversation_id: string;
             role: components["schemas"]["MessageRole"];
             /** Content */
-            content: (components["schemas"]["TextBlock"] | components["schemas"]["ChartBlock"] | components["schemas"]["TableBlock"] | components["schemas"]["ResearchersBlock"] | components["schemas"]["ProductionsBlock"] | components["schemas"]["SuggestionsBlock"])[];
+            content: (components["schemas"]["TextBlock"] | components["schemas"]["ChartBlock"] | components["schemas"]["TableBlock"] | components["schemas"]["ResearchersBlock"] | components["schemas"]["ProductionsBlock"] | components["schemas"]["ResearchGroupsBlock"] | components["schemas"]["GraduateProgramsBlock"] | components["schemas"]["SuggestionsBlock"])[];
             /**
              * Created At
              * Format: date-time
@@ -1091,14 +1126,14 @@ export interface components {
              * Type
              * @enum {string}
              */
-            type: "article" | "book" | "book_chapter" | "patent" | "software" | "event";
+            type: "article" | "book" | "book_chapter" | "patent" | "software" | "event" | "research_project" | "brand" | "guidance" | "report" | "magazine_text" | "event_work";
             /** Type Label */
             type_label: string;
             /** Year */
             year?: number | null;
             /** Authors */
-            authors?: components["schemas"]["ProductionAuthor"][];
-            details?: components["schemas"]["ProductionDetails"];
+            authors?: components["schemas"]["ProductionAuthor"][] | null;
+            details?: components["schemas"]["ProductionDetails"] | null;
         };
         /** ProductionDetails */
         ProductionDetails: {
@@ -1234,6 +1269,39 @@ export interface components {
             /** Enabled */
             enabled?: boolean;
         };
+        /** ResearchGroupCard */
+        ResearchGroupCard: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Institution Label */
+            institution_label?: string | null;
+        };
+        /** ResearchGroupsBlock */
+        ResearchGroupsBlock: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "research_groups";
+            /** Title */
+            title?: string | null;
+            /** Research Groups */
+            research_groups: components["schemas"]["ResearchGroupCard"][];
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Truncated
+             * @description O resultado foi cortado pelo limite de linhas.
+             * @default false
+             */
+            truncated: boolean;
+            origin?: components["schemas"]["BlockOrigin"] | null;
+        };
         /** ResearcherAffiliation */
         ResearcherAffiliation: {
             /** Institution Id */
@@ -1251,6 +1319,9 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+            /** Affiliations */
+            affiliations?: components["schemas"]["ResearcherAffiliation"][];
+            evidence?: components["schemas"]["ResearcherEvidence"] | null;
             /** Lattes Id */
             lattes_id?: string | null;
             /** Abstract */
@@ -1269,10 +1340,7 @@ export interface components {
             openalex_id?: string | null;
             /** Orcid */
             orcid?: string | null;
-            /** Affiliations */
-            affiliations?: components["schemas"]["ResearcherAffiliation"][];
-            metrics?: components["schemas"]["ResearcherMetrics"];
-            evidence?: components["schemas"]["ResearcherEvidence"] | null;
+            metrics?: components["schemas"]["ResearcherMetrics"] | null;
         };
         /** ResearcherEvidence */
         ResearcherEvidence: {
