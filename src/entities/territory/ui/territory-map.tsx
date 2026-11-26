@@ -139,7 +139,10 @@ export interface TerritoryMapProps {
 }
 
 function territoryActiveCities(
-  children: readonly { value: string | null; label: string; count: number }[] | null | undefined,
+  children:
+    | readonly { value: string | null; label: string; count: number }[]
+    | null
+    | undefined,
 ): TerritoryCityCount[] {
   return (children ?? [])
     .filter(
@@ -343,9 +346,13 @@ export default function TerritoryMap({
   function handleResetView() {
     setSelection(null);
     if (geoJson) {
-      fitFeaturesBounds(mapRef.current, geoJson as unknown as GeoJSON.GeoJsonObject, {
-        padding: [16, 16],
-      });
+      fitFeaturesBounds(
+        mapRef.current,
+        geoJson as unknown as GeoJSON.GeoJsonObject,
+        {
+          padding: [16, 16],
+        },
+      );
     }
   }
 
@@ -627,7 +634,8 @@ export default function TerritoryMap({
   }
 
   const hasSelection = territorySet.size > 0 || citySet.size > 0;
-  const showDetailPanel = selection !== null && renderSelectionPanel !== undefined;
+  const showDetailPanel =
+    selection !== null && renderSelectionPanel !== undefined;
   const showResetZoom = selection !== null || zoom >= MUNICIPAL_ZOOM;
 
   return (
@@ -738,8 +746,8 @@ export default function TerritoryMap({
           </div>
           {counts.unassigned && counts.unassigned.count > 0 && (
             <p className="border-t pt-2 text-xs text-muted-foreground">
-              {countLabel(counts.unassigned.count, noun)} fora dos territórios da
-              Bahia
+              {countLabel(counts.unassigned.count, noun)} fora dos territórios
+              da Bahia
             </p>
           )}
         </div>

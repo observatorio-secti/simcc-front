@@ -120,7 +120,11 @@ export function PersonCard({
               onError={() => setFailedSrc(src)}
             />
           ) : (
-            <User className="size-7 text-white/75" strokeWidth={1.75} aria-hidden />
+            <User
+              className="size-7 text-white/75"
+              strokeWidth={1.75}
+              aria-hidden
+            />
           )}
         </span>
 

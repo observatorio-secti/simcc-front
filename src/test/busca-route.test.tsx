@@ -439,9 +439,7 @@ describe('Rota /busca (T2)', () => {
     expect(router.state.location.search).not.toHaveProperty(
       'identity_territory',
     );
-    expect(
-      await findByRole('button', { name: /Ilhéus/ }),
-    ).toBeInTheDocument();
+    expect(await findByRole('button', { name: /Ilhéus/ })).toBeInTheDocument();
     await waitFor(() => {
       const previewCall = researchers.calls.find(
         (params) =>

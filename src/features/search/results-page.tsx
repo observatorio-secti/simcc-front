@@ -209,9 +209,7 @@ export function SearchResultsPage({
       ...(search as Record<string, unknown>),
       year_start: effectiveYearStart,
     },
-    defaultValues: isProductionTab
-      ? { year_start: getDefaultYearStart() }
-      : {},
+    defaultValues: isProductionTab ? { year_start: getDefaultYearStart() } : {},
     config: RESULTS_FACET_CONFIG,
     order: RESULTS_FACET_ORDER,
     loading: listQuery.isPending,

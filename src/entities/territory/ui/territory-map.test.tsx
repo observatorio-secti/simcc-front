@@ -206,9 +206,7 @@ describe('TerritoryMap', () => {
       </TerritoryDetailPanel>,
     );
 
-    expect(
-      screen.getByRole('heading', { name: 'Ilhéus' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Ilhéus' })).toBeInTheDocument();
     expect(screen.getByText('4 pesquisadores')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Litoral Sul' }));
