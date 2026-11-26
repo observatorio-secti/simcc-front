@@ -14,7 +14,7 @@ export const INCITES_PANELS: readonly IncitePanel[] = [
     title: 'INCITE Indústria 4.0',
     description:
       'Explore o panorama da Indústria 4.0 na Bahia, com dados sobre maturidade digital, tecnologias e oportunidades para o setor.',
-    href: 'https://simcc.uesc.br/incite/industria4/',
+    href: 'https://observatoriocti.secti.ba.gov.br/incite/industria4/',
     icon: Factory,
   },
   {
@@ -22,7 +22,7 @@ export const INCITES_PANELS: readonly IncitePanel[] = [
     title: 'INCITE Agricultura Familiar',
     description:
       'Informações estratégicas sobre inovação tecnológica no setor agropecuário da Bahia.',
-    href: 'https://simcc.uesc.br/incite/agricultura-familiar/',
+    href: 'https://observatoriocti.secti.ba.gov.br/incite/agricultura-familiar/',
     icon: Sprout,
   },
   {
