@@ -2,11 +2,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import {
-  getYearLabelStep,
   StackedYearChart,
   type StackedYearPoint,
   type StackedYearSeries,
 } from './stacked-year-chart';
+import { getYearLabelStep } from './year-label-step';
 
 beforeAll(() => {
   if (typeof globalThis.ResizeObserver === 'undefined') {
@@ -108,9 +108,7 @@ describe('StackedYearChart', () => {
       />,
     );
 
-    await user.click(
-      screen.getByRole('button', { name: '2024 Qualis A1: 3' }),
-    );
+    await user.click(screen.getByRole('button', { name: '2024 Qualis A1: 3' }));
     expect(onToggleKey).toHaveBeenCalledWith('A1');
   });
 });

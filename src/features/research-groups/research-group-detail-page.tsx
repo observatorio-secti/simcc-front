@@ -26,10 +26,7 @@ import {
   X,
 } from 'lucide-react';
 import { isApiError } from '@/api/errors';
-import type {
-  ResearchGroupMember,
-  ResearchGroupResearcher,
-} from '@/api/oda';
+import type { ResearchGroupMember, ResearchGroupResearcher } from '@/api/oda';
 import {
   formatGroupLocation,
   formatGroupStatus,
@@ -173,7 +170,11 @@ function MemberNameLink({
   }
 
   return (
-    <Link to="/busca" search={{ q: name, type: 'name' }} className={linkClassName}>
+    <Link
+      to="/busca"
+      search={{ q: name, type: 'name' }}
+      className={linkClassName}
+    >
       {name}
     </Link>
   );

@@ -1,9 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import {
-  oda,
-  type OdaGroupSortField,
-  type OdaSortOrder,
-} from '@/api/oda';
+import { oda, type OdaGroupSortField, type OdaSortOrder } from '@/api/oda';
 
 const REFERENCE_STALE_TIME_MS = 1000 * 60 * 30;
 

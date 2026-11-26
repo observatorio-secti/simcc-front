@@ -33,6 +33,8 @@ export default defineConfig([
     'src/routeTree.gen.ts',
     'src/api/generated',
     'design-kit',
+    // Worktrees locais de agentes (fora do git).
+    '.agents',
   ]),
 
   {
@@ -43,7 +45,11 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite(),
     ],
-    languageOptions: { globals: globals.browser },
+    languageOptions: {
+      globals: globals.browser,
+      // Raiz fixa: sem ela, os tsconfig dos worktrees em .agents/ confundem o parser.
+      parserOptions: { tsconfigRootDir: import.meta.dirname },
+    },
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'error',
