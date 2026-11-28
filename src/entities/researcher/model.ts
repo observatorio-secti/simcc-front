@@ -157,6 +157,7 @@ const EDUCATION_DEGREE_LABELS: Record<string, string> = {
   MASTERS: 'Mestrado',
   MASTER: 'Mestrado',
   'MASTER-DEGREE': 'Mestrado',
+  'PROFESSIONAL-MASTERS-DEGREE': 'Mestrado Profissional',
   DOCTORATE: 'Doutorado',
   'DOCTORATE-DEGREE': 'Doutorado',
   DOCTORAL: 'Doutorado',
@@ -201,6 +202,7 @@ export function formatEducationStatus(
   const cleaned = cleanText(status);
   if (!cleaned) return null;
   const normalized = normalizeEducationKey(cleaned);
+  if (/INCOMPLETO|INCOMPLETE/.test(normalized)) return 'Incompleto';
   if (/CONCLU|COMPLET|FINISH/.test(normalized)) return 'Concluído';
   if (/ANDAMENTO|IN-PROGRESS|ONGOING|CURSANDO|EM-CURSO/.test(normalized)) {
     return 'Em andamento';

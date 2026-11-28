@@ -118,6 +118,9 @@ describe('formação acadêmica', () => {
   it('traduz os níveis do Lattes para pt-BR', () => {
     expect(formatDegreeLabel('DOCTORATE')).toBe('Doutorado');
     expect(formatDegreeLabel('MASTERS-DEGREE')).toBe('Mestrado');
+    expect(formatDegreeLabel('PROFESSIONAL-MASTERS-DEGREE')).toBe(
+      'Mestrado Profissional',
+    );
     expect(formatDegreeLabel('UNDERGRADUATE')).toBe('Graduação');
     expect(formatDegreeLabel('SPECIALIZATION')).toBe('Especialização');
     expect(formatDegreeLabel('POST-DOCTORATE')).toBe('Pós-Doutorado');
@@ -134,6 +137,7 @@ describe('formação acadêmica', () => {
     expect(formatEducationStatus('CONCLUIDO')).toBe('Concluído');
     expect(formatEducationStatus('EM_ANDAMENTO')).toBe('Em andamento');
     expect(formatEducationStatus('IN PROGRESS')).toBe('Em andamento');
+    expect(formatEducationStatus('INCOMPLETO')).toBe('Incompleto');
     expect(formatEducationStatus('Concluído')).toBe('Concluído');
     expect(formatEducationStatus('OUTRO')).toBe('OUTRO');
     expect(formatEducationStatus('')).toBeNull();
