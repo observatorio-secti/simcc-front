@@ -138,6 +138,76 @@ export function formatLattesUpdate(
   return cleaned;
 }
 
+/**
+ * Rótulos pt-BR para os níveis de formação que o Lattes entrega em inglês
+ * (`DOCTORATE`, `MASTERS-DEGREE`, `UNDERGRADUATE`…). Valores já traduzidos ou
+ * desconhecidos são preservados como vieram da API.
+ */
+const EDUCATION_DEGREE_LABELS: Record<string, string> = {
+  UNDERGRADUATE: 'Graduação',
+  'UNDERGRADUATE-DEGREE': 'Graduação',
+  GRADUATION: 'Graduação',
+  BACHELOR: 'Graduação',
+  'BACHELORS-DEGREE': 'Graduação',
+  SPECIALIZATION: 'Especialização',
+  SPECIALIST: 'Especialização',
+  'LATO-SENSU': 'Especialização',
+  MBA: 'MBA',
+  'MASTERS-DEGREE': 'Mestrado',
+  MASTERS: 'Mestrado',
+  MASTER: 'Mestrado',
+  'MASTER-DEGREE': 'Mestrado',
+  DOCTORATE: 'Doutorado',
+  'DOCTORATE-DEGREE': 'Doutorado',
+  DOCTORAL: 'Doutorado',
+  PHD: 'Doutorado',
+  'POST-DOCTORATE': 'Pós-Doutorado',
+  POSTDOCTORATE: 'Pós-Doutorado',
+  'POST-DOCTORAL': 'Pós-Doutorado',
+  'HIGH-SCHOOL': 'Ensino médio',
+  SECONDARY: 'Ensino médio',
+  'ELEMENTARY-SCHOOL': 'Ensino fundamental',
+  PRIMARY: 'Ensino fundamental',
+  'TECHNICAL-COURSE': 'Curso técnico',
+  TECHNICAL: 'Curso técnico',
+  TECHNOLOGIST: 'Tecnólogo',
+  RESIDENCY: 'Residência',
+};
+
+function normalizeEducationKey(value: string): string {
+  return value
+    .trim()
+    .toUpperCase()
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+/** Traduz o nível de formação acadêmica do Lattes para pt-BR. */
+export function formatDegreeLabel(
+  degree: string | null | undefined,
+): string | null {
+  const cleaned = cleanText(degree);
+  if (!cleaned) return null;
+  return EDUCATION_DEGREE_LABELS[normalizeEducationKey(cleaned)] ?? cleaned;
+}
+
+/**
+ * Traduz a situação da formação acadêmica para pt-BR. Diferente do status de
+ * orientações/projetos, aqui o rótulo concorda com "curso" (Concluído).
+ */
+export function formatEducationStatus(
+  status: string | null | undefined,
+): string | null {
+  const cleaned = cleanText(status);
+  if (!cleaned) return null;
+  const normalized = normalizeEducationKey(cleaned);
+  if (/CONCLU|COMPLET|FINISH/.test(normalized)) return 'Concluído';
+  if (/ANDAMENTO|IN-PROGRESS|ONGOING|CURSANDO|EM-CURSO/.test(normalized)) {
+    return 'Em andamento';
+  }
+  return cleaned;
+}
+
 /** Formata contagem inteira no padrão pt-BR (`1.234`). */
 export function formatCount(value: number): string {
   return ptBrNumberFormat.format(value);
