@@ -4,6 +4,8 @@ import {
   formatAffiliationAcronyms,
   formatAffiliationNames,
   formatCount,
+  formatDegreeLabel,
+  formatEducationStatus,
   formatEvidenceCount,
   formatLattesUpdate,
   lattesProfileUrl,
@@ -109,6 +111,32 @@ describe('contagens e evidências', () => {
     expect(formatCount(1234)).toBe('1.234');
     expect(formatEvidenceCount(1)).toBe('1 evidência');
     expect(formatEvidenceCount(1200)).toBe('1.200 evidências');
+  });
+});
+
+describe('formação acadêmica', () => {
+  it('traduz os níveis do Lattes para pt-BR', () => {
+    expect(formatDegreeLabel('DOCTORATE')).toBe('Doutorado');
+    expect(formatDegreeLabel('MASTERS-DEGREE')).toBe('Mestrado');
+    expect(formatDegreeLabel('UNDERGRADUATE')).toBe('Graduação');
+    expect(formatDegreeLabel('SPECIALIZATION')).toBe('Especialização');
+    expect(formatDegreeLabel('POST-DOCTORATE')).toBe('Pós-Doutorado');
+    expect(formatDegreeLabel('technical course')).toBe('Curso técnico');
+  });
+
+  it('preserva valores já traduzidos ou desconhecidos', () => {
+    expect(formatDegreeLabel('Doutorado')).toBe('Doutorado');
+    expect(formatDegreeLabel('OUTRO-NIVEL')).toBe('OUTRO-NIVEL');
+    expect(formatDegreeLabel(null)).toBeNull();
+  });
+
+  it('traduz a situação da formação acadêmica', () => {
+    expect(formatEducationStatus('CONCLUIDO')).toBe('Concluído');
+    expect(formatEducationStatus('EM_ANDAMENTO')).toBe('Em andamento');
+    expect(formatEducationStatus('IN PROGRESS')).toBe('Em andamento');
+    expect(formatEducationStatus('Concluído')).toBe('Concluído');
+    expect(formatEducationStatus('OUTRO')).toBe('OUTRO');
+    expect(formatEducationStatus('')).toBeNull();
   });
 });
 

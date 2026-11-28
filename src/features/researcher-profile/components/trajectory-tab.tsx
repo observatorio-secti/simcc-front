@@ -1,5 +1,9 @@
 import { Award, Briefcase, GraduationCap } from 'lucide-react';
-import type { ResearcherDetail } from '@/entities/researcher/model';
+import {
+  formatDegreeLabel,
+  formatEducationStatus,
+  type ResearcherDetail,
+} from '@/entities/researcher/model';
 import { scholarshipColor, statusColor } from '@/shared/lib/design-tokens';
 import { Badge, Dot, Tag } from '@/shared/ui/badge';
 import { Card } from '@/shared/ui/card';
@@ -61,6 +65,8 @@ export function TrajectoryTab({ researcher }: TrajectoryTabProps) {
           <div className="flex flex-col gap-3">
             {education.map((item, idx) => {
               const span = formatYearSpan(item.start_year, item.end_year);
+              const degree = formatDegreeLabel(item.degree);
+              const status = formatEducationStatus(item.status);
               const stColor = item.status ? statusColor(item.status) : null;
               return (
                 <Card
@@ -69,14 +75,14 @@ export function TrajectoryTab({ researcher }: TrajectoryTabProps) {
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-sm font-semibold text-foreground">
-                      {item.degree}
+                      {degree ?? item.degree}
                       {item.course ? ` em ${item.course}` : ''}
                     </span>
                     <div className="flex flex-wrap items-center gap-1.5">
                       {span && <Tag variant="outline">{span}</Tag>}
-                      {item.status && stColor && (
+                      {status && stColor && (
                         <Badge size="sm" className={stColor.bg}>
-                          {item.status}
+                          {status}
                         </Badge>
                       )}
                     </div>
